@@ -8,6 +8,7 @@ export interface SubmissionCreateRequest {
 
 export interface SubmissionGradeRequest {
   questionScores: Record<string, number>; // questionId -> score mapping
+  questionFeedback?: Record<string, string>; // questionId -> feedback mapping
   overallFeedback?: string;
 }
 
@@ -17,6 +18,60 @@ export interface SubmissionApiService {
   getSubmissionById(submissionId: string): Promise<Submission>;
   gradeSubmission(submissionId: string, request: SubmissionGradeRequest): Promise<Submission>;
   deleteSubmission(submissionId: string): Promise<void>;
+}
+
+/**
+ * Transform backend AnswerDataDto format to frontend Answer format
+ * Backend: { id, type, answer: { type, id/blankAnswers/matchedPairs/response } }
+ * Frontend: { questionId, type, selectedOptionId/blanks/matches/text }
+ */
+function transformDtoToAnswer(dto: any): Answer {
+  const questionId = dto.id;
+  const type = dto.type;
+  const answerData = dto.answer;
+
+  if (!answerData) {
+    throw new Error(`Missing answer data for question ${questionId}`);
+  }
+
+  switch (type) {
+    case 'MULTIPLE_CHOICE':
+      return {
+        questionId,
+        type: 'MULTIPLE_CHOICE',
+        selectedOptionId: answerData.id,
+      };
+
+    case 'FILL_IN_BLANK':
+      return {
+        questionId,
+        type: 'FILL_IN_BLANK',
+        blanks: Object.entries(answerData.blankAnswers || {}).map(([segmentId, value]) => ({
+          segmentId,
+          value: value as string,
+        })),
+      };
+
+    case 'MATCHING':
+      return {
+        questionId,
+        type: 'MATCHING',
+        matches: Object.entries(answerData.matchedPairs || {}).map(([leftId, rightId]) => ({
+          leftId,
+          rightId: rightId as string,
+        })),
+      };
+
+    case 'OPEN_ENDED':
+      return {
+        questionId,
+        type: 'OPEN_ENDED',
+        text: answerData.response || '',
+      };
+
+    default:
+      throw new Error(`Unknown answer type: ${type}`);
+  }
 }
 
 /**
@@ -95,39 +150,58 @@ export default class SubmissionService implements SubmissionApiService {
   }
 
   async createSubmission(request: SubmissionCreateRequest): Promise<Submission> {
-    const response = await this.apiClient.post<ApiResponse<Submission>>(
+    const response = await this.apiClient.post<ApiResponse<any>>(
       `${this.baseUrl}/api/posts/${request.postId}/submissions`,
       {
         questions: request.answers.map(transformAnswerToDto), // Transform answers to backend format
       }
     );
 
-    return response.data.data;
+    const data = response.data.data;
+    return this.transformSubmission(data);
   }
 
   async getSubmissionsByPost(postId: string): Promise<Submission[]> {
-    const response = await this.apiClient.get<ApiResponse<Submission[]>>(
+    const response = await this.apiClient.get<ApiResponse<any[]>>(
       `${this.baseUrl}/api/posts/${postId}/submissions`
     );
 
-    return response.data.data;
+    return response.data.data.map((s) => this.transformSubmission(s));
   }
 
   async getSubmissionById(submissionId: string): Promise<Submission> {
-    const response = await this.apiClient.get<ApiResponse<Submission>>(
+    const response = await this.apiClient.get<ApiResponse<any>>(
       `${this.baseUrl}/api/submissions/${submissionId}`
     );
 
-    return response.data.data;
+    return this.transformSubmission(response.data.data);
   }
 
   async gradeSubmission(submissionId: string, request: SubmissionGradeRequest): Promise<Submission> {
-    const response = await this.apiClient.put<ApiResponse<Submission>>(
+    const response = await this.apiClient.put<ApiResponse<any>>(
       `${this.baseUrl}/api/submissions/${submissionId}/grade`,
       request
     );
 
-    return response.data.data;
+    return this.transformSubmission(response.data.data);
+  }
+
+  private transformSubmission(data: any): Submission {
+    return {
+      id: data.id,
+      assignmentId: data.assignmentId,
+      studentId: data.studentId,
+      student: data.student,
+      answers: (data.questions || []).map(transformDtoToAnswer), // Transform backend 'questions' to frontend 'answers'
+      submittedAt: data.submittedAt,
+      score: data.score,
+      maxScore: data.maxScore,
+      status: data.status,
+      grades: data.grades,
+      feedback: data.feedback,
+      gradedAt: data.gradedAt,
+      gradedBy: data.gradedBy,
+    };
   }
 
   async deleteSubmission(submissionId: string): Promise<void> {

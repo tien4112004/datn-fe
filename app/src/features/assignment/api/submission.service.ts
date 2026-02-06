@@ -19,6 +19,72 @@ export interface SubmissionApiService {
   deleteSubmission(submissionId: string): Promise<void>;
 }
 
+/**
+ * Transform frontend Answer format to backend AnswerDataDto format
+ * Frontend: { questionId, type, selectedOptionId/blanks/matches/text }
+ * Backend: { id, type, answer: { type, id/blankAnswers/matchedPairs/response } }
+ * Note: The type field is included in both parent and nested answer for Jackson polymorphic deserialization
+ */
+function transformAnswerToDto(answer: Answer): any {
+  switch (answer.type) {
+    case 'MULTIPLE_CHOICE':
+      return {
+        id: answer.questionId,
+        type: answer.type,
+        answer: {
+          type: answer.type, // Required for Jackson @JsonTypeInfo
+          id: answer.selectedOptionId,
+        },
+      };
+
+    case 'FILL_IN_BLANK':
+      return {
+        id: answer.questionId,
+        type: answer.type,
+        answer: {
+          type: answer.type, // Required for Jackson @JsonTypeInfo
+          blankAnswers: answer.blanks.reduce(
+            (acc, blank) => {
+              acc[blank.segmentId] = blank.value;
+              return acc;
+            },
+            {} as Record<string, string>
+          ),
+        },
+      };
+
+    case 'MATCHING':
+      return {
+        id: answer.questionId,
+        type: answer.type,
+        answer: {
+          type: answer.type, // Required for Jackson @JsonTypeInfo
+          matchedPairs: answer.matches.reduce(
+            (acc, match) => {
+              acc[match.leftId] = match.rightId;
+              return acc;
+            },
+            {} as Record<string, string>
+          ),
+        },
+      };
+
+    case 'OPEN_ENDED':
+      return {
+        id: answer.questionId,
+        type: answer.type,
+        answer: {
+          type: answer.type, // Required for Jackson @JsonTypeInfo
+          response: answer.text,
+          responseUrl: null,
+        },
+      };
+
+    default:
+      throw new Error(`Unknown answer type: ${(answer as any).type}`);
+  }
+}
+
 export default class SubmissionService implements SubmissionApiService {
   private readonly apiClient: ApiClient;
   private readonly baseUrl: string;
@@ -32,7 +98,7 @@ export default class SubmissionService implements SubmissionApiService {
     const response = await this.apiClient.post<ApiResponse<Submission>>(
       `${this.baseUrl}/api/posts/${request.postId}/submissions`,
       {
-        questions: request.answers, // Backend expects 'questions' field
+        questions: request.answers.map(transformAnswerToDto), // Transform answers to backend format
       }
     );
 

@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import type { Submission } from '@aiprimary/core';
 import { formatDistanceToNow } from 'date-fns';
-import { useAssignment } from '../hooks/useAssignmentApi';
+import { useAssignmentPublic } from '../hooks/useAssignmentApi';
 import { useSubmissionsByPost } from '../hooks';
 
 export const StudentSubmissionsPage = () => {
@@ -27,8 +27,8 @@ export const StudentSubmissionsPage = () => {
   // Get postId from query params (for homework flow)
   const postId = searchParams.get('postId');
 
-  // Fetch assignment data
-  const { data: assignment, isLoading: isLoadingAssignment } = useAssignment(id);
+  // Fetch assignment data using public endpoint (bypasses permission check for students)
+  const { data: assignment, isLoading: isLoadingAssignment } = useAssignmentPublic(id);
 
   // Fetch submissions (only if postId is available)
   const { data: submissions = [], isLoading: isLoadingSubmissions } = useSubmissionsByPost(
@@ -84,6 +84,13 @@ export const StudentSubmissionsPage = () => {
           <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
             <FileCheck className="h-3 w-3" />
             Submitted
+          </span>
+        );
+      case 'pending':
+        return (
+          <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">
+            <Clock className="h-3 w-3" />
+            Pending
           </span>
         );
       case 'in_progress':

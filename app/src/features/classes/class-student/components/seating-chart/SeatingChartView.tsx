@@ -17,7 +17,8 @@ export const SeatingChartView = ({ layout, students, classId }: SeatingChartView
   const { user } = useAuth();
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  const isTeacher = user?.role === 'teacher';
+  const isStudent = user?.role === 'student';
+  const isTeacher = !isStudent;
 
   const [localLayout, setLocalLayout] = useState<Layout | null>(null);
   const [unassignedStudents, setUnassignedStudents] = useState<any[]>([]);

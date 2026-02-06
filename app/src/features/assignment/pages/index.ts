@@ -1,5 +1,6 @@
 export { AssignmentEditorPage } from './AssignmentEditorPage';
 export { AssignmentViewPage } from './AssignmentViewPage';
+export { AssignmentPublicViewPage } from './AssignmentPublicViewPage';
 export { TeacherQuestionBankPage } from './TeacherQuestionBankPage';
 export { QuestionBankEditorPage } from './QuestionBankEditorPage';
 export { QuestionBankViewPage } from './QuestionBankViewPage';
@@ -7,5 +8,6 @@ export { QuestionRendererDemoPage } from './QuestionRendererDemoPage';
 export { GeneratedQuestionsPage } from './GeneratedQuestionsPage';
 export { AssignmentDoingPage } from './AssignmentDoingPage';
 export { StudentSubmissionsPage } from './StudentSubmissionsPage';
+export { AssignmentSubmissionsPage } from './AssignmentSubmissionsPage';
 export { TeacherGradingPage } from './TeacherGradingPage';
 export { SubmissionResultPage } from './SubmissionResultPage';

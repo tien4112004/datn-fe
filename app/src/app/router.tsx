@@ -188,11 +188,24 @@ const router = createBrowserRouter([
         loader: (await import('@/features/assignment/hooks/loaders')).getAssignmentById,
       },
       {
+        path: 'assignments/:id/preview',
+        lazy: async () => ({
+          Component: (await import('@/features/assignment/pages/AssignmentPublicViewPage'))
+            .AssignmentPublicViewPage,
+        }),
+      },
+      {
         path: 'assignment/:id',
         lazy: async () => ({
           Component: (await import('@/features/assignment/pages/AssignmentViewPage')).AssignmentViewPage,
         }),
         loader: (await import('@/features/assignment/hooks/loaders')).getAssignmentById,
+      },
+      {
+        path: 'assignments/:id/submissions',
+        lazy: async () => ({
+          Component: (await import('@/features/assignment/pages')).AssignmentSubmissionsPage,
+        }),
       },
       {
         path: 'demo/question-renderer',

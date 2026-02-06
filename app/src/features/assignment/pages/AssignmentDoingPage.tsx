@@ -25,7 +25,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/components/ui/dialog';
-import { useAssignment } from '../hooks/useAssignmentApi';
+import { useAssignmentPublic } from '../hooks/useAssignmentApi';
 import { useCreateSubmission } from '../hooks';
 
 // Check if an answer is valid (not empty) - moved outside component as pure function
@@ -57,8 +57,8 @@ export const AssignmentDoingPage = () => {
   // Get postId from query params (for homework flow) or use assignmentId (for direct access)
   const postId = searchParams.get('postId');
 
-  // Fetch assignment data
-  const { data: assignment, isLoading } = useAssignment(id);
+  // Fetch assignment data using public endpoint (bypasses permission check for students)
+  const { data: assignment, isLoading } = useAssignmentPublic(id);
 
   // Create submission mutation
   const { mutate: createSubmission, isPending: isSubmitting } = useCreateSubmission();
@@ -67,19 +67,19 @@ export const AssignmentDoingPage = () => {
   const questions = useMemo(() => assignment?.questions || [], [assignment?.questions]);
   const currentQuestion = useMemo(() => questions[currentQuestionIndex], [questions, currentQuestionIndex]);
   const totalPoints = useMemo(
-    () => assignment?.totalPoints || questions.reduce((sum, q) => sum + (q.points || 0), 0),
+    () => assignment?.totalPoints || questions.reduce((sum, q) => sum + (q.point || 0), 0),
     [assignment?.totalPoints, questions]
   );
 
   // Get current answer for the question
   const currentAnswer = useMemo(() => {
     if (!currentQuestion) return undefined;
-    return answers.find((a) => a.questionId === currentQuestion.question.id);
+    return answers.find((a) => a.questionId === currentQuestion.id);
   }, [answers, currentQuestion]);
 
   // Check if all questions are answered
   const allQuestionsAnswered = useMemo(() => {
-    return questions.every((q) => answers.some((a) => a.questionId === q.question.id && isAnswerValid(a)));
+    return questions.every((q) => answers.some((a) => a.questionId === q.id && isAnswerValid(a)));
   }, [answers, questions]);
 
   const progress = useMemo(
@@ -235,12 +235,12 @@ export const AssignmentDoingPage = () => {
           <h3 className="mb-4 text-sm font-semibold">Questions</h3>
           <div className="grid grid-cols-5 gap-2">
             {questions.map((q, index) => {
-              const isAnswered = answers.some((a) => a.questionId === q.question.id && isAnswerValid(a));
+              const isAnswered = answers.some((a) => a.questionId === q.id && isAnswerValid(a));
               const isCurrent = index === currentQuestionIndex;
 
               return (
                 <button
-                  key={q.question.id}
+                  key={q.id}
                   onClick={() => setCurrentQuestionIndex(index)}
                   className={cn(
                     'flex h-10 items-center justify-center rounded-lg border-2 text-sm font-medium transition-colors',
@@ -274,17 +274,17 @@ export const AssignmentDoingPage = () => {
                       Question {currentQuestionIndex + 1}
                     </span>
                     <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                      {currentQuestion.points} points
+                      {currentQuestion.point} points
                     </span>
                   </div>
                 </div>
               </div>
 
               <QuestionRenderer
-                question={currentQuestion.question as Question}
+                question={currentQuestion as Question}
                 viewMode={VIEW_MODE.DOING}
                 answer={currentAnswer}
-                points={currentQuestion.points}
+                points={currentQuestion.point}
                 onAnswerChange={handleAnswerChange}
                 number={currentQuestionIndex + 1}
               />

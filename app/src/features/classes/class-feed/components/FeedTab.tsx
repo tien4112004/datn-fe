@@ -16,7 +16,8 @@ export const FeedTab = ({ classId }: FeedPageProps) => {
   const { user } = useAuth();
   const { posts, loading, error, hasMore, loadMore, refresh, filter, updateFilter } = usePosts(classId);
 
-  const isTeacher = user?.role === 'teacher';
+  const isStudent = user?.role === 'student';
+  const isTeacher = !isStudent;
 
   const handleFilterChange = (type: FeedFilter['type']) => {
     updateFilter({ type });

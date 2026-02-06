@@ -117,7 +117,7 @@ export const PostDetailPage = () => {
 
       {/* Student Assignment Actions (Students only, Homework posts only) */}
       {!isTeacher && post.type === 'Homework' && post.assignmentId && (
-        <StudentAssignmentActions postId={postId!} assignmentId={post.assignmentId} dueDate={post.dueDate} />
+        <StudentAssignmentActions postId={postId!} assignmentId={post.assignmentId} />
       )}
 
       {/* Submission Statistics (Teachers only, Homework posts only) */}

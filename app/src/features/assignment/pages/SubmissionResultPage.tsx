@@ -19,7 +19,7 @@ import type { Question } from '@aiprimary/core';
 import { VIEW_MODE } from '@aiprimary/core';
 import { formatDistanceToNow } from 'date-fns';
 import { useSubmission } from '../hooks';
-import { useAssignment } from '../hooks/useAssignmentApi';
+import { useAssignmentPublic } from '../hooks/useAssignmentApi';
 
 export const SubmissionResultPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -30,8 +30,8 @@ export const SubmissionResultPage = () => {
   // Fetch submission data
   const { data: submission, isLoading: isLoadingSubmission } = useSubmission(id);
 
-  // Fetch assignment data
-  const { data: assignment, isLoading: isLoadingAssignment } = useAssignment(submission?.assignmentId);
+  // Fetch assignment data - use public endpoint since submissions reference cloned assignments
+  const { data: assignment, isLoading: isLoadingAssignment } = useAssignmentPublic(submission?.assignmentId);
 
   // Loading state
   if (isLoadingSubmission || isLoadingAssignment) {
@@ -67,10 +67,10 @@ export const SubmissionResultPage = () => {
   };
 
   // Get current answer for the question
-  const currentAnswer = submission.answers.find((a) => a.questionId === currentQuestion.question.id);
+  const currentAnswer = submission.questions?.find((a) => a.questionId === currentQuestion.id);
 
   // Get current grade for the question
-  const currentGrade = submission.grades?.find((g) => g.questionId === currentQuestion.question.id);
+  const currentGrade = submission.grades?.find((g) => g.questionId === currentQuestion.id);
 
   const handleNext = () => {
     if (currentQuestionIndex < questions.length - 1) {
@@ -88,7 +88,7 @@ export const SubmissionResultPage = () => {
     submission.maxScore && submission.score !== undefined
       ? Math.round((submission.score / submission.maxScore) * 100)
       : 0;
-  const totalPoints = assignment.totalPoints || questions.reduce((sum, q) => sum + (q.points || 0), 0);
+  const totalPoints = assignment.totalPoints || questions.reduce((sum, q) => sum + (q.point || 0), 0);
 
   const getScoreColor = (score: number, maxScore: number) => {
     const pct = (score / maxScore) * 100;
@@ -220,13 +220,13 @@ export const SubmissionResultPage = () => {
             {/* Question Navigation Grid */}
             <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-2">
               {questions.map((q, index) => {
-                const grade = submission.grades?.find((g) => g.questionId === q.question.id);
+                const grade = submission.grades?.find((g) => g.questionId === q.id);
                 const isCurrent = index === currentQuestionIndex;
-                const isCorrect = grade && grade.points === q.points;
+                const isCorrect = grade && grade.points === q.point;
 
                 return (
                   <button
-                    key={q.question.id}
+                    key={q.id}
                     onClick={() => setCurrentQuestionIndex(index)}
                     className={cn(
                       'flex h-10 min-w-[40px] items-center justify-center rounded-lg border-2 text-sm font-medium transition-colors',
@@ -261,7 +261,7 @@ export const SubmissionResultPage = () => {
                       Question {currentQuestionIndex + 1}
                     </span>
                     <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                      {currentQuestion.points} points
+                      {currentQuestion.point} points
                     </span>
                   </div>
                 </div>
@@ -269,22 +269,22 @@ export const SubmissionResultPage = () => {
                   <div className="flex items-center gap-2">
                     <span
                       className={`rounded px-2 py-0.5 text-xs font-medium ${
-                        currentGrade.points === currentQuestion.points
+                        currentGrade.points === currentQuestion.point
                           ? 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300'
                           : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300'
                       }`}
                     >
-                      You earned: {currentGrade.points}/{currentQuestion.points}
+                      You earned: {currentGrade.points}/{currentQuestion.point}
                     </span>
                   </div>
                 )}
               </div>
 
               <QuestionRenderer
-                question={currentQuestion.question as Question}
+                question={currentQuestion as Question}
                 viewMode={VIEW_MODE.AFTER_ASSESSMENT}
                 answer={currentAnswer}
-                points={currentQuestion.points}
+                points={currentQuestion.point}
                 number={currentQuestionIndex + 1}
               />
 

@@ -28,7 +28,8 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
   const [credentialsToShow, setCredentialsToShow] = useState<StudentCredential[]>([]);
   const [isCredentialsModalOpen, setIsCredentialsModalOpen] = useState(false);
 
-  const isTeacher = user?.role === 'teacher';
+  const isStudent = user?.role === 'student';
+  const isTeacher = !isStudent;
 
   // Delete confirmation dialog state
   const deleteConfirmation = useConfirmDialog<Student>();

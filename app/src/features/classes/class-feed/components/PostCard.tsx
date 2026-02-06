@@ -12,7 +12,7 @@ import { AttachmentPreview } from './AttachmentPreview';
 import { LinkedResourcesPreview } from './LinkedResourcesPreview';
 import { PostActions } from './PostActions';
 import { parseDateSafe } from '@/shared/utils/date';
-import { useAssignment } from '@/features/assignment/hooks';
+import { useAssignmentPublic } from '@/features/assignment/hooks';
 
 interface PostCardProps {
   post: Post;

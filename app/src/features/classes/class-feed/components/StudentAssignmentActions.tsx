@@ -1,31 +1,38 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PlayCircle, FileCheck, Trophy, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import {
+  PlayCircle,
+  FileCheck,
+  Trophy,
+  Clock,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Eye,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSubmissionsByPost } from '@/features/assignment/hooks';
 import { useAuth } from '@/context/auth';
 import { formatDistanceToNow } from 'date-fns';
 import type { Submission } from '@aiprimary/core';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface StudentAssignmentActionsProps {
   postId: string;
   assignmentId?: string;
-  dueDate?: string;
 }
 
-export const StudentAssignmentActions = ({
-  postId,
-  assignmentId,
-  dueDate,
-}: StudentAssignmentActionsProps) => {
+export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssignmentActionsProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data: submissions = [] } = useSubmissionsByPost(postId);
+  const [showHistory, setShowHistory] = useState(false);
 
   // Find current student's submissions
   const mySubmissions = useMemo(() => {
+    if (!user?.id) return [];
     return submissions
-      .filter((s) => s.studentId === user?.id)
+      .filter((s) => s.studentId === user.id || s.student?.id === user.id)
       .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
   }, [submissions, user?.id]);
 
@@ -36,14 +43,9 @@ export const StudentAssignmentActions = ({
     if (!latestSubmission) return 'not_started';
     if (latestSubmission.status === 'graded') return 'graded';
     if (latestSubmission.status === 'submitted') return 'submitted';
+    if (latestSubmission.status === 'pending') return 'pending';
     return 'in_progress';
   }, [latestSubmission]);
-
-  // Check if overdue
-  const isOverdue = useMemo(() => {
-    if (!dueDate) return false;
-    return new Date(dueDate) < new Date();
-  }, [dueDate]);
 
   const handleStartAssignment = () => {
     if (assignmentId) {
@@ -54,12 +56,6 @@ export const StudentAssignmentActions = ({
   const handleViewResult = () => {
     if (latestSubmission) {
       navigate(`/student/submissions/${latestSubmission.id}/result`);
-    }
-  };
-
-  const handleViewSubmissions = () => {
-    if (assignmentId) {
-      navigate(`/student/assignments/${assignmentId}/submissions?postId=${postId}`);
     }
   };
 
@@ -80,6 +76,14 @@ export const StudentAssignmentActions = ({
           color: 'text-blue-600 dark:text-blue-400',
           bgColor: 'bg-blue-50 dark:bg-blue-950/20',
           borderColor: 'border-blue-200 dark:border-blue-900',
+        };
+      case 'pending':
+        return {
+          icon: Clock,
+          label: 'Pending',
+          color: 'text-yellow-600 dark:text-yellow-400',
+          bgColor: 'bg-yellow-50 dark:bg-yellow-950/20',
+          borderColor: 'border-yellow-200 dark:border-yellow-900',
         };
       case 'in_progress':
         return {
@@ -123,7 +127,7 @@ export const StudentAssignmentActions = ({
                         Score: {latestSubmission.score}/{latestSubmission.maxScore}
                       </span>
                     )}
-                  {status === 'submitted' && (
+                  {(status === 'submitted' || status === 'pending') && (
                     <span>
                       Submitted{' '}
                       {formatDistanceToNow(new Date(latestSubmission.submittedAt), { addSuffix: true })}
@@ -149,7 +153,7 @@ export const StudentAssignmentActions = ({
               </Button>
             )}
 
-            {status === 'submitted' && (
+            {(status === 'submitted' || status === 'pending') && (
               <Button onClick={handleStartAssignment} size="sm" variant="outline">
                 <PlayCircle className="mr-2 h-4 w-4" />
                 Retake
@@ -168,53 +172,138 @@ export const StudentAssignmentActions = ({
               </>
             )}
 
-            {mySubmissions.length > 1 && (
-              <Button onClick={handleViewSubmissions} size="sm" variant="ghost">
-                View All ({mySubmissions.length})
+            {mySubmissions.length > 0 && (
+              <Button onClick={() => setShowHistory(!showHistory)} size="sm" variant="ghost">
+                {showHistory ? (
+                  <ChevronUp className="mr-2 h-4 w-4" />
+                ) : (
+                  <ChevronDown className="mr-2 h-4 w-4" />
+                )}
+                {mySubmissions.length} {mySubmissions.length === 1 ? 'Attempt' : 'Attempts'}
               </Button>
             )}
           </div>
         </div>
       </div>
 
-      {/* Due Date Warning */}
-      {dueDate && (
-        <div
-          className={`flex items-center gap-2 rounded-lg border p-3 text-sm ${
-            isOverdue
-              ? 'border-red-200 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950/20 dark:text-red-200'
-              : 'border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-900 dark:bg-blue-950/20 dark:text-blue-200'
-          }`}
-        >
-          {isOverdue ? (
-            <>
-              <AlertCircle className="h-4 w-4" />
-              <span>
-                <strong>Overdue:</strong> Due date was{' '}
-                {formatDistanceToNow(new Date(dueDate), { addSuffix: true })}
-              </span>
-            </>
-          ) : (
-            <>
-              <Clock className="h-4 w-4" />
-              <span>
-                <strong>Due:</strong> {formatDistanceToNow(new Date(dueDate), { addSuffix: true })}
-              </span>
-            </>
-          )}
-        </div>
-      )}
+      {/* Submission History Table */}
+      {showHistory && mySubmissions.length > 0 && (
+        <div className="overflow-hidden rounded-lg border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Attempt</TableHead>
+                <TableHead>Submitted</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Score</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {mySubmissions.map((submission, index) => {
+                const getSubmissionStatusBadge = (s: Submission) => {
+                  if (s.status === 'graded') {
+                    return (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-300">
+                        <CheckCircle2 className="h-3 w-3" />
+                        Graded
+                      </span>
+                    );
+                  }
+                  if (s.status === 'submitted') {
+                    return (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                        <FileCheck className="h-3 w-3" />
+                        Submitted
+                      </span>
+                    );
+                  }
+                  if (s.status === 'pending') {
+                    return (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">
+                        <Clock className="h-3 w-3" />
+                        Pending
+                      </span>
+                    );
+                  }
+                  return (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700 dark:bg-gray-950 dark:text-gray-300">
+                      <Clock className="h-3 w-3" />
+                      In Progress
+                    </span>
+                  );
+                };
 
-      {/* Submission History Summary */}
-      {mySubmissions.length > 0 && (
-        <div className="text-muted-foreground text-xs">
-          {mySubmissions.length === 1 ? '1 attempt' : `${mySubmissions.length} attempts`}
-          {status === 'graded' && latestSubmission.gradedAt && (
-            <span>
-              {' '}
-              • Graded {formatDistanceToNow(new Date(latestSubmission.gradedAt), { addSuffix: true })}
-            </span>
-          )}
+                const getScoreColor = (score: number, maxScore: number) => {
+                  const percentage = (score / maxScore) * 100;
+                  if (percentage >= 90) return 'text-green-600 dark:text-green-400';
+                  if (percentage >= 80) return 'text-blue-600 dark:text-blue-400';
+                  if (percentage >= 70) return 'text-yellow-600 dark:text-yellow-400';
+                  return 'text-red-600 dark:text-red-400';
+                };
+
+                return (
+                  <TableRow key={submission.id} className="hover:bg-muted/50">
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        <span>#{mySubmissions.length - index}</span>
+                        {index === 0 && (
+                          <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                            Latest
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Clock className="text-muted-foreground h-4 w-4" />
+                        <span className="text-sm">
+                          {formatDistanceToNow(new Date(submission.submittedAt), { addSuffix: true })}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{getSubmissionStatusBadge(submission)}</TableCell>
+                    <TableCell>
+                      {submission.status === 'graded' &&
+                      submission.score !== undefined &&
+                      submission.maxScore ? (
+                        <div className="flex items-center gap-2">
+                          <Trophy className="h-4 w-4" />
+                          <span
+                            className={`font-semibold ${getScoreColor(submission.score, submission.maxScore)}`}
+                          >
+                            {submission.score}/{submission.maxScore}
+                          </span>
+                          <span className="text-muted-foreground text-xs">
+                            ({Math.round((submission.score / submission.maxScore) * 100)}%)
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">Not graded</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {submission.status === 'graded' ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => navigate(`/student/submissions/${submission.id}/result`)}
+                        >
+                          <Eye className="mr-2 h-4 w-4" />
+                          View Result
+                        </Button>
+                      ) : (
+                        <Button variant="outline" size="sm" disabled>
+                          <Clock className="mr-2 h-4 w-4" />
+                          Pending
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>

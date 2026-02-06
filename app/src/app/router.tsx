@@ -186,9 +186,22 @@ const router = createBrowserRouter([
         }),
       },
       {
+        path: 'assignments/:id/preview',
+        lazy: async () => ({
+          Component: (await import('@/features/assignment/pages/AssignmentPublicViewPage'))
+            .AssignmentPublicViewPage,
+        }),
+      },
+      {
         path: 'assignments/:id',
         lazy: async () => ({
           Component: (await import('@/features/assignment/pages/AssignmentViewPage')).AssignmentViewPage,
+        }),
+      },
+      {
+        path: 'assignments/:id/submissions',
+        lazy: async () => ({
+          Component: (await import('@/features/assignment/pages')).AssignmentSubmissionsPage,
         }),
       },
       {

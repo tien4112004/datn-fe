@@ -11,7 +11,7 @@ import { VIEW_MODE } from '@aiprimary/core';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { useSubmission, useGradeSubmission } from '../hooks';
-import { useAssignment } from '../hooks/useAssignmentApi';
+import { useAssignmentPublic } from '../hooks/useAssignmentApi';
 
 export const TeacherGradingPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,8 +24,8 @@ export const TeacherGradingPage = () => {
   // Fetch submission data
   const { data: submission, isLoading: isLoadingSubmission } = useSubmission(id);
 
-  // Fetch assignment data
-  const { data: assignment, isLoading: isLoadingAssignment } = useAssignment(submission?.assignmentId);
+  // Fetch assignment data - use public endpoint since submissions reference cloned assignments
+  const { data: assignment, isLoading: isLoadingAssignment } = useAssignmentPublic(submission?.assignmentId);
 
   // Grade submission mutation
   const { mutate: gradeSubmission, isPending: isSaving } = useGradeSubmission();
@@ -34,7 +34,7 @@ export const TeacherGradingPage = () => {
   const questions = useMemo(() => assignment?.questions || [], [assignment?.questions]);
   const currentQuestion = useMemo(() => questions[currentQuestionIndex], [questions, currentQuestionIndex]);
   const totalPoints = useMemo(
-    () => assignment?.totalPoints || questions.reduce((sum, q) => sum + (q.points || 0), 0),
+    () => assignment?.totalPoints || questions.reduce((sum, q) => sum + (q.point || 0), 0),
     [assignment?.totalPoints, questions]
   );
 
@@ -52,13 +52,13 @@ export const TeacherGradingPage = () => {
   // Get current answer for the question
   const currentAnswer = useMemo(() => {
     if (!submission || !currentQuestion) return undefined;
-    return submission.answers.find((a) => a.questionId === currentQuestion.question.id);
+    return submission.questions?.find((a) => a.questionId === currentQuestion.id);
   }, [submission, currentQuestion]);
 
   // Get current grade for the question
   const currentGrade = useMemo(() => {
     if (!currentQuestion) return undefined;
-    return grades.find((g) => g.questionId === currentQuestion.question.id);
+    return grades.find((g) => g.questionId === currentQuestion.id);
   }, [grades, currentQuestion]);
 
   // Calculate total score
@@ -73,9 +73,9 @@ export const TeacherGradingPage = () => {
       if (!currentQuestion) return;
 
       setGrades((prev) => {
-        const existing = prev.findIndex((g) => g.questionId === currentQuestion.question.id);
+        const existing = prev.findIndex((g) => g.questionId === currentQuestion.id);
         const newGrade: Grade = {
-          questionId: currentQuestion.question.id,
+          questionId: currentQuestion.id,
           points: grade.points,
           feedback: grade.feedback,
         };
@@ -107,7 +107,7 @@ export const TeacherGradingPage = () => {
     if (!submission) return;
 
     // Check if all questions are graded
-    const ungradedQuestions = questions.filter((q) => !grades.some((g) => g.questionId === q.question.id));
+    const ungradedQuestions = questions.filter((q) => !grades.some((g) => g.questionId === q.id));
 
     if (ungradedQuestions.length > 0) {
       toast.warning(`Please grade all questions (${ungradedQuestions.length} remaining)`);
@@ -278,12 +278,12 @@ export const TeacherGradingPage = () => {
             {/* Question Navigation Grid */}
             <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-2">
               {questions.map((q, index) => {
-                const isGraded = grades.some((g) => g.questionId === q.question.id);
+                const isGraded = grades.some((g) => g.questionId === q.id);
                 const isCurrent = index === currentQuestionIndex;
 
                 return (
                   <button
-                    key={q.question.id}
+                    key={q.id}
                     onClick={() => setCurrentQuestionIndex(index)}
                     className={cn(
                       'flex h-10 min-w-[40px] items-center justify-center rounded-lg border-2 text-sm font-medium transition-colors',
@@ -310,7 +310,7 @@ export const TeacherGradingPage = () => {
                       Question {currentQuestionIndex + 1}
                     </span>
                     <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                      Max: {currentQuestion.points} points
+                      Max: {currentQuestion.point} points
                     </span>
                     {currentGrade && (
                       <span className="rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-300">
@@ -322,10 +322,10 @@ export const TeacherGradingPage = () => {
               </div>
 
               <QuestionRenderer
-                question={currentQuestion.question as Question}
+                question={currentQuestion as Question}
                 viewMode={VIEW_MODE.GRADING}
                 answer={currentAnswer}
-                points={currentQuestion.points}
+                points={currentQuestion.point}
                 onGradeChange={handleGradeChange}
                 number={currentQuestionIndex + 1}
               />

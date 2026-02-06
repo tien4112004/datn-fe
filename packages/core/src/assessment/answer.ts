@@ -76,6 +76,13 @@ export interface Submission {
   id: string; // Unique identifier for this submission
   assignmentId: string; // Reference to the assignment
   studentId: string; // Reference to the student
+  student?: {
+    // Populated student information (when included by backend)
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
   answers: Answer[]; // Student's answers to all questions
   submittedAt: string; // ISO timestamp when submitted
   score?: number; // Total score (sum of all question grades)

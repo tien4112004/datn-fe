@@ -5,9 +5,13 @@ import { useAuth } from '@/context/auth';
 export const usePostPermissions = (post?: Post) => {
   const { user } = useAuth();
 
-  const isTeacher = useMemo(() => {
-    return user?.role === 'teacher';
+  const isStudent = useMemo(() => {
+    return user?.role === 'student';
   }, [user?.role]);
+
+  const isTeacher = useMemo(() => {
+    return !isStudent;
+  }, [isStudent]);
 
   const canComment = useMemo(() => {
     return true; // All users can comment

@@ -1,23 +1,38 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileQuestion, CheckCircle2, Clock, TrendingUp, Users } from 'lucide-react';
+import {
+  FileQuestion,
+  CheckCircle2,
+  Clock,
+  TrendingUp,
+  Users,
+  Eye,
+  Edit,
+  Trophy,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSubmissionsByPost } from '@/features/assignment/hooks';
+import { SubmissionStatusBadge } from '@/features/assignment/components/SubmissionStatusBadge';
+import { formatDistanceToNow } from 'date-fns';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface SubmissionStatisticsProps {
   postId: string;
   assignmentId?: string;
 }
 
-export const SubmissionStatistics = ({ postId, assignmentId }: SubmissionStatisticsProps) => {
+export const SubmissionStatistics = ({ postId }: SubmissionStatisticsProps) => {
   const navigate = useNavigate();
   const { data: submissions = [], isLoading } = useSubmissionsByPost(postId);
+  const [showTable, setShowTable] = useState(true);
 
   const stats = useMemo(() => {
     const total = submissions.length;
     const graded = submissions.filter((s) => s.status === 'graded').length;
-    const pending = submissions.filter((s) => s.status === 'submitted' && s.status !== 'graded').length;
+    const pending = submissions.filter((s) => s.status === 'submitted').length;
     const inProgress = submissions.filter((s) => s.status === 'in_progress').length;
 
     // Calculate average score for graded submissions
@@ -96,47 +111,110 @@ export const SubmissionStatistics = ({ postId, assignmentId }: SubmissionStatist
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <FileQuestion className="text-muted-foreground h-5 w-5" />
-          <h3 className="text-lg font-semibold">Submission Overview</h3>
+          <h3 className="text-lg font-semibold">Submissions</h3>
         </div>
-        {assignmentId && stats.total > 0 && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate(`/assignments/${assignmentId}/submissions`)}
-          >
-            View All Submissions
+        {stats.total > 0 && (
+          <Button variant="outline" size="sm" onClick={() => setShowTable(!showTable)}>
+            {showTable ? <ChevronUp className="mr-2 h-4 w-4" /> : <ChevronDown className="mr-2 h-4 w-4" />}
+            {showTable ? 'Hide' : 'Show'} Table
           </Button>
         )}
       </div>
 
-      {stats.total === 0 ? (
-        <div className="py-8 text-center">
-          <FileQuestion className="text-muted-foreground/50 mx-auto mb-3 h-12 w-12" />
-          <p className="text-muted-foreground text-sm">No submissions yet</p>
-        </div>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {statCards.map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <div key={index} className={`rounded-lg border p-4 transition-colors ${stat.bgColor}`}>
-                <div className="mb-2 flex items-center justify-between">
-                  <Icon className={`h-5 w-5 ${stat.color}`} />
-                </div>
-                <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-                <p className="text-muted-foreground mt-1 text-xs">{stat.label}</p>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {stats.pending > 0 && (
-        <div className="mt-4 rounded-lg border-l-4 border-yellow-500 bg-yellow-50 p-3 dark:bg-yellow-950/20">
-          <p className="text-sm text-yellow-800 dark:text-yellow-200">
-            <strong>{stats.pending}</strong> {stats.pending === 1 ? 'submission' : 'submissions'} waiting for
-            review
-          </p>
+      {/* Submissions Table */}
+      {showTable && submissions.length > 0 && (
+        <div className="mt-4 overflow-hidden rounded-lg border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Student</TableHead>
+                <TableHead>Submitted</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Score</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {submissions.map((submission) => (
+                <TableRow key={submission.id} className="hover:bg-muted/50">
+                  <TableCell className="font-medium">
+                    {submission.student ? (
+                      <div>
+                        <p className="font-semibold">
+                          {submission.student.firstName} {submission.student.lastName}
+                        </p>
+                        <p className="text-muted-foreground text-xs">{submission.student.email}</p>
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">Unknown Student</p>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Clock className="text-muted-foreground h-4 w-4" />
+                      <span className="text-sm">
+                        {formatDistanceToNow(new Date(submission.submittedAt), { addSuffix: true })}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <SubmissionStatusBadge status={submission.status} />
+                  </TableCell>
+                  <TableCell>
+                    {submission.status === 'graded' &&
+                    submission.score !== undefined &&
+                    submission.maxScore ? (
+                      <div className="flex items-center gap-2">
+                        <Trophy className="h-4 w-4" />
+                        <span
+                          className={`font-semibold ${getScoreColor((submission.score / submission.maxScore) * 100)}`}
+                        >
+                          {submission.score}/{submission.maxScore}
+                        </span>
+                        <span className="text-muted-foreground text-xs">
+                          ({Math.round((submission.score / submission.maxScore) * 100)}%)
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">Not graded</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      {submission.status === 'graded' ? (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => navigate(`/submissions/${submission.id}/grade`)}
+                          >
+                            <Eye className="mr-2 h-4 w-4" />
+                            View
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => navigate(`/submissions/${submission.id}/grade`)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </>
+                      ) : (
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => navigate(`/submissions/${submission.id}/grade`)}
+                        >
+                          <Edit className="mr-2 h-4 w-4" />
+                          Grade
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>

@@ -26,7 +26,8 @@ export const LessonTab = ({ classId, currentClass }: LessonTabProps) => {
   const { t } = useTranslation('classes', { keyPrefix: 'lessonTab' });
   const { user } = useAuth();
 
-  const isTeacher = user?.role === 'teacher';
+  const isStudent = user?.role === 'student';
+  const isTeacher = !isStudent;
 
   // Get today's date
   const today = new Date().toISOString().split('T')[0];

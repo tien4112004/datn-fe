@@ -12,7 +12,7 @@ import { AttachmentPreview } from './AttachmentPreview';
 import { LinkedResourcesPreview } from './LinkedResourcesPreview';
 import { PostActions } from './PostActions';
 import { parseDateSafe } from '@/shared/utils/date';
-import { useAssignment } from '@/features/assignment/hooks';
+import { useAssignmentPublic } from '@/features/assignment/hooks';
 
 interface PostCardProps {
   post: Post;
@@ -27,7 +27,8 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
   const { t } = useTranslation('classes');
 
   // Fetch assignment details if this is a Homework post with an assignmentId
-  const { data: assignment, isLoading: isAssignmentLoading } = useAssignment(post.assignmentId ?? '');
+  // Use public endpoint since post references cloned assignments in assignment_post table
+  const { data: assignment, isLoading: isAssignmentLoading } = useAssignmentPublic(post.assignmentId ?? '');
 
   // Determine the appropriate link path based on whether we're in student or teacher mode
   const getPostDetailPath = () => {
@@ -157,7 +158,7 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
                 <span>{t('feed.post.loadingAssignment')}</span>
               </div>
             ) : assignment ? (
-              <Link to={`/assignments/${post.assignmentId}`} className="block space-y-2">
+              <Link to={`/assignments/${post.assignmentId}/preview`} className="block space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <ClipboardList className="h-5 w-5 text-purple-600" />

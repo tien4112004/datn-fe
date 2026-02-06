@@ -14,6 +14,7 @@ export interface AssignmentApiService {
   // CRUD operations
   getAssignments(request: AssignmentCollectionRequest): Promise<ApiResponse<CoreAssignment[]>>;
   getAssignmentById(id: string): Promise<CoreAssignment>;
+  getAssignmentByIdPublic(id: string): Promise<CoreAssignment>;
   createAssignment(data: CreateAssignmentRequest): Promise<CoreAssignment>;
   updateAssignment(id: string, data: UpdateAssignmentRequest): Promise<CoreAssignment>;
   deleteAssignment(id: string): Promise<void>;

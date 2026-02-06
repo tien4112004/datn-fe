@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/shared/components/ui/button';
 import { Textarea } from '@/shared/components/ui/textarea';
 import { Label } from '@/shared/components/ui/label';
+import { Input } from '@/shared/components/ui/input';
 import { cn } from '@/shared/lib/utils';
 import { ChevronLeft, ChevronRight, Save, User, Clock, Trophy, CheckCircle2, Loader2 } from 'lucide-react';
 import { QuestionRenderer } from '../../question/components/QuestionRenderer';
@@ -20,6 +21,7 @@ export const TeacherGradingPage = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [grades, setGrades] = useState<Grade[]>([]);
   const [overallFeedback, setOverallFeedback] = useState('');
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Fetch submission data
   const { data: submission, isLoading: isLoadingSubmission } = useSubmission(id);
@@ -38,21 +40,22 @@ export const TeacherGradingPage = () => {
     [assignment?.totalPoints, questions]
   );
 
-  // Mock student data (backend doesn't provide student details in submission)
+  // Get student data from submission (enriched by backend)
   const student = useMemo(
     () => ({
-      id: submission?.studentId || '',
-      firstName: 'Student',
-      lastName: submission?.studentId?.slice(0, 4) || '',
+      id: submission?.student?.id || submission?.studentId || '',
+      firstName: submission?.student?.firstName || 'Student',
+      lastName: submission?.student?.lastName || '',
+      email: submission?.student?.email,
       avatarUrl: undefined,
     }),
-    [submission?.studentId]
+    [submission]
   );
 
   // Get current answer for the question
   const currentAnswer = useMemo(() => {
     if (!submission || !currentQuestion) return undefined;
-    return submission.questions?.find((a) => a.questionId === currentQuestion.id);
+    return submission.answers?.find((a) => a.questionId === currentQuestion.id);
   }, [submission, currentQuestion]);
 
   // Get current grade for the question
@@ -67,6 +70,33 @@ export const TeacherGradingPage = () => {
   }, [grades]);
 
   const gradedCount = grades.length;
+
+  // Initialize grades and feedback from submission (auto-graded scores)
+  const initializeGrades = useCallback(() => {
+    if (!submission || !assignment || isInitialized) return;
+
+    // If submission has auto-graded scores, use them
+    if (submission.grades && submission.grades.length > 0) {
+      const initialGrades: Grade[] = submission.grades.map((g) => ({
+        questionId: g.questionId,
+        points: g.points,
+        feedback: g.feedback,
+      }));
+      setGrades(initialGrades);
+    }
+
+    // Initialize overall feedback if exists
+    if (submission.feedback) {
+      setOverallFeedback(submission.feedback);
+    }
+
+    setIsInitialized(true);
+  }, [submission, assignment, isInitialized]);
+
+  // Run initialization when data is loaded
+  if (!isInitialized && submission && assignment) {
+    initializeGrades();
+  }
 
   const handleGradeChange = useCallback(
     (grade: { points: number; feedback?: string }) => {
@@ -116,8 +146,13 @@ export const TeacherGradingPage = () => {
 
     // Prepare grade request
     const questionScores: Record<string, number> = {};
+    const questionFeedback: Record<string, string> = {};
+
     grades.forEach((grade) => {
       questionScores[grade.questionId] = grade.points;
+      if (grade.feedback && grade.feedback.trim()) {
+        questionFeedback[grade.questionId] = grade.feedback;
+      }
     });
 
     gradeSubmission(
@@ -125,6 +160,7 @@ export const TeacherGradingPage = () => {
         submissionId: submission.id,
         request: {
           questionScores,
+          questionFeedback: Object.keys(questionFeedback).length > 0 ? questionFeedback : undefined,
           overallFeedback: overallFeedback || undefined,
         },
       },
@@ -301,34 +337,94 @@ export const TeacherGradingPage = () => {
               })}
             </div>
 
-            {/* Question Content */}
-            <div className="rounded-lg border bg-white p-6 dark:bg-gray-900">
-              <div className="mb-4 flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="mb-2 flex items-center gap-2">
-                    <span className="text-muted-foreground text-sm font-medium">
-                      Question {currentQuestionIndex + 1}
-                    </span>
-                    <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                      Max: {currentQuestion.point} points
-                    </span>
-                    {currentGrade && (
-                      <span className="rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-300">
-                        Awarded: {currentGrade.points} points
+            {/* Question Display Section */}
+            <div className="space-y-6">
+              {/* Question Header */}
+              <div className="flex items-center gap-2 border-b pb-3">
+                <span className="text-muted-foreground text-sm font-medium">
+                  Question {currentQuestionIndex + 1}
+                </span>
+                <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                  Worth {currentQuestion.point} points
+                </span>
+              </div>
+
+              {/* Question & Answer Section */}
+              <div className="rounded-lg border bg-white p-6 dark:bg-gray-900">
+                <QuestionRenderer
+                  question={currentQuestion as Question}
+                  viewMode={VIEW_MODE.AFTER_ASSESSMENT}
+                  answer={currentAnswer}
+                  points={currentQuestion.point}
+                  number={currentQuestionIndex + 1}
+                />
+              </div>
+
+              {/* Grading Section */}
+              <div className="rounded-lg border-2 border-blue-200 bg-blue-50/50 p-6 dark:border-blue-900 dark:bg-blue-950/20">
+                <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-blue-900 dark:text-blue-100">
+                  <Trophy className="h-4 w-4" />
+                  Grading
+                </h3>
+
+                <div className="space-y-4">
+                  {/* Points Input */}
+                  <div>
+                    <Label
+                      htmlFor={`points-${currentQuestion.id}`}
+                      className="mb-2 block text-sm font-medium"
+                    >
+                      Points Awarded
+                    </Label>
+                    <div className="flex items-center gap-3">
+                      <input
+                        id={`points-${currentQuestion.id}`}
+                        type="number"
+                        min="0"
+                        max={currentQuestion.point}
+                        step="0.5"
+                        value={currentGrade?.points ?? 0}
+                        onChange={(e) => {
+                          const points = parseFloat(e.target.value) || 0;
+                          handleGradeChange({
+                            points: Math.min(Math.max(0, points), currentQuestion.point),
+                            feedback: currentGrade?.feedback,
+                          });
+                        }}
+                        className="w-24 rounded-md border border-gray-300 px-3 py-2 text-center text-lg font-semibold focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
+                      />
+                      <span className="text-muted-foreground text-sm">
+                        out of <span className="font-semibold">{currentQuestion.point}</span> points
                       </span>
-                    )}
+                      {currentGrade && currentGrade.points === currentQuestion.point && (
+                        <CheckCircle2 className="h-5 w-5 text-green-600" />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Feedback Input */}
+                  <div>
+                    <Label
+                      htmlFor={`feedback-${currentQuestion.id}`}
+                      className="mb-2 block text-sm font-medium"
+                    >
+                      Feedback for this question (Optional)
+                    </Label>
+                    <Textarea
+                      id={`feedback-${currentQuestion.id}`}
+                      value={currentGrade?.feedback || ''}
+                      onChange={(e) => {
+                        handleGradeChange({
+                          points: currentGrade?.points ?? 0,
+                          feedback: e.target.value,
+                        });
+                      }}
+                      placeholder="Add specific feedback about this answer..."
+                      className="min-h-[80px]"
+                    />
                   </div>
                 </div>
               </div>
-
-              <QuestionRenderer
-                question={currentQuestion as Question}
-                viewMode={VIEW_MODE.GRADING}
-                answer={currentAnswer}
-                points={currentQuestion.point}
-                onGradeChange={handleGradeChange}
-                number={currentQuestionIndex + 1}
-              />
             </div>
 
             {/* Navigation Buttons */}

@@ -89,6 +89,7 @@ export interface Submission {
   maxScore?: number; // Maximum possible score
   status: 'in_progress' | 'submitted' | 'graded'; // Current status of the submission
   grades?: Grade[]; // Teacher's grades for each question (available after grading)
+  feedback?: string; // Overall feedback from teacher
   gradedAt?: string; // ISO timestamp when grading was completed
   gradedBy?: string; // User ID of teacher who graded
 }

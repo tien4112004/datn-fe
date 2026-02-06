@@ -67,7 +67,7 @@ export const SubmissionResultPage = () => {
   };
 
   // Get current answer for the question
-  const currentAnswer = submission.questions?.find((a) => a.questionId === currentQuestion.id);
+  const currentAnswer = submission.answers?.find((a) => a.questionId === currentQuestion.id);
 
   // Get current grade for the question
   const currentGrade = submission.grades?.find((g) => g.questionId === currentQuestion.id);
@@ -301,6 +301,21 @@ export const SubmissionResultPage = () => {
                 </div>
               )}
             </div>
+
+            {/* Overall Feedback - Always show if available */}
+            {submission.feedback && (
+              <div className="mt-6 rounded-lg border-2 border-blue-500 bg-blue-50 p-6 dark:bg-blue-950/20">
+                <div className="mb-3 flex items-center gap-2">
+                  <User className="h-5 w-5 text-blue-600" />
+                  <h3 className="text-base font-semibold text-blue-900 dark:text-blue-100">
+                    Overall Feedback from Teacher
+                  </h3>
+                </div>
+                <p className="whitespace-pre-wrap text-sm text-blue-800 dark:text-blue-200">
+                  {submission.feedback}
+                </p>
+              </div>
+            )}
 
             {/* Navigation Buttons */}
             <div className="mt-6 flex items-center justify-between">

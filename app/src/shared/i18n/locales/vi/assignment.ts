@@ -309,6 +309,7 @@ export default {
       saveError: 'Không thể lưu bài tập',
       noTopicError: 'Vui lòng thêm ít nhất một chủ đề trước khi thêm câu hỏi từ ngân hàng',
       questionsAdded: 'Đã thêm {{count}} câu hỏi vào bài tập',
+      contextFetchError: 'Không thể tải đoạn văn đọc hiểu cho câu hỏi đã nhập',
     },
 
     // Bảng điều khiển câu hỏi
@@ -458,6 +459,17 @@ export default {
       import: 'Nhập',
       importSelected: 'Nhập đã chọn ({{count}})',
       alreadyAdded: 'Đã thêm',
+    },
+
+    // Hộp thoại nhập ngữ cảnh (hiển thị khi nhập câu hỏi có ngữ cảnh từ ngân hàng)
+    importContextDialog: {
+      title: 'Nhập đoạn văn đọc hiểu',
+      description:
+        'Một số câu hỏi đã chọn tham chiếu đến đoạn văn đọc hiểu chưa có trong bài tập này. Các đoạn văn này sẽ được thêm tự động.',
+      passageCount: '{{count}} đoạn văn sẽ được thêm:',
+      dontAskAgain: 'Không hỏi lại',
+      cancel: 'Hủy',
+      import: 'Nhập',
     },
 
     // Bảng xây dựng ma trận

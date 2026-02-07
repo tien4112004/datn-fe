@@ -157,18 +157,22 @@ const router = createBrowserRouter([
         lazy: async () => ({
           Component: (await import('@/features/assignment/pages/AssignmentEditorPage')).AssignmentEditorPage,
         }),
+        // Provide a simple loader so the page can consistently use useLoaderData()
+        loader: async () => ({ assignment: null }),
       },
       {
         path: 'assignment/edit/:id',
         lazy: async () => ({
           Component: (await import('@/features/assignment/pages/AssignmentEditorPage')).AssignmentEditorPage,
         }),
+        loader: (await import('@/features/assignment/hooks/loaders')).getAssignmentById,
       },
       {
         path: 'assignment/:id',
         lazy: async () => ({
           Component: (await import('@/features/assignment/pages/AssignmentViewPage')).AssignmentViewPage,
         }),
+        loader: (await import('@/features/assignment/hooks/loaders')).getAssignmentById,
       },
       {
         path: 'demo/question-renderer',

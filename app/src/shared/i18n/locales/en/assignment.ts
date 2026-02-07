@@ -309,6 +309,7 @@ export default {
       saveError: 'Failed to save assignment',
       noTopicError: 'Please add at least one topic before adding questions from the bank',
       questionsAdded: '{{count}} question(s) added to the assignment',
+      contextFetchError: 'Failed to fetch reading passages for imported questions',
     },
 
     // Questions panel and toolbar
@@ -459,6 +460,17 @@ export default {
       import: 'Import',
       importSelected: 'Import Selected ({{count}})',
       alreadyAdded: 'Already added',
+    },
+
+    // Import context dialog (shown when importing questions with bound contexts from bank)
+    importContextDialog: {
+      title: 'Import Reading Passages',
+      description:
+        'Some of the selected questions reference reading passages that are not yet in this assignment. These passages will be added automatically.',
+      passageCount: '{{count}} passage(s) will be added:',
+      dontAskAgain: "Don't ask again",
+      cancel: 'Cancel',
+      import: 'Import',
     },
 
     // Matrix builder panel

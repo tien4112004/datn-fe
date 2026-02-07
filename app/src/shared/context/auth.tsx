@@ -18,6 +18,7 @@ const USER_SPECIFIC_STORAGE_KEYS = [
   'mindmap-metadata-store', // Mindmap thumbnail (Zustand persist)
   'class-store', // Class filters and selection (Zustand persist)
   'question-bank-store', // Question bank filters (Zustand persist)
+  'user-preferences', // User preferences like "don't ask again" flags
 ];
 
 export function AuthProvider({ children }: { children: ReactNode }) {

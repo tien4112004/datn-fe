@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BookOpen, Trash2, AlertTriangle, Check } from 'lucide-react';
+import { BookOpen, AlertTriangle, Check } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Textarea } from '@/shared/components/ui/textarea';
@@ -186,24 +186,13 @@ export const ContextsPanel = () => {
           {contexts.map((context) => {
             const refCount = getReferencingQuestionCount(context.id);
             return (
-              <div key={context.id} className="relative">
-                <EditableContextDisplay
-                  context={context}
-                  onUpdate={(updates) => updateContext(context.id, updates)}
-                />
-                <div className="absolute right-0 top-2 flex items-center gap-2">
-                  {refCount > 0 && <span className="text-xs text-gray-400">{refCount} Q</span>}
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0 text-gray-400 hover:text-red-600"
-                    onClick={() => setDeleteTarget({ id: context.id, title: context.title })}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
+              <EditableContextDisplay
+                key={context.id}
+                context={context}
+                refCount={refCount}
+                onDelete={() => setDeleteTarget({ id: context.id, title: context.title })}
+                onUpdate={(updates) => updateContext(context.id, updates)}
+              />
             );
           })}
         </div>

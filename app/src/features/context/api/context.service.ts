@@ -58,9 +58,7 @@ export default class ContextService implements ContextApiService {
     if (ids.length === 0) {
       return [];
     }
-    const response = await this.apiClient.get(`${this.baseUrl}/api/contexts/batch`, {
-      params: { ids: ids.join(',') },
-    });
+    const response = await this.apiClient.post(`${this.baseUrl}/api/contexts/by-ids`, { ids });
     return response.data.data;
   }
 }

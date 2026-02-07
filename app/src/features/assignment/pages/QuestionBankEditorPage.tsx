@@ -46,7 +46,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
-import { validateQuestion } from '@/features/assignment/utils/validateQuestion';
+import { useValidateQuestion } from '@/features/assignment/hooks/useValidateQuestion';
 import { useTranslation } from 'react-i18next';
 
 // Helper function to create default question based on type
@@ -116,6 +116,7 @@ function createDefaultQuestion(type: QuestionType): QuestionBankItem {
 export function QuestionBankEditorPage() {
   const { t } = useTranslation('questions');
   const { t: tContext } = useTranslation('assignment', { keyPrefix: 'context' });
+  const validateQuestion = useValidateQuestion();
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
 

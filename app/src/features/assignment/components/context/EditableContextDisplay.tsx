@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BookOpen, ChevronDown, ChevronUp, Pencil, Unlink, Info } from 'lucide-react';
+import { BookOpen, ChevronDown, ChevronUp, Pencil, Unlink, Info, Trash2 } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Textarea } from '@/shared/components/ui/textarea';
@@ -12,6 +12,8 @@ interface EditableContextDisplayProps {
   context: AssignmentContext;
   onUpdate: (updates: Partial<AssignmentContext>) => void;
   onRemove?: () => void;
+  onDelete?: () => void;
+  refCount?: number;
   defaultCollapsed?: boolean;
   readOnly?: boolean;
   showTitle?: boolean;
@@ -21,6 +23,8 @@ export const EditableContextDisplay = ({
   context,
   onUpdate,
   onRemove,
+  onDelete,
+  refCount,
   defaultCollapsed = false,
   readOnly = false,
   showTitle = true,
@@ -63,16 +67,31 @@ export const EditableContextDisplay = ({
             </div>
           )}
           <div className="flex shrink-0 items-center gap-1">
+            {refCount !== undefined && refCount > 0 && (
+              <span className="text-xs text-gray-400">{refCount} Q</span>
+            )}
             {!readOnly && !isEditing && (
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0"
+                className="h-8 w-8 p-0 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
                 onClick={() => setIsEditing(true)}
+                title={t('edit')}
               >
                 <Pencil className="h-4 w-4" />
-                <span className="sr-only">{t('edit')}</span>
+              </Button>
+            )}
+            {onDelete && !readOnly && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-gray-400 hover:text-red-600 dark:hover:text-red-500"
+                onClick={onDelete}
+                title={t('disconnect')}
+              >
+                <Trash2 className="h-4 w-4" />
               </Button>
             )}
             {onRemove && !readOnly && (
@@ -80,11 +99,11 @@ export const EditableContextDisplay = ({
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0 text-gray-400 hover:text-red-600"
+                className="h-8 w-8 p-0 text-gray-400 hover:text-red-600 dark:hover:text-red-500"
                 onClick={onRemove}
+                title={t('disconnect')}
               >
                 <Unlink className="h-4 w-4" />
-                <span className="sr-only">{t('disconnect')}</span>
               </Button>
             )}
             <CollapsibleTrigger asChild>

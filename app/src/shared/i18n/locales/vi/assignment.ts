@@ -136,6 +136,7 @@ export default {
       selected: 'Đã chọn',
       applicationBadge: 'Chỉ đọc',
       untitled: 'Câu hỏi chưa có tiêu đề',
+      hasContext: 'Có đoạn văn đọc hiểu',
     },
     subjects: {
       toan: 'Toán',
@@ -685,6 +686,44 @@ export default {
       showing: 'Hiển thị {{from}} đến {{to}} trong {{total}} câu hỏi',
       previous: 'Trước',
       next: 'Sau',
+    },
+  },
+
+  questionBankView: {
+    pageTitle: 'Chi Tiết Câu Hỏi',
+    sections: {
+      metadata: 'Thông Tin Câu Hỏi',
+      content: 'Nội Dung Câu Hỏi',
+      explanation: 'Giải Thích',
+      context: 'Bài Đọc',
+    },
+    fields: {
+      title: 'Tiêu đề',
+      subject: 'Môn học',
+      grade: 'Lớp',
+      type: 'Loại câu hỏi',
+      difficulty: 'Độ khó',
+      chapter: 'Chương',
+      createdAt: 'Ngày tạo',
+      updatedAt: 'Ngày cập nhật',
+    },
+    actions: {
+      title: 'Hành động',
+      edit: 'Chỉnh sửa',
+      duplicate: 'Nhân bản',
+      delete: 'Xóa câu hỏi',
+    },
+    toast: {
+      deleteSuccess: 'Xóa câu hỏi thành công',
+      deleteError: 'Không thể xóa câu hỏi',
+      duplicateSuccess: 'Nhân bản câu hỏi thành công',
+      duplicateError: 'Không thể nhân bản câu hỏi',
+    },
+    deleteDialog: {
+      title: 'Xóa câu hỏi?',
+      description: 'Hành động này không thể hoàn tác. Câu hỏi sẽ bị xóa vĩnh viễn.',
+      cancel: 'Hủy',
+      delete: 'Xóa',
     },
   },
 

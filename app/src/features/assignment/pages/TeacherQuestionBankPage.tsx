@@ -152,21 +152,25 @@ export function TeacherQuestionBankPage() {
       columnHelper.display({
         id: 'select',
         header: ({ table }) => (
-          <Checkbox
-            checked={
-              table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')
-            }
-            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-            aria-label="Select all"
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              checked={
+                table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')
+              }
+              onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+              aria-label="Select all"
+            />
+          </div>
         ),
         cell: ({ row }) => (
-          <Checkbox
-            checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-            disabled={!canDelete(row.original)}
-            aria-label="Select row"
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              disabled={!canDelete(row.original)}
+              aria-label="Select row"
+            />
+          </div>
         ),
         size: 50,
         enableResizing: false,
@@ -228,31 +232,36 @@ export function TeacherQuestionBankPage() {
         cell: ({ row }) => {
           const question = row.original;
           return (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {canEdit(question) && (
-                  <>
-                    <DropdownMenuItem onClick={() => handleEdit(question)}>
-                      <FileEdit className="mr-2 h-4 w-4" />
-                      {t('actions.edit')}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleDuplicate(question.id)}>
-                      <Copy className="mr-2 h-4 w-4" />
-                      {t('actions.duplicate')}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(question.id)}>
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      {t('actions.delete')}
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div onClick={(e) => e.stopPropagation()}>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {canEdit(question) && (
+                    <>
+                      <DropdownMenuItem onClick={() => handleEdit(question)}>
+                        <FileEdit className="mr-2 h-4 w-4" />
+                        {t('actions.edit')}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDuplicate(question.id)}>
+                        <Copy className="mr-2 h-4 w-4" />
+                        {t('actions.duplicate')}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        onClick={() => handleDelete(question.id)}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        {t('actions.delete')}
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           );
         },
         size: 60,
@@ -357,6 +366,8 @@ export function TeacherQuestionBankPage() {
           <DataTable
             table={table}
             isLoading={isLoading}
+            onClickRow={(row) => navigate(`/question-bank/${row.original.id}`)}
+            rowStyle="cursor-pointer"
             emptyState={
               <div className="text-muted-foreground py-8 text-center">{t('table.noQuestions')}</div>
             }

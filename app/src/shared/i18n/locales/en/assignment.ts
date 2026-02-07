@@ -136,6 +136,7 @@ export default {
       selected: 'Selected',
       applicationBadge: 'Read-Only',
       untitled: 'Untitled Question',
+      hasContext: 'Has reading passage',
     },
     subjects: {
       toan: 'Math',
@@ -696,6 +697,44 @@ export default {
       showing: 'Showing {{from}} to {{to}} of {{total}} questions',
       previous: 'Previous',
       next: 'Next',
+    },
+  },
+
+  questionBankView: {
+    pageTitle: 'Question Details',
+    sections: {
+      metadata: 'Question Information',
+      content: 'Question Content',
+      explanation: 'Explanation',
+      context: 'Reading Passage',
+    },
+    fields: {
+      title: 'Title',
+      subject: 'Subject',
+      grade: 'Grade',
+      type: 'Question Type',
+      difficulty: 'Difficulty',
+      chapter: 'Chapter',
+      createdAt: 'Created At',
+      updatedAt: 'Updated At',
+    },
+    actions: {
+      title: 'Actions',
+      edit: 'Edit Question',
+      duplicate: 'Duplicate Question',
+      delete: 'Delete Question',
+    },
+    toast: {
+      deleteSuccess: 'Question deleted successfully',
+      deleteError: 'Failed to delete question',
+      duplicateSuccess: 'Question duplicated successfully',
+      duplicateError: 'Failed to duplicate question',
+    },
+    deleteDialog: {
+      title: 'Delete Question?',
+      description: 'This action cannot be undone. This will permanently delete this question.',
+      cancel: 'Cancel',
+      delete: 'Delete',
     },
   },
 

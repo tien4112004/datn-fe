@@ -34,18 +34,7 @@ import { VIEW_MODE } from '@/features/assignment/types';
 import { QuestionRenderer } from '@/features/question';
 import { generateId } from '@/shared/lib/utils';
 import { toast } from 'sonner';
-import {
-  AlertCircle,
-  Save,
-  Settings,
-  FileText,
-  Eye,
-  Edit3,
-  BookOpen,
-  Unlink,
-  ChevronDown,
-  ChevronUp,
-} from 'lucide-react';
+import { AlertCircle, Save, Eye, Edit3, Unlink, ChevronDown, ChevronUp } from 'lucide-react';
 import { useValidateQuestion } from '@/features/assignment/hooks/useValidateQuestion';
 import { useTranslation } from 'react-i18next';
 
@@ -281,10 +270,7 @@ export function QuestionBankEditorPage() {
             {/* Metadata Section */}
             {!isPreviewMode && (
               <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Settings className="text-primary h-5 w-5" />
-                  <h3 className="text-lg font-semibold">{t('editor.metadataSection')}</h3>
-                </div>
+                <h3 className="text-lg font-semibold">{t('editor.metadataSection')}</h3>
                 <Separator />
 
                 {/* Question Type - Only for create mode */}
@@ -409,10 +395,7 @@ export function QuestionBankEditorPage() {
             {/* Context Section */}
             {!isPreviewMode && (
               <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <BookOpen className="text-primary h-5 w-5" />
-                  <h3 className="text-lg font-semibold">{tContext('readingPassage')}</h3>
-                </div>
+                <h3 className="text-lg font-semibold">{tContext('readingPassage')}</h3>
                 <Separator />
 
                 {/* Context Selector */}
@@ -489,10 +472,7 @@ export function QuestionBankEditorPage() {
             {/* Context Display - Preview Mode (Read-only) */}
             {isPreviewMode && contextData && (
               <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <BookOpen className="text-primary h-5 w-5" />
-                  <h3 className="text-lg font-semibold">{tContext('readingPassage')}</h3>
-                </div>
+                <h3 className="text-lg font-semibold">{tContext('readingPassage')}</h3>
                 <Separator />
                 <div className="rounded-lg border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
                   <div className="space-y-3">
@@ -534,10 +514,7 @@ export function QuestionBankEditorPage() {
 
             {/* Question Content Section */}
             <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <FileText className="text-primary h-5 w-5" />
-                <h3 className="text-lg font-semibold">{t('editor.contentSection')}</h3>
-              </div>
+              <h3 className="text-lg font-semibold">{t('editor.contentSection')}</h3>
               <Separator />
 
               <QuestionRenderer

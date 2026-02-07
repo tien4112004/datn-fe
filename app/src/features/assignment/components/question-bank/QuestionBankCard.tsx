@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { BookOpen } from 'lucide-react';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Badge } from '@/shared/components/ui/badge';
 import { cn } from '@/shared/lib/utils';
@@ -75,6 +76,12 @@ export const QuestionBankCard = ({ question, isSelected, onToggleSelection }: Qu
       </HoverCardTrigger>
       <HoverCardContent side="right" align="start" className="max-h-96 w-[28rem] p-0">
         <ScrollArea className="max-h-96 p-4">
+          {question.contextId && (
+            <div className="mb-3 flex items-center gap-1.5 rounded-md bg-blue-50 px-2.5 py-1.5 text-xs text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
+              <BookOpen className="h-3.5 w-3.5 shrink-0" />
+              <span>{t('questionBank.card.hasContext')}</span>
+            </div>
+          )}
           <QuestionRenderer question={question} viewMode={VIEW_MODE.VIEWING} compact />
         </ScrollArea>
       </HoverCardContent>

@@ -153,6 +153,13 @@ const router = createBrowserRouter([
         loader: (await import('@/features/assignment/hooks/loaders')).getQuestionById,
       },
       {
+        path: 'question-bank/:id',
+        lazy: async () => ({
+          Component: (await import('@/features/assignment/pages/QuestionBankViewPage')).QuestionBankViewPage,
+        }),
+        loader: (await import('@/features/assignment/hooks/loaders')).getQuestionById,
+      },
+      {
         path: 'assignment/create',
         lazy: async () => ({
           Component: (await import('@/features/assignment/pages/AssignmentEditorPage')).AssignmentEditorPage,

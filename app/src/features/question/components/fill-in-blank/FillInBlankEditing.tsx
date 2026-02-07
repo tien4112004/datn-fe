@@ -16,7 +16,7 @@ interface FillInBlankEditingProps {
 }
 
 // Parse text with {{}} syntax into segments
-// Supports alternative answers: {{answer1::alternative2::alternative3}}
+// Supports alternative answers: {{answer1|alternative2|alternative3}}
 const parseQuestionText = (text: string): BlankSegment[] => {
   const segments: BlankSegment[] = [];
   const regex = /\{\{([^}]+)\}\}/g;
@@ -36,10 +36,10 @@ const parseQuestionText = (text: string): BlankSegment[] => {
       }
     }
 
-    // Parse alternatives from the blank content (e.g., "answer1::alternative2::alternative3")
+    // Parse alternatives from the blank content (e.g., "answer1|alternative2|alternative3")
     const blankContent = match[1].trim();
     const alternatives = blankContent
-      .split('::')
+      .split('|')
       .map((alt) => alt.trim())
       .filter((alt) => alt);
 
@@ -74,7 +74,7 @@ const parseQuestionText = (text: string): BlankSegment[] => {
 };
 
 // Convert segments back to text with {{}} syntax
-// Includes alternative answers: {{answer1::alternative2::alternative3}}
+// Includes alternative answers: {{answer1|alternative2|alternative3}}
 const segmentsToText = (segments: BlankSegment[]): string => {
   return segments
     .map((seg) => {
@@ -84,9 +84,9 @@ const segmentsToText = (segments: BlankSegment[]): string => {
         // Include acceptable answers in the syntax if they exist
         const alternatives =
           seg.acceptableAnswers && seg.acceptableAnswers.length > 0
-            ? seg.acceptableAnswers.filter((alt) => alt.trim()).join('::')
+            ? seg.acceptableAnswers.filter((alt) => alt.trim()).join('|')
             : '';
-        const allAnswers = alternatives ? `${seg.content}::${alternatives}` : seg.content;
+        const allAnswers = alternatives ? `${seg.content}|${alternatives}` : seg.content;
         return `{{${allAnswers}}}`;
       }
     })
@@ -186,7 +186,7 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
           {t('fillInBlank.editing.questionTextInstruction')} {t('fillInBlank.editing.questionTextExample')}
           <br />
           {t('fillInBlank.editing.alternativesSyntax', {
-            defaultValue: 'Use :: to separate alternatives: {{answer1::alternative2::alternative3}}',
+            defaultValue: 'Use | to separate alternatives: {{answer1|alternative2|alternative3}}',
           })}
         </p>
       </div>
@@ -219,7 +219,7 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
           <Label className="text-sm font-medium">{t('fillInBlank.editing.alternativeAnswers')}</Label>
           <p className="text-xs text-gray-500">
             {t('fillInBlank.editing.alternativeAnswersHint', {
-              defaultValue: 'Alternatives are parsed from your question text using :: syntax',
+              defaultValue: 'Alternatives are parsed from your question text using | syntax',
             })}
           </p>
 

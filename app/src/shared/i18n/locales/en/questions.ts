@@ -49,6 +49,7 @@ export default {
     difficulty: 'Difficulty',
     grade: 'Grade',
     validationErrors: 'Validation Errors',
+    contextDescription: 'Optional: Select a reading passage to provide context for this question',
 
     // Toast messages
     createSuccess: 'Question created successfully',
@@ -301,8 +302,8 @@ export default {
       imageUrl: 'Image URL (Optional)',
       correctAnswer: 'Correct answer',
       acceptableAnswers: 'Alternative acceptable answers',
-      alternativeAnswersHint: 'Alternatives are parsed from your question text using :: syntax',
-      alternativesSyntax: 'Use :: to separate alternatives: {{answer1::alternative2::alternative3}}',
+      alternativeAnswersHint: 'Alternatives are parsed from your question text using | syntax',
+      alternativesSyntax: 'Use | to separate alternatives: {{answer1|alternative2|alternative3}}',
       noAlternatives: 'No alternative answers',
     },
     viewing: {

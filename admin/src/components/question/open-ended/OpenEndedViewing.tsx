@@ -1,19 +1,21 @@
 import type { OpenEndedQuestion } from '@/types/questionBank';
 import { MarkdownPreview, QuestionNumber } from '../shared';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 interface OpenEndedViewingProps {
   question: OpenEndedQuestion;
   points?: number;
   number?: number;
+  compact?: boolean;
 }
 
-export const OpenEndedViewing = ({ question, points, number }: OpenEndedViewingProps) => {
+export const OpenEndedViewing = ({ question, points, number, compact }: OpenEndedViewingProps) => {
   return (
-    <div className="space-y-4">
+    <div className={cn(compact ? 'space-y-2' : 'space-y-4')}>
       {number !== undefined && (
-        <div className="flex items-center gap-3">
-          <QuestionNumber number={number} />
+        <div className={cn('flex items-center', compact ? 'gap-2' : 'gap-3')}>
+          <QuestionNumber number={number} className={compact ? 'h-6 w-6 text-xs' : undefined} />
         </div>
       )}
 
@@ -21,33 +23,51 @@ export const OpenEndedViewing = ({ question, points, number }: OpenEndedViewingP
       <div className="space-y-1">
         <MarkdownPreview content={question.title} />
         {question.titleImageUrl && (
-          <img src={question.titleImageUrl} alt="Question" className="mt-2 max-h-64 rounded-md border" />
+          <img
+            src={question.titleImageUrl}
+            alt="Question"
+            className={cn('mt-2 rounded-md border', compact ? 'max-h-32' : 'max-h-64')}
+          />
         )}
       </div>
 
       {/* Character Limit */}
       {question.data.maxLength && (
-        <p className="text-muted-foreground text-sm">Maximum {question.data.maxLength} characters</p>
+        <p className={cn('text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>
+          Maximum {question.data.maxLength} characters
+        </p>
       )}
 
       {/* Expected Answer */}
       {question.data.expectedAnswer && (
-        <div className="space-y-2 rounded-lg border border-gray-300 bg-green-50 p-3 dark:border-gray-600 dark:bg-green-900/20">
-          <Label className="text-sm font-medium">Expected Answer</Label>
+        <div
+          className={cn(
+            'space-y-1 rounded-lg border border-gray-300 bg-green-50 dark:border-gray-600 dark:bg-green-900/20',
+            compact ? 'p-2' : 'space-y-2 p-3'
+          )}
+        >
+          <Label className={cn('font-medium', compact ? 'text-xs' : 'text-sm')}>Expected Answer</Label>
           <MarkdownPreview content={question.data.expectedAnswer} />
         </div>
       )}
 
       {/* Explanation */}
       {question.explanation && (
-        <div className="space-y-2 rounded-lg border border-gray-300 bg-blue-50 p-3 dark:border-gray-600 dark:bg-blue-900/20">
-          <Label className="text-sm font-medium">Explanation</Label>
+        <div
+          className={cn(
+            'space-y-1 rounded-lg border border-gray-300 bg-blue-50 dark:border-gray-600 dark:bg-blue-900/20',
+            compact ? 'p-2' : 'space-y-2 p-3'
+          )}
+        >
+          <Label className={cn('font-medium', compact ? 'text-xs' : 'text-sm')}>Explanation</Label>
           <MarkdownPreview content={question.explanation} />
         </div>
       )}
 
       {/* Points */}
-      {points && <p className="text-muted-foreground text-sm">Points: {points}</p>}
+      {points && (
+        <p className={cn('text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>Points: {points}</p>
+      )}
     </div>
   );
 };

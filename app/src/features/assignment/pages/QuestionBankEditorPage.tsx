@@ -147,6 +147,13 @@ export function QuestionBankEditorPage() {
     }
   }, [isEditMode, existingQuestion]);
 
+  // Auto-open context display when context is selected
+  useEffect(() => {
+    if (questionData?.contextId && contextData) {
+      setIsContextOpen(true);
+    }
+  }, [questionData?.contextId, contextData]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -422,7 +429,7 @@ export function QuestionBankEditorPage() {
                           onClick={() => setQuestionData({ ...questionData, contextId: undefined })}
                         >
                           <Unlink className="h-3 w-3" />
-                          Remove
+                          {tContext('disconnect')}
                         </Button>
                         {contextData && (
                           <Button
@@ -446,9 +453,7 @@ export function QuestionBankEditorPage() {
                     value={questionData.contextId}
                     onChange={(contextId) => setQuestionData({ ...questionData, contextId })}
                   />
-                  <p className="text-muted-foreground text-xs">
-                    Optional: Select a reading passage to provide context for this question
-                  </p>
+                  <p className="text-muted-foreground text-xs">{t('editor.contextDescription')}</p>
                 </div>
 
                 {/* Context Display */}

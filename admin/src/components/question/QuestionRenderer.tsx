@@ -13,6 +13,7 @@ interface QuestionRendererProps {
   points?: number;
   onChange?: (question: Question) => void;
   number?: number;
+  compact?: boolean;
 }
 
 /**
@@ -21,14 +22,23 @@ interface QuestionRendererProps {
  * Renders questions in EDITING or VIEWING mode only.
  * Used for creating/editing questions in the admin question bank.
  */
-export const QuestionRenderer = ({ question, viewMode, points, onChange, number }: QuestionRendererProps) => {
+export const QuestionRenderer = ({
+  question,
+  viewMode,
+  points,
+  onChange,
+  number,
+  compact,
+}: QuestionRendererProps) => {
   // Multiple Choice
   if (question.type === QUESTION_TYPE.MULTIPLE_CHOICE) {
     if (viewMode === 'editing') {
       return <MultipleChoiceEditing question={question as any} onChange={onChange!} />;
     }
     if (viewMode === 'viewing') {
-      return <MultipleChoiceViewing question={question as any} points={points} number={number} />;
+      return (
+        <MultipleChoiceViewing question={question as any} points={points} number={number} compact={compact} />
+      );
     }
   }
 
@@ -38,7 +48,7 @@ export const QuestionRenderer = ({ question, viewMode, points, onChange, number 
       return <MatchingEditing question={question as any} onChange={onChange!} />;
     }
     if (viewMode === 'viewing') {
-      return <MatchingViewing question={question as any} points={points} number={number} />;
+      return <MatchingViewing question={question as any} points={points} number={number} compact={compact} />;
     }
   }
 
@@ -48,7 +58,9 @@ export const QuestionRenderer = ({ question, viewMode, points, onChange, number 
       return <OpenEndedEditing question={question as any} onChange={onChange!} />;
     }
     if (viewMode === 'viewing') {
-      return <OpenEndedViewing question={question as any} points={points} number={number} />;
+      return (
+        <OpenEndedViewing question={question as any} points={points} number={number} compact={compact} />
+      );
     }
   }
 
@@ -58,7 +70,9 @@ export const QuestionRenderer = ({ question, viewMode, points, onChange, number 
       return <FillInBlankEditing question={question as any} onChange={onChange!} />;
     }
     if (viewMode === 'viewing') {
-      return <FillInBlankViewing question={question as any} points={points} number={number} />;
+      return (
+        <FillInBlankViewing question={question as any} points={points} number={number} compact={compact} />
+      );
     }
   }
 

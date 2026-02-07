@@ -87,6 +87,26 @@ export const SUBJECT_CODE = {
 export type SubjectCode = (typeof SUBJECT_CODE)[keyof typeof SUBJECT_CODE];
 
 /**
+ * Subject Labels (Vietnamese)
+ * Display names for subjects in Vietnamese
+ */
+export const SUBJECT_LABELS = {
+  [SUBJECT_CODE.MATH]: 'Toán',
+  [SUBJECT_CODE.VIETNAMESE]: 'Tiếng Việt',
+  [SUBJECT_CODE.ENGLISH]: 'Tiếng Anh',
+} as const;
+
+/**
+ * Subject I18n Keys
+ * Localization keys for subjects (for use with i18n)
+ */
+export const SUBJECT_I18N_KEYS = {
+  [SUBJECT_CODE.MATH]: 'subjectNames.math',
+  [SUBJECT_CODE.VIETNAMESE]: 'subjectNames.vietnamese',
+  [SUBJECT_CODE.ENGLISH]: 'subjectNames.english',
+} as const;
+
+/**
  * Question Bank Types
  * Defines the ownership/visibility scope of questions
  */

@@ -5,12 +5,16 @@ import { Label } from '@/shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { Alert, AlertDescription, AlertTitle } from '@/shared/components/ui/alert';
 import { Separator } from '@/shared/components/ui/separator';
+import { Collapsible, CollapsibleContent } from '@/shared/components/ui/collapsible';
 import {
   useCreateQuestion,
   useUpdateQuestion,
   useQuestionBankItem,
   useQuestionBankChapters,
 } from '@/features/assignment/hooks/useQuestionBankApi';
+import { useContext } from '@/features/assignment/hooks/useContextApi';
+import { ContextSelector } from '@/features/assignment/components/context/ContextSelector';
+import { MarkdownPreview } from '@/features/question/components/shared/MarkdownPreview';
 import type { CreateQuestionRequest, Question, QuestionBankItem } from '@/features/assignment/types';
 import {
   DIFFICULTY,
@@ -28,7 +32,18 @@ import { VIEW_MODE } from '@/features/assignment/types';
 import { QuestionRenderer } from '@/features/question';
 import { generateId } from '@/shared/lib/utils';
 import { toast } from 'sonner';
-import { AlertCircle, Save, Settings, FileText, Eye, Edit3 } from 'lucide-react';
+import {
+  AlertCircle,
+  Save,
+  Settings,
+  FileText,
+  Eye,
+  Edit3,
+  BookOpen,
+  Unlink,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
 import { validateQuestion } from '@/features/assignment/utils/validateQuestion';
 import { useTranslation } from 'react-i18next';
 
@@ -98,6 +113,7 @@ function createDefaultQuestion(type: QuestionType): QuestionBankItem {
 
 export function QuestionBankEditorPage() {
   const { t } = useTranslation('questions');
+  const { t: tContext } = useTranslation('assignment', { keyPrefix: 'context' });
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
 
@@ -107,9 +123,13 @@ export function QuestionBankEditorPage() {
   const [questionData, setQuestionData] = useState<QuestionBankItem | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isContextOpen, setIsContextOpen] = useState(true);
 
   // Fetch existing question if editing
   const { data: existingQuestion, isLoading } = useQuestionBankItem(id || '');
+
+  // Fetch context if contextId is present
+  const { data: contextData } = useContext(questionData?.contextId);
 
   // Mutations
   const createMutation = useCreateQuestion();
@@ -374,6 +394,115 @@ export function QuestionBankEditorPage() {
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Context Section */}
+            {!isPreviewMode && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="text-primary h-5 w-5" />
+                  <h3 className="text-lg font-semibold">{tContext('readingPassage')}</h3>
+                </div>
+                <Separator />
+
+                {/* Context Selector */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label>{tContext('contextLabel')}</Label>
+                    {questionData.contextId && (
+                      <div className="flex items-center gap-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 gap-1 text-xs"
+                          onClick={() => setQuestionData({ ...questionData, contextId: undefined })}
+                        >
+                          <Unlink className="h-3 w-3" />
+                          Remove
+                        </Button>
+                        {contextData && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            onClick={() => setIsContextOpen(!isContextOpen)}
+                          >
+                            {isContextOpen ? (
+                              <ChevronUp className="h-4 w-4" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4" />
+                            )}
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <ContextSelector
+                    value={questionData.contextId}
+                    onChange={(contextId) => setQuestionData({ ...questionData, contextId })}
+                  />
+                  <p className="text-muted-foreground text-xs">
+                    Optional: Select a reading passage to provide context for this question
+                  </p>
+                </div>
+
+                {/* Context Display */}
+                {contextData && (
+                  <Collapsible open={isContextOpen} onOpenChange={setIsContextOpen}>
+                    <CollapsibleContent>
+                      <div className="mt-2 rounded-lg border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+                        <div className="space-y-3">
+                          {contextData.title && (
+                            <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                              {contextData.title}
+                            </h4>
+                          )}
+                          <MarkdownPreview
+                            content={contextData.content}
+                            className="text-sm text-gray-700 dark:text-gray-300"
+                          />
+                          {contextData.author && (
+                            <p className="text-right text-xs italic text-gray-600 dark:text-gray-400">
+                              — {contextData.author}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                )}
+              </div>
+            )}
+
+            {/* Context Display - Preview Mode (Read-only) */}
+            {isPreviewMode && contextData && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="text-primary h-5 w-5" />
+                  <h3 className="text-lg font-semibold">{tContext('readingPassage')}</h3>
+                </div>
+                <Separator />
+                <div className="rounded-lg border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+                  <div className="space-y-3">
+                    {contextData.title && (
+                      <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                        {contextData.title}
+                      </h4>
+                    )}
+                    <MarkdownPreview
+                      content={contextData.content}
+                      className="text-sm text-gray-700 dark:text-gray-300"
+                    />
+                    {contextData.author && (
+                      <p className="text-right text-xs italic text-gray-600 dark:text-gray-400">
+                        — {contextData.author}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

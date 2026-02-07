@@ -170,4 +170,9 @@ export default {
     saveFailed: 'Lưu bài trình bày thất bại',
     processFailed: 'Xử lý bài trình bày thất bại',
   },
+  subjectNames: {
+    math: 'Toán',
+    vietnamese: 'Tiếng Việt',
+    english: 'Tiếng Anh',
+  },
 };

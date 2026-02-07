@@ -4,37 +4,44 @@ import { MarkdownPreview, QuestionNumber } from '../shared';
 import { Label } from '@/shared/components/ui/label';
 import { Badge } from '@/shared/components/ui/badge';
 import { Shuffle, CheckCircle2 } from 'lucide-react';
+import { cn } from '@/shared/lib/utils';
 
 interface MultipleChoiceViewingProps {
   question: MultipleChoiceQuestion;
-  points?: number; // Optional points for display
   number?: number;
+  compact?: boolean;
 }
 
-export const MultipleChoiceViewing = ({ question, points, number }: MultipleChoiceViewingProps) => {
+export const MultipleChoiceViewing = ({ question, number, compact }: MultipleChoiceViewingProps) => {
   const { t } = useTranslation('questions');
   return (
-    <div className="space-y-4">
+    <div className={cn(compact ? 'space-y-2' : 'space-y-4')}>
       {number !== undefined && (
-        <div className="flex items-center gap-3">
-          <QuestionNumber number={number} />
+        <div className={cn('flex items-center', compact ? 'gap-2' : 'gap-3')}>
+          <QuestionNumber number={number} className={compact ? 'h-6 w-6 text-xs' : undefined} />
         </div>
       )}
       {/* Question Title */}
       <div className="space-y-1">
         <MarkdownPreview content={question.title} />
         {question.titleImageUrl && (
-          <img src={question.titleImageUrl} alt="Question" className="mt-2 max-h-64 rounded-md border" />
+          <img
+            src={question.titleImageUrl}
+            alt="Question"
+            className={cn('mt-2 rounded-md border', compact ? 'max-h-32' : 'max-h-64')}
+          />
         )}
       </div>
 
       {/* Options */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <Label className="text-sm font-medium">{t('multipleChoice.viewing.options')}</Label>
+      <div className={cn(compact ? 'space-y-1' : 'space-y-2')}>
+        <div className={cn('flex items-center', compact ? 'gap-1' : 'gap-2')}>
+          <Label className={cn('font-medium', compact ? 'text-xs' : 'text-sm')}>
+            {t('multipleChoice.viewing.options')}
+          </Label>
           {question.data.shuffleOptions && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              <Shuffle className="h-3 w-3" />
+            <Badge variant="secondary" className={cn('flex items-center gap-1', compact && 'py-0 text-xs')}>
+              <Shuffle className={cn(compact ? 'h-2.5 w-2.5' : 'h-3 w-3')} />
               {t('multipleChoice.viewing.shuffle')}
             </Badge>
           )}
@@ -42,23 +49,35 @@ export const MultipleChoiceViewing = ({ question, points, number }: MultipleChoi
         {question.data.options.map((option, index) => (
           <div
             key={option.id}
-            className={`flex items-center gap-3 rounded-md border p-3 ${option.isCorrect ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : ''}`}
+            className={cn(
+              'flex items-center rounded-md border',
+              compact ? 'gap-2 p-1.5' : 'gap-3 p-3',
+              option.isCorrect ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : ''
+            )}
           >
             <div
-              className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-sm font-medium ${option.isCorrect ? 'bg-green-600 text-white' : 'bg-muted'}`}
+              className={cn(
+                'flex flex-shrink-0 items-center justify-center rounded-full font-medium',
+                compact ? 'h-5 w-5 text-xs' : 'h-6 w-6 text-sm',
+                option.isCorrect ? 'bg-green-600 text-white' : 'bg-muted'
+              )}
             >
               {String.fromCharCode(65 + index)}
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <MarkdownPreview content={option.text} />
-                {option.isCorrect && <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-green-600" />}
+                {option.isCorrect && (
+                  <CheckCircle2
+                    className={cn('flex-shrink-0 text-green-600', compact ? 'h-3.5 w-3.5' : 'h-4 w-4')}
+                  />
+                )}
               </div>
               {option.imageUrl && (
                 <img
                   src={option.imageUrl}
                   alt={`Option ${String.fromCharCode(65 + index)}`}
-                  className="mt-2 max-h-32 rounded-md border"
+                  className={cn('mt-2 rounded-md border', compact ? 'max-h-16' : 'max-h-32')}
                 />
               )}
             </div>
@@ -68,15 +87,17 @@ export const MultipleChoiceViewing = ({ question, points, number }: MultipleChoi
 
       {/* Explanation */}
       {question.explanation && (
-        <div className="space-y-2 rounded-lg border border-gray-300 bg-blue-50 p-3 dark:border-gray-600 dark:bg-blue-900/20">
-          <Label className="text-sm font-medium">{t('multipleChoice.viewing.explanation')}</Label>
+        <div
+          className={cn(
+            'space-y-1 rounded-lg border border-gray-300 bg-blue-50 dark:border-gray-600 dark:bg-blue-900/20',
+            compact ? 'p-2' : 'space-y-2 p-3'
+          )}
+        >
+          <Label className={cn('font-medium', compact ? 'text-xs' : 'text-sm')}>
+            {t('multipleChoice.viewing.explanation')}
+          </Label>
           <MarkdownPreview content={question.explanation} />
         </div>
-      )}
-
-      {/* Points */}
-      {points && (
-        <p className="text-muted-foreground text-sm">{t('multipleChoice.viewing.points', { points })}</p>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Check, ChevronsUpDown, X, BookOpen } from 'lucide-react';
+import { Check, ChevronsUpDown, BookOpen } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
@@ -85,11 +85,6 @@ export const ContextSelector = ({
     setOpen(false);
   };
 
-  const handleClear = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onChange(undefined);
-  };
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -110,10 +105,7 @@ export const ContextSelector = ({
               <span className="text-muted-foreground">{placeholder || t('selectContext')}</span>
             )}
           </div>
-          <div className="flex items-center gap-1">
-            {value && <X className="h-4 w-4 shrink-0 opacity-50 hover:opacity-100" onClick={handleClear} />}
-            <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
-          </div>
+          <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0" align="start">

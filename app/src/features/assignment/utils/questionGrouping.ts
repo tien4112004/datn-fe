@@ -1,10 +1,30 @@
-import type { AssignmentQuestionWithTopic, AssignmentContext } from '../types/assignment';
+import type { AssignmentQuestionWithTopic, AssignmentContext, QuestionWithTopic } from '../types/assignment';
 import type { Context } from '../types/context';
+import type { Question } from '@aiprimary/core';
 
 /**
  * Base context shape used in grouping (common fields between Context and AssignmentContext)
  */
 export type GroupingContext = Pick<Context, 'id' | 'title' | 'content'> | AssignmentContext;
+
+/**
+ * Question with optional contextId (extends base Question type)
+ */
+type QuestionWithContext = Question & {
+  contextId?: string;
+};
+
+/**
+ * API response shape: can be either wrapped or unwrapped
+ */
+type QuestionInput = AssignmentQuestionWithTopic | QuestionWithContext;
+
+/**
+ * Type guard to check if input is wrapped format
+ */
+function isWrappedQuestion(q: QuestionInput): q is AssignmentQuestionWithTopic {
+  return q != null && 'question' in q && typeof q.question === 'object';
+}
 
 /**
  * Represents a group of questions - either under a context or standalone
@@ -24,12 +44,16 @@ export interface QuestionGroup {
 
 /**
  * Extracts all unique contextIds from a list of questions
+ * Handles both wrapped assignment questions ({ question, points }) and raw Question objects
  */
-export function getUniqueContextIds(questions: AssignmentQuestionWithTopic[]): string[] {
+export function getUniqueContextIds(questions: QuestionInput[]): string[] {
   const contextIds = new Set<string>();
   for (const q of questions) {
-    if (!q?.question) continue;
-    const contextId = (q.question as any).contextId;
+    if (!q) continue;
+
+    const questionObj = isWrappedQuestion(q) ? q.question : q;
+    const contextId = (questionObj as QuestionWithContext).contextId;
+
     if (contextId) {
       contextIds.add(contextId);
     }
@@ -44,19 +68,29 @@ export function getUniqueContextIds(questions: AssignmentQuestionWithTopic[]): s
  *
  * The order is determined by the first occurrence of each context/question in the original array.
  * Accepts both Context (from API) and AssignmentContext (cloned in assignment) types.
+ * Also supports both wrapped and raw question shapes by normalizing entries into
+ * AssignmentQuestionWithTopic shape when building groups.
  */
 export function groupQuestionsByContext(
-  questions: AssignmentQuestionWithTopic[],
+  questions: QuestionInput[],
   contexts: Map<string, GroupingContext>
 ): QuestionGroup[] {
   const groups: QuestionGroup[] = [];
   const contextGroups = new Map<string, QuestionGroup>();
 
   for (const q of questions) {
-    // Skip invalid entries
-    if (!q?.question) continue;
+    if (!q) continue;
 
-    const contextId = (q.question as any).contextId as string | undefined;
+    // Normalize item to AssignmentQuestionWithTopic shape
+    const questionObj = isWrappedQuestion(q) ? q.question : q;
+    if (!questionObj) continue;
+
+    const normalized: AssignmentQuestionWithTopic = {
+      question: questionObj as QuestionWithTopic,
+      points: isWrappedQuestion(q) ? q.points : 0,
+    };
+
+    const contextId = (normalized.question as QuestionWithContext).contextId;
 
     if (contextId) {
       // Question has a context - add to or create context group
@@ -72,13 +106,13 @@ export function groupQuestionsByContext(
         contextGroups.set(contextId, group);
         groups.push(group);
       }
-      group.questions.push(q);
+      group.questions.push(normalized);
     } else {
       // Standalone question - create individual group
       groups.push({
-        id: `standalone-${q.question.id}`,
+        id: `standalone-${normalized.question.id}`,
         type: 'standalone',
-        questions: [q],
+        questions: [normalized],
       });
     }
   }

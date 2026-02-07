@@ -19,7 +19,18 @@ export default class AssignmentService implements AssignmentApiService {
 
   async getAssignmentById(id: string): Promise<CoreAssignment> {
     const response = await this.apiClient.get(`${this.baseUrl}/api/assignments/${id}`);
-    return response.data.data;
+    const assignment = response.data.data;
+
+    // Normalize 'point' to 'points' for consistency with frontend types
+    if (assignment.questions) {
+      assignment.questions = assignment.questions.map((q: any) => ({
+        ...q,
+        points: q.points ?? q.point,
+        point: undefined,
+      }));
+    }
+
+    return assignment;
   }
 
   async createAssignment(data: CreateAssignmentRequest): Promise<CoreAssignment> {

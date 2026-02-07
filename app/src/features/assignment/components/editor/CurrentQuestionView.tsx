@@ -1,18 +1,20 @@
-import { useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trash2, Eye, Pencil, FileQuestion, BookOpen } from 'lucide-react';
+import { Trash2, Eye, Pencil, FileQuestion, BookOpen, Unlink, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
+import { Textarea } from '@/shared/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { Badge } from '@/shared/components/ui/badge';
+import { Collapsible, CollapsibleContent } from '@/shared/components/ui/collapsible';
+import { MarkdownPreview } from '@/features/question/components/shared/MarkdownPreview';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 import { QuestionRenderer } from '@/features/question';
 import { VIEW_MODE, type Question, getQuestionTypeName, getAllDifficulties } from '@aiprimary/core';
 import { ContextSelector } from '../context/ContextSelector';
 import { ContextGroupView } from '../context/ContextGroupView';
-import { EditableContextDisplay } from '../context/EditableContextDisplay';
 import { groupQuestionsByContext, getQuestionDisplayNumber } from '../../utils/questionGrouping';
 import type { AssignmentContext } from '../../types';
 
@@ -56,6 +58,10 @@ export const CurrentQuestionView = () => {
   const assignmentQuestion = questions[currentQuestionIndex];
   const question = assignmentQuestion?.question;
   const points = assignmentQuestion?.points || 0;
+
+  // State for context editing UI
+  const [isContextOpen, setIsContextOpen] = useState(true);
+  const [isContextEditing, setIsContextEditing] = useState(false);
 
   const viewMode = questionViewModes.get(question?.id || '') || VIEW_MODE.EDITING;
   const isEditing = viewMode === VIEW_MODE.EDITING;
@@ -251,109 +257,203 @@ export const CurrentQuestionView = () => {
 
       {/* Question Details */}
       <div className="space-y-4">
-        {/* Topic, Difficulty, and Points */}
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div>
-            <Label
-              htmlFor={`topic-${currentQuestionIndex}`}
-              className="text-xs text-gray-600 dark:text-gray-400"
-            >
-              {t('collection.item.topicLabel')}
-            </Label>
-            <Select
-              value={question.topicId}
-              onValueChange={(value) =>
-                updateQuestion(currentQuestionIndex, {
-                  question: { ...question, topicId: value },
-                })
-              }
-            >
-              <SelectTrigger id={`topic-${currentQuestionIndex}`} className="mt-1.5 h-9 text-sm">
-                <SelectValue placeholder={t('collection.item.selectTopicPlaceholder') as string} />
-              </SelectTrigger>
-              <SelectContent>
-                {topics.map((topic) => (
-                  <SelectItem key={topic.id} value={topic.id}>
-                    {topic.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Topic, Difficulty, and Points - Only show in editing mode */}
+        {isEditing && (
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div>
+              <Label
+                htmlFor={`topic-${currentQuestionIndex}`}
+                className="text-xs text-gray-600 dark:text-gray-400"
+              >
+                {t('collection.item.topicLabel')}
+              </Label>
+              <Select
+                value={question.topicId}
+                onValueChange={(value) =>
+                  updateQuestion(currentQuestionIndex, {
+                    question: { ...question, topicId: value },
+                  })
+                }
+              >
+                <SelectTrigger id={`topic-${currentQuestionIndex}`} className="mt-1.5 h-9 text-sm">
+                  <SelectValue placeholder={t('collection.item.selectTopicPlaceholder') as string} />
+                </SelectTrigger>
+                <SelectContent>
+                  {topics.map((topic) => (
+                    <SelectItem key={topic.id} value={topic.id}>
+                      {topic.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div>
-            <Label
-              htmlFor={`difficulty-${currentQuestionIndex}`}
-              className="text-xs text-gray-600 dark:text-gray-400"
-            >
-              {t('collection.item.difficultyLabel')}
-            </Label>
-            <Select
-              value={question.difficulty}
-              onValueChange={(value) =>
-                updateQuestion(currentQuestionIndex, {
-                  question: { ...question, difficulty: value as any },
-                })
-              }
-            >
-              <SelectTrigger id={`difficulty-${currentQuestionIndex}`} className="mt-1.5 h-9 text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {getAllDifficulties().map((difficulty) => (
-                  <SelectItem key={difficulty.value} value={difficulty.value}>
-                    {(tQuestions as any)(difficulty.i18nKey!)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            <div>
+              <Label
+                htmlFor={`difficulty-${currentQuestionIndex}`}
+                className="text-xs text-gray-600 dark:text-gray-400"
+              >
+                {t('collection.item.difficultyLabel')}
+              </Label>
+              <Select
+                value={question.difficulty}
+                onValueChange={(value) =>
+                  updateQuestion(currentQuestionIndex, {
+                    question: { ...question, difficulty: value as any },
+                  })
+                }
+              >
+                <SelectTrigger id={`difficulty-${currentQuestionIndex}`} className="mt-1.5 h-9 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {getAllDifficulties().map((difficulty) => (
+                    <SelectItem key={difficulty.value} value={difficulty.value}>
+                      {(tQuestions as any)(difficulty.i18nKey!)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div>
-            <Label
-              htmlFor={`points-${currentQuestionIndex}`}
-              className="text-xs text-gray-600 dark:text-gray-400"
-            >
-              {t('collection.item.pointsLabel')}
-            </Label>
-            <Input
-              id={`points-${currentQuestionIndex}`}
-              type="number"
-              value={points}
-              onChange={(e) =>
-                updateQuestion(currentQuestionIndex, {
-                  points: parseInt(e.target.value, 10) || 0,
-                })
-              }
-              min={0}
-              className="mt-1.5 h-9 text-sm"
-            />
+            <div>
+              <Label
+                htmlFor={`points-${currentQuestionIndex}`}
+                className="text-xs text-gray-600 dark:text-gray-400"
+              >
+                {t('collection.item.pointsLabel')}
+              </Label>
+              <Input
+                id={`points-${currentQuestionIndex}`}
+                type="number"
+                value={points}
+                onChange={(e) =>
+                  updateQuestion(currentQuestionIndex, {
+                    points: parseInt(e.target.value, 10) || 0,
+                  })
+                }
+                min={0}
+                className="mt-1.5 h-9 text-sm"
+              />
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Context (Reading Passage) Selector */}
-        <div>
-          <Label className="text-xs text-gray-600 dark:text-gray-400">{t('context.contextLabel')}</Label>
-          <div className="mt-1.5">
-            <ContextSelector
-              value={(question as any).contextId}
-              onChange={(newContextId) =>
-                updateQuestion(currentQuestionIndex, {
-                  question: { ...question, contextId: newContextId },
-                })
-              }
-            />
+        {/* Context (Reading Passage) - Only show selector and controls in editing mode */}
+        {isEditing && (
+          <>
+            <Label className="text-xs text-gray-600 dark:text-gray-400">{tContext('contextLabel')}</Label>
+            <div className="mt-1.5 flex items-center gap-1">
+              <div className="flex-1">
+                <ContextSelector
+                  value={(question as any).contextId}
+                  onChange={(newContextId) =>
+                    updateQuestion(currentQuestionIndex, {
+                      question: { ...question, contextId: newContextId },
+                    })
+                  }
+                />
+              </div>
+              {context && (
+                <>
+                  {!isContextEditing && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-9 w-9 shrink-0 p-0"
+                      onClick={() => {
+                        setIsContextEditing(true);
+                        setIsContextOpen(true);
+                      }}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  )}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-9 w-9 shrink-0 p-0 text-gray-400 hover:text-red-600"
+                    onClick={() =>
+                      updateQuestion(currentQuestionIndex, {
+                        question: { ...question, contextId: undefined },
+                      })
+                    }
+                  >
+                    <Unlink className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-9 w-9 shrink-0 p-0"
+                    onClick={() => setIsContextOpen(!isContextOpen)}
+                  >
+                    {isContextOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  </Button>
+                </>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* Context Display - Show read-only in viewing mode */}
+        {!isEditing && context && (
+          <div className="border-l-4 border-l-blue-400 py-2 pl-4">
+            <div className="space-y-2 pl-4 pr-8">
+              {context.title && <h3 className="text-lg font-semibold">{context.title}</h3>}
+              <MarkdownPreview content={context.content} className="text-gray-800 dark:text-gray-200" />
+              {context.author && (
+                <p className="text-muted-foreground text-right text-sm italic">— {context.author}</p>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Editable Context Display (if question has context) */}
-        {context && (
-          <EditableContextDisplay
-            context={context}
-            onUpdate={(updates) => handleContextUpdate(context.id, updates)}
-            defaultCollapsed={true}
-            readOnly={!isEditing}
-          />
+        {/* Context Collapsible - Show in editing mode */}
+        {isEditing && context && (
+          <Collapsible open={isContextOpen} onOpenChange={setIsContextOpen}>
+            <CollapsibleContent>
+              <div className="mt-2 border-l-4 border-l-blue-400 py-2 pl-4">
+                {isContextEditing ? (
+                  <div className="space-y-4">
+                    <Input
+                      value={context.title}
+                      onChange={(e) => updateContext(context.id, { title: e.target.value })}
+                      placeholder={tContext('titlePlaceholder')}
+                      className="text-base font-semibold"
+                    />
+                    <Textarea
+                      value={context.content}
+                      onChange={(e) => updateContext(context.id, { content: e.target.value })}
+                      placeholder={tContext('contentPlaceholder')}
+                      className="min-h-[200px] resize-y"
+                    />
+                    <Input
+                      value={context.author || ''}
+                      onChange={(e) => updateContext(context.id, { author: e.target.value })}
+                      placeholder={tContext('authorPlaceholder')}
+                      className="max-w-xs text-sm"
+                    />
+                    <div className="flex justify-end">
+                      <Button type="button" size="sm" onClick={() => setIsContextEditing(false)}>
+                        {tContext('done')}
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2 pl-4 pr-8">
+                    {context.title && <h3 className="text-lg font-semibold">{context.title}</h3>}
+                    <MarkdownPreview content={context.content} className="text-gray-800 dark:text-gray-200" />
+                    {context.author && (
+                      <p className="text-muted-foreground text-right text-sm italic">— {context.author}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         )}
 
         {/* QuestionRenderer */}
@@ -369,3 +469,5 @@ export const CurrentQuestionView = () => {
     </div>
   );
 };
+
+// Note: Inline context handling is now integrated directly in CurrentQuestionView

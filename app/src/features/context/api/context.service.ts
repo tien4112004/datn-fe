@@ -17,7 +17,9 @@ export default class ContextService implements ContextApiService {
   }
 
   async getContexts(filters?: ContextFilters): Promise<ContextApiResponse> {
-    const queryParams: Record<string, any> = {};
+    const queryParams: Record<string, any> = {
+      bankType: 'public',
+    };
 
     if (filters?.search) {
       queryParams.search = filters.search;

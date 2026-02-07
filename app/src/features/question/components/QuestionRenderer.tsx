@@ -47,6 +47,7 @@ interface QuestionRendererProps {
   onGradeChange?: (grade: { points: number; feedback?: string }) => void;
   onContextChange?: (contextId: string | undefined) => void; // Callback for context changes in EDITING mode
   number?: number;
+  compact?: boolean;
 }
 
 export const QuestionRenderer = ({
@@ -61,6 +62,7 @@ export const QuestionRenderer = ({
   onGradeChange,
   onContextChange,
   number,
+  compact,
 }: QuestionRendererProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'context' });
 
@@ -75,7 +77,7 @@ export const QuestionRenderer = ({
         return <MultipleChoiceEditing question={question} onChange={onChange!} />;
       }
       if (viewMode === VIEW_MODE.VIEWING) {
-        return <MultipleChoiceViewing question={question} points={points} number={number} />;
+        return <MultipleChoiceViewing question={question} number={number} compact={compact} />;
       }
       if (viewMode === VIEW_MODE.DOING) {
         return (
@@ -117,7 +119,7 @@ export const QuestionRenderer = ({
         return <MatchingEditing question={question} onChange={onChange!} />;
       }
       if (viewMode === VIEW_MODE.VIEWING) {
-        return <MatchingViewing question={question} points={points} number={number} />;
+        return <MatchingViewing question={question} number={number} compact={compact} />;
       }
       if (viewMode === VIEW_MODE.DOING) {
         return (
@@ -159,7 +161,7 @@ export const QuestionRenderer = ({
         return <OpenEndedEditing question={question} onChange={onChange!} />;
       }
       if (viewMode === VIEW_MODE.VIEWING) {
-        return <OpenEndedViewing question={question} points={points} number={number} />;
+        return <OpenEndedViewing question={question} number={number} compact={compact} />;
       }
       if (viewMode === VIEW_MODE.DOING) {
         return (
@@ -201,7 +203,7 @@ export const QuestionRenderer = ({
         return <FillInBlankEditing question={question} onChange={onChange!} />;
       }
       if (viewMode === VIEW_MODE.VIEWING) {
-        return <FillInBlankViewing question={question} points={points} number={number} />;
+        return <FillInBlankViewing question={question} number={number} compact={compact} />;
       }
       if (viewMode === VIEW_MODE.DOING) {
         return (

@@ -9,12 +9,7 @@ import { useAssignmentViewerStore } from '../../stores/useAssignmentViewerStore'
 import { LabelValuePair } from './LabelValuePair';
 import { ContextDisplay } from '@/features/context';
 import { ContextGroupView } from '../context/ContextGroupView';
-import { useQuestionContexts } from '../../hooks/useQuestionContexts';
-import {
-  groupQuestionsByContext,
-  getQuestionDisplayNumber,
-  type GroupingContext,
-} from '../../utils/questionGrouping';
+import { groupQuestionsByContext, getQuestionDisplayNumber } from '../../utils/questionGrouping';
 
 interface QuestionsViewPanelProps {
   assignment: Assignment;
@@ -28,23 +23,14 @@ export const QuestionsViewPanel = ({ assignment }: QuestionsViewPanelProps) => {
   const currentContextId = useAssignmentViewerStore((state) => state.currentContextId);
 
   const questions = (assignment.questions || []) as AssignmentQuestionWithTopic[];
-  const assignmentContexts = (assignment as any).contexts as AssignmentContext[] | undefined;
+  const assignmentContexts = ((assignment as any).contexts || []) as AssignmentContext[];
 
-  // Use assignment's cloned contexts if available, otherwise fetch from API
-  const { contextsMap: apiContextsMap } = useQuestionContexts(
-    // Only fetch from API if assignment doesn't have cloned contexts
-    assignmentContexts?.length ? [] : questions
-  );
-
-  // Build contexts map from assignment's cloned contexts or API
+  // Build contexts map from assignment's cloned contexts
   const contextsMap = useMemo(() => {
-    if (assignmentContexts?.length) {
-      const map = new Map<string, GroupingContext>();
-      assignmentContexts.forEach((ctx) => map.set(ctx.id, ctx));
-      return map;
-    }
-    return apiContextsMap;
-  }, [assignmentContexts, apiContextsMap]);
+    const map = new Map<string, AssignmentContext>();
+    assignmentContexts.forEach((ctx) => map.set(ctx.id, ctx));
+    return map;
+  }, [assignmentContexts]);
 
   // Group questions by context
   const groups = useMemo(() => groupQuestionsByContext(questions, contextsMap), [questions, contextsMap]);

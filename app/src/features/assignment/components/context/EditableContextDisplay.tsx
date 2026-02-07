@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BookOpen, ChevronDown, ChevronUp, Pencil, Eye } from 'lucide-react';
+import { BookOpen, ChevronDown, ChevronUp, Pencil, Unlink } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Textarea } from '@/shared/components/ui/textarea';
@@ -11,15 +11,19 @@ import type { AssignmentContext } from '../../types';
 interface EditableContextDisplayProps {
   context: AssignmentContext;
   onUpdate: (updates: Partial<AssignmentContext>) => void;
+  onRemove?: () => void;
   defaultCollapsed?: boolean;
   readOnly?: boolean;
+  showTitle?: boolean;
 }
 
 export const EditableContextDisplay = ({
   context,
   onUpdate,
+  onRemove,
   defaultCollapsed = false,
   readOnly = false,
+  showTitle = true,
 }: EditableContextDisplayProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'context' });
   const [isOpen, setIsOpen] = useState(!defaultCollapsed);
@@ -38,10 +42,10 @@ export const EditableContextDisplay = ({
   };
 
   return (
-    <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/20">
+    <div className="mb-4 border-l-4 border-l-blue-400 pl-4">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <div className="border-b border-blue-200 px-4 py-3 dark:border-blue-800">
-          <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between py-2">
+          {showTitle && (
             <div className="flex min-w-0 flex-1 items-center gap-2">
               <BookOpen className="h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
               {isEditing && !readOnly ? (
@@ -57,30 +61,42 @@ export const EditableContextDisplay = ({
                 </h3>
               )}
             </div>
-            <div className="flex shrink-0 items-center gap-1">
-              {!readOnly && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 p-0"
-                  onClick={() => setIsEditing(!isEditing)}
-                >
-                  {isEditing ? <Eye className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
-                  <span className="sr-only">{isEditing ? t('preview') : t('edit')}</span>
-                </Button>
-              )}
-              <CollapsibleTrigger asChild>
-                <Button type="button" variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                  <span className="sr-only">{isOpen ? t('collapse') : t('expand')}</span>
-                </Button>
-              </CollapsibleTrigger>
-            </div>
+          )}
+          <div className="flex shrink-0 items-center gap-1">
+            {!readOnly && !isEditing && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => setIsEditing(true)}
+              >
+                <Pencil className="h-4 w-4" />
+                <span className="sr-only">{t('edit')}</span>
+              </Button>
+            )}
+            {onRemove && !readOnly && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-gray-400 hover:text-red-600"
+                onClick={onRemove}
+              >
+                <Unlink className="h-4 w-4" />
+                <span className="sr-only">{t('disconnect')}</span>
+              </Button>
+            )}
+            <CollapsibleTrigger asChild>
+              <Button type="button" variant="ghost" size="sm" className="h-8 w-8 p-0">
+                {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                <span className="sr-only">{isOpen ? t('collapse') : t('expand')}</span>
+              </Button>
+            </CollapsibleTrigger>
           </div>
         </div>
         <CollapsibleContent>
-          <div className="px-4 py-3">
+          <div className="py-2">
             {isEditing && !readOnly ? (
               <div className="space-y-4">
                 <Textarea
@@ -96,6 +112,11 @@ export const EditableContextDisplay = ({
                     placeholder={t('authorPlaceholder')}
                     className="max-w-xs text-sm"
                   />
+                </div>
+                <div className="flex justify-end">
+                  <Button type="button" size="sm" onClick={() => setIsEditing(false)}>
+                    {t('done')}
+                  </Button>
                 </div>
               </div>
             ) : (

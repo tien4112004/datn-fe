@@ -859,5 +859,7 @@ export default {
     titlePlaceholder: 'Nhập tiêu đề đoạn văn...',
     contentPlaceholder: 'Nhập nội dung đoạn văn...',
     authorPlaceholder: 'Tác giả (tùy chọn)',
+    done: 'Xong',
+    disconnect: 'Ngắt kết nối đoạn văn',
   },
 };

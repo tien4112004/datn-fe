@@ -872,5 +872,7 @@ export default {
     titlePlaceholder: 'Enter reading passage title...',
     contentPlaceholder: 'Enter reading passage content...',
     authorPlaceholder: 'Author (optional)',
+    done: 'Done',
+    disconnect: 'Disconnect reading passage',
   },
 };

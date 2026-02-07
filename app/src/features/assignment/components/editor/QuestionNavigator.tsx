@@ -6,8 +6,8 @@ import { cn } from '@/shared/lib/utils';
 import { CollapsibleSection } from './CollapsibleSection';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
-import { useQuestionContexts } from '../../hooks/useQuestionContexts';
 import { groupQuestionsByContext } from '../../utils/questionGrouping';
+import type { AssignmentContext } from '../../types';
 import {
   DndContext,
   closestCenter,
@@ -82,6 +82,7 @@ export const QuestionNavigator = () => {
   const { t: tContext } = useTranslation('assignment', { keyPrefix: 'context' });
 
   const questions = useAssignmentFormStore((state) => state.questions);
+  const contexts = useAssignmentFormStore((state) => state.contexts);
   const reorderQuestions = useAssignmentFormStore((state) => state.reorderQuestions);
 
   const mainView = useAssignmentEditorStore((state) => state.mainView);
@@ -91,8 +92,12 @@ export const QuestionNavigator = () => {
   const setCurrentQuestionId = useAssignmentEditorStore((state) => state.setCurrentQuestionId);
   const setCurrentContextId = useAssignmentEditorStore((state) => state.setCurrentContextId);
 
-  // Fetch all contexts for questions
-  const { contextsMap } = useQuestionContexts(questions);
+  // Build contexts map from assignment's cloned contexts (not from API)
+  const contextsMap = useMemo(() => {
+    const map = new Map<string, AssignmentContext>();
+    contexts.forEach((ctx) => map.set(ctx.id, ctx));
+    return map;
+  }, [contexts]);
 
   // Group questions by context
   const groups = useMemo(() => groupQuestionsByContext(questions, contextsMap), [questions, contextsMap]);

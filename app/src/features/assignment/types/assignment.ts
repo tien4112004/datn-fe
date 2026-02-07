@@ -132,6 +132,7 @@ export interface CreateAssignmentRequest {
   topics?: TopicRequest[];
   contexts?: AssignmentContext[];
   matrix?: ApiMatrix; // Full 3D matrix structure with lowercase enums
+  shuffleQuestions?: boolean;
 }
 
 export interface UpdateAssignmentRequest {
@@ -143,6 +144,7 @@ export interface UpdateAssignmentRequest {
   topics?: TopicRequest[];
   contexts?: AssignmentContext[];
   matrix?: ApiMatrix; // Full 3D matrix structure with lowercase enums
+  shuffleQuestions?: boolean;
 }
 
 // Generate matrix request (calls POST /api/exams/generate-matrix)

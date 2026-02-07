@@ -60,12 +60,6 @@ export const AssignmentPublicViewPage = () => {
                   <span className="font-semibold">Total: {totalPoints} points</span>
                 </div>
               )}
-              {assignment.timeLimit && (
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  <span>{assignment.timeLimit} minutes</span>
-                </div>
-              )}
             </div>
           </div>
         </div>

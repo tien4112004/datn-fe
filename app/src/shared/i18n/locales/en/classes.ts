@@ -1100,6 +1100,33 @@ export default {
       },
       selectResources: 'Select resources...',
       resourcesSelected: '{{count}} resource(s) selected',
+      assignmentSettings: {
+        title: 'Assignment Settings',
+        displaySettings: {
+          shuffleQuestions: 'Shuffle Questions',
+          shuffleQuestionsDescription: 'Randomize question order for each student',
+          showCorrectAnswers: 'Show Correct Answers',
+          showCorrectAnswersDescription: 'Students can see correct answers after submission',
+          showScoreImmediately: 'Show Score Immediately',
+          showScoreImmediatelyDescription: 'Display score right after submission',
+        },
+        submissionSettings: {
+          allowRetakes: 'Allow Retakes',
+          allowRetakesDescription: 'Students can submit multiple times',
+          maxSubmissions: 'Max Submissions (optional)',
+          maxSubmissionsPlaceholder: 'Unlimited',
+          maxSubmissionsDescription: 'Leave empty for unlimited attempts',
+        },
+        grading: {
+          passingScore: 'Passing Score (%)',
+          passingScorePlaceholder: 'None',
+          passingScoreDescription: 'Minimum percentage to pass',
+        },
+        timing: {
+          availableFrom: 'Available From',
+          availableUntil: 'Available Until',
+        },
+      },
     },
     resourceSelector: {
       title: 'Link Resources',

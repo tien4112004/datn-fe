@@ -3,7 +3,6 @@ import { FileText, HelpCircle } from 'lucide-react';
 import { Input } from '@/shared/components/ui/input';
 import { Textarea } from '@/shared/components/ui/textarea';
 import { Label } from '@/shared/components/ui/label';
-import { Switch } from '@/shared/components/ui/switch';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
@@ -12,27 +11,27 @@ import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 export const AssignmentMetadataPanel = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.metadata' });
 
-  // Get data and actions from store
+  // Get data and actions from store - Basic Info
   const title = useAssignmentFormStore((state) => state.title);
   const description = useAssignmentFormStore((state) => state.description);
   const subject = useAssignmentFormStore((state) => state.subject);
   const grade = useAssignmentFormStore((state) => state.grade);
-  const shuffleQuestions = useAssignmentFormStore((state) => state.shuffleQuestions);
   const setTitle = useAssignmentFormStore((state) => state.setTitle);
   const setDescription = useAssignmentFormStore((state) => state.setDescription);
   const setSubject = useAssignmentFormStore((state) => state.setSubject);
   const setGrade = useAssignmentFormStore((state) => state.setGrade);
-  const setShuffleQuestions = useAssignmentFormStore((state) => state.setShuffleQuestions);
 
   const subjects = getAllSubjects();
   const grades = getElementaryGrades();
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3 border-b pb-4">
-        <FileText className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('panelTitle')}</h2>
-      </div>
+      {/* Basic Information */}
+      <div>
+        <div className="flex items-center gap-3 border-b pb-4">
+          <FileText className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Basic Information</h2>
+        </div>
 
       <div className="space-y-4 px-2">
         <div>

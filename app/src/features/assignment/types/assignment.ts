@@ -103,6 +103,7 @@ export interface CreateAssignmentRequest {
   questions?: QuestionItemRequest[];
   topics?: TopicRequest[];
   matrixCells?: MatrixCellRequest[];
+  shuffleQuestions?: boolean;
 }
 
 export interface UpdateAssignmentRequest {
@@ -113,4 +114,5 @@ export interface UpdateAssignmentRequest {
   questions?: QuestionItemRequest[];
   topics?: TopicRequest[];
   matrixCells?: MatrixCellRequest[];
+  shuffleQuestions?: boolean;
 }

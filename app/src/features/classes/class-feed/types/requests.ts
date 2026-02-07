@@ -11,6 +11,16 @@ export interface PostCreateRequest {
   assignmentId?: string; // For Homework type posts
   dueDate?: string; // ISO string for Homework type posts
   allowComments?: boolean;
+
+  // Assignment settings (only for Homework type)
+  maxSubmissions?: number;
+  allowRetake?: boolean;
+  shuffleQuestions?: boolean;
+  showCorrectAnswers?: boolean;
+  showScoreImmediately?: boolean;
+  passingScore?: number;
+  availableFrom?: string;
+  availableUntil?: string;
 }
 
 export interface PostUpdateRequest {

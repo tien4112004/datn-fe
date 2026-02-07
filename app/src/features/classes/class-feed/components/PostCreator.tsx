@@ -10,6 +10,8 @@ import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
 import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
 import { Label } from '@/shared/components/ui/label';
 import { Checkbox } from '@/shared/components/ui/checkbox';
+import { Switch } from '@/shared/components/ui/switch';
+import { Input } from '@/shared/components/ui/input';
 import {
   Dialog,
   DialogContent,
@@ -80,6 +82,16 @@ export const PostCreator = ({
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [allowComments, setAllowComments] = useState(true);
 
+  // Assignment settings (for Homework type)
+  const [maxSubmissions, setMaxSubmissions] = useState<number | undefined>(undefined);
+  const [allowRetake, setAllowRetake] = useState(true);
+  const [shuffleQuestions, setShuffleQuestions] = useState(false);
+  const [showCorrectAnswers, setShowCorrectAnswers] = useState(false);
+  const [showScoreImmediately, setShowScoreImmediately] = useState(true);
+  const [passingScore, setPassingScore] = useState<number | undefined>(undefined);
+  const [availableFrom, setAvailableFrom] = useState<string>('');
+  const [availableUntil, setAvailableUntil] = useState<string>('');
+
   // Sync type with initialType when it changes (e.g., when filter switches to Homework)
   useEffect(() => {
     setType(initialType);
@@ -116,6 +128,17 @@ export const PostCreator = ({
         assignmentId: type === 'Homework' && selectedAssignment ? selectedAssignment.id : undefined,
         dueDate: type === 'Homework' && dueDate ? dueDate.toISOString() : undefined,
         allowComments,
+        // Include assignment settings for Homework type
+        ...(type === 'Homework' && {
+          maxSubmissions,
+          allowRetake,
+          shuffleQuestions,
+          showCorrectAnswers,
+          showScoreImmediately,
+          passingScore,
+          availableFrom: availableFrom || undefined,
+          availableUntil: availableUntil || undefined,
+        }),
       };
 
       await createPost.mutateAsync(request);
@@ -129,6 +152,15 @@ export const PostCreator = ({
       setDueDate(undefined);
       setType(initialType);
       setAllowComments(true);
+      // Reset assignment settings
+      setMaxSubmissions(undefined);
+      setAllowRetake(true);
+      setShuffleQuestions(false);
+      setShowCorrectAnswers(false);
+      setShowScoreImmediately(true);
+      setPassingScore(undefined);
+      setAvailableFrom('');
+      setAvailableUntil('');
       setOpen(false);
 
       onPostCreated?.();
@@ -245,6 +277,157 @@ export const PostCreator = ({
                   </PopoverContent>
                 </Popover>
               </div>
+
+              {/* Assignment Settings */}
+              {selectedAssignment && (
+                <div className="space-y-4 rounded-lg border p-4">
+                  <h4 className="text-sm font-semibold">{t('feed.creator.assignmentSettings.title')}</h4>
+
+                  {/* Display Settings */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <Label htmlFor="shuffle" className="text-sm">
+                          {t('feed.creator.assignmentSettings.displaySettings.shuffleQuestions')}
+                        </Label>
+                        <p className="text-xs text-gray-500">
+                          {t('feed.creator.assignmentSettings.displaySettings.shuffleQuestionsDescription')}
+                        </p>
+                      </div>
+                      <Switch id="shuffle" checked={shuffleQuestions} onCheckedChange={setShuffleQuestions} />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <Label htmlFor="showAnswers" className="text-sm">
+                          {t('feed.creator.assignmentSettings.displaySettings.showCorrectAnswers')}
+                        </Label>
+                        <p className="text-xs text-gray-500">
+                          {t('feed.creator.assignmentSettings.displaySettings.showCorrectAnswersDescription')}
+                        </p>
+                      </div>
+                      <Switch
+                        id="showAnswers"
+                        checked={showCorrectAnswers}
+                        onCheckedChange={setShowCorrectAnswers}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <Label htmlFor="showScore" className="text-sm">
+                          {t('feed.creator.assignmentSettings.displaySettings.showScoreImmediately')}
+                        </Label>
+                        <p className="text-xs text-gray-500">
+                          {t(
+                            'feed.creator.assignmentSettings.displaySettings.showScoreImmediatelyDescription'
+                          )}
+                        </p>
+                      </div>
+                      <Switch
+                        id="showScore"
+                        checked={showScoreImmediately}
+                        onCheckedChange={setShowScoreImmediately}
+                      />
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Submission Settings */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <Label htmlFor="allowRetake" className="text-sm">
+                          {t('feed.creator.assignmentSettings.submissionSettings.allowRetakes')}
+                        </Label>
+                        <p className="text-xs text-gray-500">
+                          {t('feed.creator.assignmentSettings.submissionSettings.allowRetakesDescription')}
+                        </p>
+                      </div>
+                      <Switch id="allowRetake" checked={allowRetake} onCheckedChange={setAllowRetake} />
+                    </div>
+
+                    {allowRetake && (
+                      <div>
+                        <Label htmlFor="maxSub" className="text-xs text-gray-600">
+                          {t('feed.creator.assignmentSettings.submissionSettings.maxSubmissions')}
+                        </Label>
+                        <Input
+                          id="maxSub"
+                          type="number"
+                          min="1"
+                          value={maxSubmissions || ''}
+                          onChange={(e) =>
+                            setMaxSubmissions(e.target.value ? parseInt(e.target.value) : undefined)
+                          }
+                          placeholder={t(
+                            'feed.creator.assignmentSettings.submissionSettings.maxSubmissionsPlaceholder'
+                          )}
+                          className="mt-1 h-8"
+                        />
+                        <p className="mt-1 text-xs text-gray-500">
+                          {t('feed.creator.assignmentSettings.submissionSettings.maxSubmissionsDescription')}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  <Separator />
+
+                  {/* Grading and Timing */}
+                  <div className="space-y-3">
+                    <div>
+                      <Label htmlFor="passingScore" className="text-xs text-gray-600">
+                        {t('feed.creator.assignmentSettings.grading.passingScore')}
+                      </Label>
+                      <Input
+                        id="passingScore"
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={passingScore || ''}
+                        onChange={(e) =>
+                          setPassingScore(e.target.value ? parseFloat(e.target.value) : undefined)
+                        }
+                        placeholder={t('feed.creator.assignmentSettings.grading.passingScorePlaceholder')}
+                        className="mt-1 h-8"
+                      />
+                      <p className="mt-1 text-xs text-gray-500">
+                        {t('feed.creator.assignmentSettings.grading.passingScoreDescription')}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor="availFrom" className="text-xs text-gray-600">
+                        {t('feed.creator.assignmentSettings.timing.availableFrom')}
+                      </Label>
+                      <Input
+                        id="availFrom"
+                        type="datetime-local"
+                        value={availableFrom}
+                        onChange={(e) => setAvailableFrom(e.target.value)}
+                        className="mt-1 h-8"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="availUntil" className="text-xs text-gray-600">
+                        {t('feed.creator.assignmentSettings.timing.availableUntil')}
+                      </Label>
+                      <Input
+                        id="availUntil"
+                        type="datetime-local"
+                        value={availableUntil}
+                        onChange={(e) => setAvailableUntil(e.target.value)}
+                        className="mt-1 h-8"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <>

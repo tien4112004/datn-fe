@@ -299,6 +299,7 @@ export const AssignmentEditorPage = () => {
           name: topic.name,
           description: topic.description,
         })),
+        shuffleQuestions: data.shuffleQuestions,
         // Include matrix cells (only those with requiredCount > 0)
         matrixCells: data.matrixCells
           .filter((cell) => cell.requiredCount > 0)

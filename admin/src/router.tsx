@@ -1,8 +1,8 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import GlobalSpinner from '@/components/common/GlobalSpinner';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
-import GlobalSpinner from '@/components/common/GlobalSpinner';
+import { lazy, Suspense } from 'react';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 const LoginPage = lazy(() => import('@/pages/LoginPage').then((m) => ({ default: m.LoginPage })));
 const DashboardPage = lazy(() => import('@/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })));
@@ -36,8 +36,8 @@ const ContextsPage = lazy(() => import('@/pages/ContextsPage').then((m) => ({ de
 const ContextFormPage = lazy(() =>
   import('@/pages/ContextFormPage').then((m) => ({ default: m.ContextFormPage }))
 );
-const CoinPricingPage = lazy(() =>
-  import('@/pages/CoinPricingPage').then((m) => ({ default: m.CoinPricingPage }))
+const GlobalConfigPage = lazy(() =>
+  import('@/pages/GlobalConfigPage').then((m) => ({ default: m.GlobalConfigPage }))
 );
 
 const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
@@ -154,6 +154,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: 'global-config',
+        element: (
+          <LazyWrapper>
+            <GlobalConfigPage />
+          </LazyWrapper>
+        ),
+      },
+      {
         path: 'faq-posts',
         element: (
           <LazyWrapper>
@@ -190,14 +198,6 @@ export const router = createBrowserRouter([
         element: (
           <LazyWrapper>
             <QuestionBankEditorPage />
-          </LazyWrapper>
-        ),
-      },
-      {
-        path: 'coin-pricing',
-        element: (
-          <LazyWrapper>
-            <CoinPricingPage />
           </LazyWrapper>
         ),
       },

@@ -6,34 +6,27 @@ import type {
   FAQPost,
   Pagination,
   PaginationParams,
-  UserQueryParams,
   SlideTemplateParams,
+  UserQueryParams,
 } from '@/types/api';
-import type { Model, ModelPatchData } from '@aiprimary/core';
 import type { User } from '@/types/auth';
-import type { AdminApiService } from '@/types/service';
-import { API_MODE, type ApiMode, api } from '@aiprimary/api';
-import type { ArtStyle, SlideTemplate, SlideTheme } from '@aiprimary/core';
-import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
+import type { Context } from '@/types/context';
+import type { GlobalConfig, UpdateGlobalConfigRequest } from '@/types/globalConfig';
 import type {
+  ChapterResponse,
+  CreateQuestionPayload,
+  ImportResult,
+  QuestionBankFilters,
   QuestionBankItem,
   QuestionBankParams,
-  QuestionBankFilters,
-  CreateQuestionPayload,
   UpdateQuestionPayload,
-  ImportResult,
-  ChapterResponse,
 } from '@/types/questionBank';
-import type { Context } from '@/types/context';
-import type {
-  CoinPricing,
-  CoinPricingCreateRequest,
-  CoinPricingUpdateRequest,
-  CoinPricingQueryParams,
-  EnumOption,
-} from '@/types/coin';
-import { parseQuestionBankCSV, exportQuestionsToCSV } from '@/utils/csvParser';
+import type { AdminApiService } from '@/types/service';
+import { exportQuestionsToCSV, parseQuestionBankCSV } from '@/utils/csvParser';
 import { validateQuestionBankCSV } from '@/utils/csvValidation';
+import { API_MODE, type ApiMode, api } from '@aiprimary/api';
+import type { ArtStyle, Model, ModelPatchData, SlideTemplate, SlideTheme } from '@aiprimary/core';
+import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
 
 // ============= HELPER FUNCTIONS =============
 const delay = (ms: number = 300) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -694,48 +687,44 @@ export default class AdminRealApiService implements AdminApiService {
     return response.data;
   }
 
-  // Coin Pricing
-  async getCoinPricing(params?: CoinPricingQueryParams): Promise<ApiResponse<CoinPricing[]>> {
-    const response = await api.get<ApiResponse<CoinPricing[]>>(`${this.baseUrl}/api/admin/coin-pricing`, {
-      params,
-    });
-    return response.data;
+  // Global Configuration (MOCK - Backend not implemented yet)
+  async getGlobalConfig(): Promise<ApiResponse<GlobalConfig>> {
+    await delay();
+    // Return mock global configuration
+    const config: GlobalConfig = {
+      id: 'global-config-1',
+      presentation: {
+        defaultVisibility: 'authenticated',
+        defaultPermission: 'read',
+        allowPublicCreation: false,
+      },
+      assignment: {
+        defaultVisibility: 'authenticated',
+        defaultPermission: 'read',
+        allowPublicCreation: false,
+      },
+      mindmap: {
+        defaultVisibility: 'authenticated',
+        defaultPermission: 'read',
+        allowPublicCreation: false,
+      },
+      updatedAt: new Date().toISOString(),
+      updatedBy: 'admin@example.com',
+    };
+    return { success: true, data: config };
   }
 
-  async getCoinPricingById(id: string): Promise<ApiResponse<CoinPricing>> {
-    const response = await api.get<ApiResponse<CoinPricing>>(`${this.baseUrl}/api/admin/coin-pricing/${id}`);
-    return response.data;
-  }
-
-  async createCoinPricing(data: CoinPricingCreateRequest): Promise<ApiResponse<CoinPricing>> {
-    const response = await api.post<ApiResponse<CoinPricing>>(`${this.baseUrl}/api/admin/coin-pricing`, data);
-    return response.data;
-  }
-
-  async updateCoinPricing(id: string, data: CoinPricingUpdateRequest): Promise<ApiResponse<CoinPricing>> {
-    const response = await api.put<ApiResponse<CoinPricing>>(
-      `${this.baseUrl}/api/admin/coin-pricing/${id}`,
-      data
-    );
-    return response.data;
-  }
-
-  async deleteCoinPricing(id: string): Promise<ApiResponse<void>> {
-    const response = await api.delete<ApiResponse<void>>(`${this.baseUrl}/api/admin/coin-pricing/${id}`);
-    return response.data;
-  }
-
-  async getResourceTypes(): Promise<ApiResponse<EnumOption[]>> {
-    const response = await api.get<ApiResponse<EnumOption[]>>(
-      `${this.baseUrl}/api/admin/coin-pricing/resource-types`
-    );
-    return response.data;
-  }
-
-  async getUnitTypes(): Promise<ApiResponse<EnumOption[]>> {
-    const response = await api.get<ApiResponse<EnumOption[]>>(
-      `${this.baseUrl}/api/admin/coin-pricing/unit-types`
-    );
-    return response.data;
+  async updateGlobalConfig(data: UpdateGlobalConfigRequest): Promise<ApiResponse<GlobalConfig>> {
+    await delay();
+    // Mock implementation - merge updates with existing config
+    const existingConfig = (await this.getGlobalConfig()).data;
+    const updatedConfig: GlobalConfig = {
+      ...existingConfig,
+      presentation: { ...existingConfig.presentation, ...data.presentation },
+      assignment: { ...existingConfig.assignment, ...data.assignment },
+      mindmap: { ...existingConfig.mindmap, ...data.mindmap },
+      updatedAt: new Date().toISOString(),
+    };
+    return { success: true, data: updatedConfig };
   }
 }

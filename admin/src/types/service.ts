@@ -1,32 +1,26 @@
 import type { ApiMode } from '@aiprimary/api';
-import type { User, LoginRequest, LoginResponse } from './auth';
+import type { ArtStyle, Model, ModelPatchData, SlideTemplate, SlideTheme } from '@aiprimary/core';
 import type {
   ApiResponse,
-  PaginationParams,
-  UserQueryParams,
-  SlideTemplateParams,
-  FAQPost,
+  ArtStyleRequest,
   Book,
   BookType,
-  ArtStyleRequest,
+  FAQPost,
+  PaginationParams,
+  SlideTemplateParams,
+  UserQueryParams,
 } from './api';
-import type { SlideTheme, SlideTemplate, ArtStyle, Model, ModelPatchData } from '@aiprimary/core';
+import type { LoginRequest, LoginResponse, User } from './auth';
+import type { Context } from './context';
+import type { GlobalConfig, UpdateGlobalConfigRequest } from './globalConfig';
 import type {
+  CreateQuestionPayload,
+  ImportResult,
+  QuestionBankFilters,
   QuestionBankItem,
   QuestionBankParams,
-  QuestionBankFilters,
-  CreateQuestionPayload,
   UpdateQuestionPayload,
-  ImportResult,
 } from './questionBank';
-import type { Context } from './context';
-import type {
-  CoinPricing,
-  CoinPricingCreateRequest,
-  CoinPricingUpdateRequest,
-  CoinPricingQueryParams,
-  EnumOption,
-} from './coin';
 
 /**
  * Base service interface that all API services must extend
@@ -115,12 +109,7 @@ export interface AdminApiService extends Service {
   ): Promise<ApiResponse<Context>>;
   deleteContext(id: string): Promise<ApiResponse<void>>;
 
-  // Coin Pricing
-  getCoinPricing(params?: CoinPricingQueryParams): Promise<ApiResponse<CoinPricing[]>>;
-  getCoinPricingById(id: string): Promise<ApiResponse<CoinPricing>>;
-  createCoinPricing(data: CoinPricingCreateRequest): Promise<ApiResponse<CoinPricing>>;
-  updateCoinPricing(id: string, data: CoinPricingUpdateRequest): Promise<ApiResponse<CoinPricing>>;
-  deleteCoinPricing(id: string): Promise<ApiResponse<void>>;
-  getResourceTypes(): Promise<ApiResponse<EnumOption[]>>;
-  getUnitTypes(): Promise<ApiResponse<EnumOption[]>>;
+  // Global Configuration
+  getGlobalConfig(): Promise<ApiResponse<GlobalConfig>>;
+  updateGlobalConfig(data: UpdateGlobalConfigRequest): Promise<ApiResponse<GlobalConfig>>;
 }

@@ -1,14 +1,14 @@
 import { ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Background, BackgroundVariant, MiniMap } from '@xyflow/react';
-import { MessageSquare, PanelRight, PanelRightOpen, X } from 'lucide-react';
+import { MessageSquare, PanelRight, PanelRightOpen, X, Loader2 } from 'lucide-react';
 import { Flow, LogicHandler, Toolbar, MindmapControls } from '@/features/mindmap/components';
 import { Button } from '@/components/ui/button';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useCoreStore } from '../stores';
-import type { Mindmap } from '../types';
+import type { Mindmap, MindmapMobileGenerationRequest, MindmapGenerateRequest } from '../types';
 import { MindmapPermissionProvider } from '../contexts/MindmapPermissionContext';
 
 /**
@@ -16,8 +16,16 @@ import { MindmapPermissionProvider } from '../contexts/MindmapPermissionContext'
  * This ensures backward compatibility with mindmaps that stored layout data globally.
  */
 import { migrateLayoutDataToRootNodes } from '../utils/layoutUtils';
-import { useCommentDrawerTrigger } from '../hooks';
+import { useCommentDrawerTrigger, useGenerateMindmap, useUpdateMindmap } from '../hooks';
 import { CommentDrawer } from '@/features/comments';
+import { convertAiDataToMindMapNodes, DEFAULT_LAYOUT_TYPE } from '../services/utils';
+
+/** Notify Flutter via InAppWebView JavaScript handler */
+const notifyFlutter = (handler: string, data: Record<string, unknown>) => {
+  if ((window as any).flutter_inappwebview) {
+    (window as any).flutter_inappwebview.callHandler(handler, data);
+  }
+};
 
 /**
  * MindmapEmbedPage - Public mindmap viewer for webview embedding.
@@ -28,7 +36,12 @@ import { CommentDrawer } from '@/features/comments';
  * - No unsaved changes tracking/blocking
  * - Full UI preserved (TreePanel, Flow, Toolbar, Controls, MiniMap)
  *
+ * Supports two modes:
+ * - View mode (default): Display existing mindmap
+ * - Generation mode (mode=generate): Generate mindmap content via AI
+ *
  * Route: /mindmap/embed/:id (public route)
+ * Route: /mindmap/embed/:id?mode=generate (generation mode from Flutter)
  * Data loader: getPublicMindmapById from embedLoaders.ts
  */
 const MindmapEmbedPage = () => {
@@ -40,16 +53,36 @@ const MindmapEmbedPage = () => {
   const [isPanOnDrag, setIsPanOnDrag] = useState(false);
   const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
 
+  // Detect generation mode from URL on initial render
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialIsGenerationMode = urlParams.get('mode') === 'generate';
+
+  // Generation mode state (set once on initial render, never changes)
+  const [isGenerationMode] = useState(initialIsGenerationMode);
+  const [isGenerating, setIsGenerating] = useState(initialIsGenerationMode);
+  const [generationError, setGenerationError] = useState<string | null>(null);
+  const generationStartedRef = useRef(false);
+
+  // Generation hooks
+  const generateMutation = useGenerateMindmap();
+  const updateMindmapMutation = useUpdateMindmap();
+
   const userPermission = mindmap?.permission;
 
-  // Apply locale from URL (from Flutter) or localStorage
+  // Track if locale was already applied to prevent infinite loops
+  const localeAppliedRef = useRef(false);
+
+  // Apply locale from URL (from Flutter) or localStorage - run only once on mount
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlLocale = urlParams.get('locale');
+    if (localeAppliedRef.current) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const urlLocale = params.get('locale');
     const savedLocale = localStorage.getItem('i18nextLng');
     const localeToApply = urlLocale || savedLocale;
 
     if (localeToApply && localeToApply !== i18n.language) {
+      localeAppliedRef.current = true;
       i18n.changeLanguage(localeToApply);
       // Save to localStorage so it persists
       if (urlLocale) {
@@ -58,10 +91,121 @@ const MindmapEmbedPage = () => {
     }
   }, [i18n]);
 
-  // Fullscreen functionality
+  /**
+   * Poll localStorage for generation request from Flutter.
+   * Flutter stores the request before loading the WebView.
+   */
+  const pollForGenerationRequest = useCallback((): Promise<MindmapMobileGenerationRequest> => {
+    return new Promise((resolve, reject) => {
+      let attempts = 0;
+      const maxAttempts = 50; // 5 seconds max
 
-  // Sync mindmap data from React Router loader to stores
+      const poll = () => {
+        const stored = localStorage.getItem('mindmapGenerationRequest');
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored) as MindmapMobileGenerationRequest;
+            localStorage.removeItem('mindmapGenerationRequest'); // Clean up
+            resolve(parsed);
+          } catch (e) {
+            reject(new Error('Invalid generation request format'));
+          }
+        } else if (attempts < maxAttempts) {
+          attempts++;
+          setTimeout(poll, 100);
+        } else {
+          reject(new Error('Generation request not found'));
+        }
+      };
+
+      poll();
+    });
+  }, []);
+
+  /**
+   * Run the mindmap generation flow.
+   */
+  const runGeneration = useCallback(async () => {
+    try {
+      // Signal Flutter that we're ready to show WebView
+      notifyFlutter('mindmapGenerationViewReady', {});
+
+      // Poll for generation request from Flutter
+      const request = await pollForGenerationRequest();
+
+      // Build the API request
+      const generateRequest: MindmapGenerateRequest = {
+        topic: request.topic,
+        model: request.model,
+        provider: request.provider,
+        language: request.language,
+        maxDepth: request.maxDepth,
+        maxBranchesPerNode: request.maxBranchesPerNode,
+        grade: request.grade,
+        subject: request.subject,
+      };
+
+      // Step 1: Generate AI nodes
+      const aiResponse = await generateMutation.mutateAsync(generateRequest);
+
+      // Step 2: Convert AI response to mindmap nodes/edges with layout
+      const basePosition = { x: 0, y: 0 };
+      const { nodes, edges } = await convertAiDataToMindMapNodes(
+        aiResponse,
+        basePosition,
+        DEFAULT_LAYOUT_TYPE
+      );
+
+      // Step 3: Update the mindmap with generated content
+      // Backend expects multipart/form-data with JSON blob (not plain JSON)
+      const updateData = {
+        title: request.topic,
+        nodes,
+        edges,
+      };
+      const formData = new FormData();
+      formData.append('data', new Blob([JSON.stringify(updateData)], { type: 'application/json' }));
+
+      await updateMindmapMutation.mutateAsync({
+        id: mindmap.id,
+        data: formData,
+      });
+
+      // Step 4: Set nodes/edges in store for display
+      setNodes(nodes);
+      setEdges(edges);
+
+      // Step 5: Signal completion to Flutter
+      setIsGenerating(false);
+      notifyFlutter('mindmapGenerationCompleted', {
+        success: true,
+        nodeCount: nodes.length,
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Generation failed';
+      setGenerationError(errorMessage);
+      setIsGenerating(false);
+      notifyFlutter('mindmapGenerationCompleted', {
+        success: false,
+        error: errorMessage,
+      });
+    }
+  }, [pollForGenerationRequest, generateMutation, updateMindmapMutation, mindmap.id, setNodes, setEdges]);
+
+  // Start generation when in generation mode
   useEffect(() => {
+    if (isGenerationMode && !generationStartedRef.current) {
+      generationStartedRef.current = true;
+      runGeneration();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isGenerationMode]); // runGeneration intentionally omitted - ref guards execution
+
+  // Sync mindmap data from React Router loader to stores (view mode only)
+  useEffect(() => {
+    // Skip if in generation mode - generation flow handles this
+    if (isGenerationMode) return;
+
     if (mindmap) {
       // Migrate layout data from metadata to root nodes for backward compatibility
       const migratedNodes = migrateLayoutDataToRootNodes(mindmap.nodes, mindmap.metadata);
@@ -70,14 +214,12 @@ const MindmapEmbedPage = () => {
       setEdges(mindmap.edges);
 
       // Notify Flutter that mindmap is loaded (hides native loader)
-      if ((window as any).flutter_inappwebview) {
-        (window as any).flutter_inappwebview.callHandler('mindmapLoaded', {
-          success: true,
-          nodeCount: migratedNodes.length,
-        });
-      }
+      notifyFlutter('mindmapLoaded', {
+        success: true,
+        nodeCount: migratedNodes.length,
+      });
     }
-  }, [mindmap, setNodes, setEdges]);
+  }, [mindmap, setNodes, setEdges, isGenerationMode]);
 
   const [isToolbarVisible, setIsToolbarVisible] = useState(false);
 
@@ -87,9 +229,30 @@ const MindmapEmbedPage = () => {
 
   useCommentDrawerTrigger(() => setIsCommentDrawerOpen(true));
 
+  // Show error state if generation failed
+  if (generationError) {
+    return (
+      <div className="bg-background fixed inset-0 flex items-center justify-center">
+        <div className="p-6 text-center">
+          <div className="text-destructive mb-2 text-lg font-semibold">Generation Failed</div>
+          <div className="text-muted-foreground text-sm">{generationError}</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <ReactFlowProvider>
       <MindmapPermissionProvider isPresenterMode={false} userPermission={userPermission}>
+        {/* Generation loading overlay */}
+        {isGenerating && (
+          <div className="bg-background fixed inset-0 z-[100] flex flex-col items-center justify-center">
+            <Loader2 className="text-primary mb-4 h-10 w-10 animate-spin" />
+            <div className="text-lg font-medium">Generating mindmap...</div>
+            <div className="text-muted-foreground mt-2 text-sm">This may take a moment</div>
+          </div>
+        )}
+
         <div
           className="fixed inset-0 flex h-full w-full overflow-hidden"
           style={{ backgroundColor: 'var(--background)', touchAction: 'none' }}

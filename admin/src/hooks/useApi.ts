@@ -5,19 +5,19 @@ import type {
   BookType,
   FAQPost,
   PaginationParams,
-  UserQueryParams,
   SlideTemplateParams,
+  UserQueryParams,
 } from '@/types/api';
-import type { ModelPatchData } from '@aiprimary/core';
 import type { LoginRequest } from '@/types/auth';
-import type { SlideTemplate, SlideTheme } from '@aiprimary/core';
+import type { Context } from '@/types/context';
+import type { UpdateGlobalConfigRequest } from '@/types/globalConfig';
 import type {
-  QuestionBankParams,
-  QuestionBankFilters,
   CreateQuestionPayload,
+  QuestionBankFilters,
+  QuestionBankParams,
   UpdateQuestionPayload,
 } from '@/types/questionBank';
-import type { Context } from '@/types/context';
+import type { ModelPatchData, SlideTemplate, SlideTheme } from '@aiprimary/core';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -85,6 +85,10 @@ export const adminKeys = {
     all: ['contexts'] as const,
     list: (params?: PaginationParams) => [...adminKeys.contexts.all, 'list', params] as const,
     detail: (id: string) => [...adminKeys.contexts.all, 'detail', id] as const,
+  },
+  // Global Configuration
+  globalConfig: {
+    all: ['global-config'] as const,
   },
 };
 
@@ -779,6 +783,43 @@ export function useDeleteContext() {
     },
     onError: (error) => {
       toast.error('Failed to delete context', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    },
+  });
+}
+
+// ============= GLOBAL CONFIGURATION =============
+
+/**
+ * Hook to get global configuration
+ * Returns system-wide settings for resource defaults
+ */
+export function useGlobalConfig() {
+  return useQuery({
+    queryKey: adminKeys.globalConfig.all,
+    queryFn: async () => {
+      const response = await getAdminApiService().getGlobalConfig();
+      return response.data;
+    },
+  });
+}
+
+/**
+ * Hook to update global configuration
+ * Updates system-wide settings
+ */
+export function useUpdateGlobalConfig() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: UpdateGlobalConfigRequest) => getAdminApiService().updateGlobalConfig(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.globalConfig.all });
+      toast.success('Global configuration updated successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to update global configuration', {
         description: error instanceof Error ? error.message : 'An error occurred',
       });
     },

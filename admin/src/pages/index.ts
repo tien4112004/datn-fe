@@ -1,8 +1,9 @@
-export { LoginPage } from './LoginPage';
 export { DashboardPage } from './DashboardPage';
-export { UsersPage } from './UsersPage';
-export { UserDetailPage } from './UserDetailPage';
-export { SlideThemesPage } from './SlideThemesPage';
-export { SlideTemplatesPage } from './SlideTemplatesPage';
-export { ModelConfigPage } from './ModelConfigPage';
 export { FAQPostsPage } from './FAQPostsPage';
+export { GlobalConfigPage } from './GlobalConfigPage';
+export { LoginPage } from './LoginPage';
+export { ModelConfigPage } from './ModelConfigPage';
+export { SlideTemplatesPage } from './SlideTemplatesPage';
+export { SlideThemesPage } from './SlideThemesPage';
+export { UserDetailPage } from './UserDetailPage';
+export { UsersPage } from './UsersPage';

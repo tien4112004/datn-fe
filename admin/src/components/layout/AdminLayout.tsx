@@ -1,24 +1,24 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/auth';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import {
-  LayoutDashboard,
-  Users,
-  Palette,
-  LayoutTemplate,
-  Brush,
-  Settings,
-  LogOut,
-  Menu,
-  X,
-  Library,
-  BookOpen,
-  Coins,
-} from 'lucide-react';
-import { useState } from 'react';
+import { useAuth } from '@/context/auth';
 import { cn } from '@/lib/utils';
 import { getBackendUrl } from '@aiprimary/api';
+import {
+  BookOpen,
+  Brush,
+  LayoutDashboard,
+  LayoutTemplate,
+  Library,
+  LogOut,
+  Menu,
+  Palette,
+  Settings,
+  Shield,
+  Users,
+  X,
+} from 'lucide-react';
+import { useState } from 'react';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -29,7 +29,7 @@ const navItems = [
   { to: '/art-styles', icon: Brush, label: 'Art Styles' },
   { to: '/question-bank', icon: Library, label: 'Question Bank' },
   { to: '/model-config', icon: Settings, label: 'Model Config' },
-  { to: '/coin-pricing', icon: Coins, label: 'Coin Pricing' },
+  { to: '/global-config', icon: Shield, label: 'Global Config' },
 ];
 
 export function AdminLayout() {

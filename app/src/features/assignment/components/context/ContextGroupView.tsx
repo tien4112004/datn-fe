@@ -38,8 +38,8 @@ export const ContextGroupView = ({
 }: ContextGroupViewProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'context' });
 
-  // Check if context is an AssignmentContext (has sourceContextId field) and editing is enabled
-  const isAssignmentContext = 'sourceContextId' in context || onContextUpdate;
+  // Check if editing is enabled (AssignmentContext with update callback)
+  const isAssignmentContext = !!onContextUpdate;
 
   return (
     <div className="flex h-full flex-col">

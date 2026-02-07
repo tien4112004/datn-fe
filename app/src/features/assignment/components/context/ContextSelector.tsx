@@ -12,7 +12,6 @@ import {
   CommandItem,
   CommandList,
 } from '@/shared/components/ui/command';
-import { useContextList } from '@/features/context';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 
 interface ContextSelectorProps {
@@ -34,53 +33,30 @@ export const ContextSelector = ({
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Get form store actions for context cloning
+  // Read assignment-local contexts from the store
   const assignmentContexts = useAssignmentFormStore((state) => state.contexts);
-  const addContext = useAssignmentFormStore((state) => state.addContext);
-  const getContextBySourceId = useAssignmentFormStore((state) => state.getContextBySourceId);
 
-  const { data, isLoading } = useContextList({
-    search: searchQuery || undefined,
-    pageSize: 20,
-  });
+  // Filter by search query
+  const filteredContexts = useMemo(() => {
+    if (!searchQuery) return assignmentContexts;
+    const q = searchQuery.toLowerCase();
+    return assignmentContexts.filter(
+      (ctx) => ctx.title.toLowerCase().includes(q) || ctx.content.toLowerCase().includes(q)
+    );
+  }, [assignmentContexts, searchQuery]);
 
-  const contexts = data?.contexts || [];
-
-  // Look up selected context from assignment's cloned contexts first, then from library
+  // Find selected context
   const selectedContext = useMemo(() => {
     if (!value) return null;
-    // First check assignment's cloned contexts
-    const localContext = assignmentContexts.find((ctx) => ctx.id === value);
-    if (localContext) {
-      return { id: localContext.id, title: localContext.title, content: localContext.content };
-    }
-    // Fallback to library contexts (for backwards compatibility)
-    return contexts.find((ctx) => ctx.id === value) || null;
-  }, [value, assignmentContexts, contexts]);
+    return assignmentContexts.find((ctx) => ctx.id === value) || null;
+  }, [value, assignmentContexts]);
 
-  const handleSelect = (sourceContextId: string) => {
-    // Find the source context from library
-    const sourceContext = contexts.find((ctx) => ctx.id === sourceContextId);
-    if (!sourceContext) return;
-
-    // Check if this context is already cloned in the assignment
-    let localContextId = getContextBySourceId(sourceContextId)?.id;
-
-    if (!localContextId) {
-      // Clone the context to the assignment
-      localContextId = addContext({
-        title: sourceContext.title,
-        content: sourceContext.content,
-        author: sourceContext.author,
-        sourceContextId: sourceContextId,
-      });
-    }
-
-    // Toggle selection: if already selected, deselect
-    if (localContextId === value) {
+  const handleSelect = (contextId: string) => {
+    // Toggle: if already selected, deselect
+    if (contextId === value) {
       onChange(undefined);
     } else {
-      onChange(localContextId);
+      onChange(contextId);
     }
     setOpen(false);
   };
@@ -112,16 +88,12 @@ export const ContextSelector = ({
         <Command shouldFilter={false}>
           <CommandInput placeholder={t('searchContext')} value={searchQuery} onValueChange={setSearchQuery} />
           <CommandList>
-            {isLoading ? (
-              <div className="text-muted-foreground py-6 text-center text-sm">{t('loading')}</div>
-            ) : contexts.length === 0 ? (
+            {filteredContexts.length === 0 ? (
               <CommandEmpty>{t('noContextFound')}</CommandEmpty>
             ) : (
               <CommandGroup>
-                {contexts.map((context) => {
-                  // Check if this library context is cloned and currently selected
-                  const clonedContext = getContextBySourceId(context.id);
-                  const isSelected = value && clonedContext?.id === value;
+                {filteredContexts.map((context) => {
+                  const isSelected = value === context.id;
 
                   return (
                     <CommandItem

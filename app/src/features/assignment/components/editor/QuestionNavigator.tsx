@@ -189,6 +189,27 @@ export const QuestionNavigator = () => {
             </TooltipContent>
           </Tooltip>
 
+          {/* Contexts Panel Icon */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => setMainView('contexts')}
+                className={cn(
+                  'flex h-8 w-full items-center justify-center rounded text-xs transition-colors',
+                  mainView === 'contexts'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
+                )}
+              >
+                <BookOpen className="h-3 w-3" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{t('tooltips.contexts')}</p>
+            </TooltipContent>
+          </Tooltip>
+
           {/* Groups: Context groups and standalone questions */}
           <SortableContext
             items={questions.filter((q) => q?.question?.id).map((q) => q.question.id)}

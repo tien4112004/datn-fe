@@ -286,6 +286,8 @@ export default {
         save: 'Lưu thay đổi',
         generate: 'Tạo bằng AI (sắp có)',
         fromBank: 'Thêm từ kho câu hỏi',
+        addContext: 'Tạo đoạn văn mới',
+        fromLibrary: 'Nhập từ thư viện đoạn văn',
       },
     },
 
@@ -431,6 +433,33 @@ export default {
       },
     },
 
+    // Bảng quản lý đoạn văn
+    contextsPanel: {
+      panelTitle: 'Đoạn văn đọc hiểu',
+      description: 'Tạo và quản lý các đoạn văn đọc hiểu có thể chia sẻ giữa các câu hỏi.',
+      addContext: 'Thêm đoạn văn',
+      emptyState: 'Chưa có đoạn văn nào. Tạo đoạn văn để gắn vào câu hỏi.',
+      titleField: 'Tiêu đề',
+      contentField: 'Nội dung',
+      authorField: 'Tác giả (tùy chọn)',
+      create: 'Tạo',
+      cancel: 'Hủy',
+      deleteConfirmTitle: 'Xóa đoạn văn',
+      deleteConfirmDescription: 'Bạn có chắc muốn xóa "{{title}}"?',
+      deleteConfirmWarning:
+        'Đoạn văn này đang được {{count}} câu hỏi tham chiếu. Xóa sẽ ngắt kết nối các câu hỏi đó.',
+      delete: 'Xóa',
+      fromLibrary: 'Từ thư viện',
+      fromLibraryTitle: 'Nhập từ thư viện',
+      fromLibraryDescription: 'Duyệt đoạn văn từ thư viện và thêm vào bài tập này.',
+      searchLibrary: 'Tìm trong thư viện...',
+      loadingLibrary: 'Đang tải...',
+      noLibraryContextFound: 'Không tìm thấy đoạn văn nào trong thư viện',
+      import: 'Nhập',
+      importSelected: 'Nhập đã chọn ({{count}})',
+      alreadyAdded: 'Đã thêm',
+    },
+
     // Bảng xây dựng ma trận
     matrixBuilder: {
       panelTitle: 'Bảng ma trận đánh giá',
@@ -496,10 +525,12 @@ export default {
       listView: 'Xem danh sách',
       assignmentInfo: 'Thông tin bài tập',
       matrixBuilder: 'Ma trận',
+      contexts: 'Đoạn văn đọc hiểu',
       untitled: 'Chưa có tiêu đề',
       tooltips: {
         assignmentInfo: 'Sửa thông tin bài tập',
         matrixBuilder: 'Cấu hình ma trận đánh giá',
+        contexts: 'Quản lý đoạn văn đọc hiểu',
         questionNumber: 'Nhấp để sửa, kéo để sắp xếp',
       },
     },
@@ -861,5 +892,6 @@ export default {
     authorPlaceholder: 'Tác giả (tùy chọn)',
     done: 'Xong',
     disconnect: 'Ngắt kết nối đoạn văn',
+    assignmentOnlyHint: 'Thay đổi chỉ áp dụng cho bài tập này.',
   },
 };

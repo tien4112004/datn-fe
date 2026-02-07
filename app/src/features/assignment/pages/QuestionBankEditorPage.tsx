@@ -9,11 +9,13 @@ import { Collapsible, CollapsibleContent } from '@/shared/components/ui/collapsi
 import {
   useCreateQuestion,
   useUpdateQuestion,
-  useQuestionBankItem,
   useQuestionBankChapters,
 } from '@/features/assignment/hooks/useQuestionBankApi';
+import { useLoaderData } from 'react-router-dom';
+import { CriticalError } from '@aiprimary/api';
+import { ERROR_TYPE } from '@/shared/constants';
 import { useContext } from '@/features/assignment/hooks/useContextApi';
-import { ContextSelector } from '@/features/assignment/components/context/ContextSelector';
+import { ContextSelector } from '@/features/question/components/shared/ContextSelector';
 import { MarkdownPreview } from '@/features/question/components/shared/MarkdownPreview';
 import type { CreateQuestionRequest, Question, QuestionBankItem } from '@/features/assignment/types';
 import {
@@ -125,8 +127,13 @@ export function QuestionBankEditorPage() {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isContextOpen, setIsContextOpen] = useState(true);
 
-  // Fetch existing question if editing
-  const { data: existingQuestion, isLoading } = useQuestionBankItem(id || '');
+  // Loader-provided question (edit mode) or null (create mode)
+  const { question: existingQuestion } = useLoaderData() as { question?: QuestionBankItem | null };
+
+  // If we are in edit mode and no question was loaded, throw a resource error so the app shows the standard error UI
+  if (isEditMode && existingQuestion === null) {
+    throw new CriticalError('Question data is unavailable', ERROR_TYPE.RESOURCE_NOT_FOUND);
+  }
 
   // Fetch context if contextId is present
   const { data: contextData } = useContext(questionData?.contextId);
@@ -219,14 +226,6 @@ export function QuestionBankEditorPage() {
       });
     }
   };
-
-  if (isEditMode && isLoading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-muted-foreground">{t('editor.loading')}</div>
-      </div>
-    );
-  }
 
   if (!questionData) {
     return null;
@@ -449,10 +448,12 @@ export function QuestionBankEditorPage() {
                       </div>
                     )}
                   </div>
-                  <ContextSelector
-                    value={questionData.contextId}
-                    onChange={(contextId) => setQuestionData({ ...questionData, contextId })}
-                  />
+                  {!questionData.contextId && (
+                    <ContextSelector
+                      value={questionData.contextId}
+                      onChange={(contextId) => setQuestionData({ ...questionData, contextId })}
+                    />
+                  )}
                   <p className="text-muted-foreground text-xs">{t('editor.contextDescription')}</p>
                 </div>
 

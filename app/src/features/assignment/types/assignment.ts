@@ -7,7 +7,6 @@ export interface AssignmentContext {
   title: string;
   content: string;
   author?: string; // Author of the reading passage
-  sourceContextId?: string; // Original context ID for reference
 }
 
 // Question with topic assignment (intersection of core Question with topicId)

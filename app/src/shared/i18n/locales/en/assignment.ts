@@ -286,6 +286,8 @@ export default {
         save: 'Save changes',
         generate: 'AI generate (coming soon)',
         fromBank: 'Add from question bank',
+        addContext: 'Create a new reading passage',
+        fromLibrary: 'Import from context library',
       },
     },
 
@@ -432,6 +434,33 @@ export default {
       },
     },
 
+    // Contexts panel
+    contextsPanel: {
+      panelTitle: 'Reading Passages',
+      description: 'Create and manage reading passages that can be shared across questions.',
+      addContext: 'Add Reading Passage',
+      emptyState: 'No reading passages yet. Create one to attach to questions.',
+      titleField: 'Title',
+      contentField: 'Content',
+      authorField: 'Author (optional)',
+      create: 'Create',
+      cancel: 'Cancel',
+      deleteConfirmTitle: 'Delete Reading Passage',
+      deleteConfirmDescription: 'Are you sure you want to delete "{{title}}"?',
+      deleteConfirmWarning:
+        'This passage is referenced by {{count}} question(s). Deleting it will unlink those questions.',
+      delete: 'Delete',
+      fromLibrary: 'From Library',
+      fromLibraryTitle: 'Import from Library',
+      fromLibraryDescription: 'Browse reading passages from the library and add them to this assignment.',
+      searchLibrary: 'Search library...',
+      loadingLibrary: 'Loading...',
+      noLibraryContextFound: 'No reading passages found in library',
+      import: 'Import',
+      importSelected: 'Import Selected ({{count}})',
+      alreadyAdded: 'Already added',
+    },
+
     // Matrix builder panel
     matrixBuilder: {
       panelTitle: 'Assessment Matrix Builder',
@@ -497,10 +526,12 @@ export default {
       listView: 'List View',
       assignmentInfo: 'Assignment Info',
       matrixBuilder: 'Matrix Builder',
+      contexts: 'Reading Passages',
       untitled: 'Untitled',
       tooltips: {
         assignmentInfo: 'Edit assignment details',
         matrixBuilder: 'Configure assessment matrix',
+        contexts: 'Manage reading passages',
         questionNumber: 'Click to edit, drag to reorder',
       },
     },
@@ -874,5 +905,6 @@ export default {
     authorPlaceholder: 'Author (optional)',
     done: 'Done',
     disconnect: 'Disconnect reading passage',
+    assignmentOnlyHint: 'Changes only apply to this assignment.',
   },
 };

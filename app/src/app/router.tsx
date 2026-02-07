@@ -141,6 +141,8 @@ const router = createBrowserRouter([
           Component: (await import('@/features/assignment/pages/QuestionBankEditorPage'))
             .QuestionBankEditorPage,
         }),
+        // Provide a simple loader so the page can consistently use useLoaderData()
+        loader: async () => ({ question: null }),
       },
       {
         path: 'question-bank/edit/:id',
@@ -148,6 +150,7 @@ const router = createBrowserRouter([
           Component: (await import('@/features/assignment/pages/QuestionBankEditorPage'))
             .QuestionBankEditorPage,
         }),
+        loader: (await import('@/features/assignment/hooks/loaders')).getQuestionById,
       },
       {
         path: 'assignment/create',

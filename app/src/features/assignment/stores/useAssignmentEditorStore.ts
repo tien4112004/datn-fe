@@ -3,7 +3,7 @@ import { devtools } from 'zustand/middleware';
 import type { AssignmentQuestionWithTopic, MatrixCell, AssignmentTopic } from '../types';
 import { VIEW_MODE, type ViewMode } from '@aiprimary/core';
 
-type MainView = 'info' | 'questions' | 'matrix';
+type MainView = 'info' | 'questions' | 'matrix' | 'contexts';
 
 interface AssignmentEditorState {
   // UI State
@@ -15,6 +15,8 @@ interface AssignmentEditorState {
   questionViewModes: Map<string, ViewMode>;
   isMetadataDialogOpen: boolean;
   isMatrixEditorOpen: boolean;
+  isContextCreateFormOpen: boolean;
+  isContextLibraryDialogOpen: boolean;
   mainView: MainView;
 
   // Actions
@@ -27,6 +29,8 @@ interface AssignmentEditorState {
   toggleQuestionViewMode: (questionId: string) => void;
   setMetadataDialogOpen: (open: boolean) => void;
   setMatrixEditorOpen: (open: boolean) => void;
+  setContextCreateFormOpen: (open: boolean) => void;
+  setContextLibraryDialogOpen: (open: boolean) => void;
   setMainView: (view: MainView) => void;
 
   // Question operations (these will be used by components to update form)
@@ -56,6 +60,8 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       questionViewModes: new Map(),
       isMetadataDialogOpen: false,
       isMatrixEditorOpen: false,
+      isContextCreateFormOpen: false,
+      isContextLibraryDialogOpen: false,
       mainView: 'info',
 
       // UI actions
@@ -81,6 +87,8 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       },
       setMetadataDialogOpen: (open) => set({ isMetadataDialogOpen: open }),
       setMatrixEditorOpen: (open) => set({ isMatrixEditorOpen: open }),
+      setContextCreateFormOpen: (open) => set({ isContextCreateFormOpen: open }),
+      setContextLibraryDialogOpen: (open) => set({ isContextLibraryDialogOpen: open }),
 
       // Reorder questions (used with drag-drop)
       reorderQuestions: (questions, oldIndex, newIndex) => {

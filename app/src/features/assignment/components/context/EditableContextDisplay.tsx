@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BookOpen, ChevronDown, ChevronUp, Pencil, Unlink } from 'lucide-react';
+import { BookOpen, ChevronDown, ChevronUp, Pencil, Unlink, Info } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Textarea } from '@/shared/components/ui/textarea';
@@ -113,7 +113,11 @@ export const EditableContextDisplay = ({
                     className="max-w-xs text-sm"
                   />
                 </div>
-                <div className="flex justify-end">
+                <div className="flex items-center justify-between">
+                  <p className="flex items-center gap-1.5 text-xs text-gray-400">
+                    <Info className="h-3 w-3 shrink-0" />
+                    {t('assignmentOnlyHint')}
+                  </p>
                   <Button type="button" size="sm" onClick={() => setIsEditing(false)}>
                     {t('done')}
                   </Button>

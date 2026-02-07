@@ -85,8 +85,6 @@ interface AssignmentFormStore {
   addContext: (context: Omit<AssignmentContext, 'id'>) => string; // Returns new ID
   updateContext: (contextId: string, updates: Partial<AssignmentContext>) => void;
   removeContext: (contextId: string) => void;
-  getContextBySourceId: (sourceContextId: string) => AssignmentContext | undefined;
-
   // === ACTIONS: Questions ===
   addQuestion: (question: AssignmentQuestionWithTopic) => void;
   removeQuestion: (index: number) => void;
@@ -266,10 +264,6 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
           'assignment/removeContext'
         );
         dispatchDirtyEvent(true);
-      },
-
-      getContextBySourceId: (sourceContextId) => {
-        return get().contexts.find((c) => c.sourceContextId === sourceContextId);
       },
 
       // === QUESTION ACTIONS ===

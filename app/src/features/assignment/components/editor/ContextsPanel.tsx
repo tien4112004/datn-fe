@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BookOpen, AlertTriangle, Check } from 'lucide-react';
+import { BookOpen, AlertTriangle } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Textarea } from '@/shared/components/ui/textarea';
@@ -14,17 +14,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/shared/components/ui/alert-dialog';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/shared/components/ui/dialog';
-import { cn } from '@/shared/lib/utils';
-import { useContextList } from '@/features/context';
+import type { Context } from '@/features/context';
 import { ContextListDisplay } from '../context/ContextListDisplay';
+import { ContextLibraryDialog } from './ContextLibraryDialog';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 
@@ -52,16 +44,6 @@ export const ContextsPanel = () => {
   // Delete confirmation state
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
-  // Library import dialog state
-  const [librarySearch, setLibrarySearch] = useState('');
-  const [selectedLibraryIds, setSelectedLibraryIds] = useState<Set<string>>(new Set());
-
-  // Fetch library contexts when dialog is open
-  const { data: libraryData, isLoading: isLoadingLibrary } = useContextList(
-    showLibraryDialog ? { search: librarySearch || undefined, pageSize: 20 } : { pageSize: 0 }
-  );
-  const libraryContexts = libraryData?.contexts || [];
-
   // Track which library context titles are already in the assignment (by title match)
   const existingTitles = useMemo(() => new Set(contexts.map((c) => c.title.toLowerCase())), [contexts]);
 
@@ -75,37 +57,18 @@ export const ContextsPanel = () => {
     }
   };
 
-  const toggleLibrarySelection = (id: string) => {
-    setSelectedLibraryIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
-
-  const handleImportSelected = () => {
-    const toImport = libraryContexts.filter((ctx) => selectedLibraryIds.has(ctx.id));
-    toImport.forEach((ctx) => {
-      addContext({
-        title: ctx.title,
-        content: ctx.content,
-        author: ctx.author,
+  const handleImportFromLibrary = useCallback(
+    (importedContexts: Context[]) => {
+      importedContexts.forEach((ctx) => {
+        addContext({
+          title: ctx.title,
+          content: ctx.content,
+          author: ctx.author,
+        });
       });
-    });
-    setSelectedLibraryIds(new Set());
-    setLibrarySearch('');
-    setShowLibraryDialog(false);
-  };
-
-  const handleCloseLibraryDialog = () => {
-    setSelectedLibraryIds(new Set());
-    setLibrarySearch('');
-    setShowLibraryDialog(false);
-  };
+    },
+    [addContext]
+  );
 
   // Also close create form when creating
   const handleCreate = () => {
@@ -212,89 +175,12 @@ export const ContextsPanel = () => {
       </AlertDialog>
 
       {/* Library Import Dialog */}
-      <Dialog open={showLibraryDialog} onOpenChange={(open) => !open && handleCloseLibraryDialog()}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>{t('fromLibraryTitle')}</DialogTitle>
-            <DialogDescription>{t('fromLibraryDescription')}</DialogDescription>
-          </DialogHeader>
-
-          <Input
-            value={librarySearch}
-            onChange={(e) => setLibrarySearch(e.target.value)}
-            placeholder={t('searchLibrary')}
-          />
-
-          <div className="max-h-[400px] overflow-y-auto">
-            {isLoadingLibrary ? (
-              <div className="py-8 text-center text-sm text-gray-500">{t('loadingLibrary')}</div>
-            ) : libraryContexts.length === 0 ? (
-              <div className="py-8 text-center text-sm text-gray-500">{t('noLibraryContextFound')}</div>
-            ) : (
-              <div className="space-y-1">
-                {libraryContexts.map((ctx) => {
-                  const alreadyExists = existingTitles.has(ctx.title.toLowerCase());
-                  const isSelected = selectedLibraryIds.has(ctx.id);
-
-                  return (
-                    <button
-                      key={ctx.id}
-                      type="button"
-                      disabled={alreadyExists}
-                      onClick={() => toggleLibrarySelection(ctx.id)}
-                      className={cn(
-                        'flex w-full items-start gap-3 rounded-md px-3 py-3 text-left transition-colors',
-                        alreadyExists
-                          ? 'cursor-not-allowed opacity-50'
-                          : isSelected
-                            ? 'bg-blue-50 dark:bg-blue-900/20'
-                            : 'hover:bg-gray-50 dark:hover:bg-gray-800'
-                      )}
-                    >
-                      <div
-                        className={cn(
-                          'mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border',
-                          isSelected
-                            ? 'border-blue-600 bg-blue-600 text-white'
-                            : 'border-gray-300 dark:border-gray-600'
-                        )}
-                      >
-                        {isSelected && <Check className="h-3 w-3" />}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="truncate text-sm font-medium">{ctx.title}</span>
-                          {alreadyExists && (
-                            <span className="shrink-0 text-xs text-gray-400">{t('alreadyAdded')}</span>
-                          )}
-                        </div>
-                        <p className="mt-0.5 line-clamp-2 text-xs text-gray-500">
-                          {ctx.content.substring(0, 120)}
-                          {ctx.content.length > 120 ? '...' : ''}
-                        </p>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          <DialogFooter>
-            <Button type="button" variant="ghost" size="sm" onClick={handleCloseLibraryDialog}>
-              {t('cancel')}
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleImportSelected}
-              disabled={selectedLibraryIds.size === 0}
-            >
-              {t('importSelected', { count: selectedLibraryIds.size })}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ContextLibraryDialog
+        open={showLibraryDialog}
+        onOpenChange={setShowLibraryDialog}
+        existingTitles={existingTitles}
+        onImport={handleImportFromLibrary}
+      />
     </div>
   );
 };

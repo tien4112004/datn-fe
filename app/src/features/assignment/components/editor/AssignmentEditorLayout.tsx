@@ -1,15 +1,18 @@
-import { Save, Wand2, Database } from 'lucide-react';
+import { Save, Wand2, Database, Plus, Library } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/components/ui/button';
 import LoadingButton from '@/shared/components/common/LoadingButton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
-import { QuestionsEditorPanel } from './QuestionsEditorPanel';
+import { CurrentQuestionView } from './CurrentQuestionView';
 import { AssignmentMetadataPanel } from './AssignmentMetadataPanel';
 import { MatrixBuilderPanel } from './MatrixBuilderPanel';
+import { ContextsPanel } from './ContextsPanel';
 import { QuestionNavigator } from './QuestionNavigator';
 import { AddQuestionButton } from './AddQuestionButton';
 import { QuestionListDialog } from './QuestionListDialog';
+import { QuestionsListViewPanel } from '../viewer/QuestionsListViewPanel';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
+import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 
 interface AssignmentEditorLayoutProps {
   onCancel: () => void;
@@ -20,8 +23,14 @@ interface AssignmentEditorLayoutProps {
 export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLayoutProps) => {
   const mainView = useAssignmentEditorStore((state) => state.mainView);
   const setQuestionBankOpen = useAssignmentEditorStore((state) => state.setQuestionBankOpen);
+  const setContextCreateFormOpen = useAssignmentEditorStore((state) => state.setContextCreateFormOpen);
+  const setContextLibraryDialogOpen = useAssignmentEditorStore((state) => state.setContextLibraryDialogOpen);
+  const questions = useAssignmentFormStore((state) => state.questions);
+  const contexts = useAssignmentFormStore((state) => state.contexts);
+  const topics = useAssignmentFormStore((state) => state.topics);
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor' });
   const { t: tToolbar } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
+  const { t: tContextsPanel } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.contextsPanel' });
   const { t: tActions } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.actions' });
 
   return (
@@ -31,21 +40,28 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
         {mainView === 'info' ? (
           <AssignmentMetadataPanel />
         ) : mainView === 'questions' ? (
-          <QuestionsEditorPanel />
+          <CurrentQuestionView />
         ) : mainView === 'matrix' ? (
           <MatrixBuilderPanel />
+        ) : mainView === 'contexts' ? (
+          <ContextsPanel />
+        ) : mainView === 'questionsList' ? (
+          <QuestionsListViewPanel assignment={{ questions, contexts, topics } as any} />
         ) : null}
       </div>
 
       {/* Right: Sidebar (25% width on large screens) */}
       <div className="space-y-6 lg:overflow-y-auto lg:pr-2">
+        {/* Navigation */}
+        <QuestionNavigator />
+
         <div className="space-y-3 rounded-lg border bg-white p-4 dark:bg-gray-900">
           <div className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             {t('actions.actions')}
           </div>
 
           {/* Question Actions - Only show when not in matrix view */}
-          {mainView !== 'matrix' && (
+          {mainView !== 'matrix' && mainView !== 'contexts' && (
             <>
               <div className="space-y-2">
                 <AddQuestionButton className="w-full" />
@@ -84,6 +100,51 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
             </>
           )}
 
+          {/* Context Actions - Only show in contexts view */}
+          {mainView === 'contexts' && (
+            <>
+              <div className="space-y-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setContextCreateFormOpen(true)}
+                      className="w-full"
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      {tContextsPanel('addContext')}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{tActions('tooltips.addContext')}</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setContextLibraryDialogOpen(true)}
+                      className="w-full"
+                    >
+                      <Library className="mr-2 h-4 w-4" />
+                      {tContextsPanel('fromLibrary')}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{tActions('tooltips.fromLibrary')}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t pt-3" />
+            </>
+          )}
+
           {/* Save/Cancel Actions */}
           <div className="space-y-2">
             <Tooltip>
@@ -104,9 +165,6 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
             </Tooltip>
           </div>
         </div>
-
-        {/* Navigation */}
-        <QuestionNavigator />
       </div>
 
       {/* Question List Dialog */}

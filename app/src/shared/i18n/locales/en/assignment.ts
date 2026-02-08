@@ -136,6 +136,7 @@ export default {
       selected: 'Selected',
       applicationBadge: 'Read-Only',
       untitled: 'Untitled Question',
+      hasContext: 'Has reading passage',
     },
     subjects: {
       toan: 'Math',
@@ -286,6 +287,8 @@ export default {
         save: 'Save changes',
         generate: 'AI generate (coming soon)',
         fromBank: 'Add from question bank',
+        addContext: 'Create a new reading passage',
+        fromLibrary: 'Import from context library',
       },
     },
 
@@ -307,6 +310,7 @@ export default {
       saveError: 'Failed to save assignment',
       noTopicError: 'Please add at least one topic before adding questions from the bank',
       questionsAdded: '{{count}} question(s) added to the assignment',
+      contextFetchError: 'Failed to fetch reading passages for imported questions',
     },
 
     // Questions panel and toolbar
@@ -432,6 +436,44 @@ export default {
       },
     },
 
+    // Contexts panel
+    contextsPanel: {
+      panelTitle: 'Reading Passages',
+      description: 'Create and manage reading passages that can be shared across questions.',
+      addContext: 'Add Reading Passage',
+      emptyState: 'No reading passages yet. Create one to attach to questions.',
+      titleField: 'Title',
+      contentField: 'Content',
+      authorField: 'Author (optional)',
+      create: 'Create',
+      cancel: 'Cancel',
+      deleteConfirmTitle: 'Delete Reading Passage',
+      deleteConfirmDescription: 'Are you sure you want to delete "{{title}}"?',
+      deleteConfirmWarning:
+        'This passage is referenced by {{count}} question(s). Deleting it will unlink those questions.',
+      delete: 'Delete',
+      fromLibrary: 'From Library',
+      fromLibraryTitle: 'Import from Library',
+      fromLibraryDescription: 'Browse reading passages from the library and add them to this assignment.',
+      searchLibrary: 'Search library...',
+      loadingLibrary: 'Loading...',
+      noLibraryContextFound: 'No reading passages found in library',
+      import: 'Import',
+      importSelected: 'Import Selected ({{count}})',
+      alreadyAdded: 'Already added',
+    },
+
+    // Import context dialog (shown when importing questions with bound contexts from bank)
+    importContextDialog: {
+      title: 'Import Reading Passages',
+      description:
+        'Some of the selected questions reference reading passages that are not yet in this assignment. These passages will be added automatically.',
+      passageCount: '{{count}} passage(s) will be added:',
+      dontAskAgain: "Don't ask again",
+      cancel: 'Cancel',
+      import: 'Import',
+    },
+
     // Matrix builder panel
     matrixBuilder: {
       panelTitle: 'Assessment Matrix Builder',
@@ -497,10 +539,12 @@ export default {
       listView: 'List View',
       assignmentInfo: 'Assignment Info',
       matrixBuilder: 'Matrix Builder',
+      contexts: 'Reading Passages',
       untitled: 'Untitled',
       tooltips: {
         assignmentInfo: 'Edit assignment details',
         matrixBuilder: 'Configure assessment matrix',
+        contexts: 'Manage reading passages',
         questionNumber: 'Click to edit, drag to reorder',
       },
     },
@@ -529,6 +573,8 @@ export default {
       preview: 'Preview',
       noQuestions: 'No questions yet',
       addQuestionHint: 'Click "Add Question" to get started',
+      noQuestionSelected: 'No question selected',
+      selectQuestionHint: 'Select a question from the navigator to edit',
     },
 
     // Questions list
@@ -651,6 +697,44 @@ export default {
       showing: 'Showing {{from}} to {{to}} of {{total}} questions',
       previous: 'Previous',
       next: 'Next',
+    },
+  },
+
+  questionBankView: {
+    pageTitle: 'Question Details',
+    sections: {
+      metadata: 'Question Information',
+      content: 'Question Content',
+      explanation: 'Explanation',
+      context: 'Reading Passage',
+    },
+    fields: {
+      title: 'Title',
+      subject: 'Subject',
+      grade: 'Grade',
+      type: 'Question Type',
+      difficulty: 'Difficulty',
+      chapter: 'Chapter',
+      createdAt: 'Created At',
+      updatedAt: 'Updated At',
+    },
+    actions: {
+      title: 'Actions',
+      edit: 'Edit Question',
+      duplicate: 'Duplicate Question',
+      delete: 'Delete Question',
+    },
+    toast: {
+      deleteSuccess: 'Question deleted successfully',
+      deleteError: 'Failed to delete question',
+      duplicateSuccess: 'Question duplicated successfully',
+      duplicateError: 'Failed to duplicate question',
+    },
+    deleteDialog: {
+      title: 'Delete Question?',
+      description: 'This action cannot be undone. This will permanently delete this question.',
+      cancel: 'Cancel',
+      delete: 'Delete',
     },
   },
 
@@ -780,12 +864,15 @@ export default {
     },
     navigator: {
       questionsCount: 'Questions ({{count}})',
+      listView: 'List View',
       assignmentInfo: 'Assignment Info',
       matrixBuilder: 'Assessment Matrix',
+      contexts: 'Reading Passages',
     },
     actions: {
       title: 'Actions',
       edit: 'Edit Assignment',
+      viewQuestionsList: 'View Questions List',
       delete: 'Delete Assignment',
     },
   },
@@ -849,5 +936,29 @@ export default {
       questionNumber: 'Question {{number}}',
       points: '{{points}} pts',
     },
+  },
+
+  context: {
+    readingPassage: 'Reading Passage',
+    collapse: 'Collapse',
+    expand: 'Expand',
+    edit: 'Edit',
+    preview: 'Preview',
+    selectContext: 'Select reading passage...',
+    searchContext: 'Search reading passages...',
+    loading: 'Loading...',
+    noContextFound: 'No reading passages found',
+    contextLabel: 'Reading Passage',
+    noContext: 'None',
+    questionInGroup: 'Question {{current}} of {{total}} (Q{{number}})',
+    points: 'pts',
+    questionsCount: '{{count}} questions',
+    contextGroupEditTip: 'Click individual question numbers in the navigator to edit them separately.',
+    titlePlaceholder: 'Enter reading passage title...',
+    contentPlaceholder: 'Enter reading passage content...',
+    authorPlaceholder: 'Author (optional)',
+    done: 'Done',
+    disconnect: 'Disconnect reading passage',
+    assignmentOnlyHint: 'Changes only apply to this assignment.',
   },
 };

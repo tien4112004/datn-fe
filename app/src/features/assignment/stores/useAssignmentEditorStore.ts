@@ -3,7 +3,7 @@ import { devtools } from 'zustand/middleware';
 import type { AssignmentQuestionWithTopic, MatrixCell, AssignmentTopic } from '../types';
 import { VIEW_MODE, type ViewMode } from '@aiprimary/core';
 
-type MainView = 'info' | 'questions' | 'matrix';
+type MainView = 'info' | 'questions' | 'matrix' | 'contexts' | 'questionsList';
 
 interface AssignmentEditorState {
   // UI State
@@ -11,9 +11,12 @@ interface AssignmentEditorState {
   isQuestionBankOpen: boolean;
   isQuestionListDialogOpen: boolean;
   currentQuestionId: string | null;
+  currentContextId: string | null; // Selected context group (mutually exclusive with currentQuestionId)
   questionViewModes: Map<string, ViewMode>;
   isMetadataDialogOpen: boolean;
   isMatrixEditorOpen: boolean;
+  isContextCreateFormOpen: boolean;
+  isContextLibraryDialogOpen: boolean;
   mainView: MainView;
 
   // Actions
@@ -21,10 +24,13 @@ interface AssignmentEditorState {
   setQuestionBankOpen: (open: boolean) => void;
   setQuestionListDialogOpen: (open: boolean) => void;
   setCurrentQuestionId: (id: string | null) => void;
+  setCurrentContextId: (id: string | null) => void;
   setQuestionViewMode: (questionId: string, mode: ViewMode) => void;
   toggleQuestionViewMode: (questionId: string) => void;
   setMetadataDialogOpen: (open: boolean) => void;
   setMatrixEditorOpen: (open: boolean) => void;
+  setContextCreateFormOpen: (open: boolean) => void;
+  setContextLibraryDialogOpen: (open: boolean) => void;
   setMainView: (view: MainView) => void;
 
   // Question operations (these will be used by components to update form)
@@ -50,16 +56,22 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       isQuestionBankOpen: false,
       isQuestionListDialogOpen: false,
       currentQuestionId: null,
+      currentContextId: null,
       questionViewModes: new Map(),
       isMetadataDialogOpen: false,
       isMatrixEditorOpen: false,
+      isContextCreateFormOpen: false,
+      isContextLibraryDialogOpen: false,
       mainView: 'info',
 
       // UI actions
       setSelectedQuestion: (id) => set({ selectedQuestionId: id }),
       setQuestionBankOpen: (open) => set({ isQuestionBankOpen: open }),
       setQuestionListDialogOpen: (open) => set({ isQuestionListDialogOpen: open }),
-      setCurrentQuestionId: (id) => set({ currentQuestionId: id }),
+      // Setting currentQuestionId clears currentContextId (mutually exclusive)
+      setCurrentQuestionId: (id) => set({ currentQuestionId: id, currentContextId: null }),
+      // Setting currentContextId clears currentQuestionId (mutually exclusive)
+      setCurrentContextId: (id) => set({ currentContextId: id, currentQuestionId: null }),
       setMainView: (view) => set({ mainView: view }),
       setQuestionViewMode: (questionId, mode) => {
         const modes = new Map(get().questionViewModes);
@@ -75,6 +87,8 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       },
       setMetadataDialogOpen: (open) => set({ isMetadataDialogOpen: open }),
       setMatrixEditorOpen: (open) => set({ isMatrixEditorOpen: open }),
+      setContextCreateFormOpen: (open) => set({ isContextCreateFormOpen: open }),
+      setContextLibraryDialogOpen: (open) => set({ isContextLibraryDialogOpen: open }),
 
       // Reorder questions (used with drag-drop)
       reorderQuestions: (questions, oldIndex, newIndex) => {

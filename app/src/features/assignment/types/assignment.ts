@@ -1,9 +1,18 @@
 import type { Difficulty, SubjectCode, AssignmentQuestion } from '@aiprimary/core';
 import type { Question } from '@aiprimary/core';
 
+// Context stored at assignment level (cloned & editable)
+export interface AssignmentContext {
+  id: string; // Local ID within assignment
+  title: string;
+  content: string;
+  author?: string; // Author of the reading passage
+}
+
 // Question with topic assignment (intersection of core Question with topicId)
 export type QuestionWithTopic = Question & {
   topicId: string;
+  contextId?: string; // References AssignmentContext.id within the assignment
 };
 
 // Assignment Question with topic assignment
@@ -41,6 +50,7 @@ export interface AssignmentFormData {
   subject: string;
   grade?: string;
   topics: AssignmentTopic[];
+  contexts: AssignmentContext[];
   questions: AssignmentQuestionWithTopic[];
   matrixCells: MatrixCell[];
   shuffleQuestions?: boolean; // Shuffle questions for each student (default: false)
@@ -54,6 +64,7 @@ export interface Assignment {
   subject?: SubjectCode;
   grade?: string;
   topics?: AssignmentTopic[];
+  contexts?: AssignmentContext[];
   questions: (AssignmentQuestion | AssignmentQuestionWithTopic)[];
   matrix?: {
     cells: MatrixCell[];
@@ -78,6 +89,7 @@ export interface QuestionItemRequest {
   subject?: string;
   data: unknown;
   point: number;
+  contextId?: string;
 }
 
 // Matrix cell for API request
@@ -102,6 +114,7 @@ export interface CreateAssignmentRequest {
   grade?: string;
   questions?: QuestionItemRequest[];
   topics?: TopicRequest[];
+  contexts?: AssignmentContext[];
   matrixCells?: MatrixCellRequest[];
 }
 
@@ -112,5 +125,6 @@ export interface UpdateAssignmentRequest {
   grade?: string;
   questions?: QuestionItemRequest[];
   topics?: TopicRequest[];
+  contexts?: AssignmentContext[];
   matrixCells?: MatrixCellRequest[];
 }

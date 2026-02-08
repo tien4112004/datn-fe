@@ -136,6 +136,7 @@ export default {
       selected: 'Đã chọn',
       applicationBadge: 'Chỉ đọc',
       untitled: 'Câu hỏi chưa có tiêu đề',
+      hasContext: 'Có đoạn văn đọc hiểu',
     },
     subjects: {
       toan: 'Toán',
@@ -286,6 +287,8 @@ export default {
         save: 'Lưu thay đổi',
         generate: 'Tạo bằng AI (sắp có)',
         fromBank: 'Thêm từ kho câu hỏi',
+        addContext: 'Tạo đoạn văn mới',
+        fromLibrary: 'Nhập từ thư viện đoạn văn',
       },
     },
 
@@ -307,6 +310,7 @@ export default {
       saveError: 'Không thể lưu bài tập',
       noTopicError: 'Vui lòng thêm ít nhất một chủ đề trước khi thêm câu hỏi từ ngân hàng',
       questionsAdded: 'Đã thêm {{count}} câu hỏi vào bài tập',
+      contextFetchError: 'Không thể tải đoạn văn đọc hiểu cho câu hỏi đã nhập',
     },
 
     // Bảng điều khiển câu hỏi
@@ -431,6 +435,44 @@ export default {
       },
     },
 
+    // Bảng quản lý đoạn văn
+    contextsPanel: {
+      panelTitle: 'Đoạn văn đọc hiểu',
+      description: 'Tạo và quản lý các đoạn văn đọc hiểu có thể chia sẻ giữa các câu hỏi.',
+      addContext: 'Thêm đoạn văn',
+      emptyState: 'Chưa có đoạn văn nào. Tạo đoạn văn để gắn vào câu hỏi.',
+      titleField: 'Tiêu đề',
+      contentField: 'Nội dung',
+      authorField: 'Tác giả (tùy chọn)',
+      create: 'Tạo',
+      cancel: 'Hủy',
+      deleteConfirmTitle: 'Xóa đoạn văn',
+      deleteConfirmDescription: 'Bạn có chắc muốn xóa "{{title}}"?',
+      deleteConfirmWarning:
+        'Đoạn văn này đang được {{count}} câu hỏi tham chiếu. Xóa sẽ ngắt kết nối các câu hỏi đó.',
+      delete: 'Xóa',
+      fromLibrary: 'Từ thư viện',
+      fromLibraryTitle: 'Nhập từ thư viện',
+      fromLibraryDescription: 'Duyệt đoạn văn từ thư viện và thêm vào bài tập này.',
+      searchLibrary: 'Tìm trong thư viện...',
+      loadingLibrary: 'Đang tải...',
+      noLibraryContextFound: 'Không tìm thấy đoạn văn nào trong thư viện',
+      import: 'Nhập',
+      importSelected: 'Nhập đã chọn ({{count}})',
+      alreadyAdded: 'Đã thêm',
+    },
+
+    // Hộp thoại nhập ngữ cảnh (hiển thị khi nhập câu hỏi có ngữ cảnh từ ngân hàng)
+    importContextDialog: {
+      title: 'Nhập đoạn văn đọc hiểu',
+      description:
+        'Một số câu hỏi đã chọn tham chiếu đến đoạn văn đọc hiểu chưa có trong bài tập này. Các đoạn văn này sẽ được thêm tự động.',
+      passageCount: '{{count}} đoạn văn sẽ được thêm:',
+      dontAskAgain: 'Không hỏi lại',
+      cancel: 'Hủy',
+      import: 'Nhập',
+    },
+
     // Bảng xây dựng ma trận
     matrixBuilder: {
       panelTitle: 'Bảng ma trận đánh giá',
@@ -496,10 +538,12 @@ export default {
       listView: 'Xem danh sách',
       assignmentInfo: 'Thông tin bài tập',
       matrixBuilder: 'Ma trận',
+      contexts: 'Đoạn văn đọc hiểu',
       untitled: 'Chưa có tiêu đề',
       tooltips: {
         assignmentInfo: 'Sửa thông tin bài tập',
         matrixBuilder: 'Cấu hình ma trận đánh giá',
+        contexts: 'Quản lý đoạn văn đọc hiểu',
         questionNumber: 'Nhấp để sửa, kéo để sắp xếp',
       },
     },
@@ -519,6 +563,8 @@ export default {
       preview: 'Xem trước',
       noQuestions: 'Chưa có câu hỏi',
       addQuestionHint: 'Nhấn "Thêm câu hỏi" để bắt đầu',
+      noQuestionSelected: 'Chưa chọn câu hỏi',
+      selectQuestionHint: 'Chọn một câu hỏi từ thanh điều hướng để chỉnh sửa',
     },
 
     // Danh sách câu hỏi
@@ -640,6 +686,44 @@ export default {
       showing: 'Hiển thị {{from}} đến {{to}} trong {{total}} câu hỏi',
       previous: 'Trước',
       next: 'Sau',
+    },
+  },
+
+  questionBankView: {
+    pageTitle: 'Chi Tiết Câu Hỏi',
+    sections: {
+      metadata: 'Thông Tin Câu Hỏi',
+      content: 'Nội Dung Câu Hỏi',
+      explanation: 'Giải Thích',
+      context: 'Bài Đọc',
+    },
+    fields: {
+      title: 'Tiêu đề',
+      subject: 'Môn học',
+      grade: 'Lớp',
+      type: 'Loại câu hỏi',
+      difficulty: 'Độ khó',
+      chapter: 'Chương',
+      createdAt: 'Ngày tạo',
+      updatedAt: 'Ngày cập nhật',
+    },
+    actions: {
+      title: 'Hành động',
+      edit: 'Chỉnh sửa',
+      duplicate: 'Nhân bản',
+      delete: 'Xóa câu hỏi',
+    },
+    toast: {
+      deleteSuccess: 'Xóa câu hỏi thành công',
+      deleteError: 'Không thể xóa câu hỏi',
+      duplicateSuccess: 'Nhân bản câu hỏi thành công',
+      duplicateError: 'Không thể nhân bản câu hỏi',
+    },
+    deleteDialog: {
+      title: 'Xóa câu hỏi?',
+      description: 'Hành động này không thể hoàn tác. Câu hỏi sẽ bị xóa vĩnh viễn.',
+      cancel: 'Hủy',
+      delete: 'Xóa',
     },
   },
 
@@ -768,12 +852,15 @@ export default {
     },
     navigator: {
       questionsCount: 'Câu hỏi ({{count}})',
+      listView: 'Xem danh sách',
       assignmentInfo: 'Thông tin bài tập',
       matrixBuilder: 'Ma trận đánh giá',
+      contexts: 'Đoạn văn bản',
     },
     actions: {
       title: 'Hành động',
       edit: 'Chỉnh sửa bài tập',
+      viewQuestionsList: 'Xem danh sách câu hỏi',
       delete: 'Xóa bài tập',
     },
   },
@@ -836,5 +923,29 @@ export default {
       questionNumber: 'Câu {{number}}',
       points: '{{points}} điểm',
     },
+  },
+
+  context: {
+    readingPassage: 'Đoạn văn đọc hiểu',
+    collapse: 'Thu gọn',
+    expand: 'Mở rộng',
+    edit: 'Chỉnh sửa',
+    preview: 'Xem trước',
+    selectContext: 'Chọn đoạn văn đọc hiểu...',
+    searchContext: 'Tìm kiếm đoạn văn...',
+    loading: 'Đang tải...',
+    noContextFound: 'Không tìm thấy đoạn văn nào',
+    contextLabel: 'Đoạn văn đọc hiểu',
+    noContext: 'Không có',
+    questionInGroup: 'Câu {{current}}/{{total}} (Câu {{number}})',
+    points: 'điểm',
+    questionsCount: '{{count}} câu hỏi',
+    contextGroupEditTip: 'Nhấn vào số câu hỏi trong thanh điều hướng để chỉnh sửa riêng từng câu.',
+    titlePlaceholder: 'Nhập tiêu đề đoạn văn...',
+    contentPlaceholder: 'Nhập nội dung đoạn văn...',
+    authorPlaceholder: 'Tác giả (tùy chọn)',
+    done: 'Xong',
+    disconnect: 'Ngắt kết nối đoạn văn',
+    assignmentOnlyHint: 'Thay đổi chỉ áp dụng cho bài tập này.',
   },
 };

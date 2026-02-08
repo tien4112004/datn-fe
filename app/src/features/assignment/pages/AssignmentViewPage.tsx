@@ -1,9 +1,3 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { Loader2 } from 'lucide-react';
-import { useAssignment, useDeleteAssignment } from '../hooks';
-import { AssignmentViewerLayout } from '../components/viewer/AssignmentViewerLayout';
-import { useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,7 +8,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/shared/components/ui/alert-dialog';
+import { ERROR_TYPE } from '@/shared/constants';
+import { CriticalError } from '@aiprimary/api';
+import type { Assignment } from '@aiprimary/core';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import { AssignmentViewerLayout } from '../components/viewer/AssignmentViewerLayout';
+import { useDeleteAssignment } from '../hooks';
 
 export const AssignmentViewPage = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'view' });
@@ -23,7 +25,14 @@ export const AssignmentViewPage = () => {
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const { data: assignment, isLoading, error } = useAssignment(id!);
+  // Get assignment from loader
+  const { assignment } = useLoaderData() as { assignment: Assignment | null };
+
+  // If no assignment was loaded, throw a resource error
+  if (assignment === null) {
+    throw new CriticalError('Assignment data is unavailable', ERROR_TYPE.RESOURCE_NOT_FOUND);
+  }
+
   const deleteAssignment = useDeleteAssignment();
 
   const handleEdit = () => {
@@ -40,25 +49,6 @@ export const AssignmentViewPage = () => {
     }
     setIsDeleteDialogOpen(false);
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
-  if (error || !assignment) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-lg font-semibold">{t('notFound')}</h2>
-          <p className="text-muted-foreground">{t('notFoundDescription')}</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-gray-950">

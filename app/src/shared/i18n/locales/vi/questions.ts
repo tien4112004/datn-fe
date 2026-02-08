@@ -302,9 +302,9 @@ export default {
       imageUrl: 'URL hình ảnh (Tùy chọn)',
       correctAnswer: 'Đáp án đúng',
       acceptableAnswers: 'Các đáp án thay thế chấp nhận được',
-      alternativeAnswersHint: 'Các đáp án thay thế được phân tích từ văn bản câu hỏi bằng cú pháp ::',
+      alternativeAnswersHint: 'Các đáp án thay thế được phân tích từ văn bản câu hỏi bằng cú pháp |',
       alternativesSyntax:
-        'Sử dụng :: để phân tách các đáp án thay thế: {{đáp_án_1::đáp_án_thay_thế_2::đáp_án_thay_thế_3}}',
+        'Sử dụng | để phân tách các đáp án thay thế: {{đáp_án_1|đáp_án_thay_thế_2|đáp_án_thay_thế_3}}',
       noAlternatives: 'Không có đáp án thay thế',
     },
     viewing: {

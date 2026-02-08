@@ -5,12 +5,18 @@ import { Label } from '@/shared/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { Alert, AlertDescription, AlertTitle } from '@/shared/components/ui/alert';
 import { Separator } from '@/shared/components/ui/separator';
+import { Collapsible, CollapsibleContent } from '@/shared/components/ui/collapsible';
 import {
   useCreateQuestion,
   useUpdateQuestion,
-  useQuestionBankItem,
   useQuestionBankChapters,
 } from '@/features/assignment/hooks/useQuestionBankApi';
+import { useLoaderData } from 'react-router-dom';
+import { CriticalError } from '@aiprimary/api';
+import { ERROR_TYPE } from '@/shared/constants';
+import { useContext } from '@/features/assignment/hooks/useContextApi';
+import { ContextSelector } from '@/features/question/components/shared/ContextSelector';
+import { MarkdownPreview } from '@/features/question/components/shared/MarkdownPreview';
 import type { CreateQuestionRequest, Question, QuestionBankItem } from '@/features/assignment/types';
 import {
   DIFFICULTY,
@@ -28,8 +34,8 @@ import { VIEW_MODE } from '@/features/assignment/types';
 import { QuestionRenderer } from '@/features/question';
 import { generateId } from '@/shared/lib/utils';
 import { toast } from 'sonner';
-import { AlertCircle, Save, Settings, FileText, Eye, Edit3 } from 'lucide-react';
-import { validateQuestion } from '@/features/assignment/utils/validateQuestion';
+import { AlertCircle, Save, Eye, Edit3, Unlink, ChevronDown, ChevronUp } from 'lucide-react';
+import { useValidateQuestion } from '@/features/assignment/hooks/useValidateQuestion';
 import { useTranslation } from 'react-i18next';
 
 // Helper function to create default question based on type
@@ -98,6 +104,8 @@ function createDefaultQuestion(type: QuestionType): QuestionBankItem {
 
 export function QuestionBankEditorPage() {
   const { t } = useTranslation('questions');
+  const { t: tContext } = useTranslation('assignment', { keyPrefix: 'context' });
+  const validateQuestion = useValidateQuestion();
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
 
@@ -107,9 +115,18 @@ export function QuestionBankEditorPage() {
   const [questionData, setQuestionData] = useState<QuestionBankItem | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isContextOpen, setIsContextOpen] = useState(true);
 
-  // Fetch existing question if editing
-  const { data: existingQuestion, isLoading } = useQuestionBankItem(id || '');
+  // Loader-provided question (edit mode) or null (create mode)
+  const { question: existingQuestion } = useLoaderData() as { question?: QuestionBankItem | null };
+
+  // If we are in edit mode and no question was loaded, throw a resource error so the app shows the standard error UI
+  if (isEditMode && existingQuestion === null) {
+    throw new CriticalError('Question data is unavailable', ERROR_TYPE.RESOURCE_NOT_FOUND);
+  }
+
+  // Fetch context if contextId is present
+  const { data: contextData } = useContext(questionData?.contextId);
 
   // Mutations
   const createMutation = useCreateQuestion();
@@ -126,6 +143,13 @@ export function QuestionBankEditorPage() {
       setQuestionData(createDefaultQuestion(QUESTION_TYPE.MULTIPLE_CHOICE));
     }
   }, [isEditMode, existingQuestion]);
+
+  // Auto-open context display when context is selected
+  useEffect(() => {
+    if (questionData?.contextId && contextData) {
+      setIsContextOpen(true);
+    }
+  }, [questionData?.contextId, contextData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -193,14 +217,6 @@ export function QuestionBankEditorPage() {
     }
   };
 
-  if (isEditMode && isLoading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-muted-foreground">{t('editor.loading')}</div>
-      </div>
-    );
-  }
-
   if (!questionData) {
     return null;
   }
@@ -254,10 +270,7 @@ export function QuestionBankEditorPage() {
             {/* Metadata Section */}
             {!isPreviewMode && (
               <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Settings className="text-primary h-5 w-5" />
-                  <h3 className="text-lg font-semibold">{t('editor.metadataSection')}</h3>
-                </div>
+                <h3 className="text-lg font-semibold">{t('editor.metadataSection')}</h3>
                 <Separator />
 
                 {/* Question Type - Only for create mode */}
@@ -379,6 +392,109 @@ export function QuestionBankEditorPage() {
               </div>
             )}
 
+            {/* Context Section */}
+            {!isPreviewMode && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">{tContext('readingPassage')}</h3>
+                <Separator />
+
+                {/* Context Selector */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label>{tContext('contextLabel')}</Label>
+                    {questionData.contextId && (
+                      <div className="flex items-center gap-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 gap-1 text-xs"
+                          onClick={() => setQuestionData({ ...questionData, contextId: undefined })}
+                        >
+                          <Unlink className="h-3 w-3" />
+                          {tContext('disconnect')}
+                        </Button>
+                        {contextData && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            onClick={() => setIsContextOpen(!isContextOpen)}
+                          >
+                            {isContextOpen ? (
+                              <ChevronUp className="h-4 w-4" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4" />
+                            )}
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {!questionData.contextId && (
+                    <ContextSelector
+                      value={questionData.contextId}
+                      onChange={(contextId) => setQuestionData({ ...questionData, contextId })}
+                    />
+                  )}
+                  <p className="text-muted-foreground text-xs">{t('editor.contextDescription')}</p>
+                </div>
+
+                {/* Context Display */}
+                {contextData && (
+                  <Collapsible open={isContextOpen} onOpenChange={setIsContextOpen}>
+                    <CollapsibleContent>
+                      <div className="mt-2 rounded-lg border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+                        <div className="space-y-3">
+                          {contextData.title && (
+                            <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                              {contextData.title}
+                            </h4>
+                          )}
+                          <MarkdownPreview
+                            content={contextData.content}
+                            className="text-sm text-gray-700 dark:text-gray-300"
+                          />
+                          {contextData.author && (
+                            <p className="text-right text-xs italic text-gray-600 dark:text-gray-400">
+                              — {contextData.author}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                )}
+              </div>
+            )}
+
+            {/* Context Display - Preview Mode (Read-only) */}
+            {isPreviewMode && contextData && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">{tContext('readingPassage')}</h3>
+                <Separator />
+                <div className="rounded-lg border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+                  <div className="space-y-3">
+                    {contextData.title && (
+                      <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                        {contextData.title}
+                      </h4>
+                    )}
+                    <MarkdownPreview
+                      content={contextData.content}
+                      className="text-sm text-gray-700 dark:text-gray-300"
+                    />
+                    {contextData.author && (
+                      <p className="text-right text-xs italic text-gray-600 dark:text-gray-400">
+                        — {contextData.author}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Validation Errors */}
             {!isPreviewMode && validationErrors.length > 0 && (
               <Alert variant="destructive">
@@ -398,10 +514,7 @@ export function QuestionBankEditorPage() {
 
             {/* Question Content Section */}
             <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <FileText className="text-primary h-5 w-5" />
-                <h3 className="text-lg font-semibold">{t('editor.contentSection')}</h3>
-              </div>
+              <h3 className="text-lg font-semibold">{t('editor.contentSection')}</h3>
               <Separator />
 
               <QuestionRenderer

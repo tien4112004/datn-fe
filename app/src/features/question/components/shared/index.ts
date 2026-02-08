@@ -5,4 +5,7 @@ export { DifficultyBadge } from './DifficultyBadge';
 export { QuestionTypeIcon } from './QuestionTypeIcon';
 export { AnswerFeedback } from './AnswerFeedback';
 export { QuestionNumber } from './QuestionNumber';
+export { ContextSelector } from './ContextSelector';
+export { ExplanationSection } from './ExplanationSection';
+export type { ExplanationMode } from './ExplanationSection';
 export { indexToLetter } from './numberingUtils';

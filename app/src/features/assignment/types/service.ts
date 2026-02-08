@@ -1,6 +1,6 @@
 import type { ApiResponse } from '@aiprimary/api';
-import type { Assignment as CoreAssignment, Submission } from '@aiprimary/core';
-import type { CreateAssignmentRequest, UpdateAssignmentRequest } from './assignment';
+import type { Submission } from '@aiprimary/core';
+import type { Assignment, CreateAssignmentRequest, UpdateAssignmentRequest } from './assignment';
 
 export interface AssignmentCollectionRequest {
   page?: number;
@@ -12,10 +12,10 @@ export interface AssignmentCollectionRequest {
 
 export interface AssignmentApiService {
   // CRUD operations
-  getAssignments(request: AssignmentCollectionRequest): Promise<ApiResponse<CoreAssignment[]>>;
-  getAssignmentById(id: string): Promise<CoreAssignment>;
-  createAssignment(data: CreateAssignmentRequest): Promise<CoreAssignment>;
-  updateAssignment(id: string, data: UpdateAssignmentRequest): Promise<CoreAssignment>;
+  getAssignments(request: AssignmentCollectionRequest): Promise<ApiResponse<Assignment[]>>;
+  getAssignmentById(id: string): Promise<Assignment>;
+  createAssignment(data: CreateAssignmentRequest): Promise<Assignment>;
+  updateAssignment(id: string, data: UpdateAssignmentRequest): Promise<Assignment>;
   deleteAssignment(id: string): Promise<void>;
 
   // Submission operations

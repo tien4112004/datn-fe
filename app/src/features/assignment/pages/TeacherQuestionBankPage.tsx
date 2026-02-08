@@ -29,55 +29,17 @@ import {
   QuestionBankFilters,
   QuestionBankDialog,
 } from '@/features/assignment/components/question-bank';
-import { getSubjectName, getQuestionTypeName, getDifficultyName, getGradeName } from '@aiprimary/core';
+import {
+  getSubjectName,
+  getQuestionTypeName,
+  getDifficultyName,
+  getGradeName,
+  getSubjectBadgeClass,
+  getDifficultyBadgeClass,
+  getQuestionTypeBadgeClass,
+} from '@aiprimary/core';
 
 const columnHelper = createColumnHelper<QuestionBankItem>();
-
-// Helper functions for colorful badges
-const getSubjectBadgeClass = (subject: string) => {
-  switch (subject) {
-    case 'T': // Math
-      return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800';
-    case 'TV': // Vietnamese
-      return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800';
-    case 'TA': // English
-      return 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800';
-    default:
-      return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800';
-  }
-};
-
-const getDifficultyBadgeClass = (difficulty: string) => {
-  switch (difficulty) {
-    case 'KNOWLEDGE':
-      return 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800';
-    case 'COMPREHENSION':
-      return 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800';
-    case 'APPLICATION':
-      return 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800';
-    case 'ADVANCED_APPLICATION':
-      return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800';
-    default:
-      return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800';
-  }
-};
-
-const getQuestionTypeBadgeClass = (type: string) => {
-  switch (type) {
-    case 'MULTIPLE_CHOICE':
-      return 'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800';
-    case 'MATCHING':
-      return 'bg-pink-100 text-pink-800 border-pink-200 dark:bg-pink-900/30 dark:text-pink-300 dark:border-pink-800';
-    case 'FILL_IN_BLANK':
-      return 'bg-cyan-100 text-cyan-800 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800';
-    case 'OPEN_ENDED':
-      return 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800';
-    case 'GROUP':
-      return 'bg-violet-100 text-violet-800 border-violet-200 dark:bg-violet-900/30 dark:text-violet-300 dark:border-violet-800';
-    default:
-      return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800';
-  }
-};
 
 export function TeacherQuestionBankPage() {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, { keyPrefix: 'teacherQuestionBank' });
@@ -142,8 +104,9 @@ export function TeacherQuestionBankPage() {
 
   const handleDuplicate = async (id: string) => {
     try {
-      await duplicateMutation.mutateAsync(id);
+      const newQuestion = await duplicateMutation.mutateAsync(id);
       toast.success(t('toast.duplicateSuccess'));
+      navigate(`/question-bank/edit/${newQuestion.id}`);
     } catch {
       toast.error(t('toast.duplicateError'));
     }
@@ -189,21 +152,25 @@ export function TeacherQuestionBankPage() {
       columnHelper.display({
         id: 'select',
         header: ({ table }) => (
-          <Checkbox
-            checked={
-              table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')
-            }
-            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-            aria-label="Select all"
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              checked={
+                table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')
+              }
+              onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+              aria-label="Select all"
+            />
+          </div>
         ),
         cell: ({ row }) => (
-          <Checkbox
-            checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-            disabled={!canDelete(row.original)}
-            aria-label="Select row"
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              disabled={!canDelete(row.original)}
+              aria-label="Select row"
+            />
+          </div>
         ),
         size: 50,
         enableResizing: false,
@@ -265,31 +232,36 @@ export function TeacherQuestionBankPage() {
         cell: ({ row }) => {
           const question = row.original;
           return (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {canEdit(question) && (
-                  <>
-                    <DropdownMenuItem onClick={() => handleEdit(question)}>
-                      <FileEdit className="mr-2 h-4 w-4" />
-                      {t('actions.edit')}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleDuplicate(question.id)}>
-                      <Copy className="mr-2 h-4 w-4" />
-                      {t('actions.duplicate')}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(question.id)}>
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      {t('actions.delete')}
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div onClick={(e) => e.stopPropagation()}>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {canEdit(question) && (
+                    <>
+                      <DropdownMenuItem onClick={() => handleEdit(question)}>
+                        <FileEdit className="mr-2 h-4 w-4" />
+                        {t('actions.edit')}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDuplicate(question.id)}>
+                        <Copy className="mr-2 h-4 w-4" />
+                        {t('actions.duplicate')}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        onClick={() => handleDelete(question.id)}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        {t('actions.delete')}
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           );
         },
         size: 60,
@@ -394,6 +366,8 @@ export function TeacherQuestionBankPage() {
           <DataTable
             table={table}
             isLoading={isLoading}
+            onClickRow={(row) => navigate(`/question-bank/${row.original.id}`)}
+            rowStyle="cursor-pointer"
             emptyState={
               <div className="text-muted-foreground py-8 text-center">{t('table.noQuestions')}</div>
             }

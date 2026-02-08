@@ -2,40 +2,56 @@ import type { FillInBlankQuestion } from '@/types/questionBank';
 import { MarkdownPreview, QuestionNumber } from '../shared';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 interface FillInBlankViewingProps {
   question: FillInBlankQuestion;
   points?: number;
   number?: number;
+  compact?: boolean;
 }
 
-export const FillInBlankViewing = ({ question, points, number }: FillInBlankViewingProps) => {
+export const FillInBlankViewing = ({ question, points, number, compact }: FillInBlankViewingProps) => {
   return (
-    <div className="space-y-4">
+    <div className={cn(compact ? 'space-y-2' : 'space-y-4')}>
       {number !== undefined && (
-        <div className="flex items-center gap-3">
-          <QuestionNumber number={number} />
+        <div className={cn('flex items-center', compact ? 'gap-2' : 'gap-3')}>
+          <QuestionNumber number={number} className={compact ? 'h-6 w-6 text-xs' : undefined} />
         </div>
       )}
 
       {/* Title */}
       {question.title && (
         <div className="space-y-1">
-          <p className="font-medium">{question.title}</p>
+          <p className={cn('font-medium', compact && 'text-sm')}>{question.title}</p>
           {question.titleImageUrl && (
-            <img src={question.titleImageUrl} alt="Question" className="mt-2 max-h-64 rounded-md border" />
+            <img
+              src={question.titleImageUrl}
+              alt="Question"
+              className={cn('mt-2 rounded-md border', compact ? 'max-h-32' : 'max-h-64')}
+            />
           )}
         </div>
       )}
 
       {/* Question with blanks */}
-      <div className="bg-muted/50 rounded-md border border-gray-300 p-4 font-mono text-sm dark:border-gray-600">
+      <div
+        className={cn(
+          'bg-muted/50 rounded-md border border-gray-300 font-mono dark:border-gray-600',
+          compact ? 'p-2 text-xs' : 'p-4 text-sm'
+        )}
+      >
         {question.data.segments.map((segment) => (
           <span key={segment.id}>
             {segment.type === 'text' ? (
               segment.content
             ) : (
-              <span className="border-primary mx-1 inline-block min-w-[100px] border-b-2 border-dashed px-2">
+              <span
+                className={cn(
+                  'border-primary mx-1 inline-block border-b-2 border-dashed px-2',
+                  compact ? 'min-w-[60px]' : 'min-w-[100px]'
+                )}
+              >
                 _________
               </span>
             )}
@@ -44,15 +60,24 @@ export const FillInBlankViewing = ({ question, points, number }: FillInBlankView
       </div>
 
       {/* Expected Answers */}
-      <div className="space-y-2 rounded-lg border border-gray-300 bg-green-50 p-3 dark:border-gray-600 dark:bg-green-900/20">
-        <Label className="text-sm font-medium">Expected Answers</Label>
+      <div
+        className={cn(
+          'rounded-lg border border-gray-300 bg-green-50 dark:border-gray-600 dark:bg-green-900/20',
+          compact ? 'space-y-1 p-2' : 'space-y-2 p-3'
+        )}
+      >
+        <Label className={cn('font-medium', compact ? 'text-xs' : 'text-sm')}>Expected Answers</Label>
         <div className="space-y-1">
           {question.data.segments
             .filter((segment) => segment.type === 'blank')
             .map((segment, index) => (
-              <div key={segment.id} className="flex items-center gap-2">
-                <Badge variant="outline">Blank {index + 1}</Badge>
-                <code className="bg-background rounded px-2 py-1 text-sm">{segment.content}</code>
+              <div key={segment.id} className={cn('flex items-center', compact ? 'gap-1' : 'gap-2')}>
+                <Badge variant="outline" className={compact ? 'py-0 text-xs' : undefined}>
+                  Blank {index + 1}
+                </Badge>
+                <code className={cn('bg-background rounded px-2 py-1', compact ? 'text-xs' : 'text-sm')}>
+                  {segment.content}
+                </code>
               </div>
             ))}
         </div>
@@ -60,21 +85,33 @@ export const FillInBlankViewing = ({ question, points, number }: FillInBlankView
 
       {/* Case Sensitivity */}
       {question.data.caseSensitive && (
-        <div className="rounded-md border border-amber-200 bg-amber-50 p-2 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
+        <div
+          className={cn(
+            'rounded-md border border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200',
+            compact ? 'p-1.5 text-[10px]' : 'p-2 text-xs'
+          )}
+        >
           Answers are case-sensitive
         </div>
       )}
 
       {/* Explanation */}
       {question.explanation && (
-        <div className="space-y-2 rounded-lg border border-gray-300 bg-blue-50 p-3 dark:border-gray-600 dark:bg-blue-900/20">
-          <Label className="text-sm font-medium">Explanation</Label>
+        <div
+          className={cn(
+            'space-y-1 rounded-lg border border-gray-300 bg-blue-50 dark:border-gray-600 dark:bg-blue-900/20',
+            compact ? 'p-2' : 'space-y-2 p-3'
+          )}
+        >
+          <Label className={cn('font-medium', compact ? 'text-xs' : 'text-sm')}>Explanation</Label>
           <MarkdownPreview content={question.explanation} />
         </div>
       )}
 
       {/* Points */}
-      {points && <p className="text-muted-foreground text-sm">Points: {points}</p>}
+      {points && (
+        <p className={cn('text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>Points: {points}</p>
+      )}
     </div>
   );
 };

@@ -1,8 +1,10 @@
-import type { Assignment } from '../../types';
 import { useAssignmentViewerStore } from '../../stores/useAssignmentViewerStore';
+import type { Assignment } from '../../types';
 import { AssignmentMetadataViewPanel } from './AssignmentMetadataViewPanel';
-import { QuestionsViewPanel } from './QuestionsViewPanel';
+import { ContextsViewPanel } from './ContextsViewPanel';
 import { MatrixViewPanel } from './MatrixViewPanel';
+import { QuestionsListViewPanel } from './QuestionsListViewPanel';
+import { QuestionsViewPanel } from './QuestionsViewPanel';
 import { QuestionViewNavigator } from './QuestionViewNavigator';
 import { ViewerActionsPanel } from './ViewerActionsPanel';
 
@@ -21,7 +23,9 @@ export const AssignmentViewerLayout = ({ assignment, onEdit, onDelete }: Assignm
       <div className="lg:col-span-3 lg:overflow-y-auto lg:pr-2">
         {mainView === 'info' && <AssignmentMetadataViewPanel assignment={assignment} />}
         {mainView === 'questions' && <QuestionsViewPanel assignment={assignment} />}
+        {mainView === 'questionsList' && <QuestionsListViewPanel assignment={assignment} />}
         {mainView === 'matrix' && <MatrixViewPanel assignment={assignment} />}
+        {mainView === 'contexts' && <ContextsViewPanel assignment={assignment} />}
       </div>
 
       {/* Sidebar (25% width on large screens) */}

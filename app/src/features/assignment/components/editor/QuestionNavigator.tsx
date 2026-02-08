@@ -1,9 +1,13 @@
-import { List, FileText, Grid3x3 } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { List, FileText, Grid3x3, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
+import { cn } from '@/shared/lib/utils';
 import { CollapsibleSection } from './CollapsibleSection';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
+import { groupQuestionsByContext } from '../../utils/questionGrouping';
+import type { AssignmentContext } from '../../types';
 import {
   DndContext,
   closestCenter,
@@ -21,25 +25,16 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-interface SortableQuestionButtonProps {
+interface SortableItemProps {
   id: string;
-  index: number;
   isActive: boolean;
-  hasTitle: boolean;
-  title: string;
   onClick: () => void;
-  untitledLabel: string;
+  children: React.ReactNode;
+  className?: string;
+  tooltip?: string;
 }
 
-const SortableQuestionButton = ({
-  id,
-  index,
-  isActive,
-  hasTitle,
-  title,
-  onClick,
-  untitledLabel,
-}: SortableQuestionButtonProps) => {
+const SortableItem = ({ id, isActive, onClick, children, className, tooltip }: SortableItemProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
   const style = {
@@ -48,43 +43,69 @@ const SortableQuestionButton = ({
     opacity: isDragging ? 0.5 : 1,
   };
 
-  return (
+  const button = (
     <button
       ref={setNodeRef}
       style={style}
       type="button"
       onClick={onClick}
-      className={`flex h-8 w-full items-center justify-center rounded text-xs font-medium transition-colors ${
-        isActive
-          ? 'bg-primary text-primary-foreground'
-          : hasTitle
-            ? 'bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900'
-            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
-      } ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-      title={title || untitledLabel}
+      className={cn(
+        'flex h-8 w-full items-center justify-center rounded text-xs font-medium transition-colors',
+        isActive ? 'bg-primary text-primary-foreground' : className,
+        isDragging ? 'cursor-grabbing' : 'cursor-grab'
+      )}
       {...attributes}
       {...listeners}
     >
-      {index + 1}
+      {children}
     </button>
   );
+
+  if (tooltip) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div>{button}</div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{tooltip}</p>
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return button;
 };
 
 export const QuestionNavigator = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.navigator' });
+  const { t: tContext } = useTranslation('assignment', { keyPrefix: 'context' });
 
   const questions = useAssignmentFormStore((state) => state.questions);
+  const contexts = useAssignmentFormStore((state) => state.contexts);
   const reorderQuestions = useAssignmentFormStore((state) => state.reorderQuestions);
 
   const mainView = useAssignmentEditorStore((state) => state.mainView);
   const setMainView = useAssignmentEditorStore((state) => state.setMainView);
   const currentQuestionId = useAssignmentEditorStore((state) => state.currentQuestionId);
+  const currentContextId = useAssignmentEditorStore((state) => state.currentContextId);
   const setCurrentQuestionId = useAssignmentEditorStore((state) => state.setCurrentQuestionId);
+  const setCurrentContextId = useAssignmentEditorStore((state) => state.setCurrentContextId);
+
+  // Build contexts map from assignment's cloned contexts (not from API)
+  const contextsMap = useMemo(() => {
+    const map = new Map<string, AssignmentContext>();
+    contexts.forEach((ctx) => map.set(ctx.id, ctx));
+    return map;
+  }, [contexts]);
+
+  // Group questions by context
+  const groups = useMemo(() => groupQuestionsByContext(questions, contextsMap), [questions, contextsMap]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // Require 8px movement before activating drag
+        distance: 8,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -101,10 +122,22 @@ export const QuestionNavigator = () => {
 
       if (oldIndex !== -1 && newIndex !== -1) {
         reorderQuestions(oldIndex, newIndex);
-        // Current question ID remains the same, no need to update
       }
     }
   };
+
+  const handleQuestionClick = (questionId: string) => {
+    setMainView('questions');
+    setCurrentQuestionId(questionId);
+  };
+
+  const handleContextClick = (contextId: string) => {
+    setMainView('questions');
+    setCurrentContextId(contextId);
+  };
+
+  // Track question numbers
+  let questionNumber = 0;
 
   return (
     <CollapsibleSection
@@ -120,11 +153,12 @@ export const QuestionNavigator = () => {
               <button
                 type="button"
                 onClick={() => setMainView('info')}
-                className={`flex h-8 w-full items-center justify-center rounded text-xs transition-colors ${
+                className={cn(
+                  'flex h-8 w-full items-center justify-center rounded text-xs transition-colors',
                   mainView === 'info'
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
-                }`}
+                )}
               >
                 <FileText className="h-3 w-3" />
               </button>
@@ -140,11 +174,12 @@ export const QuestionNavigator = () => {
               <button
                 type="button"
                 onClick={() => setMainView('matrix')}
-                className={`flex h-8 w-full items-center justify-center rounded text-xs transition-colors ${
+                className={cn(
+                  'flex h-8 w-full items-center justify-center rounded text-xs transition-colors',
                   mainView === 'matrix'
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
-                }`}
+                )}
               >
                 <Grid3x3 className="h-3 w-3" />
               </button>
@@ -154,36 +189,137 @@ export const QuestionNavigator = () => {
             </TooltipContent>
           </Tooltip>
 
-          {/* Question Numbers */}
-          <SortableContext items={questions.map((q) => q.question.id)} strategy={rectSortingStrategy}>
-            {questions.map((aq, index) => {
-              const isActive = mainView === 'questions' && currentQuestionId === aq.question.id;
-              const question = aq.question;
-              const hasTitle = Boolean(question.title) && question.title.trim() !== '';
+          {/* Contexts Panel Icon */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => setMainView('contexts')}
+                className={cn(
+                  'flex h-8 w-full items-center justify-center rounded text-xs transition-colors',
+                  mainView === 'contexts'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
+                )}
+              >
+                <BookOpen className="h-3 w-3" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{t('tooltips.contexts')}</p>
+            </TooltipContent>
+          </Tooltip>
 
-              return (
-                <Tooltip key={question.id}>
-                  <TooltipTrigger asChild>
-                    <div>
-                      <SortableQuestionButton
-                        id={question.id}
-                        index={index}
-                        isActive={isActive}
-                        hasTitle={hasTitle}
-                        title={question.title}
-                        untitledLabel={t('untitled')}
-                        onClick={() => {
-                          setMainView('questions');
-                          setCurrentQuestionId(question.id);
-                        }}
-                      />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{t('tooltips.questionNumber')}</p>
-                  </TooltipContent>
-                </Tooltip>
-              );
+          {/* Questions List View Icon */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => setMainView('questionsList')}
+                className={cn(
+                  'flex h-8 w-full items-center justify-center rounded text-xs transition-colors',
+                  mainView === 'questionsList'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
+                )}
+              >
+                <List className="h-3 w-3" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{t('listView')}</p>
+            </TooltipContent>
+          </Tooltip>
+
+          {/* Groups: Context groups and standalone questions */}
+          <SortableContext
+            items={questions.filter((q) => q?.question?.id).map((q) => q.question.id)}
+            strategy={rectSortingStrategy}
+          >
+            {groups.map((group) => {
+              if (group.type === 'context') {
+                // Context group - show BookOpen icon THEN individual questions
+                const isContextActive = mainView === 'questions' && currentContextId === group.contextId;
+
+                return (
+                  <React.Fragment key={group.id}>
+                    {/* Context group icon - click to view all questions together */}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={() => handleContextClick(group.contextId!)}
+                          className={cn(
+                            'flex h-8 w-full items-center justify-center rounded text-xs font-medium transition-colors',
+                            isContextActive
+                              ? 'bg-primary text-primary-foreground'
+                              : 'bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800'
+                          )}
+                        >
+                          <BookOpen className="h-3 w-3" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>
+                          {group.context?.title || tContext('readingPassage')} (
+                          {tContext('questionsCount', { count: group.questions.length })})
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+
+                    {/* Individual questions in the context group */}
+                    {group.questions.map((aq) => {
+                      const question = aq?.question;
+                      if (!question) return null;
+                      questionNumber++;
+                      const isQuestionActive = mainView === 'questions' && currentQuestionId === question.id;
+                      const hasTitle = Boolean(question.title) && question.title.trim() !== '';
+
+                      return (
+                        <SortableItem
+                          key={question.id}
+                          id={question.id}
+                          isActive={isQuestionActive}
+                          onClick={() => handleQuestionClick(question.id)}
+                          className={
+                            hasTitle
+                              ? 'bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900'
+                              : 'bg-blue-50/50 text-blue-600 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-400 dark:hover:bg-blue-900'
+                          }
+                          tooltip={question.title || t('untitled')}
+                        >
+                          {questionNumber}
+                        </SortableItem>
+                      );
+                    })}
+                  </React.Fragment>
+                );
+              } else {
+                // Standalone question (no context)
+                const aq = group.questions[0];
+                const question = aq?.question;
+                if (!question) return null;
+                questionNumber++;
+                const isActive = mainView === 'questions' && currentQuestionId === question.id;
+                const hasTitle = Boolean(question.title) && question.title.trim() !== '';
+
+                return (
+                  <SortableItem
+                    key={group.id}
+                    id={question.id}
+                    isActive={isActive}
+                    onClick={() => handleQuestionClick(question.id)}
+                    className={
+                      hasTitle
+                        ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
+                    }
+                    tooltip={question.title || t('untitled')}
+                  >
+                    {questionNumber}
+                  </SortableItem>
+                );
+              }
             })}
           </SortableContext>
         </div>

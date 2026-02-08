@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion, FillInBlankAnswer } from '@/features/assignment/types';
-import { MarkdownPreview, AnswerFeedback, QuestionNumber } from '../shared';
+import { AnswerFeedback, QuestionNumber, ExplanationSection } from '../shared';
 
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
@@ -121,12 +121,7 @@ export const FillInBlankAfterAssessment = ({
       </div>
 
       {/* Explanation */}
-      {question.explanation && (
-        <div className="bg-muted/50 rounded-md p-4">
-          <h4 className="mb-2 font-semibold">{t('common.explanation')}:</h4>
-          <MarkdownPreview content={question.explanation} />
-        </div>
-      )}
+      <ExplanationSection mode="afterAssessment" explanation={question.explanation} />
 
       {/* Score Summary */}
       <p className="text-muted-foreground text-sm">

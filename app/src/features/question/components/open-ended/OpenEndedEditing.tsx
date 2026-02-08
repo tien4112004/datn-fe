@@ -19,7 +19,7 @@ export const OpenEndedEditing = ({ question, onChange }: OpenEndedEditingProps) 
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 p-2">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">{t('title')}</h3>
         <DifficultyBadge difficulty={question.difficulty} />
@@ -27,45 +27,45 @@ export const OpenEndedEditing = ({ question, onChange }: OpenEndedEditingProps) 
       {/* Question */}
       <div className="space-y-1">
         <Label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('labels.question')}</Label>
-        <div className="space-y-2 rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900">
-          <div className="flex items-center gap-2">
-            <MarkdownEditor
-              value={question.title}
-              onChange={(title) => updateQuestion({ title })}
-              placeholder={t('placeholders.question')}
-              className="flex-1"
-            />
-            {question.titleImageUrl ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => updateQuestion({ titleImageUrl: undefined })}
-                title={t('buttons.removeImage', { ns: 'assignment', defaultValue: 'Remove Image' })}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => updateQuestion({ titleImageUrl: '' })}
-                title={t('buttons.addImage', { ns: 'assignment', defaultValue: 'Add Image' })}
-              >
-                <ImagePlus className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-
-          {question.titleImageUrl && (
-            <ImageUploader
-              label={t('labels.questionImage')}
-              value={question.titleImageUrl}
-              onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
-            />
+        <div className="group/title relative">
+          <MarkdownEditor
+            value={question.title}
+            onChange={(title) => updateQuestion({ title })}
+            placeholder={t('placeholders.question')}
+            className="pr-9"
+          />
+          {question.titleImageUrl != null ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => updateQuestion({ titleImageUrl: undefined })}
+              title={t('buttons.removeImage', { ns: 'assignment', defaultValue: 'Remove Image' })}
+              className="absolute right-1.5 top-1.5 h-7 w-7 p-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => updateQuestion({ titleImageUrl: '' })}
+              title={t('buttons.addImage', { ns: 'assignment', defaultValue: 'Add Image' })}
+              className="absolute right-1.5 top-1.5 h-7 w-7 p-0 opacity-0 transition-opacity group-hover/title:opacity-100"
+            >
+              <ImagePlus className="h-4 w-4" />
+            </Button>
           )}
         </div>
+
+        {question.titleImageUrl != null && (
+          <ImageUploader
+            label={t('labels.questionImage')}
+            value={question.titleImageUrl}
+            onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
+          />
+        )}
       </div>
 
       {/* Max Length */}
@@ -86,7 +86,7 @@ export const OpenEndedEditing = ({ question, onChange }: OpenEndedEditingProps) 
           onChange={(e) =>
             updateQuestion({ data: { ...question.data, maxLength: parseInt(e.target.value) || 500 } })
           }
-          className="h-8 border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-900"
+          className="h-8"
         />
       </div>
 
@@ -95,14 +95,12 @@ export const OpenEndedEditing = ({ question, onChange }: OpenEndedEditingProps) 
         <Label className="text-xs font-medium text-gray-700 dark:text-gray-300">
           {t('labels.expectedAnswer')}
         </Label>
-        <div className="rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900">
-          <MarkdownEditor
-            value={question.data.expectedAnswer || ''}
-            onChange={(expectedAnswer) => updateQuestion({ data: { ...question.data, expectedAnswer } })}
-            placeholder={t('placeholders.expectedAnswer')}
-            minHeight={80}
-          />
-        </div>
+        <MarkdownEditor
+          value={question.data.expectedAnswer || ''}
+          onChange={(expectedAnswer) => updateQuestion({ data: { ...question.data, expectedAnswer } })}
+          placeholder={t('placeholders.expectedAnswer')}
+          minHeight={80}
+        />
       </div>
 
       {/* Explanation */}
@@ -110,14 +108,12 @@ export const OpenEndedEditing = ({ question, onChange }: OpenEndedEditingProps) 
         <Label className="text-xs font-medium text-gray-700 dark:text-gray-300">
           {t('labels.explanation')}
         </Label>
-        <div className="rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900">
-          <MarkdownEditor
-            value={question.explanation || ''}
-            onChange={(explanation) => updateQuestion({ explanation })}
-            placeholder={t('placeholders.explanation')}
-            minHeight={80}
-          />
-        </div>
+        <MarkdownEditor
+          value={question.explanation || ''}
+          onChange={(explanation) => updateQuestion({ explanation })}
+          placeholder={t('placeholders.explanation')}
+          minHeight={80}
+        />
       </div>
     </div>
   );

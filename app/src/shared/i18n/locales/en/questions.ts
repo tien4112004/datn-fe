@@ -49,6 +49,7 @@ export default {
     difficulty: 'Difficulty',
     grade: 'Grade',
     validationErrors: 'Validation Errors',
+    contextDescription: 'Optional: Select a reading passage to provide context for this question',
 
     // Toast messages
     createSuccess: 'Question created successfully',
@@ -114,16 +115,26 @@ export default {
 
   validation: {
     titleRequired: 'Title is required',
+    missingData: 'Question data is missing',
     optionTextRequired: 'Option text is required',
     minOptions: 'At least 2 options required',
     maxOptions: 'Maximum 6 options allowed',
     exactlyOneCorrect: 'Exactly one option must be marked as correct',
+    emptyOptions: '{{count}} option(s) have no text',
+    placeholderOptions: '{{count}} option(s) appear to use placeholder text (e.g., "Option 1")',
     leftItemRequired: 'Left item is required',
     rightItemRequired: 'Right item is required',
     minPairs: 'At least 2 pairs required',
     maxPairs: 'Maximum 8 pairs allowed',
+    emptyLeftItems: '{{count}} pair(s) have no left value',
+    emptyRightItems: '{{count}} pair(s) have no right value',
+    placeholderPairs: '{{count}} pair(s) appear to use placeholder text (e.g., "Left 1")',
     maxLengthExceeded: 'Maximum length exceeded',
     minSegments: 'At least one segment required',
+    emptyBlanks: '{{count}} blank(s) have no correct answer',
+    placeholderSegments: 'Some segments appear to use placeholder text (e.g., "Fill in the blank")',
+    missingExpectedAnswer: 'Consider adding an expected answer for grading reference',
+    shortMaxLength: 'Maximum length seems very short (less than 10 characters)',
   },
 
   // Multiple Choice
@@ -301,8 +312,8 @@ export default {
       imageUrl: 'Image URL (Optional)',
       correctAnswer: 'Correct answer',
       acceptableAnswers: 'Alternative acceptable answers',
-      alternativeAnswersHint: 'Alternatives are parsed from your question text using :: syntax',
-      alternativesSyntax: 'Use :: to separate alternatives: {{answer1::alternative2::alternative3}}',
+      alternativeAnswersHint: 'Alternatives are parsed from your question text using | syntax',
+      alternativesSyntax: 'Use | to separate alternatives: {{answer1|alternative2|alternative3}}',
       noAlternatives: 'No alternative answers',
     },
     viewing: {

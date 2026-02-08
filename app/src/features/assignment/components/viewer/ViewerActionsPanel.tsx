@@ -1,6 +1,6 @@
-import { useTranslation } from 'react-i18next';
-import { Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
+import { Edit, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ViewerActionsPanelProps {
   onEdit: () => void;

@@ -17,6 +17,7 @@ export type QuestionBankItem = Question & {
   subject: SubjectCode; // Subject classification (required for bank organization)
   grade?: string; // Grade level (e.g., "1", "2", "3", "4", "5")
   chapter?: string; // Chapter name or identifier
+  contextId?: string; // Reference to reading passage context
   createdAt?: string; // ISO timestamp of creation
   updatedAt?: string; // ISO timestamp of last update
 };

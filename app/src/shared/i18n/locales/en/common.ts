@@ -170,4 +170,9 @@ export default {
     saveFailed: 'Failed to save presentation',
     processFailed: 'Failed to process presentation',
   },
+  subjectNames: {
+    math: 'Math',
+    vietnamese: 'Vietnamese',
+    english: 'English',
+  },
 };

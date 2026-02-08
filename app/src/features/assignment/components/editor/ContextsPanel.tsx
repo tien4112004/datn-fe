@@ -24,7 +24,7 @@ import {
 } from '@/shared/components/ui/dialog';
 import { cn } from '@/shared/lib/utils';
 import { useContextList } from '@/features/context';
-import { EditableContextDisplay } from '../context/EditableContextDisplay';
+import { ContextListDisplay } from '../context/ContextListDisplay';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 
@@ -176,26 +176,13 @@ export const ContextsPanel = () => {
       )}
 
       {/* Context List */}
-      {contexts.length === 0 && !showCreateForm ? (
-        <div className="rounded-lg border border-dashed p-8 text-center">
-          <BookOpen className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-          <p className="text-sm text-gray-500">{t('emptyState')}</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {contexts.map((context) => {
-            const refCount = getReferencingQuestionCount(context.id);
-            return (
-              <EditableContextDisplay
-                key={context.id}
-                context={context}
-                refCount={refCount}
-                onDelete={() => setDeleteTarget({ id: context.id, title: context.title })}
-                onUpdate={(updates) => updateContext(context.id, updates)}
-              />
-            );
-          })}
-        </div>
+      {(contexts.length > 0 || !showCreateForm) && (
+        <ContextListDisplay
+          contexts={contexts}
+          questions={questions}
+          onUpdate={updateContext}
+          onDelete={(ctx) => setDeleteTarget(ctx)}
+        />
       )}
 
       {/* Delete Confirmation Dialog */}

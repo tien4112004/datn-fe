@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion, BlankSegment } from '@/features/assignment/types';
-import { MarkdownEditor, ImageUploader } from '../shared';
+import { ImageUploader, ExplanationSection } from '../shared';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
@@ -115,7 +115,7 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
       {/* Title */}
       <div className="space-y-1.5">
         <Label className="text-sm font-medium">{t('fillInBlank.editing.title')}</Label>
-        <div className="space-y-2 rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900">
+        <div className="border-muted bg-background space-y-2 rounded-md border p-2">
           <div className="flex items-center gap-2">
             <Input
               value={question.title}
@@ -161,10 +161,7 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
         <div className="flex items-center justify-between">
           <Label className="text-sm font-medium">{t('fillInBlank.editing.questionText')}</Label>
           <div className="flex items-center gap-2">
-            <Label
-              htmlFor="case-sensitive"
-              className="cursor-pointer text-xs text-gray-600 dark:text-gray-400"
-            >
+            <Label htmlFor="case-sensitive" className="text-muted-foreground cursor-pointer text-xs">
               {t('fillInBlank.editing.caseSensitive')}
             </Label>
             <Switch
@@ -193,10 +190,8 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
 
       {/* Preview */}
       {blankSegments.length > 0 && (
-        <div className="rounded-lg border bg-gray-50 p-4 dark:bg-gray-900/50">
-          <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-            {t('fillInBlank.editing.preview')}
-          </p>
+        <div className="bg-muted/50 rounded-lg border p-4">
+          <p className="mb-2 text-sm font-medium">{t('fillInBlank.editing.preview')}</p>
           <div className="text-sm">
             {question.data.segments.map((segment) => (
               <span key={segment.id}>
@@ -217,14 +212,14 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
       {blankSegments.length > 0 && (
         <div className="space-y-3">
           <Label className="text-sm font-medium">{t('fillInBlank.editing.alternativeAnswers')}</Label>
-          <p className="text-xs text-gray-500">
+          <p className="text-muted-foreground text-xs">
             {t('fillInBlank.editing.alternativeAnswersHint', {
               defaultValue: 'Alternatives are parsed from your question text using | syntax',
             })}
           </p>
 
           {blankSegments.map((segment, index) => (
-            <div key={segment.id} className="space-y-2 rounded-lg border bg-gray-50 p-3 dark:bg-gray-900/50">
+            <div key={segment.id} className="bg-muted/50 space-y-2 rounded-lg border p-3">
               <Label className="text-sm font-medium">
                 {t('fillInBlank.editing.blankLabel', { index: index + 1 })}{' '}
                 <span className="font-mono text-blue-600">{segment.content}</span>
@@ -242,7 +237,7 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
                   ))}
                 </div>
               ) : (
-                <p className="text-xs italic text-gray-400">
+                <p className="text-muted-foreground text-xs italic">
                   {t('fillInBlank.editing.noAlternatives', {
                     defaultValue: 'No alternative answers',
                   })}
@@ -254,16 +249,11 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
       )}
 
       {/* Explanation */}
-      <div className="space-y-1.5">
-        <Label className="text-sm font-medium">{t('fillInBlank.editing.explanation')}</Label>
-        <div className="rounded-lg border p-3">
-          <MarkdownEditor
-            value={question.explanation || ''}
-            onChange={(explanation) => updateQuestion({ explanation })}
-            placeholder={t('fillInBlank.editing.explanationPlaceholder')}
-          />
-        </div>
-      </div>
+      <ExplanationSection
+        mode="editing"
+        explanation={question.explanation}
+        onChange={(explanation) => updateQuestion({ explanation })}
+      />
     </div>
   );
 };

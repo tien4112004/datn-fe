@@ -1,11 +1,3 @@
-import { useParams, useNavigate, useLoaderData } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { useDeleteAssignment } from '../hooks';
-import { AssignmentViewerLayout } from '../components/viewer/AssignmentViewerLayout';
-import type { Assignment } from '@aiprimary/core';
-import { CriticalError } from '@aiprimary/api';
-import { ERROR_TYPE } from '@/shared/constants';
-import { useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,7 +8,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/shared/components/ui/alert-dialog';
+import { ERROR_TYPE } from '@/shared/constants';
+import { CriticalError } from '@aiprimary/api';
+import type { Assignment } from '@aiprimary/core';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import { AssignmentViewerLayout } from '../components/viewer/AssignmentViewerLayout';
+import { useDeleteAssignment } from '../hooks';
 
 export const AssignmentViewPage = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'view' });

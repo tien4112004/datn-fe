@@ -1,6 +1,7 @@
-import { useTranslation } from 'react-i18next';
-import { Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
+import { Edit, List, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useAssignmentViewerStore } from '../../stores/useAssignmentViewerStore';
 
 interface ViewerActionsPanelProps {
   onEdit: () => void;
@@ -9,6 +10,7 @@ interface ViewerActionsPanelProps {
 
 export const ViewerActionsPanel = ({ onEdit, onDelete }: ViewerActionsPanelProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'viewer.actions' });
+  const setMainView = useAssignmentViewerStore((state) => state.setMainView);
 
   return (
     <div className="space-y-3 rounded-lg border bg-white p-4 dark:bg-gray-900">
@@ -18,6 +20,11 @@ export const ViewerActionsPanel = ({ onEdit, onDelete }: ViewerActionsPanelProps
         <Button onClick={onEdit} variant="outline" size="sm" className="w-full">
           <Edit className="mr-2 h-4 w-4" />
           {t('edit')}
+        </Button>
+
+        <Button onClick={() => setMainView('questionsList')} variant="outline" size="sm" className="w-full">
+          <List className="mr-2 h-4 w-4" />
+          {t('viewQuestionsList')}
         </Button>
 
         <Button onClick={onDelete} variant="outline" size="sm" className="text-destructive w-full">

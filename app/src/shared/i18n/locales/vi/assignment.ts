@@ -854,10 +854,12 @@ export default {
       questionsCount: 'Câu hỏi ({{count}})',
       assignmentInfo: 'Thông tin bài tập',
       matrixBuilder: 'Ma trận đánh giá',
+      contexts: 'Đoạn văn bản',
     },
     actions: {
       title: 'Hành động',
       edit: 'Chỉnh sửa bài tập',
+      viewQuestionsList: 'Xem danh sách câu hỏi',
       delete: 'Xóa bài tập',
     },
   },

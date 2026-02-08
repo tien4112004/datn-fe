@@ -70,7 +70,7 @@ export const FillInBlankDoing = ({
       )}
 
       {/* Question with input blanks */}
-      <div className="rounded-md border border-gray-300 bg-white p-4 text-sm leading-relaxed dark:border-gray-600 dark:bg-gray-800">
+      <div className="border-muted bg-background rounded-md border p-4 text-sm leading-relaxed">
         {question.data.segments.map((segment) => (
           <span key={segment.id}>
             {segment.type === 'text' ? (

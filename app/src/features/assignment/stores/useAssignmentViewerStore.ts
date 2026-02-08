@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
-type MainView = 'info' | 'questions' | 'matrix';
+type MainView = 'info' | 'questions' | 'matrix' | 'contexts' | 'questionsList';
 
 interface AssignmentViewerState {
   // UI State

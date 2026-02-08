@@ -866,10 +866,12 @@ export default {
       questionsCount: 'Questions ({{count}})',
       assignmentInfo: 'Assignment Info',
       matrixBuilder: 'Assessment Matrix',
+      contexts: 'Reading Passages',
     },
     actions: {
       title: 'Actions',
       edit: 'Edit Assignment',
+      viewQuestionsList: 'View Questions List',
       delete: 'Delete Assignment',
     },
   },

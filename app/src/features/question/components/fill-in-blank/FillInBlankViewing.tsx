@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion } from '@/features/assignment/types';
-import { MarkdownPreview, QuestionNumber } from '../shared';
+import { QuestionNumber, ExplanationSection } from '../shared';
 import { Label } from '@/shared/components/ui/label';
 import { Badge } from '@/shared/components/ui/badge';
 import { cn } from '@/shared/lib/utils';
@@ -37,7 +37,7 @@ export const FillInBlankViewing = ({ question, number, compact }: FillInBlankVie
       {/* Question with blanks */}
       <div
         className={cn(
-          'bg-muted/50 rounded-md border border-gray-300 font-mono dark:border-gray-600',
+          'bg-muted/50 border-muted rounded-md border font-mono',
           compact ? 'p-2 text-xs' : 'p-4 text-sm'
         )}
       >
@@ -62,7 +62,7 @@ export const FillInBlankViewing = ({ question, number, compact }: FillInBlankVie
       {/* Expected Answers */}
       <div
         className={cn(
-          'rounded-lg border border-gray-300 bg-green-50 dark:border-gray-600 dark:bg-green-900/20',
+          'border-muted rounded-lg border bg-green-50 dark:bg-green-900/20',
           compact ? 'space-y-1 p-2' : 'space-y-2 p-3'
         )}
       >
@@ -98,19 +98,7 @@ export const FillInBlankViewing = ({ question, number, compact }: FillInBlankVie
       )}
 
       {/* Explanation */}
-      {question.explanation && (
-        <div
-          className={cn(
-            'space-y-1 rounded-lg border border-gray-300 bg-blue-50 dark:border-gray-600 dark:bg-blue-900/20',
-            compact ? 'p-2' : 'space-y-2 p-3'
-          )}
-        >
-          <Label className={cn('font-medium', compact ? 'text-xs' : 'text-sm')}>
-            {t('fillInBlank.viewing.explanation')}
-          </Label>
-          <MarkdownPreview content={question.explanation} />
-        </div>
-      )}
+      <ExplanationSection mode="viewing" explanation={question.explanation} compact={compact} />
     </div>
   );
 };

@@ -51,7 +51,7 @@ export const MultipleChoiceViewing = ({ question, number, compact }: MultipleCho
             key={option.id}
             className={cn(
               'flex items-center rounded-md border',
-              compact ? 'gap-2 p-1.5' : 'gap-3 p-3',
+              compact ? 'gap-2 p-1' : 'gap-3 px-3 py-2',
               option.isCorrect ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : ''
             )}
           >
@@ -90,7 +90,7 @@ export const MultipleChoiceViewing = ({ question, number, compact }: MultipleCho
         <div
           className={cn(
             'space-y-1 rounded-lg border border-gray-300 bg-blue-50 dark:border-gray-600 dark:bg-blue-900/20',
-            compact ? 'p-2' : 'space-y-2 p-3'
+            compact ? 'p-1.5' : 'space-y-2 p-3'
           )}
         >
           <Label className={cn('font-medium', compact ? 'text-xs' : 'text-sm')}>

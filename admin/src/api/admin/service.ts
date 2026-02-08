@@ -35,10 +35,10 @@ import type {
 import { parseQuestionBankCSV, exportQuestionsToCSV } from '@/utils/csvParser';
 import { validateQuestionBankCSV } from '@/utils/csvValidation';
 
+import { generateId } from '@aiprimary/core';
+
 // ============= HELPER FUNCTIONS =============
 const delay = (ms: number = 300) => new Promise((resolve) => setTimeout(resolve, ms));
-const generateId = (prefix: string = 'id') =>
-  `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 const paginate = <T>(
   items: T[],
   page: number = 1,
@@ -293,7 +293,7 @@ export default class AdminRealApiService implements AdminApiService {
     await delay(500);
     const newPost: FAQPost = {
       ...data,
-      id: generateId('faq'),
+      id: generateId(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };

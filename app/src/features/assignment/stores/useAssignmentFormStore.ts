@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { AssignmentTopic, AssignmentQuestionWithTopic, MatrixCell, AssignmentContext } from '../types';
-import { generateId } from '@/shared/lib/utils';
+import { generateId, createCellId } from '@aiprimary/core';
 
 /**
  * Sync matrix cell counts based on current questions
@@ -14,7 +14,7 @@ function syncMatrixCounts(questions: AssignmentQuestionWithTopic[], matrixCells:
 
   questions.forEach((aq) => {
     if (aq.question.topicId && aq.question.difficulty && aq.question.type) {
-      const key = `${aq.question.topicId}-${aq.question.difficulty}-${aq.question.type}`;
+      const key = createCellId(aq.question.topicId, aq.question.difficulty, aq.question.type);
       counts.set(key, (counts.get(key) || 0) + 1);
     }
   });
@@ -22,7 +22,7 @@ function syncMatrixCounts(questions: AssignmentQuestionWithTopic[], matrixCells:
   // Update currentCount for all cells
   const updatedCells = matrixCells.map((cell) => ({
     ...cell,
-    currentCount: counts.get(`${cell.topicId}-${cell.difficulty}-${cell.questionType}`) || 0,
+    currentCount: counts.get(createCellId(cell.topicId, cell.difficulty, cell.questionType)) || 0,
   }));
 
   return updatedCells;
@@ -348,7 +348,7 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
       createMatrixCell: (cell) => {
         set(
           (state) => {
-            const cellId = `${cell.topicId}-${cell.difficulty}-${cell.questionType}`;
+            const cellId = createCellId(cell.topicId, cell.difficulty, cell.questionType);
             // Check if cell already exists
             const existingCell = state.matrix.find((c) => c.id === cellId);
             if (existingCell) {

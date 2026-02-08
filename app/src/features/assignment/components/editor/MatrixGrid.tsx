@@ -24,7 +24,7 @@ import {
   getDifficultyI18nKey,
   getQuestionTypeI18nKey,
 } from '@aiprimary/core';
-import { generateId } from '../../utils';
+import { generateId } from '@aiprimary/core';
 import { QuestionTypeIcon } from '@/features/question/components/shared/QuestionTypeIcon';
 import type { AssignmentTopic, QuestionType } from '@/features/assignment/types';
 

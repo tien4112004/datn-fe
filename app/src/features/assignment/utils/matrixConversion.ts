@@ -1,6 +1,13 @@
 import type { AssessmentMatrix, Difficulty, QuestionType, SubjectCode } from '@aiprimary/core';
 import type { Grade } from '@aiprimary/core/assessment/grades.js';
-import { parseCellValue, serializeCellValue, difficultyFromApi, questionTypeFromApi } from '@aiprimary/core';
+import {
+  createCellId,
+  createTopicId,
+  parseCellValue,
+  serializeCellValue,
+  difficultyFromApi,
+  questionTypeFromApi,
+} from '@aiprimary/core';
 import type { MatrixCell, ApiMatrix, AssignmentTopic, MatrixDimensionTopic } from '../types';
 
 /**
@@ -115,7 +122,7 @@ export function mergeApiMatrixIntoCells(apiMatrix: ApiMatrix, fullCells: MatrixC
   // Ensure all subtopics have IDs
   flatSubtopics.forEach((sub, idx) => {
     if (!sub.id) {
-      sub.id = `topic-${idx}-${Date.now()}`;
+      sub.id = createTopicId();
     }
   });
 
@@ -176,7 +183,7 @@ export function assessmentMatrixToCells(matrix: AssessmentMatrix): MatrixCell[] 
         const { count } = parseCellValue(cellValue);
 
         cells.push({
-          id: `${topic.id}-${difficulty}-${questionType}`,
+          id: createCellId(topic.id, difficulty, questionType),
           topicId: topic.id,
           topicName: topic.name,
           difficulty,
@@ -247,28 +254,5 @@ export function cellsToAssessmentMatrix(
   };
 }
 
-/**
- * Create a cell ID from components
- */
-export function createCellId(topicId: string, difficulty: Difficulty, questionType: QuestionType): string {
-  return `${topicId}-${difficulty}-${questionType}`;
-}
-
-/**
- * Parse a cell ID into components
- */
-export function parseCellId(
-  cellId: string
-): { topicId: string; difficulty: Difficulty; questionType: QuestionType } | null {
-  const parts = cellId.split('-');
-  if (parts.length < 3) return null;
-
-  // The topicId might contain dashes, so we need to handle that
-  // Format: topicId-DIFFICULTY-QUESTION_TYPE
-  // DIFFICULTY and QUESTION_TYPE are UPPER_SNAKE_CASE
-  const questionType = parts.pop() as QuestionType;
-  const difficulty = parts.pop() as Difficulty;
-  const topicId = parts.join('-');
-
-  return { topicId, difficulty, questionType };
-}
+// Re-export from core for backwards compatibility
+export { createCellId, parseCellId } from '@aiprimary/core';

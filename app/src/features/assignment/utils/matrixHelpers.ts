@@ -4,7 +4,7 @@ import type {
   MatrixValidationResult,
   MatrixCellStatus,
 } from '../types';
-import type { ConstantItem, Difficulty, QuestionType } from '@aiprimary/core';
+import { createCellId, type ConstantItem, type Difficulty, type QuestionType } from '@aiprimary/core';
 
 /**
  * Validate a single matrix cell and return validation status
@@ -103,7 +103,7 @@ export const createMatrixCellsForTopic = (
   difficulties.forEach((difficulty) => {
     questionTypes.forEach((questionType) => {
       cells.push({
-        id: `${topicId}-${difficulty.value}-${questionType.value}`,
+        id: createCellId(topicId, difficulty.value, questionType.value),
         topicId,
         topicName,
         difficulty: difficulty.value,
@@ -115,11 +115,4 @@ export const createMatrixCellsForTopic = (
   });
 
   return cells;
-};
-
-/**
- * Generate a unique ID
- */
-export const generateId = (): string => {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 };

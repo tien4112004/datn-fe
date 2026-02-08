@@ -1,3 +1,4 @@
+export * from './ids';
 export * from './slide';
 export * from './presentation';
 export * from './shared';

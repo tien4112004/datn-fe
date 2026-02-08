@@ -121,13 +121,7 @@ export const TopicEditModal = ({ topicId, open, onOpenChange }: TopicEditModalPr
         </div>
 
         <DialogFooter className="flex justify-between sm:justify-between">
-          <Button
-            type="button"
-            variant="destructive"
-            size="sm"
-            onClick={handleDelete}
-            disabled={topics.length === 0}
-          >
+          <Button type="button" variant="destructive" size="sm" onClick={handleDelete}>
             <Trash2 className="mr-2 h-4 w-4" />
             {t('deleteTopic')}
           </Button>

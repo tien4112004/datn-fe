@@ -1,6 +1,6 @@
 import type { ApiClient, ApiResponse } from '@aiprimary/api';
 import type { Submission } from '@aiprimary/core';
-import { getAllDifficulties, getAllQuestionTypes } from '@aiprimary/core';
+import { getAllDifficulties, getAllQuestionTypes, createTopicId } from '@aiprimary/core';
 import type { AssignmentApiService, AssignmentCollectionRequest } from '../types/service';
 import type {
   Assignment,
@@ -90,9 +90,8 @@ export default class AssignmentService implements AssignmentApiService {
  * Create a default topic for new assignments
  */
 export function createDefaultTopic() {
-  const ts = Date.now();
   return {
-    id: `topic-${ts}`,
+    id: createTopicId(),
     name: 'General',
     description: '',
   };
@@ -108,7 +107,7 @@ export function transformAssignmentToFormData(assignment: Assignment): Assignmen
   // Flatten topic > subtopic hierarchy into a flat topics list
   let topics: AssignmentTopic[] = (assignment.matrix?.dimensions?.topics ?? []).flatMap((topic) =>
     (topic.subtopics ?? []).map((sub, idx) => ({
-      id: sub.id || `topic-${idx}-${Date.now()}`,
+      id: sub.id || createTopicId(),
       name: sub.name,
       parentTopic: topic.name,
     }))

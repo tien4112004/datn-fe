@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { useExamplePrompts } from '../hooks/useExamplePrompts';
 import { ExamplePromptType } from '../types/examplePrompt';
 import { Sparkles, Loader2 } from 'lucide-react';
+// We need the * import for dynamic lookup string -> component
+import * as LucideIcons from 'lucide-react';
 
 interface ExamplePromptsProps {
   onExampleClick: (example: string) => void;
@@ -55,16 +57,7 @@ const ExamplePrompts = ({
               onClick={() => onExampleClick(item.prompt)}
             >
               <div className="bg-primary/10 text-primary mr-3 mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
-                {item.icon ? (
-                  // We assume icon is a valid emoji or a specific string we can handle.
-                  // For now, if it's not a generic icon, we might need a mapping or just display it if it's an emoji.
-                  // Given the backend stores icons as string (emoji or icon name), let's assume emoji for now or simpler logic.
-                  // If it's an emoji, it renders fine. If it's a lucide icon name, we'd need a dynamic lookup.
-                  // For simplicity in this iteration, let's treat it as text/emoji.
-                  <span className="text-lg">{item.icon}</span>
-                ) : (
-                  <Sparkles className="h-4 w-4" />
-                )}
+                <IconWrapper iconName={item.icon} />
               </div>
               <p className="line-clamp-3 text-sm">{item.prompt}</p>
             </Button>
@@ -73,6 +66,17 @@ const ExamplePrompts = ({
       </motion.div>
     </AnimatePresence>
   );
+};
+
+const IconWrapper = ({ iconName }: { iconName?: string }) => {
+  // Try to find the icon component in LucideIcons
+  const IconComponent = iconName ? (LucideIcons as any)[iconName] : null;
+
+  if (!IconComponent) {
+    return <Sparkles className="h-4 w-4" />;
+  }
+
+  return <IconComponent className="h-5 w-5" />;
 };
 
 export default ExamplePrompts;

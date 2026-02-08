@@ -2,7 +2,7 @@ import type { ApiClient, ApiResponse } from '@aiprimary/api';
 import type { ExamplePromptType, ExamplePromptContent } from '../types/examplePrompt';
 
 export interface ExamplePromptsApiService {
-  getExamplePrompts(type: ExamplePromptType): Promise<ExamplePromptContent[]>;
+  getExamplePrompts(type: ExamplePromptType, language?: string): Promise<ExamplePromptContent[]>;
 }
 
 export default class ExamplePromptsService implements ExamplePromptsApiService {
@@ -18,11 +18,11 @@ export default class ExamplePromptsService implements ExamplePromptsApiService {
     return 'real' as const;
   }
 
-  async getExamplePrompts(type: ExamplePromptType): Promise<ExamplePromptContent[]> {
+  async getExamplePrompts(type: ExamplePromptType, language?: string): Promise<ExamplePromptContent[]> {
     const response = await this.apiClient.get<ApiResponse<ExamplePromptContent[]>>(
       `${this.baseUrl}/api/example-prompts`,
       {
-        params: { type },
+        params: { type, language, count: 6 },
       }
     );
     return response.data.data;

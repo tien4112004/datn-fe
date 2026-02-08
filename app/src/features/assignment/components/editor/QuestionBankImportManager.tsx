@@ -26,7 +26,7 @@ import type { Question } from '../../types';
  * and the context import confirmation AlertDialog.
  *
  * Replaces the duplicate QuestionBankDialog that was in both
- * AssignmentEditorPage and QuestionsEditorPanel.
+ * AssignmentEditorPage and CurrentQuestionView.
  */
 export const QuestionBankImportManager: React.FC = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor' });

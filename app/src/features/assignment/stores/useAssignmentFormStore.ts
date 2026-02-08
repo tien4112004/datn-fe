@@ -62,7 +62,7 @@ interface AssignmentFormStore {
   topics: AssignmentTopic[];
   questions: AssignmentQuestionWithTopic[];
   matrixCells: MatrixCell[];
-  contexts: AssignmentContext[]; // Cloned contexts for this assignment
+  contexts: AssignmentContext[];
   shuffleQuestions: boolean;
 
   // === FORM STATE ===

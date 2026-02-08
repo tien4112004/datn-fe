@@ -3,14 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/components/ui/button';
 import LoadingButton from '@/shared/components/common/LoadingButton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
-import { QuestionsEditorPanel } from './QuestionsEditorPanel';
+import { CurrentQuestionView } from './CurrentQuestionView';
 import { AssignmentMetadataPanel } from './AssignmentMetadataPanel';
 import { MatrixBuilderPanel } from './MatrixBuilderPanel';
 import { ContextsPanel } from './ContextsPanel';
 import { QuestionNavigator } from './QuestionNavigator';
 import { AddQuestionButton } from './AddQuestionButton';
 import { QuestionListDialog } from './QuestionListDialog';
+import { QuestionsListViewPanel } from '../viewer/QuestionsListViewPanel';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
+import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 
 interface AssignmentEditorLayoutProps {
   onCancel: () => void;
@@ -23,6 +25,9 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
   const setQuestionBankOpen = useAssignmentEditorStore((state) => state.setQuestionBankOpen);
   const setContextCreateFormOpen = useAssignmentEditorStore((state) => state.setContextCreateFormOpen);
   const setContextLibraryDialogOpen = useAssignmentEditorStore((state) => state.setContextLibraryDialogOpen);
+  const questions = useAssignmentFormStore((state) => state.questions);
+  const contexts = useAssignmentFormStore((state) => state.contexts);
+  const topics = useAssignmentFormStore((state) => state.topics);
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor' });
   const { t: tToolbar } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
   const { t: tContextsPanel } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.contextsPanel' });
@@ -35,11 +40,13 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
         {mainView === 'info' ? (
           <AssignmentMetadataPanel />
         ) : mainView === 'questions' ? (
-          <QuestionsEditorPanel />
+          <CurrentQuestionView />
         ) : mainView === 'matrix' ? (
           <MatrixBuilderPanel />
         ) : mainView === 'contexts' ? (
           <ContextsPanel />
+        ) : mainView === 'questionsList' ? (
+          <QuestionsListViewPanel assignment={{ questions, contexts, topics } as any} />
         ) : null}
       </div>
 

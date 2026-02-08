@@ -55,6 +55,7 @@ export function useSaveAssignment({ id, onSaveSuccess, onSaveError }: UseSaveAss
           name: topic.name,
           description: topic.description,
         })),
+        contexts: data.contexts,
         matrixCells: data.matrixCells
           .filter((cell) => cell.requiredCount > 0)
           .map((cell) => ({
@@ -64,16 +65,18 @@ export function useSaveAssignment({ id, onSaveSuccess, onSaveError }: UseSaveAss
           })),
       };
 
+      let savedId = id;
       if (id) {
         await updateAssignment({ id, data: formData });
         toast.success(t('toasts.updateSuccess'));
       } else {
-        await createAssignment(formData);
+        const newAssignment = await createAssignment(formData);
+        savedId = newAssignment.id;
         toast.success(t('toasts.createSuccess'));
       }
 
       onSaveSuccess();
-      navigate('/projects?resource=assignment');
+      navigate(`/assignment/${savedId}`);
     } catch (error) {
       console.error('Failed to save assignment:', error);
       toast.error(t('toasts.saveError'));

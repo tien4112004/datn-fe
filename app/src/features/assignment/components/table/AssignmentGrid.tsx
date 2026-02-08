@@ -2,7 +2,7 @@ import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/re
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import type { Assignment } from '@aiprimary/core';
+import type { Assignment } from '../../types';
 import { useAssignmentList } from '@/features/assignment/hooks/useAssignmentApi';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, ClipboardList } from 'lucide-react';
@@ -127,7 +127,7 @@ const AssignmentGrid = () => {
 
     try {
       // TODO: Implement delete assignment mutation
-      toast.success(t('assignment.deleteSuccess'));
+      toast.success(t('assignment.deleteSuccess', { name: selectedAssignment.title }));
       setIsDeleteOpen(false);
       setSelectedAssignment(null);
     } catch (error) {

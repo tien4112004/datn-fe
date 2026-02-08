@@ -1,15 +1,17 @@
 import { Badge } from '@/shared/components/ui/badge';
+import type { AssignmentQuestion } from '@aiprimary/core';
 import { getDifficultyName, getQuestionTypeName } from '@aiprimary/core';
-import type { AssignmentQuestionWithTopic, AssignmentTopic } from '../../types';
+import type { AssignmentTopic } from '../../types';
 
 interface QuestionListViewItemProps {
-  question: AssignmentQuestionWithTopic;
+  question: AssignmentQuestion;
   index: number;
   topics: AssignmentTopic[];
 }
 
 export const QuestionListViewItem = ({ question, index, topics }: QuestionListViewItemProps) => {
-  const topic = topics.find((t) => t.id === question.question.topicId);
+  const topicId = 'topicId' in question.question ? (question.question.topicId as string) : undefined;
+  const topic = topicId ? topics.find((t) => t.id === topicId) : undefined;
   const hasTitle = question.question.title && question.question.title.trim() !== '';
 
   return (

@@ -50,6 +50,7 @@ export interface AssignmentFormData {
   subject: string;
   grade?: string;
   topics: AssignmentTopic[];
+  contexts: AssignmentContext[];
   questions: AssignmentQuestionWithTopic[];
   matrixCells: MatrixCell[];
   shuffleQuestions?: boolean; // Shuffle questions for each student (default: false)
@@ -63,6 +64,7 @@ export interface Assignment {
   subject?: SubjectCode;
   grade?: string;
   topics?: AssignmentTopic[];
+  contexts?: AssignmentContext[];
   questions: (AssignmentQuestion | AssignmentQuestionWithTopic)[];
   matrix?: {
     cells: MatrixCell[];
@@ -87,6 +89,7 @@ export interface QuestionItemRequest {
   subject?: string;
   data: unknown;
   point: number;
+  contextId?: string;
 }
 
 // Matrix cell for API request
@@ -111,6 +114,7 @@ export interface CreateAssignmentRequest {
   grade?: string;
   questions?: QuestionItemRequest[];
   topics?: TopicRequest[];
+  contexts?: AssignmentContext[];
   matrixCells?: MatrixCellRequest[];
 }
 
@@ -121,5 +125,6 @@ export interface UpdateAssignmentRequest {
   grade?: string;
   questions?: QuestionItemRequest[];
   topics?: TopicRequest[];
+  contexts?: AssignmentContext[];
   matrixCells?: MatrixCellRequest[];
 }

@@ -864,6 +864,7 @@ export default {
     },
     navigator: {
       questionsCount: 'Questions ({{count}})',
+      listView: 'List View',
       assignmentInfo: 'Assignment Info',
       matrixBuilder: 'Assessment Matrix',
       contexts: 'Reading Passages',

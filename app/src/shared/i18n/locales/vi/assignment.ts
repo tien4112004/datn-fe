@@ -852,6 +852,7 @@ export default {
     },
     navigator: {
       questionsCount: 'Câu hỏi ({{count}})',
+      listView: 'Xem danh sách',
       assignmentInfo: 'Thông tin bài tập',
       matrixBuilder: 'Ma trận đánh giá',
       contexts: 'Đoạn văn bản',

@@ -1,7 +1,11 @@
 import { DIFFICULTY } from '../types';
-import type { AssignmentTopic, AssignmentQuestionWithTopic, MatrixCell, AssignmentContext } from '../types';
-import type { Assignment } from '@aiprimary/core';
-import { transformQuestionsFromApi } from './questionTransform';
+import type {
+  Assignment,
+  AssignmentTopic,
+  AssignmentQuestionWithTopic,
+  MatrixCell,
+  AssignmentContext,
+} from '../types';
 
 export interface AssignmentFormInitData {
   title: string;
@@ -12,7 +16,7 @@ export interface AssignmentFormInitData {
   topics: AssignmentTopic[];
   questions: AssignmentQuestionWithTopic[];
   matrixCells: MatrixCell[];
-  contexts?: AssignmentContext[];
+  contexts: AssignmentContext[];
 }
 
 export function createDefaultTopic(): AssignmentTopic {
@@ -49,6 +53,7 @@ export function createEmptyFormData(): AssignmentFormInitData {
     grade: '',
     shuffleQuestions: false,
     topics: [topic],
+    contexts: [],
     questions: [],
     matrixCells: createDefaultMatrixCells(topic.id),
   };
@@ -58,11 +63,24 @@ export function transformAssignmentToFormData(assignment: Assignment): Assignmen
   const extendedAssignment = assignment as typeof assignment & {
     subject?: string;
     grade?: string;
+    matrix?: { cells: MatrixCell[] };
   };
 
-  const topic = createDefaultTopic();
-  const backendQuestions = (extendedAssignment.questions || []) as unknown as any[];
-  const transformedQuestions = transformQuestionsFromApi(backendQuestions, topic.id);
+  // Use existing topics from the assignment, fall back to a default topic
+  const topics =
+    extendedAssignment.topics && extendedAssignment.topics.length > 0
+      ? extendedAssignment.topics
+      : [createDefaultTopic()];
+
+  // Questions are already in nested { question, points } format from the service.
+  // Preserve topicId, contextId, and all other fields as-is.
+  const questions = (extendedAssignment.questions || []) as AssignmentQuestionWithTopic[];
+
+  // Use existing matrix cells from the assignment, fall back to defaults
+  const matrixCells =
+    extendedAssignment.matrix?.cells && extendedAssignment.matrix.cells.length > 0
+      ? extendedAssignment.matrix.cells
+      : createDefaultMatrixCells(topics[0].id);
 
   return {
     title: extendedAssignment.title || 'Untitled Assignment',
@@ -70,8 +88,9 @@ export function transformAssignmentToFormData(assignment: Assignment): Assignmen
     subject: extendedAssignment.subject || '',
     grade: extendedAssignment.grade || '',
     shuffleQuestions: extendedAssignment.shuffleQuestions || false,
-    topics: [topic],
-    questions: transformedQuestions,
-    matrixCells: createDefaultMatrixCells(topic.id),
+    topics,
+    contexts: assignment.contexts || [],
+    questions,
+    matrixCells,
   };
 }

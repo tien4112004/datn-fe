@@ -71,18 +71,21 @@ export const QuestionRenderer = ({
   const displayContext = context || fetchedContext;
   // Render question content based on type and view mode
   const renderQuestionContent = () => {
+    const type = question?.type?.toUpperCase();
+
     // Multiple Choice
-    if (question.type === QUESTION_TYPE.MULTIPLE_CHOICE) {
+    if (type === QUESTION_TYPE.MULTIPLE_CHOICE) {
+      const mcQuestion = question as any;
       if (viewMode === VIEW_MODE.EDITING) {
-        return <MultipleChoiceEditing question={question} onChange={onChange!} />;
+        return <MultipleChoiceEditing question={mcQuestion} onChange={onChange!} />;
       }
       if (viewMode === VIEW_MODE.VIEWING) {
-        return <MultipleChoiceViewing question={question} number={number} compact={compact} />;
+        return <MultipleChoiceViewing question={mcQuestion} number={number} compact={compact} />;
       }
       if (viewMode === VIEW_MODE.DOING) {
         return (
           <MultipleChoiceDoing
-            question={question}
+            question={mcQuestion}
             answer={answer as any}
             points={points}
             onAnswerChange={onAnswerChange!}
@@ -93,7 +96,7 @@ export const QuestionRenderer = ({
       if (viewMode === VIEW_MODE.AFTER_ASSESSMENT) {
         return (
           <MultipleChoiceAfterAssessment
-            question={question}
+            question={mcQuestion}
             answer={answer as any}
             points={points}
             number={number}
@@ -103,7 +106,7 @@ export const QuestionRenderer = ({
       if (viewMode === VIEW_MODE.GRADING) {
         return (
           <MultipleChoiceGrading
-            question={question}
+            question={mcQuestion}
             answer={answer as any}
             points={points}
             onGradeChange={onGradeChange!}
@@ -114,17 +117,18 @@ export const QuestionRenderer = ({
     }
 
     // Matching
-    if (question.type === QUESTION_TYPE.MATCHING) {
+    if (type === QUESTION_TYPE.MATCHING) {
+      const mQuestion = question as any;
       if (viewMode === VIEW_MODE.EDITING) {
-        return <MatchingEditing question={question} onChange={onChange!} />;
+        return <MatchingEditing question={mQuestion} onChange={onChange!} />;
       }
       if (viewMode === VIEW_MODE.VIEWING) {
-        return <MatchingViewing question={question} number={number} compact={compact} />;
+        return <MatchingViewing question={mQuestion} number={number} compact={compact} />;
       }
       if (viewMode === VIEW_MODE.DOING) {
         return (
           <MatchingDoing
-            question={question}
+            question={mQuestion}
             answer={answer as any}
             points={points}
             onAnswerChange={onAnswerChange!}
@@ -135,7 +139,7 @@ export const QuestionRenderer = ({
       if (viewMode === VIEW_MODE.AFTER_ASSESSMENT) {
         return (
           <MatchingAfterAssessment
-            question={question}
+            question={mQuestion}
             answer={answer as any}
             points={points}
             number={number}
@@ -145,7 +149,7 @@ export const QuestionRenderer = ({
       if (viewMode === VIEW_MODE.GRADING) {
         return (
           <MatchingGrading
-            question={question}
+            question={mQuestion}
             answer={answer as any}
             points={points}
             onGradeChange={onGradeChange!}
@@ -156,17 +160,18 @@ export const QuestionRenderer = ({
     }
 
     // Open-ended
-    if (question.type === QUESTION_TYPE.OPEN_ENDED) {
+    if (type === QUESTION_TYPE.OPEN_ENDED) {
+      const oeQuestion = question as any;
       if (viewMode === VIEW_MODE.EDITING) {
-        return <OpenEndedEditing question={question} onChange={onChange!} />;
+        return <OpenEndedEditing question={oeQuestion} onChange={onChange!} />;
       }
       if (viewMode === VIEW_MODE.VIEWING) {
-        return <OpenEndedViewing question={question} number={number} compact={compact} />;
+        return <OpenEndedViewing question={oeQuestion} number={number} compact={compact} />;
       }
       if (viewMode === VIEW_MODE.DOING) {
         return (
           <OpenEndedDoing
-            question={question}
+            question={oeQuestion}
             answer={answer as any}
             points={points}
             onAnswerChange={onAnswerChange!}
@@ -177,7 +182,7 @@ export const QuestionRenderer = ({
       if (viewMode === VIEW_MODE.AFTER_ASSESSMENT) {
         return (
           <OpenEndedAfterAssessment
-            question={question}
+            question={oeQuestion}
             answer={answer as any}
             points={points}
             number={number}
@@ -187,7 +192,7 @@ export const QuestionRenderer = ({
       if (viewMode === VIEW_MODE.GRADING) {
         return (
           <OpenEndedGrading
-            question={question}
+            question={oeQuestion}
             answer={answer as any}
             points={points}
             onGradeChange={onGradeChange!}
@@ -198,17 +203,18 @@ export const QuestionRenderer = ({
     }
 
     // Fill In Blank
-    if (question.type === QUESTION_TYPE.FILL_IN_BLANK) {
+    if (type === QUESTION_TYPE.FILL_IN_BLANK) {
+      const fibQuestion = question as any;
       if (viewMode === VIEW_MODE.EDITING) {
-        return <FillInBlankEditing question={question} onChange={onChange!} />;
+        return <FillInBlankEditing question={fibQuestion} onChange={onChange!} />;
       }
       if (viewMode === VIEW_MODE.VIEWING) {
-        return <FillInBlankViewing question={question} number={number} compact={compact} />;
+        return <FillInBlankViewing question={fibQuestion} number={number} compact={compact} />;
       }
       if (viewMode === VIEW_MODE.DOING) {
         return (
           <FillInBlankDoing
-            question={question}
+            question={fibQuestion}
             answer={answer as any}
             points={points}
             onAnswerChange={onAnswerChange!}
@@ -219,7 +225,7 @@ export const QuestionRenderer = ({
       if (viewMode === VIEW_MODE.AFTER_ASSESSMENT) {
         return (
           <FillInBlankAfterAssessment
-            question={question}
+            question={fibQuestion}
             answer={answer as any}
             points={points}
             number={number}
@@ -229,7 +235,7 @@ export const QuestionRenderer = ({
       if (viewMode === VIEW_MODE.GRADING) {
         return (
           <FillInBlankGrading
-            question={question}
+            question={fibQuestion}
             answer={answer as any}
             points={points}
             onGradeChange={onGradeChange!}
@@ -241,7 +247,7 @@ export const QuestionRenderer = ({
 
     return (
       <div className="rounded-md border p-8 text-center">
-        <p className="text-destructive">Unknown question type</p>
+        <p className="text-destructive">Unknown question type: {String(question?.type)}</p>
       </div>
     );
   };

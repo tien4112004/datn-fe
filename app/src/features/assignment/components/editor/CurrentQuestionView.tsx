@@ -8,6 +8,17 @@ import { Textarea } from '@/shared/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { Badge } from '@/shared/components/ui/badge';
 import { Collapsible, CollapsibleContent } from '@/shared/components/ui/collapsible';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/shared/components/ui/alert-dialog';
 import { MarkdownPreview } from '@/features/question/components/shared/MarkdownPreview';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
@@ -80,21 +91,16 @@ export const CurrentQuestionView = () => {
     return getQuestionDisplayNumber(groups, firstQuestion.question.id);
   }, [groups, selectedContextGroup]);
 
-  const handleDelete = () => {
+  const handleConfirmDelete = () => {
     if (question && currentQuestionIndex !== -1) {
-      const confirmMessage = t('collection.item.removeQuestionConfirm', {
-        type: getQuestionTypeName(question.type),
-      });
-      if (window.confirm(confirmMessage)) {
-        removeQuestion(currentQuestionIndex);
-        // Set current question to the next one or previous if at end
-        if (questions.length > 1) {
-          const nextIndex =
-            currentQuestionIndex >= questions.length - 1 ? currentQuestionIndex - 1 : currentQuestionIndex;
-          setCurrentQuestionId(questions[nextIndex]?.question.id || null);
-        } else {
-          setCurrentQuestionId(null);
-        }
+      removeQuestion(currentQuestionIndex);
+      // Set current question to the next one or previous if at end
+      if (questions.length > 1) {
+        const nextIndex =
+          currentQuestionIndex >= questions.length - 1 ? currentQuestionIndex - 1 : currentQuestionIndex;
+        setCurrentQuestionId(questions[nextIndex]?.question.id || null);
+      } else {
+        setCurrentQuestionId(null);
       }
     }
   };
@@ -217,7 +223,9 @@ export const CurrentQuestionView = () => {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             {tQuestion('panelTitle', { number: questionDisplayNumber })}
           </h2>
-          <span className="ml-auto text-xs text-gray-500">{getQuestionTypeName(question.type)}</span>
+          <span className="ml-auto text-xs text-gray-500">
+            {getQuestionTypeName(question.type?.toUpperCase() as any)}
+          </span>
 
           {/* Edit/Preview Toggle */}
           <div className="flex items-center rounded border">
@@ -243,15 +251,34 @@ export const CurrentQuestionView = () => {
             </Button>
           </div>
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleDelete}
-            className="h-8 w-8 p-0 text-gray-400 hover:text-red-600"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-gray-400 hover:text-red-600"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t('collection.item.deleteConfirm.title')}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {t('collection.item.removeQuestionConfirm', {
+                    type: getQuestionTypeName(question.type?.toUpperCase() as any),
+                  })}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t('collection.item.deleteConfirm.cancel')}</AlertDialogCancel>
+                <AlertDialogAction onClick={handleConfirmDelete} className="bg-red-600 hover:bg-red-700">
+                  {t('collection.item.deleteConfirm.confirm')}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
 
@@ -459,7 +486,7 @@ export const CurrentQuestionView = () => {
         {/* QuestionRenderer */}
         <div className="pt-2">
           <QuestionRenderer
-            question={question as Question}
+            question={question}
             viewMode={viewMode}
             points={points}
             onChange={handleQuestionChange}

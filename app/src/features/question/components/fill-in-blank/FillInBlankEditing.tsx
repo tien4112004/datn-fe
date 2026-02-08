@@ -111,49 +111,49 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
   const blankSegments = question.data.segments.filter((s) => s.type === 'blank');
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-2">
       {/* Title */}
       <div className="space-y-1.5">
         <Label className="text-sm font-medium">{t('fillInBlank.editing.title')}</Label>
-        <div className="border-muted bg-background space-y-2 rounded-md border p-2">
-          <div className="flex items-center gap-2">
-            <Input
-              value={question.title}
-              onChange={(e) => updateQuestion({ title: e.target.value })}
-              placeholder={t('fillInBlank.editing.titlePlaceholder')}
-              className="h-9 flex-1 border-0 p-0 focus-visible:ring-0"
-            />
-            {question.titleImageUrl ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => updateQuestion({ titleImageUrl: undefined })}
-                title={t('fillInBlank.editing.removeImage', { defaultValue: 'Remove Image' })}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => updateQuestion({ titleImageUrl: '' })}
-                title={t('fillInBlank.editing.addImage', { defaultValue: 'Add Image' })}
-              >
-                <ImagePlus className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-
-          {question.titleImageUrl && (
-            <ImageUploader
-              label={t('fillInBlank.editing.questionImage')}
-              value={question.titleImageUrl}
-              onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
-            />
+        <div className="group/title relative">
+          <Input
+            value={question.title}
+            onChange={(e) => updateQuestion({ title: e.target.value })}
+            placeholder={t('fillInBlank.editing.titlePlaceholder')}
+            className="h-9 pr-9"
+          />
+          {question.titleImageUrl != null ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => updateQuestion({ titleImageUrl: undefined })}
+              title={t('fillInBlank.editing.removeImage', { defaultValue: 'Remove Image' })}
+              className="absolute right-1.5 top-1/2 h-7 w-7 -translate-y-1/2 p-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => updateQuestion({ titleImageUrl: '' })}
+              title={t('fillInBlank.editing.addImage', { defaultValue: 'Add Image' })}
+              className="absolute right-1.5 top-1/2 h-7 w-7 -translate-y-1/2 p-0 opacity-0 transition-opacity group-hover/title:opacity-100"
+            >
+              <ImagePlus className="h-4 w-4" />
+            </Button>
           )}
         </div>
+
+        {question.titleImageUrl != null && (
+          <ImageUploader
+            label={t('fillInBlank.editing.questionImage')}
+            value={question.titleImageUrl}
+            onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
+          />
+        )}
       </div>
 
       {/* Question Text with {{}} syntax */}

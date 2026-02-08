@@ -217,7 +217,7 @@ export const CurrentQuestionView = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between gap-3 border-b pb-4">
+      <div className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b bg-white pb-4 pt-1 lg:top-0 dark:bg-gray-950">
         <div className="flex w-full items-center gap-3">
           <FileQuestion className="h-5 w-5 text-gray-600 dark:text-gray-400" />
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">

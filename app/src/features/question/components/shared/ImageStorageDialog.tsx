@@ -8,7 +8,7 @@ import {
 } from '@/shared/components/ui/dialog';
 import { Button } from '@/shared/components/ui/button';
 import { useImages } from '@/features/image/hooks/useApi';
-import { Loader2, ImageIcon } from 'lucide-react';
+import { Loader2, ImageIcon, Check } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useTranslation } from 'react-i18next';
 import type { ImageData } from '@/features/image/types/service';
@@ -44,14 +44,14 @@ export const ImageStorageDialog = ({ open, onClose, onSelect }: ImageStorageDial
 
   return (
     <Dialog open={open} onOpenChange={handleCancel}>
-      <DialogContent className="flex max-h-[80vh] max-w-4xl flex-col">
+      <DialogContent className="flex max-h-[80vh] !max-w-4xl flex-col">
         <DialogHeader>
           <DialogTitle>{t('title')}</DialogTitle>
           <DialogDescription>{t('description')}</DialogDescription>
         </DialogHeader>
 
         {/* Image Grid */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto px-3">
           {isLoading ? (
             <div className="flex h-40 items-center justify-center">
               <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
@@ -65,11 +65,12 @@ export const ImageStorageDialog = ({ open, onClose, onSelect }: ImageStorageDial
             <>
               <div className="grid grid-cols-2 gap-4 pb-4 sm:grid-cols-3 md:grid-cols-4">
                 {images.map((image) => (
-                  <button
+                  <Button
                     key={image.id}
                     onClick={() => handleImageClick(image)}
+                    variant="ghost"
                     className={cn(
-                      'relative aspect-square overflow-hidden rounded-lg border-2 transition-all hover:scale-105',
+                      'relative aspect-square h-auto overflow-hidden rounded-lg border-2 p-0 transition-all hover:scale-105',
                       selectedImage?.id === image.id
                         ? 'border-primary ring-primary ring-2 ring-offset-2'
                         : 'hover:border-muted-foreground/50 border-transparent'
@@ -79,24 +80,11 @@ export const ImageStorageDialog = ({ open, onClose, onSelect }: ImageStorageDial
                     {selectedImage?.id === image.id && (
                       <div className="bg-primary/20 absolute inset-0 flex items-center justify-center">
                         <div className="bg-primary text-primary-foreground rounded-full p-2">
-                          <svg
-                            className="h-6 w-6"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M5 13l4 4L19 7"
-                            />
-                          </svg>
+                          <Check className="h-6 w-6" />
                         </div>
                       </div>
                     )}
-                  </button>
+                  </Button>
                 ))}
               </div>
 

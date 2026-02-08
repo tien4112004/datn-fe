@@ -3,6 +3,7 @@ import { MarkdownEditor, ImageUploader, DifficultyBadge } from '../shared';
 import { Button } from '@/shared/components/ui/button';
 import { Label } from '@/shared/components/ui/label';
 import { Switch } from '@/shared/components/ui/switch';
+import { Badge } from '@/shared/components/ui/badge';
 import { Plus, Trash2, ImagePlus, X, Shuffle } from 'lucide-react';
 import { generateId } from '@/shared/lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -47,7 +48,7 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 p-2">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">{t('title')}</h3>
         <DifficultyBadge difficulty={question.difficulty} />
@@ -56,45 +57,45 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
       {/* Question Title */}
       <div className="space-y-1">
         <Label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('labels.question')}</Label>
-        <div className="space-y-2 rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900">
-          <div className="flex items-center gap-2">
-            <MarkdownEditor
-              value={question.title}
-              onChange={(title) => updateQuestion({ title })}
-              placeholder={t('placeholders.question')}
-              className="flex-1"
-            />
-            {question.titleImageUrl ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => updateQuestion({ titleImageUrl: undefined })}
-                title={t('buttons.removeImage')}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => updateQuestion({ titleImageUrl: '' })}
-                title={t('buttons.addImage')}
-              >
-                <ImagePlus className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-
-          {question.titleImageUrl && (
-            <ImageUploader
-              label={t('labels.questionImage')}
-              value={question.titleImageUrl}
-              onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
-            />
+        <div className="group/title relative">
+          <MarkdownEditor
+            value={question.title}
+            onChange={(title) => updateQuestion({ title })}
+            placeholder={t('placeholders.question')}
+            className="pr-9"
+          />
+          {question.titleImageUrl != null ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => updateQuestion({ titleImageUrl: undefined })}
+              title={t('buttons.removeImage')}
+              className="absolute right-1.5 top-1.5 h-7 w-7 p-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => updateQuestion({ titleImageUrl: '' })}
+              title={t('buttons.addImage')}
+              className="absolute right-1.5 top-1.5 h-7 w-7 p-0 opacity-0 transition-opacity group-hover/title:opacity-100"
+            >
+              <ImagePlus className="h-4 w-4" />
+            </Button>
           )}
         </div>
+
+        {question.titleImageUrl != null && (
+          <ImageUploader
+            label={t('labels.questionImage')}
+            value={question.titleImageUrl}
+            onChange={(titleImageUrl) => updateQuestion({ titleImageUrl })}
+          />
+        )}
       </div>
 
       {/* Pairs */}
@@ -118,12 +119,9 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
 
         <div className="space-y-2">
           {question.data.pairs.map((pair, index) => (
-            <div
-              key={pair.id}
-              className="space-y-2 rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900"
-            >
+            <div key={pair.id} className="space-y-2 rounded-md">
               <div className="mb-2 flex items-center justify-between">
-                <h4 className="text-sm font-semibold">{t('pair', { number: index + 1 })}</h4>
+                <Badge variant="secondary">{t('pair', { number: index + 1 })}</Badge>
                 <Button
                   type="button"
                   variant="ghost"
@@ -138,15 +136,22 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
               <div className="grid grid-cols-2 gap-3">
                 {/* Left Item */}
                 <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-muted-foreground text-xs">{t('labels.left')}</Label>
-                    {!pair.leftImageUrl ? (
+                  <Label className="text-muted-foreground text-xs">{t('labels.left')}</Label>
+                  <div className="group/left relative">
+                    <MarkdownEditor
+                      value={pair.left}
+                      onChange={(left) => updatePair(pair.id, { left })}
+                      placeholder={t('placeholders.leftItem')}
+                      minHeight={50}
+                      className="pr-8"
+                    />
+                    {pair.leftImageUrl == null ? (
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
                         onClick={() => updatePair(pair.id, { leftImageUrl: '' })}
-                        className="h-6 w-6 p-0"
+                        className="absolute right-1 top-1 h-6 w-6 p-0 opacity-0 transition-opacity group-hover/left:opacity-100"
                         title={t('buttons.addImage')}
                       >
                         <ImagePlus className="h-3 w-3" />
@@ -157,20 +162,14 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
                         variant="ghost"
                         size="sm"
                         onClick={() => updatePair(pair.id, { leftImageUrl: undefined })}
-                        className="h-6 w-6 p-0"
+                        className="absolute right-1 top-1 h-6 w-6 p-0"
                         title={t('buttons.removeImage')}
                       >
                         <X className="h-3 w-3" />
                       </Button>
                     )}
                   </div>
-                  <MarkdownEditor
-                    value={pair.left}
-                    onChange={(left) => updatePair(pair.id, { left })}
-                    placeholder={t('placeholders.leftItem')}
-                    minHeight={50}
-                  />
-                  {pair.leftImageUrl && (
+                  {pair.leftImageUrl != null && (
                     <ImageUploader
                       label=""
                       value={pair.leftImageUrl}
@@ -181,15 +180,22 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
 
                 {/* Right Item */}
                 <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-muted-foreground text-xs">{t('labels.right')}</Label>
-                    {!pair.rightImageUrl ? (
+                  <Label className="text-muted-foreground text-xs">{t('labels.right')}</Label>
+                  <div className="group/right relative">
+                    <MarkdownEditor
+                      value={pair.right}
+                      onChange={(right) => updatePair(pair.id, { right })}
+                      placeholder={t('placeholders.rightItem')}
+                      minHeight={50}
+                      className="pr-8"
+                    />
+                    {pair.rightImageUrl == null ? (
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
                         onClick={() => updatePair(pair.id, { rightImageUrl: '' })}
-                        className="h-6 w-6 p-0"
+                        className="absolute right-1 top-1 h-6 w-6 p-0 opacity-0 transition-opacity group-hover/right:opacity-100"
                         title={t('buttons.addImage')}
                       >
                         <ImagePlus className="h-3 w-3" />
@@ -200,20 +206,14 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
                         variant="ghost"
                         size="sm"
                         onClick={() => updatePair(pair.id, { rightImageUrl: undefined })}
-                        className="h-6 w-6 p-0"
+                        className="absolute right-1 top-1 h-6 w-6 p-0"
                         title={t('buttons.removeImage')}
                       >
                         <X className="h-3 w-3" />
                       </Button>
                     )}
                   </div>
-                  <MarkdownEditor
-                    value={pair.right}
-                    onChange={(right) => updatePair(pair.id, { right })}
-                    placeholder={t('placeholders.rightItem')}
-                    minHeight={50}
-                  />
-                  {pair.rightImageUrl && (
+                  {pair.rightImageUrl != null && (
                     <ImageUploader
                       label=""
                       value={pair.rightImageUrl}
@@ -245,13 +245,11 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
         <Label className="text-xs font-medium text-gray-700 dark:text-gray-300">
           {t('labels.explanation')}
         </Label>
-        <div className="rounded-md border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900">
-          <MarkdownEditor
-            value={question.explanation || ''}
-            onChange={(explanation) => updateQuestion({ explanation })}
-            placeholder={t('placeholders.explanation')}
-          />
-        </div>
+        <MarkdownEditor
+          value={question.explanation || ''}
+          onChange={(explanation) => updateQuestion({ explanation })}
+          placeholder={t('placeholders.explanation')}
+        />
       </div>
     </div>
   );

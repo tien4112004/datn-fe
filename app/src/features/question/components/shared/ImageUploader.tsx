@@ -60,56 +60,62 @@ export const ImageUploader = ({
     onChange(imageUrl);
   };
 
+  const hasImage = value && isValidImageUrl(value);
+
   return (
     <div className={cn('space-y-2', className)}>
       {(label || defaultLabel) && <Label>{label || defaultLabel}</Label>}
 
-      <div className="flex items-center gap-2">
-        <Input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleFileSelect}
-          className="hidden"
-          disabled={disabled || isUploading}
-        />
+      <Input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileSelect}
+        className="hidden"
+        disabled={disabled || isUploading}
+      />
 
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={disabled || isUploading}
-        >
-          <Upload className="mr-2 h-4 w-4" />
-          {isUploading ? t('uploading') : t('uploadButton')}
-        </Button>
-
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => setIsStorageDialogOpen(true)}
-          disabled={disabled || isUploading}
-        >
-          <Images className="mr-2 h-4 w-4" />
-          {t('chooseFromStorage')}
-        </Button>
-
-        {value && isValidImageUrl(value) && (
-          <Button type="button" variant="ghost" size="sm" onClick={handleRemove} disabled={disabled}>
-            <X className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-
-      {error && <p className="text-destructive text-sm">{error}</p>}
-
-      {value && isValidImageUrl(value) && (
-        <div className="relative mt-2 inline-block max-w-xs">
+      {hasImage ? (
+        <div className="relative inline-block max-w-xs">
           <img src={value} alt={t('preview')} className="rounded-md border" style={{ maxHeight: '200px' }} />
+          <Button
+            type="button"
+            variant="secondary"
+            size="icon"
+            className="absolute -right-2 -top-2 h-6 w-6 rounded-full shadow-sm"
+            onClick={handleRemove}
+            disabled={disabled}
+          >
+            <X className="h-3 w-3" />
+          </Button>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={disabled || isUploading}
+          >
+            <Upload className="mr-2 h-4 w-4" />
+            {isUploading ? t('uploading') : t('uploadButton')}
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setIsStorageDialogOpen(true)}
+            disabled={disabled || isUploading}
+          >
+            <Images className="mr-2 h-4 w-4" />
+            {t('chooseFromStorage')}
+          </Button>
         </div>
       )}
+
+      {error && <p className="text-destructive text-sm">{error}</p>}
 
       <ImageStorageDialog
         open={isStorageDialogOpen}

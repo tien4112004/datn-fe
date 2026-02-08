@@ -37,13 +37,11 @@ export const ExplanationSection = ({
     return (
       <div className="space-y-1.5">
         <Label className="text-sm font-medium">{t(`${translationKey}.editing.explanation` as any)}</Label>
-        <div className="rounded-lg border p-2">
-          <MarkdownEditor
-            value={explanation || ''}
-            onChange={(value) => onChange?.(value)}
-            placeholder={t(`${translationKey}.editing.explanationPlaceholder` as any)}
-          />
-        </div>
+        <MarkdownEditor
+          value={explanation || ''}
+          onChange={(value) => onChange?.(value)}
+          placeholder={t(`${translationKey}.editing.explanationPlaceholder` as any)}
+        />
       </div>
     );
   }

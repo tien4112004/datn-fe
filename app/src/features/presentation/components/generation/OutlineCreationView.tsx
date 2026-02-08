@@ -13,7 +13,7 @@ import AdvancedOptions from './AdvancedOptions';
 import { SLIDE_COUNT_OPTIONS } from '@/features/presentation/types';
 import { MODEL_TYPES, useModels } from '@/features/model';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
-import { ExamplePromptType } from '@/features/projects/types/examplePrompt';
+import { EXAMPLE_PROMPT_TYPE } from '@/features/projects/types/examplePrompt';
 
 interface OutlineCreationViewProps {
   onCreateOutline: () => void;
@@ -137,7 +137,7 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
             <ExamplePrompts
               onExampleClick={handleExampleClick}
               isShown={showExamplePrompts}
-              type={ExamplePromptType.PRESENTATION}
+              type={EXAMPLE_PROMPT_TYPE.PRESENTATION}
               fallbackPrompts={presentationExamplePrompts}
               title={t('examples.title')}
             />

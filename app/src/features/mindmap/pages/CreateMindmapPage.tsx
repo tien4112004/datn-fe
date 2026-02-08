@@ -15,7 +15,7 @@ import useFormPersist from 'react-hook-form-persist';
 import { getLocalStorageData } from '@/shared/lib/utils';
 import { MODEL_TYPES, useModels } from '@/features/model';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
-import { ExamplePromptType } from '@/features/projects/types/examplePrompt';
+import { EXAMPLE_PROMPT_TYPE } from '@/features/projects/types/examplePrompt';
 
 const MINDMAP_FORM_PERSIST = 'create-mindmap-form';
 
@@ -166,7 +166,7 @@ const CreateMindmapPage = () => {
             <ExamplePrompts
               onExampleClick={handleExampleClick}
               isShown={showExamplePrompts}
-              type={ExamplePromptType.MINDMAP}
+              type={EXAMPLE_PROMPT_TYPE.MINDMAP}
               fallbackPrompts={mindmapExamplePrompts}
               title={t('create.examples.title')}
             />

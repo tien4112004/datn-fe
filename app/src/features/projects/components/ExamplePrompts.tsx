@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { CardTitle } from '@/shared/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useExamplePrompts } from '../hooks/useExamplePrompts';
-import { ExamplePromptType } from '../types/examplePrompt';
+import { type ExamplePromptType } from '../types/examplePrompt';
 import { Sparkles, Loader2 } from 'lucide-react';
 // We need the * import for dynamic lookup string -> component
 import * as LucideIcons from 'lucide-react';

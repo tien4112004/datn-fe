@@ -425,6 +425,13 @@ export default {
       topicDescription: 'Mô tả chủ đề',
       topicPlaceholder: 'Tên chủ đề...',
       descriptionPlaceholder: 'Mô tả chủ đề (tùy chọn)...',
+      addSubtopic: 'Thêm chủ đề con',
+      parentTopic: 'Nhóm chủ đề',
+      parentTopicPlaceholder: 'Tên nhóm chủ đề...',
+      editGroup: 'Chỉnh sửa nhóm chủ đề',
+      editGroupDescription: 'Đổi tên nhóm chủ đề. Tất cả chủ đề con trong nhóm này sẽ được cập nhật.',
+      groupName: 'Tên nhóm',
+      groupNamePlaceholder: 'Tên nhóm chủ đề...',
       deleteTopic: 'Xóa chủ đề',
       emptyMessage: 'Thêm chủ đề để xem ma trận',
       done: 'Xong',
@@ -476,12 +483,15 @@ export default {
     // Bảng xây dựng ma trận
     matrixBuilder: {
       panelTitle: 'Bảng ma trận đánh giá',
-      description:
-        'Cấu hình chủ đề và số lượng câu hỏi yêu cầu cho mỗi mức độ khó. Thay đổi được lưu tự động.',
+      description: 'Cấu hình chủ đề và số lượng câu hỏi yêu cầu cho mỗi mức độ khó. ',
       tooltips: {
         addTopic: 'Thêm chủ đề mới',
+        addSubtopic: 'Thêm chủ đề con vào nhóm này',
+        editGroup: 'Đổi tên nhóm chủ đề',
         editTopic: 'Sửa thông tin chủ đề',
         cellInput: 'Số câu hỏi yêu cầu',
+        removeCell: 'Xóa ô',
+        addCell: 'Thêm ô tiêu chí',
       },
     },
 

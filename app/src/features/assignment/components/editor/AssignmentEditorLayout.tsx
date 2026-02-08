@@ -100,6 +100,36 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
             </>
           )}
 
+          {/* Matrix Actions - Only show in matrix view */}
+          {mainView === 'matrix' && (
+            <>
+              <div className="space-y-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        window.dispatchEvent(new CustomEvent('matrix.addTopic'));
+                      }}
+                      className="w-full"
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      {t('matrixEditor.addTopic')}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{t('matrixBuilder.tooltips.addTopic')}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t pt-3" />
+            </>
+          )}
+
           {/* Context Actions - Only show in contexts view */}
           {mainView === 'contexts' && (
             <>

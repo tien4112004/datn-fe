@@ -1,13 +1,7 @@
-import type { AssessmentMatrix, Difficulty, QuestionType } from '@aiprimary/core';
-import {
-  parseCellValue,
-  serializeCellValue,
-  difficultyToApi,
-  questionTypeToApi,
-  difficultyFromApi,
-  questionTypeFromApi,
-} from '@aiprimary/core';
-import type { MatrixCell, ApiMatrix } from '../types';
+import type { AssessmentMatrix, Difficulty, QuestionType, SubjectCode } from '@aiprimary/core';
+import type { Grade } from '@aiprimary/core/assessment/grades.js';
+import { parseCellValue, serializeCellValue, difficultyFromApi, questionTypeFromApi } from '@aiprimary/core';
+import type { MatrixCell, ApiMatrix, AssignmentTopic, MatrixDimensionTopic } from '../types';
 
 /**
  * Matrix Conversion Utilities
@@ -20,46 +14,63 @@ import type { MatrixCell, ApiMatrix } from '../types';
 // ============================================================================
 
 /**
- * Convert flat MatrixCell array to API matrix format
+ * Convert flat MatrixCell array to API matrix format with topic > subtopic hierarchy.
  *
  * @param cells - Flat array of MatrixCell from UI
- * @param metadata - Matrix metadata (grade, subject, createdAt)
- * @returns ApiMatrix with lowercase enum values
+ * @param metadata - Matrix metadata (grade, subject)
+ * @param topics - Store topics (subtopics with optional parentTopic grouping)
+ * @returns ApiMatrix with topic > subtopic dimensions
  */
 export function cellsToApiMatrix(
   cells: MatrixCell[],
   metadata: {
-    grade?: string | null;
-    subject?: string | null;
-    createdAt?: string;
-  }
+    grade: Grade;
+    subject: SubjectCode;
+  },
+  topics: AssignmentTopic[]
 ): ApiMatrix {
-  // Extract unique dimensions (preserving order from cells)
-  const topicsMap = new Map<string, { id: string; name: string }>();
+  // Extract unique dimensions from cells
+  const subtopicsMap = new Map<string, { id: string; name: string }>();
   const difficultiesSet = new Set<Difficulty>();
   const questionTypesSet = new Set<QuestionType>();
 
   cells.forEach((cell) => {
-    if (!topicsMap.has(cell.topicId)) {
-      topicsMap.set(cell.topicId, { id: cell.topicId, name: cell.topicName });
+    if (!subtopicsMap.has(cell.topicId)) {
+      subtopicsMap.set(cell.topicId, { id: cell.topicId, name: cell.topicName });
     }
     difficultiesSet.add(cell.difficulty);
     questionTypesSet.add(cell.questionType);
   });
 
-  const topics = Array.from(topicsMap.values());
+  const flatSubtopics = Array.from(subtopicsMap.values());
   const difficulties = Array.from(difficultiesSet);
   const questionTypes = Array.from(questionTypesSet);
 
-  // Build 3D matrix with "count:points" format
-  const matrix: string[][][] = topics.map((topic) =>
+  // Build topic > subtopic hierarchy from store topics
+  const groupMap = new Map<string, { id: string; name: string }[]>();
+  const groupOrder: string[] = [];
+  topics.forEach((t) => {
+    const group = t.parentTopic || t.name;
+    if (!groupMap.has(group)) {
+      groupMap.set(group, []);
+      groupOrder.push(group);
+    }
+    groupMap.get(group)!.push({ id: t.id, name: t.name });
+  });
+  const dimensionTopics: MatrixDimensionTopic[] = groupOrder.map((name) => ({
+    name,
+    subtopics: groupMap.get(name)!,
+  }));
+
+  // Build 3D matrix — rows are flattened subtopics in group order
+  const orderedSubtopics = dimensionTopics.flatMap((t) => t.subtopics);
+  const matrix: string[][][] = orderedSubtopics.map((subtopic) =>
     difficulties.map((difficulty) =>
       questionTypes.map((questionType) => {
         const cell = cells.find(
-          (c) => c.topicId === topic.id && c.difficulty === difficulty && c.questionType === questionType
+          (c) => c.topicId === subtopic.id && c.difficulty === difficulty && c.questionType === questionType
         );
         if (!cell || cell.requiredCount === 0) return '0:0';
-        // Format as "count:points" with decimal for points
         return `${cell.requiredCount}:${cell.requiredCount.toFixed(1)}`;
       })
     )
@@ -70,17 +81,16 @@ export function cellsToApiMatrix(
   let totalPoints = 0;
   cells.forEach((cell) => {
     totalQuestions += cell.requiredCount;
-    totalPoints += cell.requiredCount; // 1 point per question by default
+    totalPoints += cell.requiredCount;
   });
 
   return {
-    grade: metadata.grade ?? null,
-    subject: metadata.subject ?? null,
-    createdAt: metadata.createdAt ?? new Date().toISOString(),
+    grade: metadata.grade,
+    subject: metadata.subject,
     dimensions: {
-      topics,
-      difficulties: difficulties.map(difficultyToApi), // Convert to lowercase
-      questionTypes: questionTypes.map(questionTypeToApi), // Convert to lowercase
+      topics: dimensionTopics,
+      difficulties,
+      questionTypes,
     },
     matrix,
     totalQuestions,
@@ -89,39 +99,60 @@ export function cellsToApiMatrix(
 }
 
 /**
- * Convert API matrix format to flat MatrixCell array for UI
+ * Merge API matrix required counts into a full matrix cell grid.
+ * Flattens topic > subtopic hierarchy to match matrix row indexing.
  *
- * @param apiMatrix - Matrix from API (lowercase enums)
- * @returns Flat array of MatrixCell for UI
+ * @param apiMatrix - Matrix from API (with topic > subtopic dimensions)
+ * @param fullCells - Full grid of MatrixCell (one per subtopic × difficulty × questionType)
+ * @returns Updated cells with requiredCount from API
  */
-export function apiMatrixToCells(apiMatrix: ApiMatrix): MatrixCell[] {
-  const cells: MatrixCell[] = [];
+export function mergeApiMatrixIntoCells(apiMatrix: ApiMatrix, fullCells: MatrixCell[]): MatrixCell[] {
   const { dimensions, matrix } = apiMatrix;
 
-  dimensions.topics.forEach((topic, topicIdx) => {
+  // Flatten subtopics — matrix rows correspond to flattened subtopics
+  const flatSubtopics = dimensions.topics.flatMap((t) => t.subtopics ?? []);
+
+  // Ensure all subtopics have IDs
+  flatSubtopics.forEach((sub, idx) => {
+    if (!sub.id) {
+      sub.id = `topic-${idx}-${Date.now()}`;
+    }
+  });
+
+  // Create a map for quick lookup by subtopic index
+  const cellsBySubtopicIndex = new Map<number, MatrixCell[]>();
+  fullCells.forEach((cell) => {
+    const subIdx = flatSubtopics.findIndex((s) => s.id === cell.topicId);
+    if (subIdx >= 0) {
+      if (!cellsBySubtopicIndex.has(subIdx)) {
+        cellsBySubtopicIndex.set(subIdx, []);
+      }
+      cellsBySubtopicIndex.get(subIdx)!.push(cell);
+    }
+  });
+
+  // Update requiredCount from API matrix
+  flatSubtopics.forEach((_, subIdx) => {
+    const subCells = cellsBySubtopicIndex.get(subIdx) || [];
+
     dimensions.difficulties.forEach((difficultyApi, diffIdx) => {
       dimensions.questionTypes.forEach((questionTypeApi, qtIdx) => {
-        const cellValue = matrix[topicIdx]?.[diffIdx]?.[qtIdx] || '0:0';
+        const cellValue = matrix[subIdx]?.[diffIdx]?.[qtIdx] || '0:0';
         const { count } = parseCellValue(cellValue);
 
-        // Convert from API format (lowercase) to frontend format (UPPERCASE)
         const difficulty = difficultyFromApi(difficultyApi);
         const questionType = questionTypeFromApi(questionTypeApi);
 
-        cells.push({
-          id: `${topic.id}-${difficulty}-${questionType}`,
-          topicId: topic.id,
-          topicName: topic.name,
-          difficulty,
-          questionType,
-          requiredCount: count,
-          currentCount: 0,
-        });
+        const cell = subCells.find((c) => c.difficulty === difficulty && c.questionType === questionType);
+        if (cell) {
+          cell.requiredCount = count;
+        }
       });
     });
   });
 
-  return cells;
+  // Filter out cells with requiredCount = 0
+  return fullCells.filter((cell) => cell.requiredCount > 0);
 }
 
 // ============================================================================

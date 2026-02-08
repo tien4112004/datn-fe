@@ -8,7 +8,7 @@ import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesD
 import { useAssignmentFormStore } from '../stores/useAssignmentFormStore';
 import { useAssignmentDirtyState } from '../hooks/useAssignmentDirtyState';
 import { useSaveAssignment } from '../hooks/useSaveAssignment';
-import { createEmptyFormData, transformAssignmentToFormData } from '../utils/defaultFormData';
+import { createEmptyFormData, transformAssignmentToFormData } from '../api/service';
 import { ERROR_TYPE } from '@/shared/constants';
 import { CriticalError } from '@aiprimary/api';
 import type { Assignment } from '@aiprimary/core';

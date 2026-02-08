@@ -45,10 +45,14 @@ export function useSaveAssignment({ id, onSaveSuccess, onSaveError }: UseSaveAss
 
     setIsSaving(true);
     try {
-      const apiMatrix = cellsToApiMatrix(data.matrixCells, {
-        grade: data.grade || null,
-        subject: data.subject || null,
-      });
+      const apiMatrix = cellsToApiMatrix(
+        data.matrix,
+        {
+          grade: data.grade || null,
+          subject: data.subject || null,
+        },
+        data.topics
+      );
 
       const formData = {
         title: data.title,

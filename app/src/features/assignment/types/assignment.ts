@@ -1,5 +1,6 @@
 import type { Difficulty, QuestionType, SubjectCode, AssignmentQuestion } from '@aiprimary/core';
 import type { Question } from '@aiprimary/core';
+import type { Grade } from '@aiprimary/core/assessment/grades.js';
 
 // Context stored at assignment level (cloned & editable)
 export interface AssignmentContext {
@@ -26,6 +27,13 @@ export interface AssignmentTopic {
   id: string;
   name: string;
   description?: string;
+  parentTopic?: string; // Parent topic name for matrix grouping
+}
+
+// Matrix dimension topic (topic > subtopic hierarchy for API)
+export interface MatrixDimensionTopic {
+  name: string;
+  subtopics: { id: string; name: string }[];
 }
 
 // Matrix cell (topic × difficulty × questionType) - flat representation for UI
@@ -54,7 +62,7 @@ export interface AssignmentFormData {
   topics: AssignmentTopic[];
   contexts: AssignmentContext[];
   questions: AssignmentQuestionWithTopic[];
-  matrixCells: MatrixCell[];
+  matrix: MatrixCell[];
   shuffleQuestions?: boolean; // Shuffle questions for each student (default: false)
 }
 
@@ -64,13 +72,11 @@ export interface Assignment {
   title: string;
   description?: string;
   subject?: SubjectCode;
-  grade?: string;
+  grade?: Grade;
   topics?: AssignmentTopic[];
   contexts?: AssignmentContext[];
   questions: (AssignmentQuestion | AssignmentQuestionWithTopic)[];
-  matrix?: {
-    cells: MatrixCell[];
-  };
+  matrix?: ApiMatrix;
   totalPoints?: number;
   shuffleQuestions?: boolean;
   status: 'draft' | 'published' | 'archived';
@@ -86,9 +92,9 @@ export interface QuestionItemRequest {
   title: string;
   titleImageUrl?: string;
   explanation?: string;
-  grade?: string;
+  grade?: Grade;
   chapter?: string;
-  subject?: string;
+  subject?: SubjectCode;
   data: unknown;
   point: number;
 }
@@ -100,15 +106,14 @@ export interface TopicRequest {
   description?: string;
 }
 
-// Matrix structure for API requests/responses (lowercase enums)
+// Matrix structure for API requests/responses
 export interface ApiMatrix {
-  grade: string | null;
-  subject: string | null;
-  createdAt: string;
+  grade: Grade;
+  subject: SubjectCode;
   dimensions: {
-    topics: { id: string; name: string }[];
-    difficulties: string[]; // lowercase: "knowledge", "comprehension", "application"
-    questionTypes: string[]; // lowercase: "multiple_choice", "fill_in_blank", etc.
+    topics: MatrixDimensionTopic[];
+    difficulties: Difficulty[];
+    questionTypes: QuestionType[];
   };
   matrix: string[][][]; // "count:points" format, e.g., "3:3.0"
   totalQuestions: number;
@@ -119,8 +124,8 @@ export interface ApiMatrix {
 export interface CreateAssignmentRequest {
   title: string;
   description?: string;
-  subject: string;
-  grade?: string;
+  subject: SubjectCode;
+  grade?: Grade;
   questions?: QuestionItemRequest[];
   topics?: TopicRequest[];
   contexts?: AssignmentContext[];
@@ -130,8 +135,8 @@ export interface CreateAssignmentRequest {
 export interface UpdateAssignmentRequest {
   title?: string;
   description?: string;
-  subject?: string;
-  grade?: string;
+  subject?: SubjectCode;
+  grade?: Grade;
   questions?: QuestionItemRequest[];
   topics?: TopicRequest[];
   contexts?: AssignmentContext[];

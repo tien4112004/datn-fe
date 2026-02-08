@@ -1,10 +1,21 @@
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pencil, Plus } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
 import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
+import { Label } from '@/shared/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/shared/components/ui/dialog';
 import { MatrixCell } from './MatrixCell';
+import { EmptyMatrixCell } from './EmptyMatrixCell';
 import { TopicEditModal } from './TopicEditModal';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 import {
@@ -15,21 +26,25 @@ import {
 } from '@aiprimary/core';
 import { generateId } from '../../utils';
 import { QuestionTypeIcon } from '@/features/question/components/shared/QuestionTypeIcon';
-import type { QuestionType } from '@/features/assignment/types';
+import type { AssignmentTopic, QuestionType } from '@/features/assignment/types';
 
 export const MatrixGrid = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrixEditor' });
-  const { t: tMatrix } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrixBuilder' });
   const { t: tDifficulty } = useTranslation('questions');
   const { t: tQuestionType } = useTranslation('questions');
 
   // Get data from store (matrix counts are auto-synced)
   const topics = useAssignmentFormStore((state) => state.topics);
-  const matrixCells = useAssignmentFormStore((state) => state.matrixCells);
+  const matrixCells = useAssignmentFormStore((state) => state.matrix);
   const addTopic = useAssignmentFormStore((state) => state.addTopic);
+  const updateTopic = useAssignmentFormStore((state) => state.updateTopic);
 
   // Modal state
   const [editingTopicId, setEditingTopicId] = useState<string | null>(null);
+
+  // Group rename dialog state
+  const [editingGroup, setEditingGroup] = useState<string | null>(null);
+  const [groupNameInput, setGroupNameInput] = useState('');
 
   const handleAddTopic = () => {
     const newTopicId = generateId();
@@ -37,22 +52,41 @@ export const MatrixGrid = () => {
     setEditingTopicId(newTopicId);
   };
 
+  // Listen for add topic event from Actions sidebar
+  useEffect(() => {
+    const handler = () => handleAddTopic();
+    window.addEventListener('matrix.addTopic', handler);
+    return () => window.removeEventListener('matrix.addTopic', handler);
+  });
+
+  const handleAddSubtopic = (parentTopic: string) => {
+    const newTopicId = generateId();
+    addTopic({ id: newTopicId, name: '', parentTopic });
+    setEditingTopicId(newTopicId);
+  };
+
+  const handleOpenEditGroup = (groupName: string) => {
+    setEditingGroup(groupName);
+    setGroupNameInput(groupName);
+  };
+
+  const handleSaveGroupName = () => {
+    if (editingGroup === null) return;
+    const newName = groupNameInput.trim();
+    if (newName !== editingGroup) {
+      topics.forEach((topic) => {
+        const group = topic.parentTopic || topic.name;
+        if (group === editingGroup) {
+          updateTopic(topic.id, { parentTopic: newName || undefined });
+        }
+      });
+    }
+    setEditingGroup(null);
+  };
+
   if (!topics || topics.length === 0) {
     return (
       <div className="space-y-4">
-        <div className="flex justify-end">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button type="button" size="sm" variant="outline" onClick={handleAddTopic}>
-                <Plus className="mr-1 h-3 w-3" />
-                {t('addTopic')}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{tMatrix('tooltips.addTopic')}</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
         <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center dark:border-gray-700 dark:bg-gray-900">
           <p className="text-sm text-gray-500">{t('emptyMessage')}</p>
         </div>
@@ -70,20 +104,6 @@ export const MatrixGrid = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button type="button" size="sm" variant="outline" onClick={handleAddTopic}>
-              <Plus className="mr-1 h-3 w-3" />
-              {t('addTopic')}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{tMatrix('tooltips.addTopic')}</p>
-          </TooltipContent>
-        </Tooltip>
-      </div>
-
       <div className="overflow-x-auto rounded-lg border">
         <Table className="table-fixed">
           <TableHeader>
@@ -126,58 +146,116 @@ export const MatrixGrid = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {topics.map((topic) => (
-              <TableRow key={topic.id}>
-                <TableCell className="w-[160px] align-top font-medium">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1 space-y-1">
-                      <div className="whitespace-normal break-words">
-                        {topic.name || t('tableHeaders.topic')}
-                      </div>
-                      {topic.description && (
-                        <div className="whitespace-normal break-words text-xs font-normal text-gray-500">
-                          {topic.description}
+            {(() => {
+              const totalDataCols = difficulties.length * questionTypes.length;
+
+              // Group topics by parentTopic
+              const groups = new Map<string, AssignmentTopic[]>();
+              const groupOrder: string[] = [];
+              topics.forEach((topic) => {
+                const group = topic.parentTopic || topic.name;
+                if (!groups.has(group)) {
+                  groups.set(group, []);
+                  groupOrder.push(group);
+                }
+                groups.get(group)!.push(topic);
+              });
+
+              return groupOrder.map((groupName) => {
+                const subtopics = groups.get(groupName)!;
+                return (
+                  <React.Fragment key={groupName}>
+                    {/* Topic group header */}
+                    <TableRow className="bg-gray-100 dark:bg-gray-800">
+                      <TableCell colSpan={1 + totalDataCols} className="font-semibold">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1">
+                            <span>{groupName}</span>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleOpenEditGroup(groupName)}
+                              className="h-7 w-7 shrink-0 p-0"
+                            >
+                              <Pencil className="h-3 w-3" />
+                            </Button>
+                          </div>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleAddSubtopic(groupName)}
+                          >
+                            <Plus className="mr-1 h-3 w-3" />
+                            {t('addSubtopic')}
+                          </Button>
                         </div>
-                      )}
-                    </div>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setEditingTopicId(topic.id)}
-                          className="h-8 w-8 shrink-0 p-0"
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{tMatrix('tooltips.editTopic')}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                </TableCell>
-                {difficulties.map((difficulty) =>
-                  questionTypes.map((questionType) => {
-                    const cell = matrixCells?.find(
-                      (c) =>
-                        c.topicId === topic.id &&
-                        c.difficulty === difficulty.value &&
-                        c.questionType === questionType.value
-                    );
-                    return (
-                      <TableCell
-                        key={`${topic.id}-${difficulty.value}-${questionType.value}`}
-                        className="w-[70px] p-1"
-                      >
-                        {cell && <MatrixCell cell={cell} />}
                       </TableCell>
-                    );
-                  })
-                )}
-              </TableRow>
-            ))}
+                    </TableRow>
+                    {/* Subtopic rows */}
+                    {subtopics.map((topic) => (
+                      <TableRow key={topic.id}>
+                        <TableCell className="w-[160px] pl-6 align-top font-medium">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0 flex-1 space-y-1">
+                              <div className="whitespace-normal break-words">
+                                {topic.name || t('tableHeaders.topic')}
+                              </div>
+                              {topic.description && (
+                                <div className="whitespace-normal break-words text-xs font-normal text-gray-500">
+                                  {topic.description}
+                                </div>
+                              )}
+                            </div>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setEditingTopicId(topic.id)}
+                              className="h-8 w-8 shrink-0 p-0"
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                        {difficulties.map((difficulty, difficultyIndex) =>
+                          questionTypes.map((questionType) => {
+                            const cell = matrixCells?.find(
+                              (c) =>
+                                c.topicId === topic.id &&
+                                c.difficulty === difficulty.value &&
+                                c.questionType === questionType.value
+                            );
+                            const bgColor =
+                              difficultyIndex % 2 === 0
+                                ? 'bg-white dark:bg-gray-950'
+                                : 'bg-gray-50 dark:bg-gray-900';
+                            return (
+                              <TableCell
+                                key={`${topic.id}-${difficulty.value}-${questionType.value}`}
+                                className={`w-[70px] p-1 ${bgColor}`}
+                              >
+                                {cell ? (
+                                  <MatrixCell cell={cell} />
+                                ) : (
+                                  <EmptyMatrixCell
+                                    topicId={topic.id}
+                                    topicName={topic.name}
+                                    difficulty={difficulty.value}
+                                    questionType={questionType.value}
+                                  />
+                                )}
+                              </TableCell>
+                            );
+                          })
+                        )}
+                      </TableRow>
+                    ))}
+                  </React.Fragment>
+                );
+              });
+            })()}
           </TableBody>
         </Table>
       </div>
@@ -187,6 +265,36 @@ export const MatrixGrid = () => {
         open={!!editingTopicId}
         onOpenChange={(open) => !open && setEditingTopicId(null)}
       />
+
+      {/* Group rename dialog */}
+      <Dialog open={editingGroup !== null} onOpenChange={(open) => !open && setEditingGroup(null)}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>{t('editGroup')}</DialogTitle>
+            <DialogDescription>{t('editGroupDescription')}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 py-4">
+            <Label htmlFor="group-name">{t('groupName')}</Label>
+            <Input
+              id="group-name"
+              value={groupNameInput}
+              onChange={(e) => setGroupNameInput(e.target.value)}
+              placeholder={t('groupNamePlaceholder')}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSaveGroupName();
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setEditingGroup(null)}>
+              {t('cancel')}
+            </Button>
+            <Button type="button" onClick={handleSaveGroupName}>
+              {t('save')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

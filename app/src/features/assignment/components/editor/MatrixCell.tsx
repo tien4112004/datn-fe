@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { X } from 'lucide-react';
 import { Input } from '@/shared/components/ui/input';
+import { Button } from '@/shared/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
 import type { MatrixCell as MatrixCellType } from '../../types';
 import { validateMatrixCell } from '../../utils';
@@ -16,6 +19,8 @@ export const MatrixCell = ({ cell }: MatrixCellProps) => {
     keyPrefix: 'assignmentEditor.matrixBuilder',
   });
   const updateMatrixCell = useAssignmentFormStore((state) => state.updateMatrixCell);
+  const removeMatrixCell = useAssignmentFormStore((state) => state.removeMatrixCell);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Validate the cell
   const validation = validateMatrixCell(cell);
@@ -28,7 +33,7 @@ export const MatrixCell = ({ cell }: MatrixCellProps) => {
   };
 
   const handleRequiredCountChange = (value: string) => {
-    const numValue = parseInt(value, 10) || 0;
+    const numValue = Math.min(128, Math.max(0, parseInt(value, 10) || 0));
     updateMatrixCell(cell.id, { requiredCount: numValue });
   };
 
@@ -60,35 +65,51 @@ export const MatrixCell = ({ cell }: MatrixCellProps) => {
   const statusDisplay = getStatusDisplay();
 
   return (
-    <div className="space-y-1">
-      <Tooltip>
-        <TooltipTrigger asChild>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div
+          className="relative space-y-1"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          {isHovered && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => removeMatrixCell(cell.id)}
+                  className="absolute -right-1 -top-1 z-10 h-4 w-4 rounded-full bg-red-100 p-0 text-red-600 hover:bg-red-200"
+                >
+                  <X className="h-2.5 w-2.5 text-red-500" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{tMatrix('tooltips.removeCell')}</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+
           <Input
-            type="number"
+            type="text"
             min="0"
             value={cell.requiredCount}
             onChange={(e) => handleRequiredCountChange(e.target.value)}
             className="h-7 w-full text-center text-xs"
           />
-        </TooltipTrigger>
-        <TooltipContent>
-          <p className="max-w-xs">{tMatrix('tooltips.cellInput')}</p>
-        </TooltipContent>
-      </Tooltip>
 
-      <Tooltip>
-        <TooltipTrigger asChild>
           <div
             className={`overflow-hidden rounded-md border px-1 py-1.5 text-center ${statusColors[status]}`}
           >
             <div className="truncate text-sm font-bold leading-none">{statusDisplay.text}</div>
             <div className="mt-0.5 truncate text-[10px] leading-none">{statusDisplay.compactText}</div>
           </div>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{statusDisplay.fullText || t('ok')}</p>
-        </TooltipContent>
-      </Tooltip>
-    </div>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent>
+        {statusDisplay.fullText && <p className="mt-1">{statusDisplay.fullText}</p>}
+      </TooltipContent>
+    </Tooltip>
   );
 };

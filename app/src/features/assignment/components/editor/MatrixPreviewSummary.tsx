@@ -19,7 +19,7 @@ export const MatrixPreviewSummary = () => {
 
   // Get data from store (auto-synced)
   const topics = useAssignmentFormStore((state) => state.topics);
-  const matrixCells = useAssignmentFormStore((state) => state.matrixCells);
+  const matrixCells = useAssignmentFormStore((state) => state.matrix);
   const questions = useAssignmentFormStore((state) => state.questions);
 
   const difficulties = getAllDifficulties();

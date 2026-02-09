@@ -39,25 +39,15 @@ export const MatrixCell = ({ cell }: MatrixCellProps) => {
   const getStatusDisplay = () => {
     const diff = cell.currentCount - cell.requiredCount;
     if (cell.requiredCount === 0 && cell.currentCount === 0) {
-      return { text: '0', fullText: t('ok'), compactText: t('ok') };
+      return { fullText: t('ok') };
     }
     if (diff === 0) {
-      return { text: `${cell.currentCount}`, fullText: t('ok'), compactText: t('ok') };
+      return { fullText: t('ok') };
     }
     if (diff < 0) {
-      const missing = cell.requiredCount - cell.currentCount;
-      return {
-        text: `${cell.currentCount}`,
-        fullText: t('needMore', { count: missing }),
-        compactText: t('missing', { count: missing }),
-      };
+      return { fullText: t('needMore', { count: Math.abs(diff) }) };
     }
-    const surplus = cell.currentCount - cell.requiredCount;
-    return {
-      text: `${cell.currentCount}`,
-      fullText: t('extra', { count: surplus }),
-      compactText: t('surplus', { count: surplus }),
-    };
+    return { fullText: t('extra', { count: diff }) };
   };
 
   const statusDisplay = getStatusDisplay();
@@ -94,8 +84,14 @@ export const MatrixCell = ({ cell }: MatrixCellProps) => {
           <div
             className={`overflow-hidden rounded-md border px-1 py-1.5 text-center ${statusColors[status]}`}
           >
-            <div className="truncate text-sm font-bold leading-none">{statusDisplay.text}</div>
-            <div className="mt-0.5 truncate text-[10px] leading-none">{statusDisplay.compactText}</div>
+            <div className="text-sm font-bold leading-none">
+              {cell.currentCount}/{cell.requiredCount}
+            </div>
+            {cell.points != null && cell.points > 0 && (
+              <div className="mt-0.5 text-[10px] leading-none opacity-75">
+                {cell.points % 1 === 0 ? cell.points : cell.points.toFixed(1)}p
+              </div>
+            )}
           </div>
         </div>
       </TooltipTrigger>

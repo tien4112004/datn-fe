@@ -731,6 +731,10 @@ export default {
         difficultyApplication: 'Vận dụng',
         model: 'Mô hình AI',
         modelPlaceholder: 'Chọn mô hình (tùy chọn)',
+        total: 'Tổng:',
+        questionSingular: 'câu hỏi',
+        questionPlural: 'câu hỏi',
+        largeGenerationWarning: 'Tạo nhiều câu hỏi có thể mất nhiều thời gian',
       },
       tooltips: {
         prompt: 'Mô tả chủ đề, chương, hoặc nội dung cụ thể bạn muốn tạo câu hỏi',
@@ -762,6 +766,14 @@ export default {
         subjectRequired: 'Môn học là bắt buộc',
         questionTypesRequired: 'Cần chọn ít nhất một loại câu hỏi',
         questionsRequired: 'Cần yêu cầu ít nhất một câu hỏi',
+      },
+      footer: {
+        readyToGenerate: 'Sẵn sàng tạo:',
+        questionSingular: 'câu hỏi',
+        questionPlural: 'câu hỏi',
+        typeSingular: 'loại',
+        typePlural: 'loại',
+        validationRequired: 'Vui lòng điền tất cả các trường bắt buộc trước khi tạo',
       },
     },
 

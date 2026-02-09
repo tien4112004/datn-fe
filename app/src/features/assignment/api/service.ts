@@ -113,11 +113,13 @@ export function transformAssignmentToFormData(assignment: Assignment): Assignmen
 
   // Flatten topic > subtopic hierarchy into a flat topics list
   let topics: AssignmentTopic[] = (assignment.matrix?.dimensions?.topics ?? []).flatMap((topic) =>
-    (topic.subtopics ?? []).map((sub) => ({
-      id: sub.id || createTopicId(),
-      name: sub.name,
-      parentTopic: topic.name,
-    }))
+    (topic.subtopics ?? [])
+      .filter((sub) => sub.name?.trim())
+      .map((sub) => ({
+        id: sub.id || createTopicId(),
+        name: sub.name,
+        parentTopic: topic.name,
+      }))
   );
 
   // Fall back to a default topic if empty

@@ -311,7 +311,14 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
       updateQuestion: (index, updates) => {
         set(
           (state) => {
-            const newQuestions = state.questions.map((q, i) => (i === index ? { ...q, ...updates } : q));
+            const newQuestions = state.questions.map((q, i) => {
+              if (i !== index) return q;
+              return {
+                ...q,
+                ...updates,
+                question: updates.question ? { ...q.question, ...updates.question } : q.question,
+              };
+            });
             const updatedCells = syncMatrixCounts(newQuestions, state.matrix);
 
             return {
@@ -361,8 +368,9 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
               currentCount: 0,
             };
 
+            const newMatrix = [...state.matrix, newCell];
             return {
-              matrix: [...state.matrix, newCell],
+              matrix: syncMatrixCounts(state.questions, newMatrix),
               isDirty: true,
             };
           },

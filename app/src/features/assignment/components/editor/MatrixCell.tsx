@@ -63,7 +63,7 @@ export const MatrixCell = ({ cell }: MatrixCellProps) => {
                 size="icon"
                 variant="ghost"
                 onClick={() => removeMatrixCell(cell.id)}
-                className="pointer-events-none absolute -right-1 -top-1 z-10 h-4 w-4 rounded-full bg-red-100 p-0 text-red-600 opacity-0 transition-opacity hover:bg-red-200 group-hover:pointer-events-auto group-hover:opacity-100"
+                className="absolute -right-1 -top-1 z-10 h-4 w-4 rounded-full bg-red-100 p-0 text-red-600 opacity-0 transition-opacity hover:bg-red-200 group-hover:pointer-events-auto group-hover:opacity-100"
               >
                 <X className="h-2.5 w-2.5 text-red-500" />
               </Button>

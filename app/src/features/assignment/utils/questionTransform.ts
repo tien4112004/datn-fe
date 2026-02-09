@@ -18,6 +18,7 @@ interface BackendQuestion {
   subject?: string;
   data: unknown;
   points: number;
+  topicId?: string;
   contextId?: string;
 }
 
@@ -39,7 +40,7 @@ export function transformQuestionsFromApi(
       explanation: q.explanation,
       data: q.data,
       contextId: q.contextId,
-      topicId: defaultTopicId,
+      topicId: q.topicId || defaultTopicId,
     } as AssignmentQuestionWithTopic['question'];
 
     return {
@@ -72,6 +73,7 @@ export function transformQuestionsForApi(questions: AssignmentQuestionWithTopic[
       subject: q.subject as SubjectCode | undefined,
       data: q.data ? { type: q.type, ...q.data } : null,
       point: points,
+      topicId: q.topicId,
       contextId: q.contextId,
     };
   });

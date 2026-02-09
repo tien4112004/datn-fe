@@ -476,18 +476,18 @@ export function QuestionGeneratePanel({
             </div>
             <div className="flex items-center justify-between">
               <p className="text-muted-foreground text-xs">
-                Total:{' '}
+                {t('fields.total')}{' '}
                 <span
                   className={`font-semibold ${getTotalQuestions() === 0 ? 'text-red-500' : getTotalQuestions() > 10 ? 'text-orange-500' : 'text-green-600'}`}
                 >
                   {getTotalQuestions()}
                 </span>{' '}
-                question(s)
+                {getTotalQuestions() === 1 ? t('fields.questionSingular') : t('fields.questionPlural')}
               </p>
               {getTotalQuestions() > 10 && (
                 <p className="flex items-center gap-1 text-xs text-orange-500">
                   <AlertCircle className="h-3 w-3" />
-                  Large generation may take longer
+                  {t('fields.largeGenerationWarning')}
                 </p>
               )}
             </div>
@@ -524,15 +524,17 @@ export function QuestionGeneratePanel({
           {isFormValid() && (
             <div className="mb-4 flex items-center gap-2 text-sm">
               <Sparkles className="text-primary h-4 w-4" />
-              <span className="font-medium">Ready to generate:</span>
+              <span className="font-medium">{t('footer.readyToGenerate')}</span>
               <span className="text-muted-foreground">
-                {getTotalQuestions()} {getTotalQuestions() === 1 ? 'question' : 'questions'}
+                {getTotalQuestions()}{' '}
+                {getTotalQuestions() === 1 ? t('footer.questionSingular') : t('footer.questionPlural')}
               </span>
               {selectedTypes.length > 0 && (
                 <>
                   <span className="text-muted-foreground">•</span>
                   <span className="text-muted-foreground">
-                    {selectedTypes.length} {selectedTypes.length === 1 ? 'type' : 'types'}
+                    {selectedTypes.length}{' '}
+                    {selectedTypes.length === 1 ? t('footer.typeSingular') : t('footer.typePlural')}
                   </span>
                 </>
               )}
@@ -570,7 +572,7 @@ export function QuestionGeneratePanel({
                 </TooltipTrigger>
                 {!isFormValid() && (
                   <TooltipContent>
-                    <p className="max-w-xs">Please fill in all required fields before generating</p>
+                    <p className="max-w-xs">{t('footer.validationRequired')}</p>
                   </TooltipContent>
                 )}
               </Tooltip>

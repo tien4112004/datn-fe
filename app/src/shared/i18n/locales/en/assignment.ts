@@ -751,6 +751,10 @@ export default {
         difficultyApplication: 'Application',
         model: 'AI Model',
         modelPlaceholder: 'Select model (optional)',
+        total: 'Total:',
+        questionSingular: 'question',
+        questionPlural: 'questions',
+        largeGenerationWarning: 'Large generation may take longer',
       },
       tooltips: {
         prompt: 'Describe the topic, chapter, or specific content you want questions about',
@@ -782,6 +786,14 @@ export default {
         subjectRequired: 'Subject is required',
         questionTypesRequired: 'At least one question type is required',
         questionsRequired: 'At least one question must be requested',
+      },
+      footer: {
+        readyToGenerate: 'Ready to generate:',
+        questionSingular: 'question',
+        questionPlural: 'questions',
+        typeSingular: 'type',
+        typePlural: 'types',
+        validationRequired: 'Please fill in all required fields before generating',
       },
     },
 

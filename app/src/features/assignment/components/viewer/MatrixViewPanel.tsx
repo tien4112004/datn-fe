@@ -14,8 +14,8 @@ export const MatrixViewPanel = ({ assignment }: MatrixViewPanelProps) => {
 
   const { topics, cells } = useMemo(() => {
     if (!assignment.matrix) return { topics: [], cells: [] };
-    return apiMatrixToViewData(assignment.matrix);
-  }, [assignment.matrix]);
+    return apiMatrixToViewData(assignment.matrix, assignment.questions);
+  }, [assignment.matrix, assignment.questions]);
 
   return (
     <div className="space-y-6">

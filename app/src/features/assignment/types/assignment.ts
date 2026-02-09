@@ -45,6 +45,7 @@ export interface MatrixCell {
   questionType: QuestionType;
   requiredCount: number;
   currentCount: number;
+  points?: number;
 }
 
 // Matrix cell with validation
@@ -97,6 +98,7 @@ export interface QuestionItemRequest {
   subject?: SubjectCode;
   data: unknown;
   point: number;
+  topicId?: string;
 }
 
 // Topic for API request

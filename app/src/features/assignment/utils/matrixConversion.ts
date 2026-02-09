@@ -165,7 +165,10 @@ export function mergeApiMatrixIntoCells(apiMatrix: ApiMatrix, fullCells: MatrixC
  * Convert ApiMatrix to flat MatrixCell array + AssignmentTopic array for viewer.
  * Handles the 3D matrix → flat cells conversion and extracts topic hierarchy.
  */
-export function apiMatrixToViewData(apiMatrix: ApiMatrix): {
+export function apiMatrixToViewData(
+  apiMatrix: ApiMatrix,
+  questions?: { question: { topicId?: string; difficulty?: string; type?: string } }[]
+): {
   topics: AssignmentTopic[];
   cells: MatrixCell[];
 } {
@@ -173,34 +176,50 @@ export function apiMatrixToViewData(apiMatrix: ApiMatrix): {
 
   // Build topics with parentTopic grouping from dimension hierarchy
   const topics: AssignmentTopic[] = dimensions.topics.flatMap((topic) =>
-    (topic.subtopics ?? []).map((sub) => ({
-      id: sub.id || createTopicId(),
-      name: sub.name,
-      parentTopic: topic.name,
-    }))
+    (topic.subtopics ?? [])
+      .filter((sub) => sub.name?.trim())
+      .map((sub) => ({
+        id: sub.id || createTopicId(),
+        name: sub.name,
+        parentTopic: topic.name,
+      }))
   );
 
   // Flatten subtopics in order matching matrix row indices
   const flatSubtopics = dimensions.topics.flatMap((t) => t.subtopics ?? []);
+
+  // Count questions per cell if questions are provided
+  const counts = new Map<string, number>();
+  if (questions?.length) {
+    questions.forEach((aq) => {
+      const q = aq.question;
+      if (q.topicId && q.difficulty && q.type) {
+        const key = createCellId(q.topicId, difficultyFromApi(q.difficulty), questionTypeFromApi(q.type));
+        counts.set(key, (counts.get(key) || 0) + 1);
+      }
+    });
+  }
 
   const cells: MatrixCell[] = [];
   flatSubtopics.forEach((sub, subIdx) => {
     dimensions.difficulties.forEach((difficultyRaw, diffIdx) => {
       dimensions.questionTypes.forEach((questionTypeRaw, qtIdx) => {
         const cellValue = matrix[subIdx]?.[diffIdx]?.[qtIdx] || '0:0';
-        const { count } = parseCellValue(cellValue);
+        const { count, points } = parseCellValue(cellValue);
 
         const difficulty = difficultyFromApi(difficultyRaw);
         const questionType = questionTypeFromApi(questionTypeRaw);
+        const cellId = createCellId(sub.id || '', difficulty, questionType);
 
         cells.push({
-          id: createCellId(sub.id || '', difficulty, questionType),
+          id: cellId,
           topicId: sub.id || '',
           topicName: sub.name,
           difficulty,
           questionType,
           requiredCount: count,
-          currentCount: 0,
+          currentCount: counts.get(cellId) || 0,
+          points,
         });
       });
     });

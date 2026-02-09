@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { AssignmentQuestionWithTopic, MatrixCell, AssignmentTopic } from '../types';
-import { VIEW_MODE, type ViewMode } from '@aiprimary/core';
+import { VIEW_MODE, type ViewMode, createCellId } from '@aiprimary/core';
 
 type MainView =
   | 'info'
@@ -107,20 +107,18 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
 
       // Sync matrix counts based on current questions
       syncMatrixCounts: (questions, _topics, matrixCells) => {
-        // Count questions by topic × difficulty
         const counts = new Map<string, number>();
 
         questions.forEach((aq) => {
-          if (aq.question.topicId) {
-            const key = `${aq.question.topicId}-${aq.question.difficulty}`;
+          if (aq.question.topicId && aq.question.difficulty && aq.question.type) {
+            const key = createCellId(aq.question.topicId, aq.question.difficulty, aq.question.type);
             counts.set(key, (counts.get(key) || 0) + 1);
           }
         });
 
-        // Update matrix cells with current counts
         return matrixCells.map((cell) => ({
           ...cell,
-          currentCount: counts.get(`${cell.topicId}-${cell.difficulty}`) || 0,
+          currentCount: counts.get(createCellId(cell.topicId, cell.difficulty, cell.questionType)) || 0,
         }));
       },
     }),

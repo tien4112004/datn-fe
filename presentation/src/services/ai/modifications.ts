@@ -41,15 +41,6 @@ export const aiModificationService = {
           };
           break;
 
-        case 'generate-image':
-          endpoint = '/api/ai/generate-image';
-          payload = {
-            description: request.parameters.description,
-            style: request.parameters.style,
-            slideId: request.context.slideId,
-          };
-          break;
-
         case 'expand-slide':
           endpoint = '/api/ai/expand-slide';
           payload = {

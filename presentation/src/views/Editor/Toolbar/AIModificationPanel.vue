@@ -7,115 +7,140 @@
 
     <Divider />
 
-    <!-- Category Tabs -->
-    <Tabs
-      :value="activeCategory"
-      @update:value="(val: string | number) => (activeCategory = String(val))"
-      :tabs="tabs"
-      card
-      class="category-tabs"
-    />
-
     <div class="panel-content">
-      <!-- TAP 1: REFINE (Chat + Chips) -->
-      <div v-if="activeCategory === 'refine'" class="tab-content refine-tab">
-        <!-- Multi-select message -->
-        <div v-if="currentContext.type === 'elements'" class="info-message">
-          <IconInfo class="info-icon" />
-          <span>Select a single element to use AI modifications</span>
-        </div>
-
-        <!-- Text Element Context -->
-        <template v-else-if="currentContext.type === 'element' && currentContext.elementType === 'text'">
-          <div class="context-hint">
-            <IconText class="hint-icon" />
-            <span>Refining selected text element</span>
-          </div>
-
-          <div class="quick-actions-row">
-            <button
-              v-for="action in textQuickActions"
-              :key="action.label"
-              class="chip-button"
-              @click="
-                () => {
-                  chatInput = action.instruction;
-                  handleRefineElementText();
-                }
-              "
-              :disabled="isProcessing"
-            >
-              <component :is="action.icon" class="chip-icon" />
-              {{ action.label }}
-            </button>
-          </div>
-
-          <div class="chat-interface">
-            <div class="chat-input-wrapper">
-              <textarea
-                v-model="chatInput"
-                class="chat-textarea"
-                placeholder="Describe how to modify this text..."
-                :disabled="isProcessing"
-                @keydown.enter.prevent="handleRefineElementText"
-              ></textarea>
-              <button
-                class="send-button"
-                @click="handleRefineElementText"
-                :disabled="!chatInput.trim() || isProcessing"
-              >
-                <IconSend v-if="!isProcessing" />
-                <div v-else class="spinner"></div>
-              </button>
-            </div>
-            <div v-if="refineMessage" class="feedback-message" :class="refineType">
-              {{ refineMessage }}
-            </div>
-          </div>
-        </template>
-
-        <!-- Slide Context (existing) -->
-        <template v-else-if="currentContext.type === 'slide'">
-          <div class="quick-actions-row">
-            <button
-              v-for="action in quickActions"
-              :key="action.label"
-              class="chip-button"
-              @click="handleQuickAction(action)"
-              :disabled="isProcessing"
-            >
-              <component :is="action.icon" class="chip-icon" />
-              {{ action.label }}
-            </button>
-          </div>
-
-          <div class="chat-interface">
-            <div class="chat-input-wrapper">
-              <textarea
-                v-model="chatInput"
-                class="chat-textarea"
-                placeholder="Describe how to change this slide..."
-                :disabled="isProcessing"
-                @keydown.enter.prevent="handleChatSubmit"
-              ></textarea>
-              <button
-                class="send-button"
-                @click="handleChatSubmit"
-                :disabled="!chatInput.trim() || isProcessing"
-              >
-                <IconSend v-if="!isProcessing" />
-                <div v-else class="spinner"></div>
-              </button>
-            </div>
-            <div v-if="refineMessage" class="feedback-message" :class="refineType">
-              {{ refineMessage }}
-            </div>
-          </div>
-        </template>
+      <!-- Multi-select: show info message -->
+      <div v-if="currentContext.type === 'elements'" class="info-message">
+        <IconInfo class="info-icon" />
+        <span>Select a single element to use AI modifications</span>
       </div>
 
-      <!-- TAP 2: STRUCTURE -->
-      <div v-if="activeCategory === 'structure'" class="tab-content structure-tab">
+      <!-- Text Element: refine text -->
+      <template v-else-if="currentContext.type === 'element' && currentContext.elementType === 'text'">
+        <div class="context-hint">
+          <IconText class="hint-icon" />
+          <span>Refining selected text element</span>
+        </div>
+
+        <div class="quick-actions-row">
+          <button
+            v-for="action in textQuickActions"
+            :key="action.label"
+            class="chip-button"
+            @click="
+              () => {
+                chatInput = action.instruction;
+                handleRefineElementText();
+              }
+            "
+            :disabled="isProcessing"
+          >
+            <component :is="action.icon" class="chip-icon" />
+            {{ action.label }}
+          </button>
+        </div>
+
+        <div class="chat-interface">
+          <div class="chat-input-wrapper">
+            <textarea
+              v-model="chatInput"
+              class="chat-textarea"
+              placeholder="Describe how to modify this text..."
+              :disabled="isProcessing"
+              @keydown.enter.prevent="handleRefineElementText"
+            ></textarea>
+            <button
+              class="send-button"
+              @click="handleRefineElementText"
+              :disabled="!chatInput.trim() || isProcessing"
+            >
+              <IconSend v-if="!isProcessing" />
+              <div v-else class="spinner"></div>
+            </button>
+          </div>
+          <div v-if="refineMessage" class="feedback-message" :class="refineType">
+            {{ refineMessage }}
+          </div>
+        </div>
+      </template>
+
+      <!-- Image Element: replace image -->
+      <template v-else-if="currentContext.type === 'element' && currentContext.elementType === 'image'">
+        <div class="section-title">Replace This Image</div>
+
+        <div class="image-preview">
+          <img :src="currentContext.data.src" alt="Current image" class="preview-img" />
+        </div>
+
+        <div class="input-group">
+          <label>New Image Description</label>
+          <input v-model="imagePrompt" class="panel-input" placeholder="Describe the new image..." />
+        </div>
+
+        <div class="input-group">
+          <label>Art Style</label>
+          <select v-model="selectedStyle" class="panel-select">
+            <option value="photorealistic">Photorealistic</option>
+            <option value="minimalist">Minimalist Vector</option>
+            <option value="3d-render">3D Render</option>
+          </select>
+        </div>
+
+        <Button
+          variant="primary"
+          fullWidth
+          @click="handleReplaceElementImage"
+          :disabled="isProcessing || !imagePrompt"
+        >
+          <IconImage class="btn-icon" /> Replace Image
+        </Button>
+      </template>
+
+      <!-- Other element types: no actions available -->
+      <div v-else-if="currentContext.type === 'element'" class="info-message">
+        <IconInfo class="info-icon" />
+        <span>No AI actions available for this element type</span>
+      </div>
+
+      <!-- Slide context: refine + layout + split -->
+      <template v-else>
+        <div class="quick-actions-row">
+          <button
+            v-for="action in quickActions"
+            :key="action.label"
+            class="chip-button"
+            @click="handleQuickAction(action)"
+            :disabled="isProcessing"
+          >
+            <component :is="action.icon" class="chip-icon" />
+            {{ action.label }}
+          </button>
+        </div>
+
+        <div class="chat-interface">
+          <div class="chat-input-wrapper">
+            <textarea
+              v-model="chatInput"
+              class="chat-textarea"
+              placeholder="Describe how to change this slide..."
+              :disabled="isProcessing"
+              @keydown.enter.prevent="handleChatSubmit"
+            ></textarea>
+            <button
+              class="send-button"
+              @click="handleChatSubmit"
+              :disabled="!chatInput.trim() || isProcessing"
+            >
+              <IconSend v-if="!isProcessing" />
+              <div v-else class="spinner"></div>
+            </button>
+          </div>
+          <div v-if="refineMessage" class="feedback-message" :class="refineType">
+            {{ refineMessage }}
+          </div>
+        </div>
+
+        <Divider />
+
         <div class="section-title">Layout Type</div>
         <div class="layout-grid">
           <div
@@ -132,108 +157,19 @@
 
         <Divider />
 
-        <div class="action-row">
-          <span class="row-label">Shuffle Template</span>
-          <Button size="small" variant="outline" @click="handleShuffle" :disabled="isProcessing">
-            <IconShuffle class="btn-icon" /> Shuffle
-          </Button>
-        </div>
-
-        <Divider />
-
         <div class="section-title">Split Slide</div>
         <div class="split-buttons">
           <Button class="split-btn" @click="handleSplit(2)" :disabled="isProcessing"> Split into 2 </Button>
           <Button class="split-btn" @click="handleSplit(3)" :disabled="isProcessing"> Split into 3 </Button>
         </div>
-      </div>
-
-      <!-- TAP 3: VISUALS -->
-      <div v-if="activeCategory === 'visuals'" class="tab-content visuals-tab">
-        <!-- Image Element Context -->
-        <template v-if="currentContext.type === 'element' && currentContext.elementType === 'image'">
-          <div class="section-title">Replace This Image</div>
-
-          <div class="image-preview">
-            <img :src="currentContext.data.src" alt="Current image" class="preview-img" />
-          </div>
-
-          <div class="input-group">
-            <label>New Image Description</label>
-            <input v-model="imagePrompt" class="panel-input" placeholder="Describe the new image..." />
-          </div>
-
-          <div class="input-group">
-            <label>Art Style</label>
-            <select v-model="selectedStyle" class="panel-select">
-              <option value="photorealistic">Photorealistic</option>
-              <option value="minimalist">Minimalist Vector</option>
-              <option value="3d-render">3D Render</option>
-            </select>
-          </div>
-
-          <Button
-            variant="primary"
-            fullWidth
-            @click="handleReplaceElementImage"
-            :disabled="isProcessing || !imagePrompt"
-          >
-            <IconImage class="btn-icon" /> Replace Image
-          </Button>
-        </template>
-
-        <!-- Slide Context (existing) -->
-        <template v-else-if="currentContext.type === 'slide'">
-          <div class="section-title">Image Generation</div>
-          <div class="input-group">
-            <label>Description</label>
-            <input v-model="imagePrompt" class="panel-input" placeholder="Describe the image..." />
-          </div>
-          <div class="input-group">
-            <label>Art Style</label>
-            <select v-model="selectedStyle" class="panel-select">
-              <option value="photorealistic">Photorealistic</option>
-              <option value="minimalist">Minimalist Vector</option>
-              <option value="watercolor">Watercolor</option>
-              <option value="3d-render">3D Render</option>
-              <option value="corporate">Corporate Flat</option>
-            </select>
-          </div>
-          <Button
-            variant="primary"
-            fullWidth
-            @click="handleGenerateImage"
-            :disabled="isProcessing || !imagePrompt"
-          >
-            <IconImage class="btn-icon" /> Generate Image
-          </Button>
-
-          <Divider class="spacer" />
-
-          <div class="section-title">Global Theme</div>
-          <div class="input-group">
-            <label>Mood / Vibe</label>
-            <select v-model="selectedMood" class="panel-select">
-              <option value="professional">Professional</option>
-              <option value="creative">Creative / Playful</option>
-              <option value="dark-modern">Dark Modern</option>
-              <option value="luxury">Luxury / Elegant</option>
-              <option value="nature">Nature / Eco</option>
-            </select>
-          </div>
-          <Button variant="outline" fullWidth @click="handleSuggestTheme" :disabled="isProcessing">
-            <IconPalette class="btn-icon" /> Update Theme
-          </Button>
-        </template>
-      </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import Tabs from '@/components/Tabs.vue';
 import Button from '@/components/Button.vue';
 import Divider from '@/components/Divider.vue';
 import ContextBadge from './AIModificationPanel/ContextBadge.vue';
@@ -247,43 +183,28 @@ import {
   Maximize2,
   Minimize2,
   CheckCircle,
-  Wand2,
-  LayoutList,
   Columns,
   Image as IconImage,
-  Palette as IconPalette,
   Send as IconSend,
-  Shuffle as IconShuffle,
   Grid,
   List as IconList,
   Info as IconInfo,
   Type as IconText,
 } from 'lucide-vue-next';
-import { selectNextTemplate } from '@/utils/slideLayout'; // Ensure this is available
 
-// Icons mapping for layouts
 const slidesStore = useSlidesStore();
 const { currentSlide } = storeToRefs(slidesStore);
 
 // Local State
-const activeCategory = ref('refine');
 const chatInput = ref('');
 const isProcessing = ref(false);
 const refineMessage = ref('');
 const refineType = ref('info'); // info, success, error
 const imagePrompt = ref('');
 const selectedStyle = ref('photorealistic');
-const selectedMood = ref('professional');
 
 // Context logic
 const { currentContext } = useAIModificationState();
-
-// Tabs Config
-const tabs = [
-  { key: 'refine', label: 'Refine' },
-  { key: 'structure', label: 'Structure' },
-  { key: 'visuals', label: 'Visuals' },
-];
 
 // Quick Actions Configuration
 const quickActions = [
@@ -312,11 +233,9 @@ const currentLayout = computed(() => currentSlide.value?.type || 'LIST');
 
 // --- Handlers ---
 
-// 1. Refine (Chat & Chips)
 const handleQuickAction = (action: any) => {
   chatInput.value = action.instruction;
-  handleChatSubmit(); // Auto-submit for chips? Or let user edit?
-  // Design says "Clicking a chip immediately sends that intent"
+  handleChatSubmit();
 };
 
 const handleChatSubmit = async () => {
@@ -339,15 +258,7 @@ const handleChatSubmit = async () => {
     });
 
     if (result.success && result.data) {
-      // Update the slide in the store
-      // Assuming result.data contains { content: ... } or the full slide structure depending on API
-      // For now, let's assume it returns a partial or full object to merge.
-      // We need a way to update the slide "intelligently".
-
-      // If the API returns the updated 'data' object for the slide:
       if (result.data) {
-        // Update store directly (assuming we have a store action or we patch it)
-        // This requires useUpdateSlides mutation or direct store manipulation if permitted
         const updatedSlide = { ...currentSlide.value, ...result.data };
         // @ts-ignore
         slidesStore.updateSlide(updatedSlide, currentSlide.value!.id);
@@ -367,7 +278,6 @@ const handleChatSubmit = async () => {
   }
 };
 
-// Handle text element refinement
 const handleRefineElementText = async () => {
   if (!chatInput.value.trim() || isProcessing.value) return;
   if (currentContext.value.type !== 'element' || currentContext.value.elementType !== 'text') return;
@@ -379,10 +289,8 @@ const handleRefineElementText = async () => {
   refineMessage.value = '';
 
   try {
-    // Extract plain text (same as existing AI feature)
     const plainText = htmlToText(element.content);
 
-    // Call AI service
     const result = await aiModificationService.refineElementText({
       slideId: currentSlide.value!.id,
       elementId: element.id,
@@ -391,7 +299,6 @@ const handleRefineElementText = async () => {
     });
 
     if (result.success && result.data?.refinedText) {
-      // Use emitRichTextCommand to update (preserves formatting!)
       emitter.emit(EmitterEvents.RICH_TEXT_COMMAND, {
         action: { command: 'replace', value: result.data.refinedText },
       });
@@ -410,7 +317,6 @@ const handleRefineElementText = async () => {
   }
 };
 
-// Handle image element replacement
 const handleReplaceElementImage = async () => {
   if (!imagePrompt.value || isProcessing.value) return;
   if (currentContext.value.type !== 'element' || currentContext.value.elementType !== 'image') return;
@@ -429,7 +335,6 @@ const handleReplaceElementImage = async () => {
     });
 
     if (result.success && result.data?.imageUrl) {
-      // Update only this image element
       slidesStore.updateElement({
         id: element.id,
         props: { src: result.data.imageUrl },
@@ -446,7 +351,6 @@ const handleReplaceElementImage = async () => {
   }
 };
 
-// 2. Structure (Layout & Shuffle)
 const handleLayoutSelect = async (type: string) => {
   if (type === currentLayout.value) return;
   isProcessing.value = true;
@@ -461,17 +365,6 @@ const handleLayoutSelect = async (type: string) => {
     });
 
     if (result.success && result.data) {
-      // The API should return the new Layout Schema (type + data)
-      // We need to re-render using convertToSlide logic ideally,
-      // but if the backend returns the mapped data, we can just update the slide type and data
-      // and let the frontend re-render or call a helper.
-
-      // IMPORTANT: Changing layout type usually requires re-running convertToSlide
-      // to get the new 'elements' array positioned correctly.
-      // We'll rely on a store action/mutation that handles this if it exists,
-      // or we need to import convertToSlide here (or in a hook).
-
-      // For this implementation, let's assume we update the data and triggers a re-render
       const updatedSlide = { ...currentSlide.value, ...result.data };
       // @ts-ignore
       slidesStore.updateSlide(updatedSlide, currentSlide.value!.id);
@@ -481,22 +374,6 @@ const handleLayoutSelect = async (type: string) => {
   } finally {
     isProcessing.value = false;
   }
-};
-
-const handleShuffle = async () => {
-  // Client-side shuffle using existing utility
-  if (!currentSlide.value) return;
-
-  // @ts-ignore
-  const template = await selectNextTemplate(currentSlide.value.type);
-
-  // We need to re-run convertToSlide with the new template
-  // This part involves importing convertToSlide and dependencies again.
-  // For now, we'll placeholder this or call a hook if available.
-  console.log('Shuffle to template:', template.id);
-
-  // TODO: Implement the actual shuffle re-render logic
-  // (This usually resides in a hook like useSlideTransformer)
 };
 
 const handleSplit = async (count: number) => {
@@ -512,7 +389,6 @@ const handleSplit = async (count: number) => {
     });
 
     if (result.success && result.data && Array.isArray((result.data as any).slides)) {
-      // Replace current slide with N new slides
       // @ts-ignore
       slidesStore.replaceSlide(currentSlide.value!.id, (result.data as any).slides);
     }
@@ -520,68 +396,6 @@ const handleSplit = async (count: number) => {
     isProcessing.value = false;
   }
 };
-
-// 3. Visuals (Image & Theme)
-const handleGenerateImage = async () => {
-  // Implementation for image generation (call API -> update slide image src)
-  isProcessing.value = true;
-  try {
-    const result = await aiModificationService.processModification({
-      action: 'generate-image',
-      context: {
-        type: 'slide',
-        slideId: currentSlide.value?.id,
-      },
-      parameters: {
-        description: imagePrompt.value,
-        style: selectedStyle.value,
-      },
-    });
-
-    if (result.success && (result.data as any)?.url) {
-      // Update image element in slide
-      // Need to find the main image element
-      // For now just console log as real implementation requires iterating elements
-      console.log('New image URL:', (result.data as any).url);
-    }
-  } finally {
-    isProcessing.value = false;
-  }
-};
-
-const handleSuggestTheme = async () => {
-  isProcessing.value = true;
-  try {
-    await aiModificationService.processModification({
-      action: 'suggest-theme',
-      context: { type: 'slide' },
-      parameters: { mood: selectedMood.value },
-    });
-    // Theme update usually affects global presentation state
-  } finally {
-    isProcessing.value = false;
-  }
-};
-
-// Start logic
-watch(
-  currentSlide,
-  (newSlide) => {
-    if (newSlide) {
-      // Auto-fill context
-      // @ts-ignore
-      if (newSlide.data?.image?.prompt) {
-        // @ts-ignore
-        imagePrompt.value = newSlide.data.image.prompt;
-        // @ts-ignore
-      } else {
-        // @ts-ignore
-        imagePrompt.value = newSlide.title || '';
-      }
-    }
-  },
-  { immediate: true }
-);
 </script>
 
 <style lang="scss" scoped>
@@ -596,30 +410,44 @@ watch(
   padding: 1rem 1rem 0.5rem;
 }
 
-.category-tabs {
-  padding: 0 1rem;
-  margin-bottom: 0.5rem;
-
-  :deep(.tabs-list) {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-}
-
 .panel-content {
   flex: 1;
   overflow-y: auto;
   padding: 1rem;
-}
-
-.tab-content {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-// Refine Tab Styles
+.info-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  color: var(--presentation-muted-foreground);
+  font-size: 0.85rem;
+
+  .info-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+}
+
+.context-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--presentation-muted-foreground);
+
+  .hint-icon {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+// Quick Actions
 .quick-actions-row {
   display: flex;
   flex-wrap: wrap;
@@ -631,7 +459,7 @@ watch(
   align-items: center;
   gap: 0.4rem;
   padding: 0.4rem 0.8rem;
-  border-radius: 99px; // Pill shape
+  border-radius: 99px;
   border: 1px solid var(--presentation-border);
   background: var(--presentation-input-bg);
   color: var(--presentation-foreground);
@@ -656,8 +484,8 @@ watch(
   }
 }
 
+// Chat
 .chat-interface {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -728,7 +556,7 @@ watch(
   }
 }
 
-// Structure Tab Styles
+// Layout
 .layout-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -767,16 +595,6 @@ watch(
   }
 }
 
-.action-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  .row-label {
-    font-size: 0.9rem;
-    font-weight: 500;
-  }
-}
-
 .split-buttons {
   display: flex;
   flex-direction: column;
@@ -787,7 +605,7 @@ watch(
   }
 }
 
-// Visuals Tab Styles
+// Image replacement
 .input-group {
   display: flex;
   flex-direction: column;
@@ -807,10 +625,6 @@ watch(
   border-radius: 6px;
   border: 1px solid var(--presentation-border);
   background: var(--presentation-input-bg);
-}
-
-.spacer {
-  margin: 1.5rem 0;
 }
 
 .section-title {

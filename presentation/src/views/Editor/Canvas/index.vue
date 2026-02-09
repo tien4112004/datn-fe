@@ -205,8 +205,12 @@ onMounted(() => {
 // Click on the blank area of the canvas: clear focus elements, set canvas focus, clear text selection, and reset format painter state
 const handleClickBlankArea = (e: MouseEvent) => {
   if (mode.value === 'view') return;
-  // Block all interactions in preview mode
-  if (isCurrentSlideLocked.value) return;
+
+  // In preview mode, only allow deselection
+  if (isCurrentSlideLocked.value) {
+    if (activeElementIdList.value.length) mainStore.setActiveElementIdList([]);
+    return;
+  }
 
   if (activeElementIdList.value.length) mainStore.setActiveElementIdList([]);
 

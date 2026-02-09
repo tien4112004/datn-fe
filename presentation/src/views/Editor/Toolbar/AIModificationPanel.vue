@@ -1,12 +1,5 @@
 <template>
   <div class="ai-modification-panel">
-    <!-- Context Badge -->
-    <div class="context-section">
-      <ContextBadge :context="currentContext" />
-    </div>
-
-    <Divider />
-
     <div class="panel-content">
       <!-- Multi-select: show info message -->
       <div v-if="currentContext.type === 'elements'" class="info-message">
@@ -78,12 +71,23 @@
 
         <div class="input-group">
           <label>Art Style</label>
-          <select v-model="selectedStyle" class="panel-select">
-            <option value="photorealistic">Photorealistic</option>
-            <option value="minimalist">Minimalist Vector</option>
-            <option value="3d-render">3D Render</option>
-          </select>
+          <div class="style-grid">
+            <button
+              v-for="style in artStyles"
+              :key="style.value"
+              class="style-chip"
+              :class="{ active: selectedStyle === style.value }"
+              @click="selectedStyle = style.value"
+            >
+              {{ style.label }}
+            </button>
+          </div>
         </div>
+
+        <label class="toggle-row">
+          <input type="checkbox" v-model="matchSlideTheme" class="toggle-checkbox" />
+          <span>Match slide theme</span>
+        </label>
 
         <Button
           variant="primary"
@@ -139,28 +143,29 @@
           </div>
         </div>
 
-        <Divider />
-
-        <div class="section-title">Layout Type</div>
-        <div class="layout-grid">
-          <div
-            v-for="layout in layoutTypes"
-            :key="layout.value"
-            class="layout-item"
-            :class="{ active: currentLayout === layout.value }"
-            @click="handleLayoutSelect(layout.value)"
-          >
-            <component :is="layout.icon" class="layout-icon" />
-            <span class="layout-name">{{ layout.label }}</span>
+        <div class="section-group">
+          <div class="section-title">Layout</div>
+          <div class="layout-row">
+            <button
+              v-for="layout in layoutTypes"
+              :key="layout.value"
+              class="layout-btn"
+              :class="{ active: currentLayout === layout.value }"
+              @click="handleLayoutSelect(layout.value)"
+              :disabled="isProcessing"
+            >
+              <component :is="layout.icon" class="layout-btn-icon" />
+              {{ layout.label }}
+            </button>
           </div>
         </div>
 
-        <Divider />
-
-        <div class="section-title">Split Slide</div>
-        <div class="split-buttons">
-          <Button class="split-btn" @click="handleSplit(2)" :disabled="isProcessing"> Split into 2 </Button>
-          <Button class="split-btn" @click="handleSplit(3)" :disabled="isProcessing"> Split into 3 </Button>
+        <div class="section-group">
+          <div class="section-title">Split Slide</div>
+          <div class="split-row">
+            <Button class="split-btn" @click="handleSplit(2)" :disabled="isProcessing"> Split into 2 </Button>
+            <Button class="split-btn" @click="handleSplit(3)" :disabled="isProcessing"> Split into 3 </Button>
+          </div>
         </div>
       </template>
     </div>
@@ -171,11 +176,17 @@
 import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import Button from '@/components/Button.vue';
-import Divider from '@/components/Divider.vue';
-import ContextBadge from './AIModificationPanel/ContextBadge.vue';
 import { useSlidesStore } from '@/store';
 import { useAIModificationState } from './AIModificationPanel/useAIModificationState';
 import { aiModificationService } from '@/services/ai/modifications';
+import {
+  convertToSlide,
+  selectRandomTemplate,
+  selectTemplateById,
+  updateImageSource,
+} from '@/utils/slideLayout';
+import type { SlideLayoutSchema } from '@/utils/slideLayout/types/schemas';
+import type { PPTImageElement } from '@/types/slides';
 import emitter, { EmitterEvents } from '@/utils/emitter';
 import { htmlToText } from '@/utils/common';
 import {
@@ -195,6 +206,32 @@ import {
 const slidesStore = useSlidesStore();
 const { currentSlide } = storeToRefs(slidesStore);
 
+const getViewport = () => ({
+  width: slidesStore.viewportSize,
+  height: slidesStore.viewportSize * slidesStore.viewportRatio,
+});
+
+async function schemaToSlide(schema: SlideLayoutSchema, slideId?: string) {
+  const slide = currentSlide.value;
+  const viewport = getViewport();
+  const theme = slidesStore.theme;
+
+  // Reuse existing template if possible, otherwise pick a random one
+  let template;
+  if (slide?.layout?.templateId && slide?.layout?.layoutType) {
+    template = await selectTemplateById(slide.layout.layoutType, slide.layout.templateId);
+  } else {
+    template = await selectRandomTemplate(schema.type);
+  }
+
+  return convertToSlide(schema, viewport, theme, template, slideId);
+}
+
+function getCurrentImageSrc(): string | undefined {
+  const el = currentSlide.value?.elements?.find((e) => e.type === 'image') as PPTImageElement | undefined;
+  return el?.src;
+}
+
 // Local State
 const chatInput = ref('');
 const isProcessing = ref(false);
@@ -202,6 +239,7 @@ const refineMessage = ref('');
 const refineType = ref('info'); // info, success, error
 const imagePrompt = ref('');
 const selectedStyle = ref('photorealistic');
+const matchSlideTheme = ref(true);
 
 // Context logic
 const { currentContext } = useAIModificationState();
@@ -222,6 +260,19 @@ const textQuickActions = [
   { label: 'Formal', icon: FileText, instruction: 'Rewrite this text in a more formal tone.' },
 ];
 
+const artStyles = [
+  { value: 'photorealistic', label: 'Photorealistic' },
+  { value: 'digital-art', label: 'Digital Art' },
+  { value: 'minimalist', label: 'Minimalist' },
+  { value: 'watercolor', label: 'Watercolor' },
+  { value: 'oil-painting', label: 'Oil Painting' },
+  { value: 'anime', label: 'Anime' },
+  { value: 'cartoon', label: 'Cartoon' },
+  { value: 'sketch', label: 'Sketch' },
+  { value: 'abstract', label: 'Abstract' },
+  { value: 'surreal', label: 'Surreal' },
+];
+
 const layoutTypes = [
   { label: 'List', value: 'LIST', icon: IconList },
   { label: 'Columns', value: 'TWO_COLUMN', icon: Columns },
@@ -229,7 +280,7 @@ const layoutTypes = [
   { label: 'Pyramid', value: 'PYRAMID', icon: Grid },
 ];
 
-const currentLayout = computed(() => currentSlide.value?.type || 'LIST');
+const currentLayout = computed(() => currentSlide.value?.layout?.layoutType || 'LIST');
 
 // --- Handlers ---
 
@@ -250,23 +301,22 @@ const handleChatSubmit = async () => {
       context: {
         type: 'slide',
         slideId: currentSlide.value?.id,
-        slideContent: currentSlide.value,
+        slideSchema: currentSlide.value?.layout?.schema,
+        slideType: currentSlide.value?.layout?.layoutType,
+        currentImageSrc: getCurrentImageSrc(),
       },
       parameters: {
         instruction: chatInput.value,
       },
     });
 
-    if (result.success && result.data) {
-      if (result.data) {
-        const updatedSlide = { ...currentSlide.value, ...result.data };
-        // @ts-ignore
-        slidesStore.updateSlide(updatedSlide, currentSlide.value!.id);
+    if (result.success && result.data?.schema) {
+      const newSlide = await schemaToSlide(result.data.schema as SlideLayoutSchema, currentSlide.value!.id);
+      slidesStore.updateSlide(newSlide, currentSlide.value!.id);
 
-        refineMessage.value = 'Content refined successfully!';
-        refineType.value = 'success';
-        chatInput.value = '';
-      }
+      refineMessage.value = 'Content refined successfully!';
+      refineType.value = 'success';
+      chatInput.value = '';
     } else {
       throw new Error(result.error || 'Failed to refine content');
     }
@@ -296,6 +346,8 @@ const handleRefineElementText = async () => {
       elementId: element.id,
       currentText: plainText,
       instruction: chatInput.value,
+      slideSchema: currentSlide.value?.layout?.schema,
+      slideType: currentSlide.value?.layout?.layoutType,
     });
 
     if (result.success && result.data?.refinedText) {
@@ -321,7 +373,7 @@ const handleReplaceElementImage = async () => {
   if (!imagePrompt.value || isProcessing.value) return;
   if (currentContext.value.type !== 'element' || currentContext.value.elementType !== 'image') return;
 
-  const element = currentContext.value.data;
+  const element = currentContext.value.data as PPTImageElement;
   if (!element) return;
 
   isProcessing.value = true;
@@ -332,12 +384,16 @@ const handleReplaceElementImage = async () => {
       elementId: element.id,
       description: imagePrompt.value,
       style: selectedStyle.value,
+      matchSlideTheme: matchSlideTheme.value,
+      slideSchema: currentSlide.value?.layout?.schema,
+      slideType: currentSlide.value?.layout?.layoutType,
     });
 
     if (result.success && result.data?.imageUrl) {
+      const updated = await updateImageSource(element, result.data.imageUrl);
       slidesStore.updateElement({
         id: element.id,
-        props: { src: result.data.imageUrl },
+        props: { src: updated.src, clip: updated.clip },
       });
 
       imagePrompt.value = '';
@@ -359,15 +415,17 @@ const handleLayoutSelect = async (type: string) => {
       action: 'transform-layout',
       context: {
         type: 'slide',
-        slideContent: currentSlide.value,
+        slideId: currentSlide.value?.id,
+        slideSchema: currentSlide.value?.layout?.schema,
+        slideType: currentSlide.value?.layout?.layoutType,
+        currentImageSrc: getCurrentImageSrc(),
       },
       parameters: { targetType: type },
     });
 
-    if (result.success && result.data) {
-      const updatedSlide = { ...currentSlide.value, ...result.data };
-      // @ts-ignore
-      slidesStore.updateSlide(updatedSlide, currentSlide.value!.id);
+    if (result.success && result.data?.schema) {
+      const newSlide = await schemaToSlide(result.data.schema as SlideLayoutSchema, currentSlide.value!.id);
+      slidesStore.updateSlide(newSlide, currentSlide.value!.id);
     }
   } catch (e) {
     console.error(e);
@@ -383,14 +441,18 @@ const handleSplit = async (count: number) => {
       action: 'expand-slide',
       context: {
         type: 'slide',
-        slideContent: currentSlide.value,
+        slideId: currentSlide.value?.id,
+        slideSchema: currentSlide.value?.layout?.schema,
+        slideType: currentSlide.value?.layout?.layoutType,
+        currentImageSrc: getCurrentImageSrc(),
       },
       parameters: { count },
     });
 
-    if (result.success && result.data && Array.isArray((result.data as any).slides)) {
-      // @ts-ignore
-      slidesStore.replaceSlide(currentSlide.value!.id, (result.data as any).slides);
+    if (result.success && Array.isArray(result.data?.schemas)) {
+      const schemas = result.data.schemas as SlideLayoutSchema[];
+      const slides = await Promise.all(schemas.map((s) => schemaToSlide(s)));
+      slidesStore.replaceSlide(currentSlide.value!.id, slides);
     }
   } finally {
     isProcessing.value = false;
@@ -403,33 +465,30 @@ const handleSplit = async (count: number) => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 0 0 1rem 0;
-}
-
-.context-section {
-  padding: 1rem 1rem 0.5rem;
 }
 
 .panel-content {
   flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 12px;
+  @include overflow-overlay();
 }
 
+// Info messages
 .info-message {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 1rem;
+  gap: 8px;
+  padding: 10px 12px;
   color: var(--presentation-muted-foreground);
-  font-size: 0.85rem;
+  font-size: 13px;
+  background: var(--presentation-input);
+  border-radius: 6px;
 
   .info-icon {
-    width: 16px;
-    height: 16px;
+    width: 15px;
+    height: 15px;
     flex-shrink: 0;
   }
 }
@@ -437,38 +496,38 @@ const handleSplit = async (count: number) => {
 .context-hint {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.85rem;
+  gap: 6px;
+  font-size: 12px;
   color: var(--presentation-muted-foreground);
 
   .hint-icon {
-    width: 14px;
-    height: 14px;
+    width: 13px;
+    height: 13px;
   }
 }
 
-// Quick Actions
+// Quick action chips
 .quick-actions-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 6px;
 }
 
 .chip-button {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.8rem;
+  gap: 4px;
+  padding: 4px 10px;
   border-radius: 99px;
   border: 1px solid var(--presentation-border);
-  background: var(--presentation-input-bg);
+  background: var(--presentation-card);
   color: var(--presentation-foreground);
-  font-size: 0.8rem;
+  font-size: 12px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
 
   &:hover {
-    background: var(--presentation-hover);
+    background: rgba(0, 0, 0, 0.04);
     border-color: var(--presentation-primary);
     color: var(--presentation-primary);
   }
@@ -479,34 +538,34 @@ const handleSplit = async (count: number) => {
   }
 
   .chip-icon {
-    width: 14px;
-    height: 14px;
+    width: 13px;
+    height: 13px;
   }
 }
 
-// Chat
+// Chat input
 .chat-interface {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 6px;
 }
 
 .chat-input-wrapper {
-  display: flex;
-  gap: 0.5rem;
-  align-items: flex-start;
+  position: relative;
 }
 
 .chat-textarea {
-  flex: 1;
-  min-height: 80px;
-  padding: 0.6rem;
-  border-radius: 8px;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 36px 8px 8px;
+  border-radius: 6px;
   border: 1px solid var(--presentation-border);
-  background: var(--presentation-input-bg);
+  background: var(--presentation-input);
   resize: none;
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 13px;
+  color: var(--presentation-foreground);
+  box-sizing: border-box;
 
   &:focus {
     outline: none;
@@ -515,25 +574,34 @@ const handleSplit = async (count: number) => {
 }
 
 .send-button {
-  width: 36px;
-  height: 36px;
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: 6px;
   background: var(--presentation-primary);
   color: white;
   border: none;
   cursor: pointer;
+  padding: 0;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
 
   &:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
   }
 
   .spinner {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-top-color: white;
     border-radius: 50%;
@@ -542,101 +610,184 @@ const handleSplit = async (count: number) => {
 }
 
 .feedback-message {
-  font-size: 0.85rem;
-  padding: 0.5rem;
+  font-size: 12px;
+  padding: 6px 8px;
   border-radius: 4px;
 
   &.success {
-    background: rgba(var(--success-rgb), 0.1);
-    color: var(--success);
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
   }
   &.error {
-    background: rgba(var(--error-rgb), 0.1);
-    color: var(--error);
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
   }
 }
 
-// Layout
-.layout-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
+// Section groups (layout, split)
+.section-group {
+  padding-top: 12px;
+  border-top: 1px solid var(--presentation-border);
 }
 
-.layout-item {
+.section-title {
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--presentation-muted-foreground);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+// Layout inline row
+.layout-row {
+  display: flex;
+  gap: 6px;
+}
+
+.layout-btn {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.8rem;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 2px;
   border: 1px solid var(--presentation-border);
-  border-radius: 8px;
+  border-radius: 6px;
+  background: var(--presentation-card);
+  color: var(--presentation-foreground);
+  font-size: 10px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
 
   &:hover {
     border-color: var(--presentation-primary);
-    background: var(--presentation-hover);
+    color: var(--presentation-primary);
+    background: rgba(0, 0, 0, 0.02);
   }
 
   &.active {
     border-color: var(--presentation-primary);
-    background: rgba(var(--primary-rgb), 0.05);
+    background: rgba(37, 99, 235, 0.06);
     color: var(--presentation-primary);
   }
 
-  .layout-icon {
-    width: 24px;
-    height: 24px;
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
-  .layout-name {
-    font-size: 0.8rem;
+  .layout-btn-icon {
+    width: 16px;
+    height: 16px;
   }
 }
 
-.split-buttons {
+// Split buttons
+.split-row {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  gap: 8px;
+
   .split-btn {
-    width: 100%;
+    flex: 1;
     justify-content: center;
   }
 }
 
+// Toggle row
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--presentation-foreground);
+  cursor: pointer;
+
+  .toggle-checkbox {
+    accent-color: var(--presentation-primary);
+  }
+}
+
 // Image replacement
+.image-preview {
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--presentation-border);
+
+  .preview-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 120px;
+    object-fit: cover;
+  }
+}
+
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  margin-bottom: 0.8rem;
+  gap: 4px;
 
   label {
-    font-size: 0.8rem;
-    font-weight: 500;
+    font-size: 11px;
+    font-weight: 600;
     color: var(--presentation-muted-foreground);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
   }
 }
 
 .panel-input,
 .panel-select {
-  padding: 0.5rem;
+  padding: 6px 8px;
   border-radius: 6px;
   border: 1px solid var(--presentation-border);
-  background: var(--presentation-input-bg);
+  background: var(--presentation-input);
+  font-size: 13px;
+  color: var(--presentation-foreground);
+  font-family: inherit;
+
+  &:focus {
+    outline: none;
+    border-color: var(--presentation-primary);
+  }
 }
 
-.section-title {
-  font-weight: 600;
-  font-size: 0.9rem;
-  margin-bottom: 0.8rem;
+// Art style grid
+.style-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.style-chip {
+  padding: 4px 10px;
+  border-radius: 99px;
+  border: 1px solid var(--presentation-border);
+  background: var(--presentation-card);
+  color: var(--presentation-foreground);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: var(--presentation-primary);
+    color: var(--presentation-primary);
+  }
+
+  &.active {
+    border-color: var(--presentation-primary);
+    background: rgba(37, 99, 235, 0.06);
+    color: var(--presentation-primary);
+    font-weight: 600;
+  }
 }
 
 .btn-icon {
-  width: 16px;
-  height: 16px;
-  margin-right: 0.4rem;
+  width: 14px;
+  height: 14px;
+  margin-right: 4px;
 }
 
 @keyframes spin {

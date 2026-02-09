@@ -1,8 +1,12 @@
 import { api, getBackendUrl } from '@aiprimary/api';
 import type { ApiResponse } from '@aiprimary/api';
 import type { AIModificationRequest, AIModificationResponse } from '@/types/aiModification';
+import { mockAIModificationService } from './mockModifications';
 
 const BASE_URL = getBackendUrl();
+
+// Set to false to use real backend API instead of mocks
+const USE_MOCK = false;
 
 /**
  * AI Modification Service
@@ -15,6 +19,8 @@ export const aiModificationService = {
    * @returns Promise resolving to the modification response
    */
   async processModification(request: AIModificationRequest): Promise<AIModificationResponse> {
+    console.log(`[AI] processModification → ${request.action}`, { payload: request });
+    if (USE_MOCK) return mockAIModificationService.processModification(request);
     try {
       let endpoint = '';
       let payload = {};
@@ -24,11 +30,11 @@ export const aiModificationService = {
         case 'refine-content':
           endpoint = '/api/ai/refine-content';
           payload = {
-            content: request.context.slideContent || request.context.elementContent,
-            instruction: request.parameters.instruction || request.parameters.quickAction,
+            schema: request.context.slideSchema,
+            instruction: request.parameters.instruction,
             context: {
-              title: request.context.type === 'slide' ? 'Slide Title' : undefined, // In real app, pass actual title
               slideId: request.context.slideId,
+              slideType: request.context.slideType,
             },
           };
           break;
@@ -36,7 +42,7 @@ export const aiModificationService = {
         case 'transform-layout':
           endpoint = '/api/ai/transform-layout';
           payload = {
-            currentSchema: request.context.slideContent, // current slide schema
+            currentSchema: request.context.slideSchema,
             targetType: request.parameters.targetType,
           };
           break;
@@ -44,7 +50,7 @@ export const aiModificationService = {
         case 'expand-slide':
           endpoint = '/api/ai/expand-slide';
           payload = {
-            currentSlide: request.context.slideContent,
+            currentSchema: request.context.slideSchema,
             count: request.parameters.count,
           };
           break;
@@ -86,7 +92,11 @@ export const aiModificationService = {
     elementId: string;
     currentText: string;
     instruction: string;
+    slideSchema?: unknown;
+    slideType?: string;
   }): Promise<AIModificationResponse> {
+    console.log('[AI] refineElementText', { payload: request });
+    if (USE_MOCK) return mockAIModificationService.refineElementText(request);
     try {
       const response = await api.post<ApiResponse<any>>(`${BASE_URL}/api/ai/refine-element-text`, request);
 
@@ -120,7 +130,12 @@ export const aiModificationService = {
     elementId: string;
     description: string;
     style: string;
+    matchSlideTheme?: boolean;
+    slideSchema?: unknown;
+    slideType?: string;
   }): Promise<AIModificationResponse> {
+    console.log('[AI] replaceElementImage', { payload: request });
+    if (USE_MOCK) return mockAIModificationService.replaceElementImage(request);
     try {
       const response = await api.post<ApiResponse<any>>(`${BASE_URL}/api/ai/replace-element-image`, request);
 

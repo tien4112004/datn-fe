@@ -68,6 +68,9 @@ export interface AIModificationRequest {
     type: AIContextType;
     slideId?: string;
     elementId?: string | string[];
+    slideSchema?: unknown;
+    slideType?: string;
+    currentImageSrc?: string;
     slideContent?: unknown;
     elementContent?: unknown;
   };

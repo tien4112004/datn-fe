@@ -55,37 +55,38 @@ export const FeedTab = ({ classId }: FeedPageProps) => {
               </div>
             </nav>
 
-          {isTeacher && (
-            <PostCreator
-              classId={classId}
-              onPostCreated={refresh}
-              initialType={filter.type === 'Exercise' ? 'Exercise' : 'Post'}
-            />
-          )}
+            {isTeacher && (
+              <PostCreator
+                classId={classId}
+                onPostCreated={refresh}
+                initialType={filter.type === 'Exercise' ? 'Exercise' : 'Post'}
+              />
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Content Area */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="container mx-auto max-w-4xl">
-          {/* Error State */}
-          {error && (
-            <div className="border-destructive bg-destructive/10 mt-4 border-l-4 p-3 md:mt-6 md:p-4">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="text-destructive h-5 w-5" />
-                <p className="text-destructive text-sm font-medium">{error?.message || String(error)}</p>
+        {/* Content Area */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="container mx-auto max-w-4xl">
+            {/* Error State */}
+            {error && (
+              <div className="border-destructive bg-destructive/10 mt-4 border-l-4 p-3 md:mt-6 md:p-4">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="text-destructive h-5 w-5" />
+                  <p className="text-destructive text-sm font-medium">{error?.message || String(error)}</p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Posts List */}
-          <PostList
-            posts={posts}
-            onLoadMore={loadMore}
-            hasMore={hasMore}
-            loading={loading}
-            filterType={filter.type}
-          />
+            {/* Posts List */}
+            <PostList
+              posts={posts}
+              onLoadMore={loadMore}
+              hasMore={hasMore}
+              loading={loading}
+              filterType={filter.type}
+            />
+          </div>
         </div>
       </div>
     </div>

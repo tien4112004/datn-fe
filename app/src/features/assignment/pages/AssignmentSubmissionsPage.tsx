@@ -37,7 +37,7 @@ export const AssignmentSubmissionsPage = () => {
   const stats = useMemo(() => {
     const total = submissions.length;
     const graded = submissions.filter((s) => s.status === 'graded').length;
-    const pending = submissions.filter((s) => s.status === 'pending' || s.status === 'submitted').length;
+    const pending = submissions.filter((s) => s.status === 'submitted').length;
 
     // Calculate average score for graded submissions
     const gradedSubmissions = submissions.filter(
@@ -71,13 +71,6 @@ export const AssignmentSubmissionsPage = () => {
           <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
             <FileCheck className="h-3 w-3" />
             Submitted
-          </span>
-        );
-      case 'pending':
-        return (
-          <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">
-            <Clock className="h-3 w-3" />
-            Pending
           </span>
         );
       default:

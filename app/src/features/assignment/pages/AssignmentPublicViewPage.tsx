@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/shared/components/ui/button';
-import { ArrowLeft, Clock, FileQuestion, Loader2 } from 'lucide-react';
+import { ArrowLeft, FileQuestion, Loader2 } from 'lucide-react';
 import { useAssignmentPublic } from '../hooks';
 
 export const AssignmentPublicViewPage = () => {
@@ -68,21 +68,21 @@ export const AssignmentPublicViewPage = () => {
         {assignment.questions && assignment.questions.length > 0 && (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Questions</h2>
-            {assignment.questions.map((question, index) => (
+            {assignment.questions.map((item, index) => (
               <div
-                key={question.id || index}
+                key={item.question.id || index}
                 className="rounded-lg border bg-white p-6 shadow-sm dark:bg-gray-900"
               >
                 <div className="mb-4">
                   <h3 className="font-semibold">
-                    Question {index + 1} {question.point && `(${question.point} points)`}
+                    Question {index + 1} {item.points && `(${item.points} points)`}
                   </h3>
                 </div>
                 <div>
-                  <p className="text-base">{question.title}</p>
-                  {question.titleImageUrl && (
+                  <p className="text-base">{item.question.title}</p>
+                  {item.question.titleImageUrl && (
                     <img
-                      src={question.titleImageUrl}
+                      src={item.question.titleImageUrl}
                       alt="Question"
                       className="mt-4 max-w-full rounded-lg border"
                     />

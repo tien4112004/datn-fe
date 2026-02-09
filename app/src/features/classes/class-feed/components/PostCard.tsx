@@ -12,7 +12,7 @@ import { AttachmentPreview } from './AttachmentPreview';
 import { LinkedResourcesPreview } from './LinkedResourcesPreview';
 import { PostActions } from './PostActions';
 import { parseDateSafe } from '@/shared/utils/date';
-import { useAssignmentPublic } from '@/features/assignment/hooks';
+import { useAssignmentPublic } from '@/features/assignment';
 
 interface PostCardProps {
   post: Post;
@@ -27,7 +27,7 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
   const { t } = useTranslation('classes');
 
   // Fetch assignment details if this is an Exercise post with an assignmentId
-  const { data: assignment, isLoading: isAssignmentLoading } = useAssignment(post.assignmentId ?? '');
+  const { data: assignment, isLoading: isAssignmentLoading } = useAssignmentPublic(post.assignmentId ?? '');
 
   // Determine the appropriate link path based on whether we're in student or teacher mode
   const getPostDetailPath = () => {
@@ -98,7 +98,8 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
                 {post.type === 'Exercise' && post.dueDate && (
                   <Badge variant="outline" className="gap-1 text-[10px] md:text-xs">
                     <Clock className="h-3 w-3" />
-                    {t('feed.post.badges.dueDate')}: {format(parseDateSafe(post.dueDate), 'MMM d, yyyy')}
+                    {t('feed.post.badges.dueDate')}:{' '}
+                    {format(parseDateSafe(post.dueDate), 'PP', { locale: getLocaleDateFns() })}
                   </Badge>
                 )}
 

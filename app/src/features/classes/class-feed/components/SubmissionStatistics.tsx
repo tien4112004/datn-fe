@@ -1,17 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  FileQuestion,
-  CheckCircle2,
-  Clock,
-  TrendingUp,
-  Users,
-  Eye,
-  Edit,
-  Trophy,
-  ChevronDown,
-  ChevronUp,
-} from 'lucide-react';
+import { FileQuestion, Clock, Eye, Edit, Trophy, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSubmissionsByPost } from '@/features/assignment/hooks';
@@ -74,37 +63,6 @@ export const SubmissionStatistics = ({ postId }: SubmissionStatisticsProps) => {
     if (score >= 70) return 'text-yellow-600 dark:text-yellow-400';
     return 'text-red-600 dark:text-red-400';
   };
-
-  const statCards = [
-    {
-      icon: Users,
-      label: 'Total Submissions',
-      value: stats.total,
-      color: 'text-blue-600 dark:text-blue-400',
-      bgColor: 'bg-blue-50 dark:bg-blue-950/20',
-    },
-    {
-      icon: CheckCircle2,
-      label: 'Graded',
-      value: stats.graded,
-      color: 'text-green-600 dark:text-green-400',
-      bgColor: 'bg-green-50 dark:bg-green-950/20',
-    },
-    {
-      icon: Clock,
-      label: 'Pending Review',
-      value: stats.pending,
-      color: 'text-yellow-600 dark:text-yellow-400',
-      bgColor: 'bg-yellow-50 dark:bg-yellow-950/20',
-    },
-    {
-      icon: TrendingUp,
-      label: 'Average Score',
-      value: stats.graded > 0 ? `${stats.avgScore}%` : 'N/A',
-      color: stats.graded > 0 ? getScoreColor(stats.avgScore) : 'text-gray-600 dark:text-gray-400',
-      bgColor: stats.graded > 0 ? 'bg-purple-50 dark:bg-purple-950/20' : 'bg-gray-50 dark:bg-gray-950/20',
-    },
-  ];
 
   return (
     <div className="mt-6">

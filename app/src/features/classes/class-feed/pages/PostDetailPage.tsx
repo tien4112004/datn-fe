@@ -115,13 +115,13 @@ export const PostDetailPage = () => {
         onComment={() => setShowComments(true)}
       />
 
-      {/* Student Assignment Actions (Students only, Homework posts only) */}
-      {!isTeacher && post.type === 'Homework' && post.assignmentId && (
+      {/* Student Assignment Actions (Students only, Exercise posts only) */}
+      {!isTeacher && post.type === 'Exercise' && post.assignmentId && (
         <StudentAssignmentActions postId={postId!} assignmentId={post.assignmentId} />
       )}
 
-      {/* Submission Statistics (Teachers only, Homework posts only) */}
-      {isTeacher && post.type === 'Homework' && post.assignmentId && (
+      {/* Submission Statistics (Teachers only, Exercise posts only) */}
+      {isTeacher && post.type === 'Exercise' && post.assignmentId && (
         <SubmissionStatistics postId={postId!} assignmentId={post.assignmentId} />
       )}
 

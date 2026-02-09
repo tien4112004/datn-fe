@@ -85,13 +85,6 @@ export const StudentSubmissionsPage = () => {
             Submitted
           </span>
         );
-      case 'pending':
-        return (
-          <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">
-            <Clock className="h-3 w-3" />
-            Pending
-          </span>
-        );
       case 'in_progress':
         return (
           <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">
@@ -159,10 +152,10 @@ export const StudentSubmissionsPage = () => {
 
         {/* Assignment Info */}
         <div className="space-y-3 border-b p-6 text-sm">
-          {assignment.dueDate && (
+          {assignment.availableUntil && (
             <div className="text-muted-foreground flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              <span>Due: {new Date(assignment.dueDate).toLocaleDateString()}</span>
+              <span>Due: {new Date(assignment.availableUntil).toLocaleDateString()}</span>
             </div>
           )}
           <div className="text-muted-foreground flex items-center gap-2">

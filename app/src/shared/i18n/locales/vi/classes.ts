@@ -1122,7 +1122,7 @@ export default {
       },
       postType: {
         post: 'Bài Đăng',
-        homework: 'Bài Tập',
+        exercise: 'Bài Tập',
       },
       selectResources: 'Chọn tài nguyên...',
       resourcesSelected: '{{count}} tài nguyên đã chọn',

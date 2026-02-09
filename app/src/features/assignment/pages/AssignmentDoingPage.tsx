@@ -67,19 +67,19 @@ export const AssignmentDoingPage = () => {
   const questions = useMemo(() => assignment?.questions || [], [assignment?.questions]);
   const currentQuestion = useMemo(() => questions[currentQuestionIndex], [questions, currentQuestionIndex]);
   const totalPoints = useMemo(
-    () => assignment?.totalPoints || questions.reduce((sum, q) => sum + (q.point || 0), 0),
+    () => assignment?.totalPoints || questions.reduce((sum, q) => sum + (q.points || 0), 0),
     [assignment?.totalPoints, questions]
   );
 
   // Get current answer for the question
   const currentAnswer = useMemo(() => {
     if (!currentQuestion) return undefined;
-    return answers.find((a) => a.questionId === currentQuestion.id);
+    return answers.find((a) => a.questionId === currentQuestion.question.id);
   }, [answers, currentQuestion]);
 
   // Check if all questions are answered
   const allQuestionsAnswered = useMemo(() => {
-    return questions.every((q) => answers.some((a) => a.questionId === q.id && isAnswerValid(a)));
+    return questions.every((q) => answers.some((a) => a.questionId === q.question.id && isAnswerValid(a)));
   }, [answers, questions]);
 
   const progress = useMemo(
@@ -192,10 +192,10 @@ export const AssignmentDoingPage = () => {
 
           {/* Metadata */}
           <div className="text-muted-foreground space-y-2 text-sm">
-            {assignment.dueDate && (
+            {assignment.availableUntil && (
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
-                <span>Due: {new Date(assignment.dueDate).toLocaleDateString()}</span>
+                <span>Due: {new Date(assignment.availableUntil).toLocaleDateString()}</span>
               </div>
             )}
             <div className="flex items-center gap-2">
@@ -235,12 +235,12 @@ export const AssignmentDoingPage = () => {
           <h3 className="mb-4 text-sm font-semibold">Questions</h3>
           <div className="grid grid-cols-5 gap-2">
             {questions.map((q, index) => {
-              const isAnswered = answers.some((a) => a.questionId === q.id && isAnswerValid(a));
+              const isAnswered = answers.some((a) => a.questionId === q.question.id && isAnswerValid(a));
               const isCurrent = index === currentQuestionIndex;
 
               return (
                 <button
-                  key={q.id}
+                  key={q.question.id}
                   onClick={() => setCurrentQuestionIndex(index)}
                   className={cn(
                     'flex h-10 items-center justify-center rounded-lg border-2 text-sm font-medium transition-colors',
@@ -274,17 +274,17 @@ export const AssignmentDoingPage = () => {
                       Question {currentQuestionIndex + 1}
                     </span>
                     <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                      {currentQuestion.point} points
+                      {currentQuestion.points} points
                     </span>
                   </div>
                 </div>
               </div>
 
               <QuestionRenderer
-                question={currentQuestion as Question}
+                question={currentQuestion.question as Question}
                 viewMode={VIEW_MODE.DOING}
                 answer={currentAnswer}
-                points={currentQuestion.point}
+                points={currentQuestion.points}
                 onAnswerChange={handleAnswerChange}
                 number={currentQuestionIndex + 1}
               />

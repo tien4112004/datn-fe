@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/shared/components/ui/button';
 import { Textarea } from '@/shared/components/ui/textarea';
 import { Label } from '@/shared/components/ui/label';
-import { Input } from '@/shared/components/ui/input';
+
 import { cn } from '@/shared/lib/utils';
 import { ChevronLeft, ChevronRight, Save, User, Clock, Trophy, CheckCircle2, Loader2 } from 'lucide-react';
 import { QuestionRenderer } from '../../question/components/QuestionRenderer';
@@ -36,7 +36,7 @@ export const TeacherGradingPage = () => {
   const questions = useMemo(() => assignment?.questions || [], [assignment?.questions]);
   const currentQuestion = useMemo(() => questions[currentQuestionIndex], [questions, currentQuestionIndex]);
   const totalPoints = useMemo(
-    () => assignment?.totalPoints || questions.reduce((sum, q) => sum + (q.point || 0), 0),
+    () => assignment?.totalPoints || questions.reduce((sum, q) => sum + (q.points || 0), 0),
     [assignment?.totalPoints, questions]
   );
 
@@ -55,13 +55,13 @@ export const TeacherGradingPage = () => {
   // Get current answer for the question
   const currentAnswer = useMemo(() => {
     if (!submission || !currentQuestion) return undefined;
-    return submission.answers?.find((a) => a.questionId === currentQuestion.id);
+    return submission.answers?.find((a) => a.questionId === currentQuestion.question.id);
   }, [submission, currentQuestion]);
 
   // Get current grade for the question
   const currentGrade = useMemo(() => {
     if (!currentQuestion) return undefined;
-    return grades.find((g) => g.questionId === currentQuestion.id);
+    return grades.find((g) => g.questionId === currentQuestion.question.id);
   }, [grades, currentQuestion]);
 
   // Calculate total score
@@ -103,9 +103,9 @@ export const TeacherGradingPage = () => {
       if (!currentQuestion) return;
 
       setGrades((prev) => {
-        const existing = prev.findIndex((g) => g.questionId === currentQuestion.id);
+        const existing = prev.findIndex((g) => g.questionId === currentQuestion.question.id);
         const newGrade: Grade = {
-          questionId: currentQuestion.id,
+          questionId: currentQuestion.question.id,
           points: grade.points,
           feedback: grade.feedback,
         };
@@ -137,7 +137,7 @@ export const TeacherGradingPage = () => {
     if (!submission) return;
 
     // Check if all questions are graded
-    const ungradedQuestions = questions.filter((q) => !grades.some((g) => g.questionId === q.id));
+    const ungradedQuestions = questions.filter((q) => !grades.some((g) => g.questionId === q.question.id));
 
     if (ungradedQuestions.length > 0) {
       toast.warning(`Please grade all questions (${ungradedQuestions.length} remaining)`);
@@ -314,12 +314,12 @@ export const TeacherGradingPage = () => {
             {/* Question Navigation Grid */}
             <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-2">
               {questions.map((q, index) => {
-                const isGraded = grades.some((g) => g.questionId === q.id);
+                const isGraded = grades.some((g) => g.questionId === q.question.id);
                 const isCurrent = index === currentQuestionIndex;
 
                 return (
                   <button
-                    key={q.id}
+                    key={q.question.id}
                     onClick={() => setCurrentQuestionIndex(index)}
                     className={cn(
                       'flex h-10 min-w-[40px] items-center justify-center rounded-lg border-2 text-sm font-medium transition-colors',
@@ -345,17 +345,17 @@ export const TeacherGradingPage = () => {
                   Question {currentQuestionIndex + 1}
                 </span>
                 <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                  Worth {currentQuestion.point} points
+                  Worth {currentQuestion.points} points
                 </span>
               </div>
 
               {/* Question & Answer Section */}
               <div className="rounded-lg border bg-white p-6 dark:bg-gray-900">
                 <QuestionRenderer
-                  question={currentQuestion as Question}
+                  question={currentQuestion.question as Question}
                   viewMode={VIEW_MODE.AFTER_ASSESSMENT}
                   answer={currentAnswer}
-                  points={currentQuestion.point}
+                  points={currentQuestion.points}
                   number={currentQuestionIndex + 1}
                 />
               </div>
@@ -371,32 +371,32 @@ export const TeacherGradingPage = () => {
                   {/* Points Input */}
                   <div>
                     <Label
-                      htmlFor={`points-${currentQuestion.id}`}
+                      htmlFor={`points-${currentQuestion.question.id}`}
                       className="mb-2 block text-sm font-medium"
                     >
                       Points Awarded
                     </Label>
                     <div className="flex items-center gap-3">
                       <input
-                        id={`points-${currentQuestion.id}`}
+                        id={`points-${currentQuestion.question.id}`}
                         type="number"
                         min="0"
-                        max={currentQuestion.point}
+                        max={currentQuestion.points}
                         step="0.5"
                         value={currentGrade?.points ?? 0}
                         onChange={(e) => {
                           const points = parseFloat(e.target.value) || 0;
                           handleGradeChange({
-                            points: Math.min(Math.max(0, points), currentQuestion.point),
+                            points: Math.min(Math.max(0, points), currentQuestion.points),
                             feedback: currentGrade?.feedback,
                           });
                         }}
                         className="w-24 rounded-md border border-gray-300 px-3 py-2 text-center text-lg font-semibold focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
                       />
                       <span className="text-muted-foreground text-sm">
-                        out of <span className="font-semibold">{currentQuestion.point}</span> points
+                        out of <span className="font-semibold">{currentQuestion.points}</span> points
                       </span>
-                      {currentGrade && currentGrade.points === currentQuestion.point && (
+                      {currentGrade && currentGrade.points === currentQuestion.points && (
                         <CheckCircle2 className="h-5 w-5 text-green-600" />
                       )}
                     </div>
@@ -405,13 +405,13 @@ export const TeacherGradingPage = () => {
                   {/* Feedback Input */}
                   <div>
                     <Label
-                      htmlFor={`feedback-${currentQuestion.id}`}
+                      htmlFor={`feedback-${currentQuestion.question.id}`}
                       className="mb-2 block text-sm font-medium"
                     >
                       Feedback for this question (Optional)
                     </Label>
                     <Textarea
-                      id={`feedback-${currentQuestion.id}`}
+                      id={`feedback-${currentQuestion.question.id}`}
                       value={currentGrade?.feedback || ''}
                       onChange={(e) => {
                         handleGradeChange({

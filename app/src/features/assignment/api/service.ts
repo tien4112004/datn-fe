@@ -30,9 +30,20 @@ export default class AssignmentService implements AssignmentApiService {
 
   async getAssignmentById(id: string): Promise<Assignment> {
     const response = await this.apiClient.get(`${this.baseUrl}/api/assignments/${id}`);
-    const assignment = response.data.data;
+    return this.normalizeAssignment(response.data.data);
+  }
 
-    // Normalize questions from flat API format to nested { question, points } structure
+  /**
+   * Get assignment by ID using public endpoint (no document permission check)
+   * This should be used by students accessing assignments through posts/submissions
+   */
+  async getAssignmentByIdPublic(id: string): Promise<Assignment> {
+    const response = await this.apiClient.get(`${this.baseUrl}/api/assignments/${id}/public`);
+    return this.normalizeAssignment(response.data.data);
+  }
+
+  /** Normalize questions from flat API format to nested { question, points } structure */
+  private normalizeAssignment(assignment: any): Assignment {
     if (assignment.questions) {
       assignment.questions = assignment.questions.map((q: any) => {
         // Already in nested format { question: {...}, points }

@@ -1096,7 +1096,7 @@ export default {
       },
       postType: {
         post: 'Post',
-        homework: 'Exercise',
+        exercise: 'Exercise',
       },
       selectResources: 'Select resources...',
       resourcesSelected: '{{count}} resource(s) selected',

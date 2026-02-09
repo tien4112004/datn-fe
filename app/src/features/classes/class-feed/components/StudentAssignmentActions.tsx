@@ -43,7 +43,6 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
     if (!latestSubmission) return 'not_started';
     if (latestSubmission.status === 'graded') return 'graded';
     if (latestSubmission.status === 'submitted') return 'submitted';
-    if (latestSubmission.status === 'pending') return 'pending';
     return 'in_progress';
   }, [latestSubmission]);
 
@@ -76,14 +75,6 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
           color: 'text-blue-600 dark:text-blue-400',
           bgColor: 'bg-blue-50 dark:bg-blue-950/20',
           borderColor: 'border-blue-200 dark:border-blue-900',
-        };
-      case 'pending':
-        return {
-          icon: Clock,
-          label: 'Pending',
-          color: 'text-yellow-600 dark:text-yellow-400',
-          bgColor: 'bg-yellow-50 dark:bg-yellow-950/20',
-          borderColor: 'border-yellow-200 dark:border-yellow-900',
         };
       case 'in_progress':
         return {
@@ -127,7 +118,7 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
                         Score: {latestSubmission.score}/{latestSubmission.maxScore}
                       </span>
                     )}
-                  {(status === 'submitted' || status === 'pending') && (
+                  {status === 'submitted' && (
                     <span>
                       Submitted{' '}
                       {formatDistanceToNow(new Date(latestSubmission.submittedAt), { addSuffix: true })}
@@ -153,7 +144,7 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
               </Button>
             )}
 
-            {(status === 'submitted' || status === 'pending') && (
+            {status === 'submitted' && (
               <Button onClick={handleStartAssignment} size="sm" variant="outline">
                 <PlayCircle className="mr-2 h-4 w-4" />
                 Retake
@@ -215,14 +206,6 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
                       <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
                         <FileCheck className="h-3 w-3" />
                         Submitted
-                      </span>
-                    );
-                  }
-                  if (s.status === 'pending') {
-                    return (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">
-                        <Clock className="h-3 w-3" />
-                        Pending
                       </span>
                     );
                   }

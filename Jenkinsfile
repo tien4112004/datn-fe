@@ -139,7 +139,7 @@ pipeline {
                             export $(grep -v '^#' ${ENV_FILE} | xargs)
                             echo "✓ Environment variables loaded"
                             echo "VITE_API_URL: ${VITE_API_URL}"
-                            echo "PRESENTATION_URL: ${PRESENTATION_URL}"
+                            echo "VITE_PRESENTATION_URL: ${VITE_PRESENTATION_URL}"
                         else
                             echo "WARNING: Environment file not found at ${ENV_FILE}"
                             echo "Building without environment variables..."
@@ -147,9 +147,9 @@ pipeline {
 
                         # Build app image
                         echo "Building App image..."
-                        docker build --no-cache \
+                        docker build  \
                             --build-arg VITE_API_URL="${VITE_API_URL}" \
-                            --build-arg VITE_PRESENTATION_URL="${PRESENTATION_URL}" \
+                            --build-arg VITE_PRESENTATION_URL="${VITE_PRESENTATION_URL}" \
                             --build-arg VITE_FIREBASE_API_KEY="${VITE_FIREBASE_API_KEY}" \
                             --build-arg VITE_FIREBASE_AUTH_DOMAIN="${VITE_FIREBASE_AUTH_DOMAIN}" \
                             --build-arg VITE_FIREBASE_PROJECT_ID="${VITE_FIREBASE_PROJECT_ID}" \
@@ -165,9 +165,9 @@ pipeline {
 
                         # Build presentation image
                         echo "Building Presentation image..."
-                        docker build --no-cache \
+                        docker build  \
                             --build-arg VITE_API_URL="${VITE_API_URL}" \
-                            --build-arg VITE_PRESENTATION_URL="${PRESENTATION_URL}" \
+                            --build-arg VITE_PRESENTATION_URL="${VITE_PRESENTATION_URL}" \
                             --build-arg VITE_FIREBASE_API_KEY="${VITE_FIREBASE_API_KEY}" \
                             --build-arg VITE_FIREBASE_AUTH_DOMAIN="${VITE_FIREBASE_AUTH_DOMAIN}" \
                             --build-arg VITE_FIREBASE_PROJECT_ID="${VITE_FIREBASE_PROJECT_ID}" \
@@ -183,9 +183,9 @@ pipeline {
 
                         # Build admin image
                         echo "Building Admin image..."
-                        docker build --no-cache \
+                        docker build  \
                             --build-arg VITE_API_URL="${VITE_API_URL}" \
-                            --build-arg VITE_PRESENTATION_URL="${PRESENTATION_URL}" \
+                            --build-arg VITE_PRESENTATION_URL="${VITE_PRESENTATION_URL}" \
                             --build-arg VITE_FIREBASE_API_KEY="${VITE_FIREBASE_API_KEY}" \
                             --build-arg VITE_FIREBASE_AUTH_DOMAIN="${VITE_FIREBASE_AUTH_DOMAIN}" \
                             --build-arg VITE_FIREBASE_PROJECT_ID="${VITE_FIREBASE_PROJECT_ID}" \

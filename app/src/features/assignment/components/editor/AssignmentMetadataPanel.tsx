@@ -34,7 +34,7 @@ export const AssignmentMetadataPanel = () => {
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('panelTitle')}</h2>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 px-2">
         <div>
           <div className="mb-1.5 flex items-center gap-1.5">
             <Label htmlFor="title" className="text-xs text-gray-600 dark:text-gray-400">

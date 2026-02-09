@@ -143,12 +143,50 @@ export interface UpdateAssignmentRequest {
   matrix?: ApiMatrix; // Full 3D matrix structure with lowercase enums
 }
 
+// Generate matrix request (calls POST /api/exams/generate-matrix)
+export interface GenerateMatrixRequest {
+  name: string;
+  grade: string;
+  subject: string;
+  totalQuestions: number;
+  totalPoints: number;
+  difficulties?: string[];
+  questionTypes?: string[];
+  additionalRequirements?: string;
+  language?: string;
+  provider?: string;
+  model?: string;
+}
+
+// Generate matrix response
+export interface GenerateMatrixResponse {
+  metadata: {
+    id: string;
+    name: string;
+    grade: string;
+    subject: string;
+    createdAt: string;
+  };
+  dimensions: {
+    topics: Array<{
+      id: string;
+      name: string;
+      subtopics: Array<{ id: string; name: string }>;
+    }>;
+    difficulties: string[];
+    questionTypes: string[];
+  };
+  matrix: string[][][]; // "count:points" format
+  totalQuestions: number;
+  totalPoints: number;
+}
+
 // Re-export core types for convenience
+// Note: MatrixDimensionTopic is defined locally above, so not re-exported from core
 export type {
   AssessmentMatrix,
   MatrixMetadata,
   MatrixDimensions,
-  MatrixDimensionTopic,
   MatrixCellStatus,
   MatrixValidationResult,
 } from '@aiprimary/core';

@@ -3,7 +3,7 @@ import { useNavigate, useParams, useLoaderData } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AssignmentEditorLayout } from '../components/editor/AssignmentEditorLayout';
 import { MetadataEditDialog } from '../components/editor/MetadataEditDialog';
-import { QuestionBankImportManager } from '../components/editor/QuestionBankImportManager';
+import { QuestionBankImportManager } from '../components/question-bank/QuestionBankImportManager';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
 import { useAssignmentFormStore } from '../stores/useAssignmentFormStore';
 import { useAssignmentDirtyState } from '../hooks/useAssignmentDirtyState';

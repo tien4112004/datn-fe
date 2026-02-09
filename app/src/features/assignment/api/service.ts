@@ -8,6 +8,8 @@ import type {
   UpdateAssignmentRequest,
   AssignmentFormData,
   AssignmentTopic,
+  GenerateMatrixRequest,
+  GenerateMatrixResponse,
 } from '../types';
 import { createMatrixCellsForTopic } from '../utils/matrixHelpers';
 import { mergeApiMatrixIntoCells } from '../utils/matrixConversion';
@@ -80,6 +82,11 @@ export default class AssignmentService implements AssignmentApiService {
     );
     return response.data.data;
   }
+
+  async generateMatrix(request: GenerateMatrixRequest): Promise<GenerateMatrixResponse> {
+    const response = await this.apiClient.post(`${this.baseUrl}/api/exams/generate-matrix`, request);
+    return response.data.data;
+  }
 }
 
 // ============================================================================
@@ -106,7 +113,7 @@ export function transformAssignmentToFormData(assignment: Assignment): Assignmen
 
   // Flatten topic > subtopic hierarchy into a flat topics list
   let topics: AssignmentTopic[] = (assignment.matrix?.dimensions?.topics ?? []).flatMap((topic) =>
-    (topic.subtopics ?? []).map((sub, idx) => ({
+    (topic.subtopics ?? []).map((sub) => ({
       id: sub.id || createTopicId(),
       name: sub.name,
       parentTopic: topic.name,

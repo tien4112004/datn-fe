@@ -36,6 +36,12 @@ import {
 interface QuestionBankGenerateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** When provided, called with generated questions instead of navigating. */
+  onGenerated?: (questions: import('../../types/questionBank').QuestionBankItem[]) => void;
+  /** Optional initial value for grade field. */
+  initialGrade?: string;
+  /** Optional initial value for subject field. */
+  initialSubject?: string;
 }
 
 interface ModelValue {
@@ -43,14 +49,20 @@ interface ModelValue {
   provider: string;
 }
 
-export function QuestionBankGenerateDialog({ open, onOpenChange }: QuestionBankGenerateDialogProps) {
+export function QuestionBankGenerateDialog({
+  open,
+  onOpenChange,
+  onGenerated,
+  initialGrade,
+  initialSubject,
+}: QuestionBankGenerateDialogProps) {
   const navigate = useNavigate();
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, { keyPrefix: 'teacherQuestionBank.generate' });
 
   // Form state
   const [prompt, setPrompt] = useState('');
-  const [grade, setGrade] = useState('');
-  const [subject, setSubject] = useState('');
+  const [grade, setGrade] = useState(initialGrade || '');
+  const [subject, setSubject] = useState(initialSubject || '');
   const [chapter, setChapter] = useState('');
   const [selectedTypes, setSelectedTypes] = useState<string[]>(['MULTIPLE_CHOICE']);
   const [questionsPerDifficulty, setQuestionsPerDifficulty] = useState<Record<string, number>>({
@@ -144,19 +156,25 @@ export function QuestionBankGenerateDialog({ open, onOpenChange }: QuestionBankG
       const result = await generateMutation.mutateAsync(request);
       onOpenChange(false);
       resetForm();
-      // Navigate to generated questions page with the results
-      navigate('/question-bank/generated', {
-        state: {
-          questions: result.questions,
-          totalGenerated: result.totalGenerated,
-          generationParams: {
-            prompt: prompt.trim(),
-            grade,
-            subject,
-            ...(chapter && { chapter }),
+
+      if (onGenerated) {
+        // Editor context: pass questions to the callback
+        onGenerated(result.questions);
+      } else {
+        // Question bank page context: navigate to generated page
+        navigate('/question-bank/generated', {
+          state: {
+            questions: result.questions,
+            totalGenerated: result.totalGenerated,
+            generationParams: {
+              prompt: prompt.trim(),
+              grade,
+              subject,
+              ...(chapter && { chapter }),
+            },
           },
-        },
-      });
+        });
+      }
     } catch (error) {
       toast.error(t('toast.error'));
     }
@@ -164,8 +182,8 @@ export function QuestionBankGenerateDialog({ open, onOpenChange }: QuestionBankG
 
   const resetForm = () => {
     setPrompt('');
-    setGrade('');
-    setSubject('');
+    setGrade(initialGrade || '');
+    setSubject(initialSubject || '');
     setChapter('');
     setSelectedTypes(['MULTIPLE_CHOICE']);
     setQuestionsPerDifficulty({
@@ -183,7 +201,7 @@ export function QuestionBankGenerateDialog({ open, onOpenChange }: QuestionBankG
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl rounded-3xl border-2 shadow-xl">
+      <DialogContent className="!max-w-2xl rounded-3xl border-2 shadow-xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5" />
@@ -192,7 +210,7 @@ export function QuestionBankGenerateDialog({ open, onOpenChange }: QuestionBankG
           <DialogDescription>{t('description')}</DialogDescription>
         </DialogHeader>
 
-        <div className="max-h-[60vh] space-y-6 overflow-y-auto pr-2">
+        <div className="max-h-[60vh] space-y-6 overflow-y-auto px-2">
           {/* Prompt */}
           <div className="space-y-2">
             <Label htmlFor="prompt">{t('fields.prompt')} *</Label>

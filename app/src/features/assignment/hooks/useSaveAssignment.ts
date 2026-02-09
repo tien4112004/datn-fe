@@ -6,6 +6,8 @@ import { useCreateAssignment, useUpdateAssignment } from './useAssignmentApi';
 import { useAssignmentFormStore } from '../stores/useAssignmentFormStore';
 import { transformQuestionsForApi } from '../utils/questionTransform';
 import { cellsToApiMatrix } from '../utils';
+import type { SubjectCode } from '@aiprimary/core';
+import type { Grade } from '@aiprimary/core/assessment/grades.js';
 
 interface UseSaveAssignmentOptions {
   id?: string;
@@ -48,8 +50,8 @@ export function useSaveAssignment({ id, onSaveSuccess, onSaveError }: UseSaveAss
       const apiMatrix = cellsToApiMatrix(
         data.matrix,
         {
-          grade: data.grade || null,
-          subject: data.subject || null,
+          grade: (data.grade || '') as Grade,
+          subject: (data.subject || '') as SubjectCode,
         },
         data.topics
       );
@@ -57,8 +59,8 @@ export function useSaveAssignment({ id, onSaveSuccess, onSaveError }: UseSaveAss
       const formData = {
         title: data.title,
         description: data.description,
-        subject: data.subject,
-        grade: data.grade,
+        subject: data.subject as SubjectCode,
+        grade: data.grade as Grade,
         questions: transformQuestionsForApi(data.questions),
         topics: data.topics.map((topic) => ({
           id: topic.id,

@@ -285,7 +285,8 @@ export default {
       saving: 'Saving...',
       tooltips: {
         save: 'Save changes',
-        generate: 'AI generate (coming soon)',
+        generate: 'Generate questions using AI',
+        generateMatrix: 'Generate assessment matrix using AI',
         fromBank: 'Add from question bank',
         addContext: 'Create a new reading passage',
         fromLibrary: 'Import from context library',
@@ -328,7 +329,7 @@ export default {
         editMode: 'Edit Mode',
         tooltips: {
           addQuestion: 'Create a new question',
-          generate: 'AI generation coming soon',
+          generate: 'Generate questions using AI',
           fromBank: 'Import questions from question bank',
           switchToEdit: 'Switch all to edit mode',
           switchToPreview: 'Switch all to preview mode',
@@ -486,6 +487,7 @@ export default {
       panelTitle: 'Assessment Matrix Builder',
       description:
         'Configure topics and required question counts for each difficulty level. Changes are saved automatically.',
+      generateMatrix: 'Generate Matrix',
       tooltips: {
         addTopic: 'Add new topic',
         addSubtopic: 'Add a subtopic to this group',
@@ -494,6 +496,71 @@ export default {
         cellInput: 'Required question count',
         removeCell: 'Remove cell',
         addCell: 'Add question requirement',
+      },
+    },
+
+    // Generate matrix dialog
+    generateMatrixDialog: {
+      title: 'Generate Assessment Matrix with AI',
+      description: 'Use AI to automatically generate an assessment matrix based on your specifications.',
+      presets: {
+        label: 'Quick Start',
+        quickQuiz: {
+          label: 'Quick Quiz',
+          description: '10 questions, basic difficulty, multiple choice only',
+        },
+        standardTest: {
+          label: 'Standard Test',
+          description: '20 questions, all difficulties, no open-ended',
+        },
+        comprehensiveExam: {
+          label: 'Comprehensive Exam',
+          description: '40 questions, all difficulties, all types',
+        },
+      },
+      fields: {
+        name: 'Matrix Name',
+        namePlaceholder: 'Enter matrix name',
+        grade: 'Grade',
+        gradePlaceholder: 'Select grade',
+        subject: 'Subject',
+        subjectPlaceholder: 'Select subject',
+        totalQuestions: 'Total Questions',
+        totalPoints: 'Total Points',
+        difficulties: 'Difficulty Levels',
+        questionTypes: 'Question Types',
+        prompt: 'Prompt',
+        promptPlaceholder: 'Describe what you want the matrix to focus on...',
+        model: 'AI Model',
+        modelPlaceholder: 'Select AI model',
+      },
+      actions: {
+        cancel: 'Cancel',
+        generate: 'Generate Matrix',
+        generating: 'Generating...',
+      },
+      toast: {
+        success: 'Matrix generated successfully',
+        error: 'Failed to generate matrix',
+        noQuestionTypes: 'Please select at least one question type',
+        noDifficulties: 'Please select at least one difficulty level',
+      },
+      validation: {
+        nameRequired: 'Matrix name is required',
+        gradeRequired: 'Grade is required',
+        subjectRequired: 'Subject is required',
+        totalQuestionsRequired: 'Total questions must be at least 1',
+        totalPointsRequired: 'Total points must be at least 1',
+      },
+      confirmation: {
+        title: 'Matrix Generated Successfully',
+        description: 'How would you like to apply the generated matrix?',
+        summary: '{{topicCount}} topics, {{totalQuestions}} questions, {{totalPoints}} points',
+        replaceWarning:
+          'Warning: Replace mode will remove {{count}} existing question(s) assigned to current topics.',
+        replace: 'Replace',
+        merge: 'Merge',
+        cancel: 'Cancel',
       },
     },
 
@@ -686,6 +753,13 @@ export default {
         difficultyApplication: 'Application',
         model: 'AI Model',
         modelPlaceholder: 'Select model (optional)',
+      },
+      tooltips: {
+        prompt: 'Describe the topic, chapter, or specific content you want questions about',
+        chapter: 'Narrow down questions to a specific chapter in the curriculum',
+        questionTypes: 'Choose which question formats to generate',
+        questionsPerDifficulty: 'Set how many questions to generate for each difficulty level',
+        model: 'Choose which AI model to use for generation',
       },
       questionTypes: {
         MULTIPLE_CHOICE: 'Multiple Choice',

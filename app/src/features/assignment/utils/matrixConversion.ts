@@ -49,7 +49,6 @@ export function cellsToApiMatrix(
     questionTypesSet.add(cell.questionType);
   });
 
-  const flatSubtopics = Array.from(subtopicsMap.values());
   const difficulties = Array.from(difficultiesSet);
   const questionTypes = Array.from(questionTypesSet);
 
@@ -120,7 +119,7 @@ export function mergeApiMatrixIntoCells(apiMatrix: ApiMatrix, fullCells: MatrixC
   const flatSubtopics = dimensions.topics.flatMap((t) => t.subtopics ?? []);
 
   // Ensure all subtopics have IDs
-  flatSubtopics.forEach((sub, idx) => {
+  flatSubtopics.forEach((sub) => {
     if (!sub.id) {
       sub.id = createTopicId();
     }

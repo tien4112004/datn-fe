@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { Input } from '@/shared/components/ui/input';
@@ -20,7 +19,6 @@ export const MatrixCell = ({ cell }: MatrixCellProps) => {
   });
   const updateMatrixCell = useAssignmentFormStore((state) => state.updateMatrixCell);
   const removeMatrixCell = useAssignmentFormStore((state) => state.removeMatrixCell);
-  const [isHovered, setIsHovered] = useState(false);
 
   // Validate the cell
   const validation = validateMatrixCell(cell);
@@ -67,29 +65,23 @@ export const MatrixCell = ({ cell }: MatrixCellProps) => {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <div
-          className="relative space-y-1"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          {isHovered && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => removeMatrixCell(cell.id)}
-                  className="absolute -right-1 -top-1 z-10 h-4 w-4 rounded-full bg-red-100 p-0 text-red-600 hover:bg-red-200"
-                >
-                  <X className="h-2.5 w-2.5 text-red-500" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{tMatrix('tooltips.removeCell')}</p>
-              </TooltipContent>
-            </Tooltip>
-          )}
+        <div className="group relative space-y-1">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                onClick={() => removeMatrixCell(cell.id)}
+                className="pointer-events-none absolute -right-1 -top-1 z-10 h-4 w-4 rounded-full bg-red-100 p-0 text-red-600 opacity-0 transition-opacity hover:bg-red-200 group-hover:pointer-events-auto group-hover:opacity-100"
+              >
+                <X className="h-2.5 w-2.5 text-red-500" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{tMatrix('tooltips.removeCell')}</p>
+            </TooltipContent>
+          </Tooltip>
 
           <Input
             type="text"

@@ -1,8 +1,8 @@
+export { QuestionBankGenerateDialog } from '../editor/QuestionGenerateDialog';
+export { CopyToPersonalDialog } from './CopyToPersonalDialog';
+export { QuestionBankCard } from './QuestionBankCard';
 export { QuestionBankDialog } from './QuestionBankDialog';
 export { QuestionBankFilters } from './QuestionBankFilters';
 export { QuestionBankGrid } from './QuestionBankGrid';
-export { QuestionBankCard } from './QuestionBankCard';
 export { QuestionBankImportDialog } from './QuestionBankImportDialog';
-export { QuestionBankGenerateDialog } from './QuestionBankGenerateDialog';
 export { QuestionContentPreview } from './QuestionContentPreview';
-export { CopyToPersonalDialog } from './CopyToPersonalDialog';

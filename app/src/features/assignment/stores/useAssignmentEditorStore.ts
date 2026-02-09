@@ -3,7 +3,14 @@ import { devtools } from 'zustand/middleware';
 import type { AssignmentQuestionWithTopic, MatrixCell, AssignmentTopic } from '../types';
 import { VIEW_MODE, type ViewMode } from '@aiprimary/core';
 
-type MainView = 'info' | 'questions' | 'matrix' | 'contexts' | 'questionsList';
+type MainView =
+  | 'info'
+  | 'questions'
+  | 'matrix'
+  | 'contexts'
+  | 'questionsList'
+  | 'generateQuestions'
+  | 'generateMatrix';
 
 interface AssignmentEditorState {
   // UI State

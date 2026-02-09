@@ -1,3 +1,5 @@
+import type { SubjectCode } from '@aiprimary/core';
+import type { Grade } from '@aiprimary/core/assessment/grades.js';
 import type { AssignmentQuestionWithTopic, QuestionItemRequest } from '../types';
 
 /**
@@ -65,9 +67,9 @@ export function transformQuestionsForApi(questions: AssignmentQuestionWithTopic[
       title: q.title,
       titleImageUrl: q.titleImageUrl,
       explanation: q.explanation,
-      grade: q.grade,
+      grade: q.grade as Grade | undefined,
       chapter: q.chapter,
-      subject: q.subject,
+      subject: q.subject as SubjectCode | undefined,
       data: q.data ? { type: q.type, ...q.data } : null,
       point: points,
       contextId: q.contextId,

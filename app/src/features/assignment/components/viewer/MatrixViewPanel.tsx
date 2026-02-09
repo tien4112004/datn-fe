@@ -11,7 +11,7 @@ export const MatrixViewPanel = ({ assignment }: MatrixViewPanelProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'viewer.matrix' });
 
   const topics = assignment.topics || [];
-  const matrixCells = assignment.matrix?.cells || [];
+  const matrixCells = (assignment.matrix as any)?.cells || [];
 
   return (
     <div className="space-y-6">

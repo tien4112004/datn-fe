@@ -285,7 +285,8 @@ export default {
       saving: 'Đang lưu...',
       tooltips: {
         save: 'Lưu thay đổi',
-        generate: 'Tạo bằng AI (sắp có)',
+        generate: 'Tạo câu hỏi bằng AI',
+        generateMatrix: 'Tạo ma trận đánh giá bằng AI',
         fromBank: 'Thêm từ kho câu hỏi',
         addContext: 'Tạo đoạn văn mới',
         fromLibrary: 'Nhập từ thư viện đoạn văn',
@@ -322,13 +323,13 @@ export default {
       addFromBank: 'Thêm từ kho',
       toolbar: {
         addQuestion: 'Thêm câu hỏi',
-        generate: 'Tạo tự động',
+        generate: 'Tạo sinh',
         fromBank: 'Từ kho',
         previewMode: 'Chế độ xem trước',
         editMode: 'Chế độ chỉnh sửa',
         tooltips: {
           addQuestion: 'Tạo câu hỏi mới',
-          generate: 'Tạo bằng AI sắp ra mắt',
+          generate: 'Tạo câu hỏi bằng AI',
           fromBank: 'Nhập câu hỏi từ kho câu hỏi',
           switchToEdit: 'Chuyển tất cả sang chế độ chỉnh sửa',
           switchToPreview: 'Chuyển tất cả sang chế độ xem trước',
@@ -484,6 +485,7 @@ export default {
     matrixBuilder: {
       panelTitle: 'Bảng ma trận đánh giá',
       description: 'Cấu hình chủ đề và số lượng câu hỏi yêu cầu cho mỗi mức độ khó. ',
+      generateMatrix: 'Tạo ma trận',
       tooltips: {
         addTopic: 'Thêm chủ đề mới',
         addSubtopic: 'Thêm chủ đề con vào nhóm này',
@@ -492,6 +494,62 @@ export default {
         cellInput: 'Số câu hỏi yêu cầu',
         removeCell: 'Xóa ô',
         addCell: 'Thêm ô tiêu chí',
+      },
+    },
+
+    // Hộp thoại tạo ma trận
+    generateMatrixDialog: {
+      title: 'Tạo ma trận đánh giá bằng AI',
+      description: 'Sử dụng AI để tự động tạo ma trận đánh giá dựa trên yêu cầu của bạn.',
+      presets: {
+        label: 'Bắt đầu nhanh',
+        quickQuiz: { label: 'Kiểm tra nhanh', description: '10 câu, độ khó cơ bản, chỉ trắc nghiệm' },
+        standardTest: { label: 'Bài kiểm tra', description: '20 câu, tất cả độ khó, không tự luận' },
+        comprehensiveExam: { label: 'Đề thi tổng hợp', description: '40 câu, tất cả độ khó, tất cả loại' },
+      },
+      fields: {
+        name: 'Tên ma trận',
+        namePlaceholder: 'Nhập tên ma trận',
+        grade: 'Khối lớp',
+        gradePlaceholder: 'Chọn khối lớp',
+        subject: 'Môn học',
+        subjectPlaceholder: 'Chọn môn học',
+        totalQuestions: 'Tổng số câu hỏi',
+        totalPoints: 'Tổng điểm',
+        difficulties: 'Mức độ khó',
+        questionTypes: 'Loại câu hỏi',
+        prompt: 'Yêu cầu',
+        promptPlaceholder: 'Mô tả những gì bạn muốn ma trận tập trung vào...',
+        model: 'Mô hình AI',
+        modelPlaceholder: 'Chọn mô hình AI',
+      },
+      actions: {
+        cancel: 'Hủy',
+        generate: 'Tạo ma trận',
+        generating: 'Đang tạo...',
+      },
+      toast: {
+        success: 'Tạo ma trận thành công',
+        error: 'Không thể tạo ma trận',
+        noQuestionTypes: 'Vui lòng chọn ít nhất một loại câu hỏi',
+        noDifficulties: 'Vui lòng chọn ít nhất một mức độ khó',
+      },
+      validation: {
+        nameRequired: 'Tên ma trận là bắt buộc',
+        gradeRequired: 'Khối lớp là bắt buộc',
+        subjectRequired: 'Môn học là bắt buộc',
+        totalQuestionsRequired: 'Tổng số câu hỏi phải ít nhất là 1',
+        totalPointsRequired: 'Tổng điểm phải ít nhất là 1',
+      },
+      confirmation: {
+        title: 'Tạo ma trận thành công',
+        description: 'Bạn muốn áp dụng ma trận đã tạo như thế nào?',
+        summary: '{{topicCount}} chủ đề, {{totalQuestions}} câu hỏi, {{totalPoints}} điểm',
+        replaceWarning:
+          'Cảnh báo: Chế độ thay thế sẽ xóa {{count}} câu hỏi hiện tại được gán cho các chủ đề.',
+        replace: 'Thay thế',
+        merge: 'Gộp',
+        cancel: 'Hủy',
       },
     },
 
@@ -675,6 +733,13 @@ export default {
         difficultyApplication: 'Vận dụng',
         model: 'Mô hình AI',
         modelPlaceholder: 'Chọn mô hình (tùy chọn)',
+      },
+      tooltips: {
+        prompt: 'Mô tả chủ đề, chương, hoặc nội dung cụ thể bạn muốn tạo câu hỏi',
+        chapter: 'Thu hẹp câu hỏi theo chương cụ thể trong chương trình học',
+        questionTypes: 'Chọn định dạng câu hỏi cần tạo',
+        questionsPerDifficulty: 'Đặt số lượng câu hỏi cho mỗi mức độ khó',
+        model: 'Chọn mô hình AI để tạo câu hỏi',
       },
       questionTypes: {
         MULTIPLE_CHOICE: 'Trắc nghiệm',

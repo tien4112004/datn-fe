@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAssignmentApiService } from '../api';
 import { assignmentKeys } from '../api/assignmentApi';
-import type { CreateAssignmentRequest, UpdateAssignmentRequest } from '../types';
+import type { CreateAssignmentRequest, UpdateAssignmentRequest, GenerateMatrixRequest } from '../types';
 
 /**
  * Hook to fetch list of assignments with optional filters
@@ -102,5 +102,17 @@ export const useDeleteAssignment = () => {
       // Invalidate all assignment lists
       queryClient.invalidateQueries({ queryKey: assignmentKeys.lists() });
     },
+  });
+};
+
+/**
+ * Hook to generate an assessment matrix using AI
+ * @returns Mutation function and state
+ */
+export const useGenerateMatrix = () => {
+  const service = getAssignmentApiService();
+
+  return useMutation({
+    mutationFn: (request: GenerateMatrixRequest) => service.generateMatrix(request),
   });
 };

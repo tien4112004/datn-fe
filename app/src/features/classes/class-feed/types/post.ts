@@ -9,13 +9,20 @@ export interface UserMinimalInfo {
   avatarUrl: string | null;
 }
 
+export const PostType = {
+  Post: 'Post',
+  Exercise: 'Exercise',
+} as const;
+
+export type PostType = (typeof PostType)[keyof typeof PostType];
+
 // Class Feed Post
 export interface Post {
   id: string;
   classId: string;
   authorId: string;
   author?: UserMinimalInfo; // User info from backend
-  type: 'Post' | 'Exercise';
+  type: PostType;
   content: string;
   attachments?: string[]; // Array of URLs from backend
   linkedResources?: LinkedResourceResponse[];

@@ -13,11 +13,7 @@ import {
   Command,
 } from '@/components/ui/command';
 import { useAssignmentList } from '@/features/assignment/hooks';
-
-interface Assignment {
-  id: string;
-  title: string;
-}
+import type { Assignment } from '@/features/assignment';
 
 interface AssignmentListCommandProps {
   classId?: string;

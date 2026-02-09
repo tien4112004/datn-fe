@@ -1,9 +1,10 @@
 import type { LinkedResourceRequest } from '@/features/projects/types/resource';
+import type { PostType } from './post';
 
 // Request types
 export interface PostCreateRequest {
   classId: string;
-  type: 'Post' | 'Exercise';
+  type: PostType;
   content: string;
   attachments?: string[]; // CDN URLs from upload endpoint
   linkedResources?: LinkedResourceRequest[];
@@ -26,7 +27,7 @@ export interface PostCreateRequest {
 export interface PostUpdateRequest {
   id: string;
   content?: string;
-  type?: 'Post' | 'Exercise';
+  type?: PostType;
   attachments?: string[]; // CDN URLs from upload endpoint
   linkedResources?: LinkedResourceRequest[];
   linkedLessonId?: string;
@@ -43,7 +44,7 @@ export interface CommentCreateRequest {
 
 // Feed Filter
 export interface FeedFilter {
-  type: 'all' | 'Post' | 'Exercise';
+  type: 'all' | PostType;
   search?: string;
   startDate?: Date;
   endDate?: Date;

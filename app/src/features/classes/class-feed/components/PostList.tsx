@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { PostCard } from './PostCard';
 import { CommentThread } from './CommentThread';
 import { usePinPost, useDeletePost } from '../hooks/useApi';
-import type { Post } from '../types';
+import { type Post, PostType } from '../types';
 import { useConfirmDialog } from '@/shared/hooks/useConfirmDialog';
 import { DeleteConfirmation } from '@/shared/components/common/DeleteConfirmation';
 import { SpinnerIcon } from '@/shared/components/common/GlobalSpinner';
@@ -15,7 +15,7 @@ interface PostListProps {
   hasMore?: boolean;
   loading?: boolean;
   className?: string;
-  filterType?: 'all' | 'Post' | 'Exercise';
+  filterType?: 'all' | PostType;
 }
 
 export const PostList = ({
@@ -68,9 +68,9 @@ export const PostList = ({
 
   if (posts.length === 0 && !loading) {
     const emptyStateKey =
-      filterType === 'Exercise'
+      filterType === PostType.Exercise
         ? 'feed.list.empty.homework'
-        : filterType === 'Post'
+        : filterType === PostType.Post
           ? 'feed.list.empty.post'
           : 'feed.list.empty.all';
 

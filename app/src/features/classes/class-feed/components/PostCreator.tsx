@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCreatePost } from '../hooks/useApi';
 import { useAttachmentUpload } from '../hooks/useAttachmentUpload';
-import type { PostCreateRequest } from '../types';
+import { type PostCreateRequest, PostType } from '../types';
 import type { LinkedResource } from '@/features/projects/types/resource';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/components/ui/button';
@@ -30,7 +30,6 @@ import {
   Loader2,
   Eye,
   MessageSquare,
-  Calendar,
   CalendarIcon,
 } from 'lucide-react';
 import { Separator } from '@/shared/components/ui/separator';
@@ -42,24 +41,21 @@ import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { cn } from '@/shared/lib/utils';
 import { AssignmentListCommand } from './AssignmentListCommand';
 import { format } from 'date-fns/format';
-
-interface Assignment {
-  id: string;
-  title: string;
-}
+import type { Assignment } from '@/features/assignment';
+import { Calendar } from 'antd';
 
 interface PostCreatorProps {
   classId: string;
   onPostCreated?: () => void;
   className?: string;
-  initialType?: 'Post' | 'Exercise';
+  initialType?: PostType;
 }
 
 export const PostCreator = ({
   classId,
   onPostCreated,
   className = '',
-  initialType = 'Post',
+  initialType = PostType.Post,
 }: PostCreatorProps) => {
   const { t } = useTranslation('classes');
   const createPost = useCreatePost();
@@ -75,7 +71,7 @@ export const PostCreator = ({
     clear: clearAttachments,
   } = useAttachmentUpload();
   const [open, setOpen] = useState(false);
-  const [type, setType] = useState<'Post' | 'Exercise'>(initialType);
+  const [type, setType] = useState<PostType>(initialType);
   const [linkedResources, setLinkedResources] = useState<Array<LinkedResource>>([]);
   const [resourceSelectorOpen, setResourceSelectorOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
@@ -105,7 +101,7 @@ export const PostCreator = ({
     try {
       // Upload pending attachments first
       let attachmentUrls: string[] = [];
-      if (type === 'Post' && (pendingFiles.length > 0 || uploadedUrls.length > 0)) {
+      if (type === PostType.Post && (pendingFiles.length > 0 || uploadedUrls.length > 0)) {
         attachmentUrls = await uploadAll();
       }
 
@@ -117,18 +113,18 @@ export const PostCreator = ({
         content: contentMd,
         attachments: attachmentUrls.length > 0 ? attachmentUrls : undefined,
         linkedResources:
-          type === 'Post' && linkedResources.length > 0
+          type === PostType.Post && linkedResources.length > 0
             ? linkedResources.map((r) => ({
                 type: r.type,
                 id: r.id,
                 permissionLevel: r.permissionLevel || 'view',
               }))
             : undefined,
-        assignmentId: type === 'Exercise' && selectedAssignment ? selectedAssignment.id : undefined,
-        dueDate: type === 'Exercise' && dueDate ? dueDate.toISOString() : undefined,
+        assignmentId: type === PostType.Exercise && selectedAssignment ? selectedAssignment.id : undefined,
+        dueDate: type === PostType.Exercise && dueDate ? dueDate.toISOString() : undefined,
         allowComments,
         // Include assignment settings for Exercise type
-        ...(type === 'Exercise' && {
+        ...(type === PostType.Exercise && {
           maxSubmissions,
           allowRetake,
           shuffleQuestions,
@@ -177,7 +173,7 @@ export const PostCreator = ({
   const canSubmit = editor && editor.document.length > 0 && !createPost.isPending && !isUploading;
 
   const buttonText =
-    initialType === 'Exercise'
+    initialType === PostType.Exercise
       ? t('feed.creator.actions.createHomework')
       : t('feed.creator.actions.createPost');
 
@@ -200,17 +196,17 @@ export const PostCreator = ({
             <Label className="text-sm font-medium">{t('feed.creator.labels.postType')}</Label>
             <RadioGroup
               value={type}
-              onValueChange={(value) => setType(value as 'Post' | 'Exercise')}
+              onValueChange={(value) => setType(value as PostType)}
               className="flex gap-6"
             >
               <div className="flex items-center gap-2">
-                <RadioGroupItem value="Post" id="post" />
+                <RadioGroupItem value={PostType.Post} id="post" />
                 <Label htmlFor="post" className="cursor-pointer font-normal">
                   {t('feed.creator.postType.post')}
                 </Label>
               </div>
               <div className="flex items-center gap-2">
-                <RadioGroupItem value="Exercise" id="exercise" />
+                <RadioGroupItem value={PostType.Exercise} id="exercise" />
                 <Label htmlFor="exercise" className="cursor-pointer font-normal">
                   {t('feed.creator.postType.exercise')}
                 </Label>
@@ -232,7 +228,7 @@ export const PostCreator = ({
           </div>
           <Separator />
           {/* Conditional Fields based on Post Type */}
-          {type === 'Exercise' ? (
+          {type === PostType.Exercise ? (
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label className="text-sm font-medium">{t('feed.creator.labels.selectAssignment')}</Label>

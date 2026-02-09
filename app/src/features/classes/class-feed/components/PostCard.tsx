@@ -7,7 +7,7 @@ import { Clock, FileText, ClipboardList, MessageCircleMore, Pin, ExternalLink } 
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
-import type { Post } from '../types';
+import { type Post, PostType } from '../types';
 import { AttachmentPreview } from './AttachmentPreview';
 import { LinkedResourcesPreview } from './LinkedResourcesPreview';
 import { PostActions } from './PostActions';
@@ -78,14 +78,14 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
                 </p>
 
                 {/* Type Badge */}
-                {post.type === 'Post' && (
+                {post.type === PostType.Post && (
                   <Badge variant="secondary" className="gap-1 text-[10px] md:text-xs">
                     <FileText className="h-3 w-3" />
                     {t('feed.post.badges.post')}
                   </Badge>
                 )}
 
-                {post.type === 'Exercise' && (
+                {post.type === PostType.Exercise && (
                   <Badge
                     variant="default"
                     className="gap-1 bg-purple-600 text-[10px] hover:bg-purple-700 md:text-xs"
@@ -95,7 +95,7 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
                   </Badge>
                 )}
 
-                {post.type === 'Exercise' && post.dueDate && (
+                {post.type === PostType.Exercise && post.dueDate && (
                   <Badge variant="outline" className="gap-1 text-[10px] md:text-xs">
                     <Clock className="h-3 w-3" />
                     {t('feed.post.badges.dueDate')}:{' '}
@@ -149,7 +149,7 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
       )}
 
       {/* Linked Assignment (for Exercise posts) */}
-      {post.type === 'Exercise' && post.assignmentId && (
+      {post.type === PostType.Exercise && post.assignmentId && (
         <div className="mb-2 ml-9 w-fit md:mb-3 md:ml-[52px]">
           <div className="rounded-lg border border-purple-200 bg-purple-50/50 p-3 transition-colors hover:bg-purple-50 dark:border-purple-900 dark:bg-purple-950/30 dark:hover:bg-purple-950/50">
             {isAssignmentLoading ? (

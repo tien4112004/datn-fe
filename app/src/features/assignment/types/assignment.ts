@@ -76,11 +76,10 @@ export interface Assignment {
   grade?: Grade;
   topics?: AssignmentTopic[];
   contexts?: AssignmentContext[];
-  questions: (AssignmentQuestion | AssignmentQuestionWithTopic)[];
+  questions?: (AssignmentQuestion | AssignmentQuestionWithTopic)[];
   matrix?: ApiMatrix;
   totalPoints?: number;
   shuffleQuestions?: boolean;
-  status: 'draft' | 'published' | 'archived';
   createdAt?: string;
   updatedAt?: string;
   maxSubmissions?: number;

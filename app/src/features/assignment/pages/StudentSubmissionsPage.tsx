@@ -62,9 +62,8 @@ export const StudentSubmissionsPage = () => {
     (a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
   );
 
-  // Mock config (backend doesn't provide these)
-  const maxSubmissions = undefined; // Backend doesn't track this yet
-  const allowRetake = true;
+  const maxSubmissions = assignment.maxSubmissions;
+  const allowRetake = assignment.allowRetake !== false; // Default to true if not set
   const totalPoints = assignment.totalPoints || 100;
 
   const latestSubmission = sortedSubmissions[0];

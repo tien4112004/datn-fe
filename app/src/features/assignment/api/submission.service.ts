@@ -1,5 +1,5 @@
 import type { ApiClient, ApiResponse } from '@aiprimary/api';
-import type { Submission, Answer } from '@aiprimary/core';
+import type { Submission, Answer, Grade } from '@aiprimary/core';
 
 export interface SubmissionCreateRequest {
   postId: string;
@@ -20,14 +20,65 @@ export interface SubmissionApiService {
   deleteSubmission(submissionId: string): Promise<void>;
 }
 
+/** Backend AnswerData DTO shape (each question entry in submission.questions) */
+interface AnswerDataDto {
+  id: string;
+  answer?: {
+    type?: string;
+    id?: string;
+    blankAnswers?: Record<string, string>;
+    matchedPairs?: Record<string, string>;
+    response?: string;
+    responseUrl?: string | null;
+  };
+  point?: number;
+  feedback?: string;
+  isAutoGraded?: boolean;
+}
+
+/** Backend AnswerData DTO for outgoing requests */
+interface AnswerDataRequestDto {
+  id: string;
+  answer: {
+    type: string;
+    id?: string;
+    blankAnswers?: Record<string, string>;
+    matchedPairs?: Record<string, string>;
+    response?: string;
+    responseUrl?: string | null;
+  };
+}
+
+/** Backend submission response shape */
+interface SubmissionDto {
+  id: string;
+  assignmentId: string;
+  studentId: string;
+  student?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  postId: string;
+  questions?: AnswerDataDto[];
+  submittedAt: string;
+  score?: number;
+  maxScore?: number;
+  status: 'in_progress' | 'submitted' | 'graded';
+  feedback?: string;
+  gradedAt?: string;
+  gradedBy?: string;
+}
+
 /**
  * Transform backend AnswerDataDto format to frontend Answer format
- * Backend: { id, type, answer: { type, id/blankAnswers/matchedPairs/response } }
+ * Backend: { id, answer: { type, id/blankAnswers/matchedPairs/response }, point, feedback }
  * Frontend: { questionId, type, selectedOptionId/blanks/matches/text }
  */
-function transformDtoToAnswer(dto: any): Answer {
+function transformDtoToAnswer(dto: AnswerDataDto): Answer {
   const questionId = dto.id;
-  const type = dto.type;
+  const type = dto.answer?.type;
   const answerData = dto.answer;
 
   if (!answerData) {
@@ -39,7 +90,7 @@ function transformDtoToAnswer(dto: any): Answer {
       return {
         questionId,
         type: 'MULTIPLE_CHOICE',
-        selectedOptionId: answerData.id,
+        selectedOptionId: answerData.id || '',
       };
 
     case 'FILL_IN_BLANK':
@@ -48,7 +99,7 @@ function transformDtoToAnswer(dto: any): Answer {
         type: 'FILL_IN_BLANK',
         blanks: Object.entries(answerData.blankAnswers || {}).map(([segmentId, value]) => ({
           segmentId,
-          value: value as string,
+          value,
         })),
       };
 
@@ -58,7 +109,7 @@ function transformDtoToAnswer(dto: any): Answer {
         type: 'MATCHING',
         matches: Object.entries(answerData.matchedPairs || {}).map(([leftId, rightId]) => ({
           leftId,
-          rightId: rightId as string,
+          rightId,
         })),
       };
 
@@ -77,17 +128,16 @@ function transformDtoToAnswer(dto: any): Answer {
 /**
  * Transform frontend Answer format to backend AnswerDataDto format
  * Frontend: { questionId, type, selectedOptionId/blanks/matches/text }
- * Backend: { id, type, answer: { type, id/blankAnswers/matchedPairs/response } }
- * Note: The type field is included in both parent and nested answer for Jackson polymorphic deserialization
+ * Backend: { id, answer: { type, id/blankAnswers/matchedPairs/response } }
+ * Note: The type field is included in the nested answer for Jackson polymorphic deserialization
  */
-function transformAnswerToDto(answer: Answer): any {
+function transformAnswerToDto(answer: Answer): AnswerDataRequestDto {
   switch (answer.type) {
     case 'MULTIPLE_CHOICE':
       return {
         id: answer.questionId,
-        type: answer.type,
         answer: {
-          type: answer.type, // Required for Jackson @JsonTypeInfo
+          type: answer.type,
           id: answer.selectedOptionId,
         },
       };
@@ -95,9 +145,8 @@ function transformAnswerToDto(answer: Answer): any {
     case 'FILL_IN_BLANK':
       return {
         id: answer.questionId,
-        type: answer.type,
         answer: {
-          type: answer.type, // Required for Jackson @JsonTypeInfo
+          type: answer.type,
           blankAnswers: answer.blanks.reduce(
             (acc, blank) => {
               acc[blank.segmentId] = blank.value;
@@ -111,9 +160,8 @@ function transformAnswerToDto(answer: Answer): any {
     case 'MATCHING':
       return {
         id: answer.questionId,
-        type: answer.type,
         answer: {
-          type: answer.type, // Required for Jackson @JsonTypeInfo
+          type: answer.type,
           matchedPairs: answer.matches.reduce(
             (acc, match) => {
               acc[match.leftId] = match.rightId;
@@ -127,16 +175,17 @@ function transformAnswerToDto(answer: Answer): any {
     case 'OPEN_ENDED':
       return {
         id: answer.questionId,
-        type: answer.type,
         answer: {
-          type: answer.type, // Required for Jackson @JsonTypeInfo
+          type: answer.type,
           response: answer.text,
           responseUrl: null,
         },
       };
 
-    default:
-      throw new Error(`Unknown answer type: ${(answer as any).type}`);
+    default: {
+      const _exhaustive: never = answer;
+      throw new Error(`Unknown answer type: ${(_exhaustive as Answer).type}`);
+    }
   }
 }
 
@@ -150,10 +199,10 @@ export default class SubmissionService implements SubmissionApiService {
   }
 
   async createSubmission(request: SubmissionCreateRequest): Promise<Submission> {
-    const response = await this.apiClient.post<ApiResponse<any>>(
+    const response = await this.apiClient.post<ApiResponse<SubmissionDto>>(
       `${this.baseUrl}/api/posts/${request.postId}/submissions`,
       {
-        questions: request.answers.map(transformAnswerToDto), // Transform answers to backend format
+        questions: request.answers.map(transformAnswerToDto),
       }
     );
 
@@ -162,7 +211,7 @@ export default class SubmissionService implements SubmissionApiService {
   }
 
   async getSubmissionsByPost(postId: string): Promise<Submission[]> {
-    const response = await this.apiClient.get<ApiResponse<any[]>>(
+    const response = await this.apiClient.get<ApiResponse<SubmissionDto[]>>(
       `${this.baseUrl}/api/posts/${postId}/submissions`
     );
 
@@ -170,7 +219,7 @@ export default class SubmissionService implements SubmissionApiService {
   }
 
   async getSubmissionById(submissionId: string): Promise<Submission> {
-    const response = await this.apiClient.get<ApiResponse<any>>(
+    const response = await this.apiClient.get<ApiResponse<SubmissionDto>>(
       `${this.baseUrl}/api/submissions/${submissionId}`
     );
 
@@ -178,7 +227,7 @@ export default class SubmissionService implements SubmissionApiService {
   }
 
   async gradeSubmission(submissionId: string, request: SubmissionGradeRequest): Promise<Submission> {
-    const response = await this.apiClient.put<ApiResponse<any>>(
+    const response = await this.apiClient.put<ApiResponse<SubmissionDto>>(
       `${this.baseUrl}/api/submissions/${submissionId}/grade`,
       request
     );
@@ -186,18 +235,28 @@ export default class SubmissionService implements SubmissionApiService {
     return this.transformSubmission(response.data.data);
   }
 
-  private transformSubmission(data: any): Submission {
+  private transformSubmission(data: SubmissionDto): Submission {
+    // Derive grades from per-answer point/feedback fields (backend stores grades at answer level)
+    const questions = data.questions || [];
+    const grades: Grade[] = questions
+      .filter((q) => q.point !== undefined && q.point !== null)
+      .map((q) => ({
+        questionId: q.id,
+        points: q.point!,
+        feedback: q.feedback,
+      }));
+
     return {
       id: data.id,
       assignmentId: data.assignmentId,
       studentId: data.studentId,
       student: data.student,
-      answers: (data.questions || []).map(transformDtoToAnswer), // Transform backend 'questions' to frontend 'answers'
+      answers: questions.map(transformDtoToAnswer),
       submittedAt: data.submittedAt,
       score: data.score,
       maxScore: data.maxScore,
       status: data.status,
-      grades: data.grades,
+      grades: grades.length > 0 ? grades : undefined,
       feedback: data.feedback,
       gradedAt: data.gradedAt,
       gradedBy: data.gradedBy,

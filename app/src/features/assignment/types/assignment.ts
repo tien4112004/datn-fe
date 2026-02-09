@@ -83,6 +83,13 @@ export interface Assignment {
   status: 'draft' | 'published' | 'archived';
   createdAt?: string;
   updatedAt?: string;
+  maxSubmissions?: number;
+  allowRetake?: boolean;
+  showCorrectAnswers?: boolean;
+  showScoreImmediately?: boolean;
+  passingScore?: number;
+  availableFrom?: string;
+  availableUntil?: string;
 }
 
 // Question item for API request (flat structure matching backend)

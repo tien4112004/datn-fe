@@ -161,6 +161,54 @@ export function mergeApiMatrixIntoCells(apiMatrix: ApiMatrix, fullCells: MatrixC
   return fullCells.filter((cell) => cell.requiredCount > 0);
 }
 
+/**
+ * Convert ApiMatrix to flat MatrixCell array + AssignmentTopic array for viewer.
+ * Handles the 3D matrix → flat cells conversion and extracts topic hierarchy.
+ */
+export function apiMatrixToViewData(apiMatrix: ApiMatrix): {
+  topics: AssignmentTopic[];
+  cells: MatrixCell[];
+} {
+  const { dimensions, matrix } = apiMatrix;
+
+  // Build topics with parentTopic grouping from dimension hierarchy
+  const topics: AssignmentTopic[] = dimensions.topics.flatMap((topic) =>
+    (topic.subtopics ?? []).map((sub) => ({
+      id: sub.id || createTopicId(),
+      name: sub.name,
+      parentTopic: topic.name,
+    }))
+  );
+
+  // Flatten subtopics in order matching matrix row indices
+  const flatSubtopics = dimensions.topics.flatMap((t) => t.subtopics ?? []);
+
+  const cells: MatrixCell[] = [];
+  flatSubtopics.forEach((sub, subIdx) => {
+    dimensions.difficulties.forEach((difficultyRaw, diffIdx) => {
+      dimensions.questionTypes.forEach((questionTypeRaw, qtIdx) => {
+        const cellValue = matrix[subIdx]?.[diffIdx]?.[qtIdx] || '0:0';
+        const { count } = parseCellValue(cellValue);
+
+        const difficulty = difficultyFromApi(difficultyRaw);
+        const questionType = questionTypeFromApi(questionTypeRaw);
+
+        cells.push({
+          id: createCellId(sub.id || '', difficulty, questionType),
+          topicId: sub.id || '',
+          topicName: sub.name,
+          difficulty,
+          questionType,
+          requiredCount: count,
+          currentCount: 0,
+        });
+      });
+    });
+  });
+
+  return { topics, cells };
+}
+
 // ============================================================================
 // Frontend Matrix Conversion Functions
 // ============================================================================

@@ -1,6 +1,8 @@
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Grid3x3 } from 'lucide-react';
 import type { Assignment } from '../../types';
+import { apiMatrixToViewData } from '../../utils/matrixConversion';
 import { MatrixGridView } from './MatrixGridView';
 
 interface MatrixViewPanelProps {
@@ -10,8 +12,10 @@ interface MatrixViewPanelProps {
 export const MatrixViewPanel = ({ assignment }: MatrixViewPanelProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'viewer.matrix' });
 
-  const topics = assignment.topics || [];
-  const matrixCells = (assignment.matrix as any)?.cells || [];
+  const { topics, cells } = useMemo(() => {
+    if (!assignment.matrix) return { topics: [], cells: [] };
+    return apiMatrixToViewData(assignment.matrix);
+  }, [assignment.matrix]);
 
   return (
     <div className="space-y-6">
@@ -25,7 +29,7 @@ export const MatrixViewPanel = ({ assignment }: MatrixViewPanelProps) => {
       <p className="text-sm text-gray-600 dark:text-gray-400">{t('viewDescription')}</p>
 
       {/* Matrix Grid */}
-      <MatrixGridView topics={topics} matrixCells={matrixCells} />
+      <MatrixGridView topics={topics} matrixCells={cells} />
     </div>
   );
 };

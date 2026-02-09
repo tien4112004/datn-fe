@@ -8,7 +8,7 @@ import path from 'path';
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  process.env = { ...process.env, ...env };
+  process.env = { ...env, ...process.env };
 
   // Configure URLs with production fallbacks
   const apiUrl = process.env.VITE_API_URL;

@@ -69,6 +69,7 @@ export default {
       difficultyLabel: 'Độ khó',
       pointsLabel: 'Điểm *',
       selectTopicPlaceholder: 'Chọn chủ đề',
+      noTopic: 'Không',
       pointsShort: '{{points}} điểm',
     },
   },

@@ -295,10 +295,10 @@ export const CurrentQuestionView = () => {
                 {t('collection.item.topicLabel')}
               </Label>
               <Select
-                value={question.topicId}
+                value={question.topicId || '__none__'}
                 onValueChange={(value) =>
                   updateQuestion(currentQuestionIndex, {
-                    question: { ...question, topicId: value },
+                    question: { ...question, topicId: value === '__none__' ? '' : value },
                   })
                 }
               >
@@ -306,6 +306,9 @@ export const CurrentQuestionView = () => {
                   <SelectValue placeholder={t('collection.item.selectTopicPlaceholder') as string} />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="__none__" className="text-gray-400">
+                    {t('collection.item.noTopic')}
+                  </SelectItem>
                   {topics.map((topic) => (
                     <SelectItem key={topic.id} value={topic.id}>
                       {topic.name}

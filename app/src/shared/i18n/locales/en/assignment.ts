@@ -69,6 +69,7 @@ export default {
       difficultyLabel: 'Difficulty',
       pointsLabel: 'Points *',
       selectTopicPlaceholder: 'Select topic',
+      noTopic: 'None',
       pointsShort: '{{points}} pts',
     },
   },

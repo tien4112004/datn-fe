@@ -15,6 +15,7 @@ export interface SubmissionGradeRequest {
 export interface SubmissionApiService {
   createSubmission(request: SubmissionCreateRequest): Promise<Submission>;
   getSubmissionsByPost(postId: string): Promise<Submission[]>;
+  getSubmissionsByAssignment(assignmentId: string, studentId?: string): Promise<Submission[]>;
   getSubmissionById(submissionId: string): Promise<Submission>;
   gradeSubmission(submissionId: string, request: SubmissionGradeRequest): Promise<Submission>;
   deleteSubmission(submissionId: string): Promise<void>;
@@ -213,6 +214,15 @@ export default class SubmissionService implements SubmissionApiService {
   async getSubmissionsByPost(postId: string): Promise<Submission[]> {
     const response = await this.apiClient.get<ApiResponse<SubmissionDto[]>>(
       `${this.baseUrl}/api/posts/${postId}/submissions`
+    );
+
+    return response.data.data.map((s) => this.transformSubmission(s));
+  }
+
+  async getSubmissionsByAssignment(assignmentId: string, studentId?: string): Promise<Submission[]> {
+    const params = studentId ? `?studentId=${studentId}` : '';
+    const response = await this.apiClient.get<ApiResponse<SubmissionDto[]>>(
+      `${this.baseUrl}/api/assignments/${assignmentId}/submissions${params}`
     );
 
     return response.data.data.map((s) => this.transformSubmission(s));

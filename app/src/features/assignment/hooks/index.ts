@@ -10,6 +10,7 @@ export {
 } from './useAssignmentApi';
 export {
   useSubmissionsByPost,
+  useSubmissionsByAssignment,
   useSubmission,
   useCreateSubmission,
   useGradeSubmission,

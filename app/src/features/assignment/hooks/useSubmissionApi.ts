@@ -19,6 +19,20 @@ export const useSubmissionsByPost = (postId: string | undefined) => {
 };
 
 /**
+ * Hook to fetch submissions for a specific assignment, optionally filtered by student
+ */
+export const useSubmissionsByAssignment = (assignmentId: string | undefined, studentId?: string) => {
+  const service = useSubmissionApiService();
+
+  return useQuery({
+    queryKey: [...submissionKeys.all, 'assignment', assignmentId, studentId] as const,
+    queryFn: () => service.getSubmissionsByAssignment(assignmentId!, studentId),
+    enabled: !!assignmentId,
+    staleTime: 30000, // 30 seconds
+  });
+};
+
+/**
  * Hook to fetch a single submission by ID
  */
 export const useSubmission = (submissionId: string | undefined) => {

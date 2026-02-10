@@ -16,12 +16,14 @@ import {
 import type { Submission } from '@aiprimary/core';
 import { formatDistanceToNow } from 'date-fns';
 import { useAssignmentPublic } from '../hooks/useAssignmentApi';
-import { useSubmissionsByPost } from '../hooks';
+import { useSubmissionsByAssignment } from '../hooks';
+import { useAuth } from '@/shared/context/auth';
 
 export const StudentSubmissionsPage = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   useTranslation('assignment');
 
   // Get postId from query params (for homework flow)
@@ -30,9 +32,10 @@ export const StudentSubmissionsPage = () => {
   // Fetch assignment data using public endpoint (bypasses permission check for students)
   const { data: assignment, isLoading: isLoadingAssignment } = useAssignmentPublic(id);
 
-  // Fetch submissions (only if postId is available)
-  const { data: submissions = [], isLoading: isLoadingSubmissions } = useSubmissionsByPost(
-    postId || undefined
+  // Fetch submissions filtered by current student's ID
+  const { data: submissions = [], isLoading: isLoadingSubmissions } = useSubmissionsByAssignment(
+    id, // assignmentId
+    user?.id // studentId - filter by current user
   );
 
   // Loading state

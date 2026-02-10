@@ -97,7 +97,7 @@ export const QuestionNavigator = () => {
   const hasQuestionError = (questionId: string): boolean =>
     (validationErrors?.questions[questionId]?.errors.length ?? 0) > 0;
   const hasAssignmentError = !!(validationErrors?.assignment?.title || validationErrors?.assignment?.subject);
-  const hasMatrixError = (validationErrors?.matrix?.errors.length ?? 0) > 0;
+  const hasMatrixWarning = (validationErrors?.matrix?.errors.length ?? 0) > 0;
 
   // Build contexts map from assignment's cloned contexts (not from API)
   const contextsMap = useMemo(() => {
@@ -189,9 +189,9 @@ export const QuestionNavigator = () => {
                   mainView === 'matrix'
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
-                  hasMatrixError &&
+                  hasMatrixWarning &&
                     mainView !== 'matrix' &&
-                    'bg-destructive/15 text-destructive hover:bg-destructive/25'
+                    'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:hover:bg-yellow-900/50'
                 )}
               >
                 <Grid3x3 className="h-3 w-3" />

@@ -71,10 +71,9 @@ export function useSaveAssignment({ id, onSaveSuccess, onSaveError }: UseSaveAss
 
     const hasAssignmentErrors = Object.keys(assignmentErrors).length > 0;
     const hasQuestionErrors = Object.values(questionErrors).some((q) => q.errors.length > 0);
-    const hasMatrixErrors = (matrixErrors?.errors.length ?? 0) > 0;
 
-    if (hasAssignmentErrors || hasQuestionErrors || hasMatrixErrors) {
-      // Store errors for UI display
+    if (hasAssignmentErrors || hasQuestionErrors) {
+      // Store errors for UI display (include matrix warnings for indicator)
       data.setValidationErrors({
         assignment: assignmentErrors,
         questions: questionErrors,
@@ -84,7 +83,7 @@ export function useSaveAssignment({ id, onSaveSuccess, onSaveError }: UseSaveAss
       // Auto-navigate to first error
       if (hasAssignmentErrors) {
         useAssignmentEditorStore.getState().setMainView('info');
-      } else if (hasQuestionErrors) {
+      } else {
         const firstErrorQuestionId = data.questions.find(
           (aq) => questionErrors[aq.question.id]?.errors.length > 0
         )?.question.id;
@@ -92,8 +91,6 @@ export function useSaveAssignment({ id, onSaveSuccess, onSaveError }: UseSaveAss
           useAssignmentEditorStore.getState().setMainView('questions');
           useAssignmentEditorStore.getState().setCurrentQuestionId(firstErrorQuestionId);
         }
-      } else if (hasMatrixErrors) {
-        useAssignmentEditorStore.getState().setMainView('matrix');
       }
 
       // Show summary toast
@@ -102,12 +99,20 @@ export function useSaveAssignment({ id, onSaveSuccess, onSaveError }: UseSaveAss
         toast.error(t('validation.multipleErrors', { count: errorQuestionCount }));
       } else if (hasAssignmentErrors) {
         toast.error(t('validation.assignmentFieldsRequired'));
-      } else if (hasQuestionErrors) {
+      } else {
         toast.error(t('validation.questionsHaveErrors', { count: errorQuestionCount }));
-      } else if (hasMatrixErrors) {
-        toast.error(matrixErrors!.errors[0]);
       }
       return;
+    }
+
+    // Matrix errors are non-blocking warnings — store them but proceed with save
+    if (matrixErrors) {
+      data.setValidationErrors({
+        assignment: assignmentErrors,
+        questions: questionErrors,
+        matrix: matrixErrors,
+      });
+      toast.warning(matrixErrors.errors[0]);
     }
 
     // Clear validation errors on successful validation

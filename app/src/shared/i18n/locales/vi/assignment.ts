@@ -303,6 +303,10 @@ export default {
       subjectRequired: 'Môn học là bắt buộc',
       topicNameRequired: 'Tên chủ đề là bắt buộc',
       invalidQuestions: 'Một số câu hỏi thiếu thông tin bắt buộc',
+      questionsHaveErrors: '{{count}} câu hỏi có lỗi cần sửa',
+      assignmentFieldsRequired: 'Vui lòng điền các trường bắt buộc của bài tập',
+      multipleErrors: 'Vui lòng sửa {{count}} câu hỏi có lỗi và điền các trường bắt buộc',
+      matrixNotFulfilled: '{{count}} ô ma trận chưa đủ số lượng câu hỏi',
     },
 
     // Thông báo toast

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams, useLocation } from 'react-router-dom';
 import PresentationTable from '@/features/presentation/components/table/PresentationTable';
@@ -11,14 +12,31 @@ import Image from '@/features/image';
 import AssignmentTable from '@/features/assignment/components/table/AssignmentTable';
 import AssignmentGrid from '@/features/assignment/components/table/AssignmentGrid';
 import { SharedResourcesTable, SharedResourcesGrid } from '@/features/shared-resources';
+import { useGlobalStore } from '@/store/useGlobalStore';
 
 const ProjectListPage = () => {
   const { t } = useTranslation('projects');
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
+  const { lastResourceTab, setLastResourceTab } = useGlobalStore();
 
   const viewMode = searchParams.get('view') || 'list';
-  const resourceType = searchParams.get('resource') || 'presentation';
+  const hasResourceParam = searchParams.has('resource');
+  const resourceType = searchParams.get('resource') || lastResourceTab || 'presentation';
+
+  // On mount, if no resource param in URL, apply the stored tab
+  useEffect(() => {
+    if (!hasResourceParam && lastResourceTab) {
+      setSearchParams(
+        (prev) => {
+          const newParams = new URLSearchParams(prev);
+          newParams.set('resource', lastResourceTab);
+          return newParams;
+        },
+        { replace: true }
+      );
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Extract new image from location state for auto-preview
   const locationState = location.state as { newImage?: any; openPreview?: boolean } | null;
@@ -26,6 +44,7 @@ const ProjectListPage = () => {
     locationState?.newImage && locationState?.openPreview ? locationState.newImage : undefined;
 
   const handleResourceChange = (value: string) => {
+    setLastResourceTab(value);
     setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
       newParams.set('resource', value);

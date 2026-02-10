@@ -113,16 +113,26 @@ export default {
 
   validation: {
     titleRequired: 'Tiêu đề là bắt buộc',
+    missingData: 'Thiếu dữ liệu câu hỏi',
     optionTextRequired: 'Văn bản tùy chọn là bắt buộc',
     minOptions: 'Cần ít nhất 2 tùy chọn',
     maxOptions: 'Tối đa 6 tùy chọn',
     exactlyOneCorrect: 'Phải có đúng một tùy chọn được đánh dấu là đúng',
+    emptyOptions: '{{count}} tùy chọn chưa có nội dung',
+    placeholderOptions: '{{count}} tùy chọn có vẻ đang dùng nội dung mẫu (ví dụ: "Option 1")',
     leftItemRequired: 'Mục bên trái là bắt buộc',
     rightItemRequired: 'Mục bên phải là bắt buộc',
     minPairs: 'Cần ít nhất 2 cặp',
     maxPairs: 'Tối đa 8 cặp',
+    emptyLeftItems: '{{count}} cặp chưa có giá trị bên trái',
+    emptyRightItems: '{{count}} cặp chưa có giá trị bên phải',
+    placeholderPairs: '{{count}} cặp có vẻ đang dùng nội dung mẫu (ví dụ: "Left 1")',
     maxLengthExceeded: 'Vượt quá độ dài tối đa',
-    minSegments: 'Cần ít nhất một phân đoạn',
+    minSegments: 'Cần ít nhất một chỗ trống',
+    emptyBlanks: '{{count}} chỗ trống chưa có đáp án',
+    placeholderSegments: 'Một số phân đoạn có vẻ đang dùng nội dung mẫu (ví dụ: "Fill in the blank")',
+    missingExpectedAnswer: 'Nên thêm đáp án mẫu để tham khảo khi chấm điểm',
+    shortMaxLength: 'Độ dài tối đa có vẻ quá ngắn (dưới 10 ký tự)',
   },
 
   // Multiple Choice

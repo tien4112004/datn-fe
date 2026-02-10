@@ -303,6 +303,10 @@ export default {
       subjectRequired: 'Subject is required',
       topicNameRequired: 'Topic name is required',
       invalidQuestions: 'Some questions are missing required fields',
+      questionsHaveErrors: '{{count}} question(s) have validation errors',
+      assignmentFieldsRequired: 'Please fill in the required assignment fields',
+      multipleErrors: 'Please fix {{count}} question(s) with errors and fill in required fields',
+      matrixNotFulfilled: '{{count}} matrix cell(s) do not have enough questions',
     },
 
     // Toast notifications

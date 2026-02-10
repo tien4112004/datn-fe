@@ -11,9 +11,10 @@ import { useTranslation } from 'react-i18next';
 interface MatchingEditingProps {
   question: MatchingQuestion;
   onChange: (updated: MatchingQuestion) => void;
+  validationErrors?: { errors: string[]; warnings: string[] };
 }
 
-export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) => {
+export const MatchingEditing = ({ question, onChange, validationErrors }: MatchingEditingProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'editing.matching' });
   const { t: tEditing } = useTranslation('assignment', { keyPrefix: 'editing' });
 
@@ -47,6 +48,12 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
     });
   };
 
+  // Validation field flags
+  const hasErrors = (validationErrors?.errors.length ?? 0) > 0;
+  const titleInvalid = hasErrors && !question.title?.trim();
+  const isLeftEmpty = (pair: MatchingPair) => hasErrors && !pair.left?.trim();
+  const isRightEmpty = (pair: MatchingPair) => hasErrors && !pair.right?.trim();
+
   return (
     <div className="space-y-2 p-2">
       <div className="flex items-center justify-between">
@@ -63,6 +70,7 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
             onChange={(title) => updateQuestion({ title })}
             placeholder={t('placeholders.question')}
             className="pr-9"
+            invalid={titleInvalid}
           />
           {question.titleImageUrl != null ? (
             <Button
@@ -144,6 +152,7 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
                       placeholder={t('placeholders.leftItem')}
                       minHeight={50}
                       className="pr-8"
+                      invalid={isLeftEmpty(pair)}
                     />
                     {pair.leftImageUrl == null ? (
                       <Button
@@ -188,6 +197,7 @@ export const MatchingEditing = ({ question, onChange }: MatchingEditingProps) =>
                       placeholder={t('placeholders.rightItem')}
                       minHeight={50}
                       className="pr-8"
+                      invalid={isRightEmpty(pair)}
                     />
                     {pair.rightImageUrl == null ? (
                       <Button

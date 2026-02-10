@@ -128,6 +128,19 @@ export interface ApiMatrix {
   totalPoints: number;
 }
 
+// Validation errors for the assignment editor form
+export interface AssignmentValidationErrors {
+  /** Assignment-level field errors */
+  assignment: {
+    title?: string;
+    subject?: string;
+  };
+  /** Per-question validation results, keyed by question ID */
+  questions: Record<string, { errors: string[]; warnings: string[] }>;
+  /** Matrix validation errors */
+  matrix?: { errors: string[] };
+}
+
 // API request types
 export interface CreateAssignmentRequest {
   title: string;

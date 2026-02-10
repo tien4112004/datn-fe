@@ -9,14 +9,19 @@ import { useTranslation } from 'react-i18next';
 interface OpenEndedEditingProps {
   question: OpenEndedQuestion;
   onChange: (updated: OpenEndedQuestion) => void;
+  validationErrors?: { errors: string[]; warnings: string[] };
 }
 
-export const OpenEndedEditing = ({ question, onChange }: OpenEndedEditingProps) => {
+export const OpenEndedEditing = ({ question, onChange, validationErrors }: OpenEndedEditingProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'editing.openEnded' });
 
   const updateQuestion = (updates: Partial<OpenEndedQuestion>) => {
     onChange({ ...question, ...updates });
   };
+
+  // Validation field flags
+  const hasErrors = (validationErrors?.errors.length ?? 0) > 0;
+  const titleInvalid = hasErrors && !question.title?.trim();
 
   return (
     <div className="space-y-2 p-2">
@@ -33,6 +38,7 @@ export const OpenEndedEditing = ({ question, onChange }: OpenEndedEditingProps) 
             onChange={(title) => updateQuestion({ title })}
             placeholder={t('placeholders.question')}
             className="pr-9"
+            invalid={titleInvalid}
           />
           {question.titleImageUrl != null ? (
             <Button

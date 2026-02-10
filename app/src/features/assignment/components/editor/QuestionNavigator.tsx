@@ -85,12 +85,19 @@ export const QuestionNavigator = () => {
   const contexts = useAssignmentFormStore((state) => state.contexts);
   const reorderQuestions = useAssignmentFormStore((state) => state.reorderQuestions);
 
+  const validationErrors = useAssignmentFormStore((state) => state.validationErrors);
+
   const mainView = useAssignmentEditorStore((state) => state.mainView);
   const setMainView = useAssignmentEditorStore((state) => state.setMainView);
   const currentQuestionId = useAssignmentEditorStore((state) => state.currentQuestionId);
   const currentContextId = useAssignmentEditorStore((state) => state.currentContextId);
   const setCurrentQuestionId = useAssignmentEditorStore((state) => state.setCurrentQuestionId);
   const setCurrentContextId = useAssignmentEditorStore((state) => state.setCurrentContextId);
+
+  const hasQuestionError = (questionId: string): boolean =>
+    (validationErrors?.questions[questionId]?.errors.length ?? 0) > 0;
+  const hasAssignmentError = !!(validationErrors?.assignment?.title || validationErrors?.assignment?.subject);
+  const hasMatrixError = (validationErrors?.matrix?.errors.length ?? 0) > 0;
 
   // Build contexts map from assignment's cloned contexts (not from API)
   const contextsMap = useMemo(() => {
@@ -157,7 +164,10 @@ export const QuestionNavigator = () => {
                   'flex h-8 w-full items-center justify-center rounded text-xs transition-colors',
                   mainView === 'info'
                     ? 'bg-primary text-primary-foreground'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
+                  hasAssignmentError &&
+                    mainView !== 'info' &&
+                    'bg-destructive/15 text-destructive hover:bg-destructive/25'
                 )}
               >
                 <FileText className="h-3 w-3" />
@@ -178,7 +188,10 @@ export const QuestionNavigator = () => {
                   'flex h-8 w-full items-center justify-center rounded text-xs transition-colors',
                   mainView === 'matrix'
                     ? 'bg-primary text-primary-foreground'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
+                  hasMatrixError &&
+                    mainView !== 'matrix' &&
+                    'bg-destructive/15 text-destructive hover:bg-destructive/25'
                 )}
               >
                 <Grid3x3 className="h-3 w-3" />
@@ -281,11 +294,13 @@ export const QuestionNavigator = () => {
                           id={question.id}
                           isActive={isQuestionActive}
                           onClick={() => handleQuestionClick(question.id)}
-                          className={
+                          className={cn(
                             hasTitle
                               ? 'bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900'
-                              : 'bg-blue-50/50 text-blue-600 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-400 dark:hover:bg-blue-900'
-                          }
+                              : 'bg-blue-50/50 text-blue-600 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-400 dark:hover:bg-blue-900',
+                            hasQuestionError(question.id) &&
+                              'bg-destructive/15 text-destructive hover:bg-destructive/25'
+                          )}
                           tooltip={question.title || t('untitled')}
                         >
                           {questionNumber}
@@ -309,11 +324,13 @@ export const QuestionNavigator = () => {
                     id={question.id}
                     isActive={isActive}
                     onClick={() => handleQuestionClick(question.id)}
-                    className={
+                    className={cn(
                       hasTitle
                         ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
-                    }
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
+                      hasQuestionError(question.id) &&
+                        'bg-destructive/15 text-destructive hover:bg-destructive/25'
+                    )}
                     tooltip={question.title || t('untitled')}
                   >
                     {questionNumber}

@@ -1,6 +1,12 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { AssignmentTopic, AssignmentQuestionWithTopic, MatrixCell, AssignmentContext } from '../types';
+import type {
+  AssignmentTopic,
+  AssignmentQuestionWithTopic,
+  MatrixCell,
+  AssignmentContext,
+  AssignmentValidationErrors,
+} from '../types';
 import { generateId, createCellId } from '@aiprimary/core';
 
 /**
@@ -53,7 +59,7 @@ interface AssignmentFormStore {
 
   // === FORM STATE ===
   isDirty: boolean;
-  errors: Record<string, string>;
+  validationErrors: AssignmentValidationErrors | null;
 
   // === ACTIONS: Metadata ===
   setTitle: (title: string) => void;
@@ -87,6 +93,12 @@ interface AssignmentFormStore {
   getTotalPoints: () => number;
   getMatrixCellsWithValidation: () => MatrixCell[];
 
+  // === ACTIONS: Validation ===
+  setValidationErrors: (errors: AssignmentValidationErrors | null) => void;
+  clearQuestionErrors: (questionId: string) => void;
+  clearAssignmentFieldError: (field: 'title' | 'subject') => void;
+  clearMatrixErrors: () => void;
+
   // === ACTIONS: Form State ===
   markDirty: () => void;
   markClean: () => void;
@@ -115,7 +127,7 @@ const initialState = {
   contexts: [] as AssignmentContext[],
   shuffleQuestions: false,
   isDirty: false,
-  errors: {},
+  validationErrors: null,
 };
 
 export const useAssignmentFormStore = create<AssignmentFormStore>()(
@@ -127,6 +139,7 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
       setTitle: (title) => {
         set({ title, isDirty: true }, false, 'assignment/setTitle');
         dispatchDirtyEvent(true);
+        get().clearAssignmentFieldError('title');
       },
 
       setDescription: (description) => {
@@ -137,6 +150,7 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
       setSubject: (subject) => {
         set({ subject, isDirty: true }, false, 'assignment/setSubject');
         dispatchDirtyEvent(true);
+        get().clearAssignmentFieldError('subject');
       },
 
       setGrade: (grade) => {
@@ -309,6 +323,7 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
       },
 
       updateQuestion: (index, updates) => {
+        const questionId = get().questions[index]?.question?.id;
         set(
           (state) => {
             const newQuestions = state.questions.map((q, i) => {
@@ -331,6 +346,9 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
           'assignment/updateQuestion'
         );
         dispatchDirtyEvent(true);
+        if (questionId) {
+          get().clearQuestionErrors(questionId);
+        }
       },
 
       reorderQuestions: (oldIndex, newIndex) => {
@@ -402,6 +420,7 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
           'assignment/updateMatrixCell'
         );
         dispatchDirtyEvent(true);
+        get().clearMatrixErrors();
       },
 
       syncMatrix: () =>
@@ -422,6 +441,63 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
       getMatrixCellsWithValidation: () => {
         const { matrix: matrixCells } = get();
         return matrixCells;
+      },
+
+      // === VALIDATION ACTIONS ===
+      setValidationErrors: (validationErrors) => {
+        set({ validationErrors }, false, 'assignment/setValidationErrors');
+      },
+
+      clearQuestionErrors: (questionId) => {
+        set(
+          (state) => {
+            if (!state.validationErrors) return state;
+            const newQuestions = { ...state.validationErrors.questions };
+            delete newQuestions[questionId];
+            return {
+              validationErrors: {
+                ...state.validationErrors,
+                questions: newQuestions,
+              },
+            };
+          },
+          false,
+          'assignment/clearQuestionErrors'
+        );
+      },
+
+      clearAssignmentFieldError: (field) => {
+        set(
+          (state) => {
+            if (!state.validationErrors) return state;
+            const newAssignment = { ...state.validationErrors.assignment };
+            delete newAssignment[field];
+            return {
+              validationErrors: {
+                ...state.validationErrors,
+                assignment: newAssignment,
+              },
+            };
+          },
+          false,
+          'assignment/clearAssignmentFieldError'
+        );
+      },
+
+      clearMatrixErrors: () => {
+        set(
+          (state) => {
+            if (!state.validationErrors?.matrix) return state;
+            return {
+              validationErrors: {
+                ...state.validationErrors,
+                matrix: undefined,
+              },
+            };
+          },
+          false,
+          'assignment/clearMatrixErrors'
+        );
       },
 
       // === FORM STATE ACTIONS ===
@@ -453,7 +529,7 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
           contexts: data.contexts || [],
           shuffleQuestions: data.shuffleQuestions || false,
           isDirty: false,
-          errors: {},
+          validationErrors: null,
         };
         set(newState, false, 'assignment/initialize');
         dispatchDirtyEvent(false);

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams, useLocation } from 'react-router-dom';
 import PresentationTable from '@/features/presentation/components/table/PresentationTable';
@@ -13,12 +13,14 @@ import AssignmentTable from '@/features/assignment/components/table/AssignmentTa
 import AssignmentGrid from '@/features/assignment/components/table/AssignmentGrid';
 import { SharedResourcesTable, SharedResourcesGrid } from '@/features/shared-resources';
 import { useGlobalStore } from '@/store/useGlobalStore';
+import { Spinner } from '@/shared/components/common/GlobalSpinner';
 
 const ProjectListPage = () => {
   const { t } = useTranslation('projects');
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const { lastResourceTab, setLastResourceTab } = useGlobalStore();
+  const [isLoading, setIsLoading] = useState(true);
 
   const viewMode = searchParams.get('view') || 'list';
   const hasResourceParam = searchParams.has('resource');
@@ -36,6 +38,7 @@ const ProjectListPage = () => {
         { replace: true }
       );
     }
+    setIsLoading(false);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Extract new image from location state for auto-preview
@@ -84,6 +87,14 @@ const ProjectListPage = () => {
       content: viewMode === 'grid' ? <SharedResourcesGrid /> : <SharedResourcesTable />,
     },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="relative h-screen">
+        <Spinner text={t('loading', 'Loading...')} />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6 px-6 py-8">

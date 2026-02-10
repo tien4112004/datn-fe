@@ -518,14 +518,16 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
       },
 
       initialize: (data) => {
+        const questions = data.questions || [];
+        const matrix = data.matrix || [];
         const newState = {
           title: data.title || '',
           description: data.description || '',
           subject: data.subject || '',
           grade: data.grade || '',
           topics: data.topics || [],
-          questions: data.questions || [],
-          matrix: data.matrix || [],
+          questions,
+          matrix: syncMatrixCounts(questions, matrix),
           contexts: data.contexts || [],
           shuffleQuestions: data.shuffleQuestions || false,
           isDirty: false,

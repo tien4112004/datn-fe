@@ -60,8 +60,8 @@ export function useSaveAssignment({ id, onSaveSuccess, onSaveError }: UseSaveAss
     let matrixErrors: AssignmentValidationErrors['matrix'];
     const activeCells = data.matrix.filter((c) => c.requiredCount > 0);
     if (activeCells.length > 0) {
-      const validated = validateMatrix(activeCells);
-      const unfulfilled = validated.filter((c) => c.status === 'warning');
+      const validationResult = validateMatrix(activeCells);
+      const unfulfilled = validationResult.cellsStatus.filter((c) => !c.isFulfilled);
       if (unfulfilled.length > 0) {
         matrixErrors = {
           errors: [t('validation.matrixNotFulfilled', { count: unfulfilled.length })],

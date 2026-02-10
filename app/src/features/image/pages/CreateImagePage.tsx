@@ -21,6 +21,7 @@ import { getLocalStorageData } from '@/shared/lib/utils';
 import { MODEL_TYPES, useModels } from '@/features/model';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { useArtStyles } from '../hooks';
+import { EXAMPLE_PROMPT_TYPE } from '@/features/projects/types/examplePrompt';
 
 const IMAGE_FORM_PERSIST = 'create-image-form';
 
@@ -212,7 +213,8 @@ const CreateImagePage = () => {
             <ExamplePrompts
               onExampleClick={handleExampleClick}
               isShown={showExamplePrompts}
-              prompts={imageExamplePrompts}
+              type={EXAMPLE_PROMPT_TYPE.IMAGE}
+              fallbackPrompts={imageExamplePrompts}
               title={t('create.examples.title')}
             />
 

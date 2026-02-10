@@ -12,7 +12,7 @@ export const AssessmentMatrixPanel = () => {
   const setMainView = useAssignmentEditorStore((state) => state.setMainView);
 
   // Get data from store
-  const matrixCells = useAssignmentFormStore((state) => state.matrixCells);
+  const matrixCells = useAssignmentFormStore((state) => state.matrix);
   const questions = useAssignmentFormStore((state) => state.questions);
 
   // Show preview if there are questions OR if matrix requirements are defined

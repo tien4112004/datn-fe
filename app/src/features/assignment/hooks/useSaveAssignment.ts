@@ -5,6 +5,9 @@ import { useTranslation } from 'react-i18next';
 import { useCreateAssignment, useUpdateAssignment } from './useAssignmentApi';
 import { useAssignmentFormStore } from '../stores/useAssignmentFormStore';
 import { transformQuestionsForApi } from '../utils/questionTransform';
+import { cellsToApiMatrix } from '../utils';
+import type { SubjectCode } from '@aiprimary/core';
+import type { Grade } from '@aiprimary/core/assessment/grades.js';
 
 interface UseSaveAssignmentOptions {
   id?: string;
@@ -44,11 +47,20 @@ export function useSaveAssignment({ id, onSaveSuccess, onSaveError }: UseSaveAss
 
     setIsSaving(true);
     try {
+      const apiMatrix = cellsToApiMatrix(
+        data.matrix,
+        {
+          grade: (data.grade || '') as Grade,
+          subject: (data.subject || '') as SubjectCode,
+        },
+        data.topics
+      );
+
       const formData = {
         title: data.title,
         description: data.description,
-        subject: data.subject,
-        grade: data.grade,
+        subject: data.subject as SubjectCode,
+        grade: data.grade as Grade,
         questions: transformQuestionsForApi(data.questions),
         topics: data.topics.map((topic) => ({
           id: topic.id,
@@ -56,13 +68,7 @@ export function useSaveAssignment({ id, onSaveSuccess, onSaveError }: UseSaveAss
           description: topic.description,
         })),
         contexts: data.contexts,
-        matrixCells: data.matrixCells
-          .filter((cell) => cell.requiredCount > 0)
-          .map((cell) => ({
-            topicId: cell.topicId,
-            difficulty: cell.difficulty,
-            requiredCount: cell.requiredCount,
-          })),
+        matrix: apiMatrix,
       };
 
       let savedId = id;

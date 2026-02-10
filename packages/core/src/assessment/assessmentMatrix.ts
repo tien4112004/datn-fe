@@ -1,77 +1,67 @@
-import type { Difficulty, SubjectCode } from './constants';
+import type { Difficulty, QuestionType } from './constants';
 
 /**
- * Exam Matrix (Table of Specifications) Types
+ * Assessment Matrix (Table of Specifications) Types
  *
- * Used for creating structured exam blueprints that specify:
- * - How many questions needed per topic/difficulty combination
- * - Point distribution across the exam
- * - Validation criteria for exam construction
+ * 3D Matrix Structure: topic × difficulty × questionType
+ * Cell value format: "count:points" (e.g., "3:6" = 3 questions worth 6 total points)
  */
 
-/**
- * Unique identifier for topics
- */
-export type TopicId = string;
+// === Metadata ===
 
 /**
- * Topic metadata
- *
- * Topics are reusable across matrices within the same subject.
- * Examples: "Algebra", "Geometry", "Functions" for Math subject
+ * Matrix metadata
  */
-export interface Topic {
-  id: TopicId; // Unique identifier for this topic
-  name: string; // Topic name (e.g., "Algebra", "Đại số")
-  description?: string; // Optional description of the topic
-  subject: SubjectCode; // Subject this topic belongs to (T=Math, TV=Vietnamese, TA=English)
-  createdAt?: string; // ISO timestamp of creation
-  updatedAt?: string; // ISO timestamp of last update
+export interface MatrixMetadata {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
+// === Dimensions ===
+
+/**
+ * Topic in matrix dimensions
+ */
+export interface MatrixDimensionTopic {
+  id: string;
+  name: string;
 }
 
 /**
- * A single cell in the exam matrix grid
+ * Matrix dimensions defining the axes of the 3D matrix
  *
- * Represents the intersection of a topic and difficulty level.
- * Example: "Algebra × Vận dụng cao" might require 2 questions worth 5 points each.
+ * The arrays define the order of indices:
+ * - topics[i] corresponds to matrix[i]
+ * - difficulties[j] corresponds to matrix[i][j]
+ * - questionTypes[k] corresponds to matrix[i][j][k]
  */
-export interface MatrixCell {
-  id: string; // Unique identifier for this cell
-  topicId: TopicId; // Reference to the topic
-  difficulty: Difficulty; // Difficulty level for this cell
-  requiredQuestionCount: number; // How many questions needed for this cell
-  pointsPerQuestion: number; // Points allocated per question
-  selectedQuestions?: string[]; // Question IDs currently selected for this cell (Runtime tracking, not persisted to backend)
+export interface MatrixDimensions {
+  topics: MatrixDimensionTopic[];
+  difficulties: Difficulty[];
+  questionTypes: QuestionType[];
 }
 
+// === 3D Matrix Structure ===
+
 /**
- * The complete exam matrix specification
+ * The complete assessment matrix specification
  *
- * Defines the structure and requirements for an exam.
- * Acts as a blueprint that guides question selection.
+ * 3D structure where:
+ * - matrix[topicIndex][difficultyIndex][questionTypeIndex] = "count:points"
+ * - Example: matrix[0][1][0] = "3:6" means:
+ *   topics[0] + difficulties[1] + questionTypes[0] = 3 questions, 6 points total
+ *   pointsPerQuestion = 6/3 = 2 points each
  */
 export interface AssessmentMatrix {
-  id: string; // Unique identifier for this matrix
-  name: string; // Matrix name (e.g., "Midterm Exam - Grade 10 Math")
-  description?: string; // Optional description
-  subject: SubjectCode; // Subject of the exam
-  targetTotalPoints: number; // Target total points for the exam (e.g., 100)
-  topics: Topic[]; // Topics included in this matrix
-  cells: MatrixCell[]; // Matrix cell specifications (topic × difficulty combinations)
-  createdAt?: string; // ISO timestamp of creation
-  updatedAt?: string; // ISO timestamp of last update
-  createdBy?: string; // User ID of creator
+  metadata: MatrixMetadata;
+  dimensions: MatrixDimensions;
+  matrix: string[][][]; // matrix[topic][difficulty][questionType] = "count:points"
+  totalQuestions: number;
+  totalPoints: number;
 }
 
-/**
- * Matrix with populated question selections
- *
- * Used during question selection workflow.
- * Extends AssessmentMatrix with actual selected questions in each cell.
- */
-export interface AssessmentMatrixWithQuestions extends AssessmentMatrix {
-  cells: (MatrixCell & { selectedQuestions: string[] })[]; // Cells with guaranteed selectedQuestions array
-}
+// === Validation ===
 
 /**
  * Status of a single matrix cell
@@ -79,35 +69,49 @@ export interface AssessmentMatrixWithQuestions extends AssessmentMatrix {
  * Tracks whether a cell's requirements are fulfilled during question selection.
  */
 export interface MatrixCellStatus {
-  cellId: string; // Reference to the cell
-  topicId: TopicId; // Reference to the topic
-  difficulty: Difficulty; // Difficulty level
-  required: number; // Required question count
-  selected: number; // Currently selected question count
-  requiredPoints: number; // Required total points
-  selectedPoints: number; // Currently selected total points
-  isFulfilled: boolean; // Whether this cell meets requirements
+  topicId: string;
+  difficulty: Difficulty;
+  questionType: QuestionType;
+  required: number;
+  selected: number;
+  requiredPoints: number;
+  selectedPoints: number;
+  isFulfilled: boolean;
 }
 
 /**
  * Validation result for matrix compliance
  *
  * Checks if selected questions meet matrix requirements.
- * Used to validate before generating exam draft or publishing.
  */
 export interface MatrixValidationResult {
-  isValid: boolean; // Overall validation status
-  totalPoints: number; // Current total points from selected questions
-  targetPoints: number; // Target total points from matrix specification
-  pointsDifference: number; // Difference between current and target (current - target)
-  cellsStatus: MatrixCellStatus[]; // Status of each cell in the matrix
-  errors: string[]; // Validation errors (must fix before publishing)
-  warnings: string[]; // Validation warnings (should review but not blocking)
+  isValid: boolean;
+  totalPoints: number;
+  targetPoints: number;
+  pointsDifference: number;
+  cellsStatus: MatrixCellStatus[];
+  errors: string[];
+  warnings: string[];
   summary: {
-    // Summary statistics
-    totalCells: number; // Total number of cells in matrix
-    fulfilledCells: number; // Cells that meet requirements
-    partialCells: number; // Cells with some questions but not enough
-    emptyCells: number; // Cells with no questions selected
+    totalCells: number;
+    fulfilledCells: number;
+    partialCells: number;
+    emptyCells: number;
   };
+}
+
+// === Legacy Compatibility Types (to be removed after migration) ===
+
+/**
+ * @deprecated Use MatrixDimensionTopic instead
+ */
+export type TopicId = string;
+
+/**
+ * @deprecated Topics are now embedded in MatrixDimensions
+ */
+export interface Topic {
+  id: TopicId;
+  name: string;
+  description?: string;
 }

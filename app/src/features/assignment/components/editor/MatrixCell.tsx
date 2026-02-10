@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next';
+import { X } from 'lucide-react';
 import { Input } from '@/shared/components/ui/input';
+import { Button } from '@/shared/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
 import type { MatrixCell as MatrixCellType } from '../../types';
 import { validateMatrixCell } from '../../utils';
@@ -16,10 +18,11 @@ export const MatrixCell = ({ cell }: MatrixCellProps) => {
     keyPrefix: 'assignmentEditor.matrixBuilder',
   });
   const updateMatrixCell = useAssignmentFormStore((state) => state.updateMatrixCell);
+  const removeMatrixCell = useAssignmentFormStore((state) => state.removeMatrixCell);
 
   // Validate the cell
   const validation = validateMatrixCell(cell);
-  const { status, message } = validation;
+  const { status } = validation;
 
   const statusColors: Record<string, string> = {
     valid: 'bg-green-100 text-green-800 border-green-300 dark:bg-green-900 dark:text-green-200',
@@ -28,34 +31,73 @@ export const MatrixCell = ({ cell }: MatrixCellProps) => {
   };
 
   const handleRequiredCountChange = (value: string) => {
-    const numValue = parseInt(value, 10) || 0;
+    const numValue = Math.min(128, Math.max(0, parseInt(value, 10) || 0));
     updateMatrixCell(cell.id, { requiredCount: numValue });
   };
 
-  return (
-    <div className="space-y-1.5">
-      <div className="flex items-center gap-1">
-        <span className="text-xs text-gray-500">{t('required')}</span>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Input
-              type="number"
-              min="0"
-              value={cell.requiredCount}
-              onChange={(e) => handleRequiredCountChange(e.target.value)}
-              className="h-7 w-16 text-xs"
-            />
-          </TooltipTrigger>
-          <TooltipContent>
-            <p className="max-w-xs">{tMatrix('tooltips.cellInput')}</p>
-          </TooltipContent>
-        </Tooltip>
-      </div>
+  // Compact status display
+  const getStatusDisplay = () => {
+    const diff = cell.currentCount - cell.requiredCount;
+    if (cell.requiredCount === 0 && cell.currentCount === 0) {
+      return { fullText: t('ok') };
+    }
+    if (diff === 0) {
+      return { fullText: t('ok') };
+    }
+    if (diff < 0) {
+      return { fullText: t('needMore', { count: Math.abs(diff) }) };
+    }
+    return { fullText: t('extra', { count: diff }) };
+  };
 
-      <div className={`rounded-md border-2 p-2 text-center ${statusColors[status]}`}>
-        <div className="text-lg font-bold">{cell.currentCount}</div>
-        <div className="text-xs">{message || t('ok')}</div>
-      </div>
-    </div>
+  const statusDisplay = getStatusDisplay();
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div className="group relative space-y-1">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                onClick={() => removeMatrixCell(cell.id)}
+                className="absolute -right-1 -top-1 z-10 h-4 w-4 rounded-full bg-red-100 p-0 text-red-600 opacity-0 transition-opacity hover:bg-red-200 group-hover:pointer-events-auto group-hover:opacity-100"
+              >
+                <X className="h-2.5 w-2.5 text-red-500" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{tMatrix('tooltips.removeCell')}</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <Input
+            type="text"
+            min="0"
+            value={cell.requiredCount}
+            onChange={(e) => handleRequiredCountChange(e.target.value)}
+            className="h-7 w-full text-center text-xs"
+          />
+
+          <div
+            className={`overflow-hidden rounded-md border px-1 py-1.5 text-center ${statusColors[status]}`}
+          >
+            <div className="text-sm font-bold leading-none">
+              {cell.currentCount}/{cell.requiredCount}
+            </div>
+            {cell.points != null && cell.points > 0 && (
+              <div className="mt-0.5 text-[10px] leading-none opacity-75">
+                {cell.points % 1 === 0 ? cell.points : cell.points.toFixed(1)}p
+              </div>
+            )}
+          </div>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent>
+        {statusDisplay.fullText && <p className="mt-1">{statusDisplay.fullText}</p>}
+      </TooltipContent>
+    </Tooltip>
   );
 };

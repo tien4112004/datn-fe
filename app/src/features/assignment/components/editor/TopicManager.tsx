@@ -5,7 +5,7 @@ import { Input } from '@/shared/components/ui/input';
 import { Textarea } from '@/shared/components/ui/textarea';
 import { Label } from '@/shared/components/ui/label';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
-import { generateId } from '../../utils';
+import { generateId } from '@/shared/lib/utils';
 
 export const TopicManager = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrixEditor' });

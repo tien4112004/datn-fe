@@ -25,6 +25,20 @@ export const QuestionsViewPanel = ({ assignment }: QuestionsViewPanelProps) => {
   const questions = (assignment.questions || []) as AssignmentQuestionWithTopic[];
   const assignmentContexts = ((assignment as any).contexts || []) as AssignmentContext[];
 
+  // Build topics map from matrix dimensions (topics live inside matrix, not as a separate field)
+  const topicsMap = useMemo(() => {
+    const map = new Map<string, string>();
+    const dims = assignment.matrix?.dimensions?.topics;
+    if (dims) {
+      dims.forEach((topic) =>
+        (topic.subtopics ?? []).forEach((sub) => {
+          if (sub.id) map.set(sub.id, sub.name);
+        })
+      );
+    }
+    return map;
+  }, [assignment.matrix]);
+
   // Build contexts map from assignment's cloned contexts
   const contextsMap = useMemo(() => {
     const map = new Map<string, AssignmentContext>();
@@ -144,10 +158,7 @@ export const QuestionsViewPanel = ({ assignment }: QuestionsViewPanelProps) => {
 
       {/* Question Metadata */}
       <div className="grid grid-cols-3 gap-4">
-        <LabelValuePair
-          label={t('topic')}
-          value={(assignment.topics || []).find((topic) => topic.id === (question as any).topicId)?.name}
-        />
+        <LabelValuePair label={t('topic')} value={topicsMap.get((question as any).topicId)} />
         <LabelValuePair label={t('difficulty')} value={getDifficultyName(question.difficulty)} />
         <LabelValuePair label={t('points')} value={points} />
       </div>

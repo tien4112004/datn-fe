@@ -1,20 +1,20 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { AssignmentTopic, AssignmentQuestionWithTopic, MatrixCell, AssignmentContext } from '../types';
-import { getAllDifficulties } from '@aiprimary/core';
-import { generateId } from '@/shared/lib/utils';
+import { generateId, createCellId } from '@aiprimary/core';
 
 /**
  * Sync matrix cell counts based on current questions
  * This runs automatically whenever questions change
+ * Now includes questionType in the matching key
  */
 function syncMatrixCounts(questions: AssignmentQuestionWithTopic[], matrixCells: MatrixCell[]): MatrixCell[] {
-  // Count questions by topic-difficulty combination
+  // Count questions by topic-difficulty-questionType combination
   const counts = new Map<string, number>();
 
   questions.forEach((aq) => {
-    if (aq.question.topicId && aq.question.difficulty) {
-      const key = `${aq.question.topicId}-${aq.question.difficulty}`;
+    if (aq.question.topicId && aq.question.difficulty && aq.question.type) {
+      const key = createCellId(aq.question.topicId, aq.question.difficulty, aq.question.type);
       counts.set(key, (counts.get(key) || 0) + 1);
     }
   });
@@ -22,7 +22,7 @@ function syncMatrixCounts(questions: AssignmentQuestionWithTopic[], matrixCells:
   // Update currentCount for all cells
   const updatedCells = matrixCells.map((cell) => ({
     ...cell,
-    currentCount: counts.get(`${cell.topicId}-${cell.difficulty}`) || 0,
+    currentCount: counts.get(createCellId(cell.topicId, cell.difficulty, cell.questionType)) || 0,
   }));
 
   return updatedCells;
@@ -39,20 +39,6 @@ function dispatchDirtyEvent(isDirty: boolean): void {
   );
 }
 
-/**
- * Create matrix cells for a new topic across all difficulties
- */
-function createMatrixCellsForTopic(topicId: string): MatrixCell[] {
-  const difficulties = getAllDifficulties();
-  return difficulties.map((difficulty, index) => ({
-    id: `${topicId}-${difficulty.value}-${Date.now()}-${index}`,
-    topicId,
-    difficulty: difficulty.value,
-    requiredCount: 0,
-    currentCount: 0,
-  }));
-}
-
 interface AssignmentFormStore {
   // === FORM DATA ===
   title: string;
@@ -61,7 +47,7 @@ interface AssignmentFormStore {
   grade: string;
   topics: AssignmentTopic[];
   questions: AssignmentQuestionWithTopic[];
-  matrixCells: MatrixCell[];
+  matrix: MatrixCell[];
   contexts: AssignmentContext[];
   shuffleQuestions: boolean;
 
@@ -92,6 +78,8 @@ interface AssignmentFormStore {
   reorderQuestions: (oldIndex: number, newIndex: number) => void;
 
   // === ACTIONS: Matrix ===
+  createMatrixCell: (cell: Omit<MatrixCell, 'id' | 'currentCount'>) => void;
+  removeMatrixCell: (cellId: string) => void;
   updateMatrixCell: (cellId: string, updates: Partial<MatrixCell>) => void;
   syncMatrix: () => void; // Manual sync if needed
 
@@ -110,7 +98,7 @@ interface AssignmentFormStore {
     grade?: string;
     topics?: AssignmentTopic[];
     questions?: AssignmentQuestionWithTopic[];
-    matrixCells?: MatrixCell[];
+    matrix?: MatrixCell[];
     contexts?: AssignmentContext[];
     shuffleQuestions?: boolean;
   }) => void;
@@ -166,12 +154,8 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
         set(
           (state) => {
             const newTopics = [...state.topics, topic];
-            const newCells = createMatrixCellsForTopic(topic.id);
-            const allCells = [...state.matrixCells, ...newCells];
-
             return {
               topics: newTopics,
-              matrixCells: allCells,
               isDirty: true,
             };
           },
@@ -185,12 +169,12 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
         set(
           (state) => {
             const newTopics = state.topics.filter((t) => t.id !== topicId);
-            const newMatrixCells = state.matrixCells.filter((c) => c.topicId !== topicId);
+            const newMatrixCells = state.matrix.filter((c) => c.topicId !== topicId);
             const newQuestions = state.questions.filter((q) => q.question.topicId !== topicId);
 
             return {
               topics: newTopics,
-              matrixCells: newMatrixCells,
+              matrix: newMatrixCells,
               questions: newQuestions,
               isDirty: true,
             };
@@ -203,10 +187,20 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
 
       updateTopic: (topicId, updates) => {
         set(
-          (state) => ({
-            topics: state.topics.map((t) => (t.id === topicId ? { ...t, ...updates } : t)),
-            isDirty: true,
-          }),
+          (state) => {
+            const newTopics = state.topics.map((t) => (t.id === topicId ? { ...t, ...updates } : t));
+            // Also update topicName in matrixCells if name changed
+            const newMatrixCells =
+              updates.name !== undefined
+                ? state.matrix.map((c) => (c.topicId === topicId ? { ...c, topicName: updates.name! } : c))
+                : state.matrix;
+
+            return {
+              topics: newTopics,
+              matrix: newMatrixCells,
+              isDirty: true,
+            };
+          },
           false,
           'assignment/updateTopic'
         );
@@ -270,12 +264,23 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
       addQuestion: (question) => {
         set(
           (state) => {
+            let newTopics = [...state.topics];
+
+            const q = question.question;
+
+            // Auto-expand: Add topic if not exists (cells will be created on demand)
+            if (q.topicId && !newTopics.find((t) => t.id === q.topicId)) {
+              const newTopic = { id: q.topicId, name: q.topicId }; // User should edit name
+              newTopics.push(newTopic);
+            }
+
             const newQuestions = [...state.questions, question];
-            const updatedCells = syncMatrixCounts(newQuestions, state.matrixCells);
+            const updatedCells = syncMatrixCounts(newQuestions, state.matrix);
 
             return {
+              topics: newTopics,
               questions: newQuestions,
-              matrixCells: updatedCells,
+              matrix: updatedCells,
               isDirty: true,
             };
           },
@@ -289,11 +294,11 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
         set(
           (state) => {
             const newQuestions = state.questions.filter((_, i) => i !== index);
-            const updatedCells = syncMatrixCounts(newQuestions, state.matrixCells);
+            const updatedCells = syncMatrixCounts(newQuestions, state.matrix);
 
             return {
               questions: newQuestions,
-              matrixCells: updatedCells,
+              matrix: updatedCells,
               isDirty: true,
             };
           },
@@ -306,12 +311,19 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
       updateQuestion: (index, updates) => {
         set(
           (state) => {
-            const newQuestions = state.questions.map((q, i) => (i === index ? { ...q, ...updates } : q));
-            const updatedCells = syncMatrixCounts(newQuestions, state.matrixCells);
+            const newQuestions = state.questions.map((q, i) => {
+              if (i !== index) return q;
+              return {
+                ...q,
+                ...updates,
+                question: updates.question ? { ...q.question, ...updates.question } : q.question,
+              };
+            });
+            const updatedCells = syncMatrixCounts(newQuestions, state.matrix);
 
             return {
               questions: newQuestions,
-              matrixCells: updatedCells,
+              matrix: updatedCells,
               isDirty: true,
             };
           },
@@ -340,10 +352,50 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
       },
 
       // === MATRIX ACTIONS ===
+      createMatrixCell: (cell) => {
+        set(
+          (state) => {
+            const cellId = createCellId(cell.topicId, cell.difficulty, cell.questionType);
+            // Check if cell already exists
+            const existingCell = state.matrix.find((c) => c.id === cellId);
+            if (existingCell) {
+              return state; // Cell already exists, don't create duplicate
+            }
+
+            const newCell: MatrixCell = {
+              ...cell,
+              id: cellId,
+              currentCount: 0,
+            };
+
+            const newMatrix = [...state.matrix, newCell];
+            return {
+              matrix: syncMatrixCounts(state.questions, newMatrix),
+              isDirty: true,
+            };
+          },
+          false,
+          'assignment/createMatrixCell'
+        );
+        dispatchDirtyEvent(true);
+      },
+
+      removeMatrixCell: (cellId) => {
+        set(
+          (state) => ({
+            matrix: state.matrix.filter((c) => c.id !== cellId),
+            isDirty: true,
+          }),
+          false,
+          'assignment/removeMatrixCell'
+        );
+        dispatchDirtyEvent(true);
+      },
+
       updateMatrixCell: (cellId, updates) => {
         set(
           (state) => ({
-            matrixCells: state.matrixCells.map((c) => (c.id === cellId ? { ...c, ...updates } : c)),
+            matrix: state.matrix.map((c) => (c.id === cellId ? { ...c, ...updates } : c)),
             isDirty: true,
           }),
           false,
@@ -355,7 +407,7 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
       syncMatrix: () =>
         set(
           (state) => ({
-            matrixCells: syncMatrixCounts(state.questions, state.matrixCells),
+            matrix: syncMatrixCounts(state.questions, state.matrix),
           }),
           false,
           'assignment/syncMatrix'
@@ -368,7 +420,7 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
       },
 
       getMatrixCellsWithValidation: () => {
-        const { matrixCells } = get();
+        const { matrix: matrixCells } = get();
         return matrixCells;
       },
 
@@ -397,7 +449,7 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
           grade: data.grade || '',
           topics: data.topics || [],
           questions: data.questions || [],
-          matrixCells: data.matrixCells || [],
+          matrix: data.matrix || [],
           contexts: data.contexts || [],
           shuffleQuestions: data.shuffleQuestions || false,
           isDirty: false,

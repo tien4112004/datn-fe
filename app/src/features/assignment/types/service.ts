@@ -1,6 +1,12 @@
 import type { ApiResponse } from '@aiprimary/api';
 import type { Submission } from '@aiprimary/core';
-import type { Assignment, CreateAssignmentRequest, UpdateAssignmentRequest } from './assignment';
+import type {
+  Assignment,
+  CreateAssignmentRequest,
+  UpdateAssignmentRequest,
+  GenerateMatrixRequest,
+  GenerateMatrixResponse,
+} from './assignment';
 
 export interface AssignmentCollectionRequest {
   page?: number;
@@ -21,4 +27,7 @@ export interface AssignmentApiService {
   // Submission operations
   submitAssignment(assignmentId: string, submission: Submission): Promise<Submission>;
   getSubmission(assignmentId: string, studentId: string): Promise<Submission>;
+
+  // Generation operations
+  generateMatrix(request: GenerateMatrixRequest): Promise<GenerateMatrixResponse>;
 }

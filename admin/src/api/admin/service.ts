@@ -1,13 +1,13 @@
 import type {
   ApiResponse,
   ArtStyleRequest,
-  Book,
-  BookType,
   FAQPost,
   Pagination,
   PaginationParams,
   UserQueryParams,
   SlideTemplateParams,
+  MatrixTemplate,
+  MatrixTemplateParams,
 } from '@/types/api';
 import type { Model, ModelPatchData } from '@aiprimary/core';
 import type { User } from '@/types/auth';
@@ -35,10 +35,10 @@ import type {
 import { parseQuestionBankCSV, exportQuestionsToCSV } from '@/utils/csvParser';
 import { validateQuestionBankCSV } from '@/utils/csvValidation';
 
+import { generateId } from '@aiprimary/core';
+
 // ============= HELPER FUNCTIONS =============
 const delay = (ms: number = 300) => new Promise((resolve) => setTimeout(resolve, ms));
-const generateId = (prefix: string = 'id') =>
-  `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 const paginate = <T>(
   items: T[],
   page: number = 1,
@@ -149,81 +149,6 @@ Simply drag and drop files or use the Import button in the dashboard.`,
     order: 5,
     createdAt: '2024-05-20T13:00:00Z',
     updatedAt: '2024-09-10T10:30:00Z',
-  },
-];
-
-// Mock data for Books
-let MOCK_BOOKS: Book[] = [
-  {
-    id: 'book-1',
-    title: 'Mathematics Grade 10',
-    description:
-      'Comprehensive mathematics textbook covering algebra, geometry, and statistics for grade 10 students.',
-    type: 'TEXTBOOK',
-    grade: '10',
-    subject: 'Mathematics',
-    publisher: 'Education Press',
-    pdfUrl: '/uploads/books/math-grade-10.pdf',
-    thumbnailUrl: '/uploads/thumbnails/math-grade-10.jpg',
-    isPublished: true,
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-06-20T14:30:00Z',
-  },
-  {
-    id: 'book-2',
-    title: 'Physics Grade 11',
-    description: 'Complete physics curriculum including mechanics, thermodynamics, and electromagnetism.',
-    type: 'TEXTBOOK',
-    grade: '11',
-    subject: 'Physics',
-    publisher: 'Science Books Inc.',
-    pdfUrl: '/uploads/books/physics-grade-11.pdf',
-    thumbnailUrl: '/uploads/thumbnails/physics-grade-11.jpg',
-    isPublished: true,
-    createdAt: '2024-02-10T09:00:00Z',
-    updatedAt: '2024-07-15T11:15:00Z',
-  },
-  {
-    id: 'book-3',
-    title: 'English Literature Guide',
-    description: 'Teacher guide for English literature curriculum with lesson plans and assessments.',
-    type: 'TEACHERBOOK',
-    grade: '10-12',
-    subject: 'English',
-    publisher: 'Language Arts Publishing',
-    pdfUrl: '/uploads/books/english-teacher-guide.pdf',
-    thumbnailUrl: '/uploads/thumbnails/english-teacher-guide.jpg',
-    isPublished: true,
-    createdAt: '2024-03-05T14:00:00Z',
-    updatedAt: '2024-08-10T09:45:00Z',
-  },
-  {
-    id: 'book-4',
-    title: 'Chemistry Lab Manual',
-    description: 'Practical chemistry experiments and procedures for laboratory sessions.',
-    type: 'TEXTBOOK',
-    grade: '11',
-    subject: 'Chemistry',
-    publisher: 'Science Books Inc.',
-    pdfUrl: '/uploads/books/chemistry-lab-manual.pdf',
-    thumbnailUrl: '/uploads/thumbnails/chemistry-lab.jpg',
-    isPublished: false,
-    createdAt: '2024-04-12T16:30:00Z',
-    updatedAt: '2024-09-01T15:00:00Z',
-  },
-  {
-    id: 'book-5',
-    title: 'History Teaching Guide',
-    description: 'Comprehensive teaching guide for world history with interactive activities.',
-    type: 'TEACHERBOOK',
-    grade: '9-10',
-    subject: 'History',
-    publisher: 'Humanities Press',
-    pdfUrl: '/uploads/books/history-teacher-guide.pdf',
-    thumbnailUrl: '/uploads/thumbnails/history-guide.jpg',
-    isPublished: true,
-    createdAt: '2024-05-20T10:00:00Z',
-    updatedAt: '2024-09-15T12:30:00Z',
   },
 ];
 
@@ -368,7 +293,7 @@ export default class AdminRealApiService implements AdminApiService {
     await delay(500);
     const newPost: FAQPost = {
       ...data,
-      id: generateId('faq'),
+      id: generateId(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -390,66 +315,6 @@ export default class AdminRealApiService implements AdminApiService {
     const index = MOCK_FAQ_POSTS.findIndex((p) => p.id === id);
     if (index === -1) throw new Error('FAQ post not found');
     MOCK_FAQ_POSTS.splice(index, 1);
-    return { success: true, data: undefined };
-  }
-
-  // Books (MOCK - Backend not implemented yet)
-  async getBooks(params?: PaginationParams & { type?: BookType }): Promise<ApiResponse<Book[]>> {
-    await delay();
-    let books = MOCK_BOOKS;
-    if (params?.type) {
-      books = books.filter((b) => b.type === params.type);
-    }
-    const { data, pagination } = paginate(books, params?.page, params?.pageSize);
-    return { success: true, data, pagination };
-  }
-
-  async getBookById(id: string): Promise<ApiResponse<Book>> {
-    await delay();
-    const book = MOCK_BOOKS.find((b) => b.id === id);
-    if (!book) throw new Error('Book not found');
-    return { success: true, data: book };
-  }
-
-  async createBook(data: FormData): Promise<ApiResponse<Book>> {
-    await delay(500);
-    const newBook: Book = {
-      id: generateId('book'),
-      title: data.get('title') as string,
-      type: data.get('type') as BookType,
-      description: data.get('description') as string,
-      grade: data.get('grade') as string,
-      subject: data.get('subject') as string,
-      publisher: data.get('publisher') as string,
-      pdfUrl: '/uploads/books/sample.pdf',
-      thumbnailUrl: '/uploads/thumbnails/sample-thumb.jpg',
-      isPublished: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    MOCK_BOOKS.unshift(newBook);
-    return { success: true, data: newBook };
-  }
-
-  async updateBook(id: string, data: FormData): Promise<ApiResponse<Book>> {
-    await delay(500);
-    const index = MOCK_BOOKS.findIndex((b) => b.id === id);
-    if (index === -1) throw new Error('Book not found');
-    const updated = {
-      ...MOCK_BOOKS[index],
-      title: data.get('title') as string,
-      description: data.get('description') as string,
-      updatedAt: new Date().toISOString(),
-    };
-    MOCK_BOOKS[index] = updated;
-    return { success: true, data: updated };
-  }
-
-  async deleteBook(id: string): Promise<ApiResponse<void>> {
-    await delay(500);
-    const index = MOCK_BOOKS.findIndex((b) => b.id === id);
-    if (index === -1) throw new Error('Book not found');
-    MOCK_BOOKS.splice(index, 1);
     return { success: true, data: undefined };
   }
 
@@ -736,6 +601,43 @@ export default class AdminRealApiService implements AdminApiService {
     const response = await api.get<ApiResponse<EnumOption[]>>(
       `${this.baseUrl}/api/admin/coin-pricing/unit-types`
     );
+    return response.data;
+  }
+
+  // Matrix Templates
+  async getMatrixTemplates(params?: MatrixTemplateParams): Promise<ApiResponse<MatrixTemplate[]>> {
+    const response = await api.get<ApiResponse<MatrixTemplate[]>>(`${this.baseUrl}/api/matrix-templates`, {
+      params,
+    });
+    return response.data;
+  }
+
+  async getMatrixTemplateById(id: string): Promise<ApiResponse<MatrixTemplate>> {
+    const response = await api.get<ApiResponse<MatrixTemplate>>(`${this.baseUrl}/api/matrix-templates/${id}`);
+    return response.data;
+  }
+
+  async createMatrixTemplate(data: Partial<MatrixTemplate>): Promise<ApiResponse<MatrixTemplate>> {
+    const response = await api.post<ApiResponse<MatrixTemplate>>(
+      `${this.baseUrl}/api/matrix-templates`,
+      data
+    );
+    return response.data;
+  }
+
+  async updateMatrixTemplate(
+    id: string,
+    data: Partial<MatrixTemplate>
+  ): Promise<ApiResponse<MatrixTemplate>> {
+    const response = await api.put<ApiResponse<MatrixTemplate>>(
+      `${this.baseUrl}/api/matrix-templates/${id}`,
+      data
+    );
+    return response.data;
+  }
+
+  async deleteMatrixTemplate(id: string): Promise<ApiResponse<void>> {
+    const response = await api.delete<ApiResponse<void>>(`${this.baseUrl}/api/matrix-templates/${id}`);
     return response.data;
   }
 }

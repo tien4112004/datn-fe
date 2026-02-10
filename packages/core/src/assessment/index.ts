@@ -22,3 +22,4 @@ export * from './answer';
 export * from './questionBank';
 export * from './examDraft';
 export * from './assessmentMatrix';
+export * from './assessmentMatrixUtils';

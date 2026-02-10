@@ -136,6 +136,13 @@ const router = createBrowserRouter([
         }),
       },
       {
+        path: 'question-bank/generated',
+        lazy: async () => ({
+          Component: (await import('@/features/assignment/pages/GeneratedQuestionsPage'))
+            .GeneratedQuestionsPage,
+        }),
+      },
+      {
         path: 'question-bank/create',
         lazy: async () => ({
           Component: (await import('@/features/assignment/pages/QuestionBankEditorPage'))

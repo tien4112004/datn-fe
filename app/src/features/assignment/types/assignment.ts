@@ -1,5 +1,6 @@
-import type { Difficulty, SubjectCode, AssignmentQuestion } from '@aiprimary/core';
+import type { Difficulty, QuestionType, SubjectCode, AssignmentQuestion } from '@aiprimary/core';
 import type { Question } from '@aiprimary/core';
+import type { Grade } from '@aiprimary/core/assessment/grades.js';
 
 // Context stored at assignment level (cloned & editable)
 export interface AssignmentContext {
@@ -26,15 +27,25 @@ export interface AssignmentTopic {
   id: string;
   name: string;
   description?: string;
+  parentTopic?: string; // Parent topic name for matrix grouping
 }
 
-// Matrix cell (topic × difficulty)
+// Matrix dimension topic (topic > subtopic hierarchy for API)
+export interface MatrixDimensionTopic {
+  name: string;
+  subtopics: { id: string; name: string }[];
+}
+
+// Matrix cell (topic × difficulty × questionType) - flat representation for UI
 export interface MatrixCell {
-  id: string;
+  id: string; // e.g., "topicId-difficulty-questionType"
   topicId: string;
+  topicName: string;
   difficulty: Difficulty;
+  questionType: QuestionType;
   requiredCount: number;
   currentCount: number;
+  points?: number;
 }
 
 // Matrix cell with validation
@@ -52,7 +63,7 @@ export interface AssignmentFormData {
   topics: AssignmentTopic[];
   contexts: AssignmentContext[];
   questions: AssignmentQuestionWithTopic[];
-  matrixCells: MatrixCell[];
+  matrix: MatrixCell[];
   shuffleQuestions?: boolean; // Shuffle questions for each student (default: false)
 }
 
@@ -62,13 +73,11 @@ export interface Assignment {
   title: string;
   description?: string;
   subject?: SubjectCode;
-  grade?: string;
+  grade?: Grade;
   topics?: AssignmentTopic[];
   contexts?: AssignmentContext[];
   questions: (AssignmentQuestion | AssignmentQuestionWithTopic)[];
-  matrix?: {
-    cells: MatrixCell[];
-  };
+  matrix?: ApiMatrix;
   totalPoints?: number;
   shuffleQuestions?: boolean;
   status: 'draft' | 'published' | 'archived';
@@ -84,19 +93,12 @@ export interface QuestionItemRequest {
   title: string;
   titleImageUrl?: string;
   explanation?: string;
-  grade?: string;
+  grade?: Grade;
   chapter?: string;
-  subject?: string;
+  subject?: SubjectCode;
   data: unknown;
   point: number;
-  contextId?: string;
-}
-
-// Matrix cell for API request
-export interface MatrixCellRequest {
-  topicId: string;
-  difficulty: string;
-  requiredCount: number;
+  topicId?: string;
 }
 
 // Topic for API request
@@ -106,25 +108,87 @@ export interface TopicRequest {
   description?: string;
 }
 
+// Matrix structure for API requests/responses
+export interface ApiMatrix {
+  grade: Grade;
+  subject: SubjectCode;
+  dimensions: {
+    topics: MatrixDimensionTopic[];
+    difficulties: Difficulty[];
+    questionTypes: QuestionType[];
+  };
+  matrix: string[][][]; // "count:points" format, e.g., "3:3.0"
+  totalQuestions: number;
+  totalPoints: number;
+}
+
 // API request types
 export interface CreateAssignmentRequest {
   title: string;
   description?: string;
-  subject: string;
-  grade?: string;
+  subject: SubjectCode;
+  grade?: Grade;
   questions?: QuestionItemRequest[];
   topics?: TopicRequest[];
   contexts?: AssignmentContext[];
-  matrixCells?: MatrixCellRequest[];
+  matrix?: ApiMatrix; // Full 3D matrix structure with lowercase enums
 }
 
 export interface UpdateAssignmentRequest {
   title?: string;
   description?: string;
-  subject?: string;
-  grade?: string;
+  subject?: SubjectCode;
+  grade?: Grade;
   questions?: QuestionItemRequest[];
   topics?: TopicRequest[];
   contexts?: AssignmentContext[];
-  matrixCells?: MatrixCellRequest[];
+  matrix?: ApiMatrix; // Full 3D matrix structure with lowercase enums
 }
+
+// Generate matrix request (calls POST /api/exams/generate-matrix)
+export interface GenerateMatrixRequest {
+  name: string;
+  grade: string;
+  subject: string;
+  totalQuestions: number;
+  totalPoints: number;
+  difficulties?: string[];
+  questionTypes?: string[];
+  additionalRequirements?: string;
+  language?: string;
+  provider?: string;
+  model?: string;
+}
+
+// Generate matrix response
+export interface GenerateMatrixResponse {
+  metadata: {
+    id: string;
+    name: string;
+    grade: string;
+    subject: string;
+    createdAt: string;
+  };
+  dimensions: {
+    topics: Array<{
+      id: string;
+      name: string;
+      subtopics: Array<{ id: string; name: string }>;
+    }>;
+    difficulties: string[];
+    questionTypes: string[];
+  };
+  matrix: string[][][]; // "count:points" format
+  totalQuestions: number;
+  totalPoints: number;
+}
+
+// Re-export core types for convenience
+// Note: MatrixDimensionTopic is defined locally above, so not re-exported from core
+export type {
+  AssessmentMatrix,
+  MatrixMetadata,
+  MatrixDimensions,
+  MatrixCellStatus,
+  MatrixValidationResult,
+} from '@aiprimary/core';

@@ -11,6 +11,8 @@ import { QuestionNavigator } from './QuestionNavigator';
 import { AddQuestionButton } from './AddQuestionButton';
 import { QuestionListDialog } from './QuestionListDialog';
 import { QuestionsListViewPanel } from '../viewer/QuestionsListViewPanel';
+import { GenerateQuestionsManager } from './GenerateQuestionsManager';
+import { GenerateMatrixManager } from './GenerateMatrixManager';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 
@@ -22,6 +24,7 @@ interface AssignmentEditorLayoutProps {
 
 export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLayoutProps) => {
   const mainView = useAssignmentEditorStore((state) => state.mainView);
+  const setMainView = useAssignmentEditorStore((state) => state.setMainView);
   const setQuestionBankOpen = useAssignmentEditorStore((state) => state.setQuestionBankOpen);
   const setContextCreateFormOpen = useAssignmentEditorStore((state) => state.setContextCreateFormOpen);
   const setContextLibraryDialogOpen = useAssignmentEditorStore((state) => state.setContextLibraryDialogOpen);
@@ -47,6 +50,10 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
           <ContextsPanel />
         ) : mainView === 'questionsList' ? (
           <QuestionsListViewPanel assignment={{ questions, contexts, topics } as any} />
+        ) : mainView === 'generateQuestions' ? (
+          <GenerateQuestionsManager />
+        ) : mainView === 'generateMatrix' ? (
+          <GenerateMatrixManager />
         ) : null}
       </div>
 
@@ -60,14 +67,20 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
             {t('actions.actions')}
           </div>
 
-          {/* Question Actions - Only show when not in matrix view */}
-          {mainView !== 'matrix' && mainView !== 'contexts' && (
+          {/* Question Actions - Only show when not in matrix/contexts/generateMatrix view */}
+          {mainView !== 'matrix' && mainView !== 'contexts' && mainView !== 'generateMatrix' && (
             <>
               <div className="space-y-2">
                 <AddQuestionButton className="w-full" />
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button type="button" size="sm" variant="outline" disabled className="w-full">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setMainView('generateQuestions')}
+                      className="w-full"
+                    >
                       <Wand2 className="mr-2 h-4 w-4" />
                       {tToolbar('generate')}
                     </Button>
@@ -91,6 +104,53 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>{tActions('tooltips.fromBank')}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t pt-3" />
+            </>
+          )}
+
+          {/* Matrix Actions - Show in matrix and generateMatrix views */}
+          {(mainView === 'matrix' || mainView === 'generateMatrix') && (
+            <>
+              <div className="space-y-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        window.dispatchEvent(new CustomEvent('matrix.addTopic'));
+                      }}
+                      className="w-full"
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      {t('matrixEditor.addTopic')}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{t('matrixBuilder.tooltips.addTopic')}</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setMainView('generateMatrix')}
+                      className="w-full"
+                    >
+                      <Wand2 className="mr-2 h-4 w-4" />
+                      {t('matrixBuilder.generateMatrix')}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{tActions('tooltips.generateMatrix')}</p>
                   </TooltipContent>
                 </Tooltip>
               </div>

@@ -1,3 +1,5 @@
+import type { SubjectCode } from '@aiprimary/core';
+import type { Grade } from '@aiprimary/core/assessment/grades.js';
 import type { AssignmentQuestionWithTopic, QuestionItemRequest } from '../types';
 
 /**
@@ -16,6 +18,7 @@ interface BackendQuestion {
   subject?: string;
   data: unknown;
   points: number;
+  topicId?: string;
   contextId?: string;
 }
 
@@ -37,7 +40,7 @@ export function transformQuestionsFromApi(
       explanation: q.explanation,
       data: q.data,
       contextId: q.contextId,
-      topicId: defaultTopicId,
+      topicId: q.topicId || defaultTopicId,
     } as AssignmentQuestionWithTopic['question'];
 
     return {
@@ -65,11 +68,12 @@ export function transformQuestionsForApi(questions: AssignmentQuestionWithTopic[
       title: q.title,
       titleImageUrl: q.titleImageUrl,
       explanation: q.explanation,
-      grade: q.grade,
+      grade: q.grade as Grade | undefined,
       chapter: q.chapter,
-      subject: q.subject,
+      subject: q.subject as SubjectCode | undefined,
       data: q.data ? { type: q.type, ...q.data } : null,
       point: points,
+      topicId: q.topicId,
       contextId: q.contextId,
     };
   });

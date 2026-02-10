@@ -20,12 +20,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
-import { Plus, Upload, Download, MoreVertical, Trash2, Copy, FileEdit } from 'lucide-react';
+import { Plus, Upload, Download, MoreVertical, Trash2, Copy, FileEdit, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import DataTable from '@/shared/components/table/DataTable';
 import {
   QuestionBankImportDialog,
+  QuestionBankGenerateDialog,
   QuestionBankFilters,
   QuestionBankDialog,
 } from '@/features/assignment/components/question-bank';
@@ -54,6 +55,7 @@ export function TeacherQuestionBankPage() {
     pageSize: 10,
   });
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
   const [isBrowseDialogOpen, setIsBrowseDialogOpen] = useState(false);
 
   // Store
@@ -335,6 +337,15 @@ export function TeacherQuestionBankPage() {
                 {t('actions.browsePublic')}
               </Button>
 
+              <Button
+                size="sm"
+                onClick={() => setIsGenerateDialogOpen(true)}
+                className="gap-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white hover:from-violet-600 hover:to-purple-600"
+              >
+                <Sparkles className="h-4 w-4" />
+                {t('actions.generate')}
+              </Button>
+
               <Button size="sm" onClick={() => navigate('/question-bank/create')} className="gap-2">
                 <Plus className="h-4 w-4" />
                 {t('actions.create')}
@@ -377,6 +388,9 @@ export function TeacherQuestionBankPage() {
 
         {/* Dialogs */}
         <QuestionBankImportDialog open={isImportDialogOpen} onClose={() => setIsImportDialogOpen(false)} />
+
+        {/* Generate Questions Dialog */}
+        <QuestionBankGenerateDialog open={isGenerateDialogOpen} onOpenChange={setIsGenerateDialogOpen} />
 
         {/* Browse Public Questions Dialog */}
         <QuestionBankDialog

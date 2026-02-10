@@ -5,6 +5,8 @@ import type {
   QuestionBankFilters,
   QuestionBankApiResponse,
   ChapterResponse,
+  GenerateQuestionsRequest,
+  GenerateQuestionsResponse,
 } from '../types/questionBank';
 import { parseQuestionBankCSV, exportQuestionsToCSV } from '../utils/csvParser';
 import { validateQuestionBankCSV } from '../utils/csvValidation';
@@ -190,5 +192,10 @@ export default class QuestionBankService implements QuestionBankApiService {
       params: { subject, grade },
     });
     return response.data.data || [];
+  }
+
+  async generateQuestions(request: GenerateQuestionsRequest): Promise<GenerateQuestionsResponse> {
+    const response = await this.apiClient.post(`${this.baseUrl}/api/question-bank/generate`, request);
+    return response.data.data;
   }
 }

@@ -1,14 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useCreatePost } from '../hooks/useApi';
-import { useAttachmentUpload } from '../hooks/useAttachmentUpload';
-import { type PostCreateRequest, PostType } from '../types';
+import { ResourceSelectorDialog } from '@/features/projects/components/resource-selector';
 import type { LinkedResource } from '@/features/projects/types/resource';
-import { useTranslation } from 'react-i18next';
-import { Button } from '@/shared/components/ui/button';
 import RichTextEditor from '@/shared/components/rte/RichTextEditor';
 import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
-import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
-import { Label } from '@/shared/components/ui/label';
+import { Button } from '@/shared/components/ui/button';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Switch } from '@/shared/components/ui/switch';
 import { Input } from '@/shared/components/ui/input';
@@ -19,23 +13,32 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/components/ui/dialog';
+import { Label } from '@/shared/components/ui/label';
+import { Progress } from '@/shared/components/ui/progress';
+import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
+import { Separator } from '@/shared/components/ui/separator';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  Paperclip,
-  Plus,
-  X,
-  Link2,
   BrainCircuit,
-  Presentation,
   ClipboardList,
-  Loader2,
   Eye,
+  Link2,
+  Loader2,
   MessageSquare,
   CalendarIcon,
+  Paperclip,
+  Plus,
+  Presentation,
+  X,
 } from 'lucide-react';
-import { Separator } from '@/shared/components/ui/separator';
-import { ResourceSelectorDialog } from '@/features/projects/components/resource-selector';
-import { getAcceptString, formatFileSize } from '../utils/attachmentValidation';
-import { Progress } from '@/shared/components/ui/progress';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { useCreatePost } from '../hooks/useApi';
+import { useAttachmentUpload } from '../hooks/useAttachmentUpload';
+import { PostType, type PostCreateRequest } from '../types';
+import { formatFileSize, getAcceptString } from '../utils/attachmentValidation';
+import { postEditorSchema } from '../validation/postSchema';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { cn } from '@/shared/lib/utils';
@@ -87,17 +90,46 @@ export const PostCreator = ({
   const [passingScore, setPassingScore] = useState<number | undefined>(undefined);
   const [availableFrom, setAvailableFrom] = useState<string>('');
   const [availableUntil, setAvailableUntil] = useState<string>('');
+  const [attachmentErrors, setAttachmentErrors] = useState<string[]>([]);
 
   // Sync type with initialType when it changes (e.g., when filter switches to Exercise)
   useEffect(() => {
     setType(initialType);
   }, [initialType]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Form for content validation
+  const form = useForm<{ content: string }>({
+    resolver: zodResolver(postEditorSchema),
+    defaultValues: { content: '' },
+    mode: 'onChange',
+  });
 
-    if (!editor || editor.document.length === 0) return;
+  const {
+    handleSubmit: handleFormSubmit,
+    setValue,
+    formState: { errors, isValid },
+  } = form;
 
+  // Keep editor content in sync with the form
+  const handleEditorChange = useCallback(async () => {
+    if (!editor) return;
+    try {
+      const md = await editor.blocksToMarkdownLossy(editor.document);
+      setValue('content', md, { shouldValidate: true, shouldDirty: true });
+      setAttachmentErrors([]);
+    } catch (err) {
+      console.error('Failed to convert blocks to markdown:', err);
+    }
+  }, [editor, setValue]);
+
+  // Initial sync when editor is ready
+  useEffect(() => {
+    if (!editor) return;
+    // ensure form content is in sync when editor is focused/used
+    handleEditorChange();
+  }, [editor, handleEditorChange]);
+
+  const onSubmit = handleFormSubmit(async (data) => {
     try {
       // Upload pending attachments first
       let attachmentUrls: string[] = [];
@@ -105,12 +137,10 @@ export const PostCreator = ({
         attachmentUrls = await uploadAll();
       }
 
-      const contentMd = await editor.blocksToMarkdownLossy(editor.document);
-
       const request: PostCreateRequest = {
         classId,
         type,
-        content: contentMd,
+        content: data.content,
         attachments: attachmentUrls.length > 0 ? attachmentUrls : undefined,
         linkedResources:
           type === PostType.Post && linkedResources.length > 0
@@ -138,8 +168,9 @@ export const PostCreator = ({
 
       await createPost.mutateAsync(request);
 
-      // Reset form
+      // Reset form and UI
       editor.replaceBlocks(editor.document, []);
+      form.reset({ content: '' });
       clearAttachments();
       setLinkedResources([]);
       setSelectedAssignment(null);
@@ -161,17 +192,44 @@ export const PostCreator = ({
     } catch (err) {
       // Error is handled by the hook
     }
-  };
+  });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    addFiles(files);
+    const results = addFiles(files);
+
+    const newErrors: string[] = [];
+    for (let i = 0; i < results.length; i++) {
+      const r = results[i];
+      if (!r.valid) {
+        if (r.errorType === 'invalid_extension') {
+          newErrors.push(
+            // @ts-ignore - errorData.extension exists
+            t('feed.creator.attachments.validation.invalidFileType', { extension: r.errorData?.extension })
+          );
+        } else if (r.errorType === 'file_too_large') {
+          newErrors.push(
+            t('feed.creator.attachments.validation.fileTooLarge', {
+              fileName: files[i].name,
+              maxSize: r.errorData?.maxSizeMB,
+              actualSize: r.errorData?.actualSizeMB,
+            })
+          );
+        } else if (r.errorType === 'max_attachments') {
+          newErrors.push(t('feed.creator.validation.maxAttachmentsExceeded', { max: r.errorData?.max }));
+        } else {
+          newErrors.push(t('feed.creator.attachments.validation.cannotAdd', { fileName: files[i].name }));
+        }
+      }
+    }
+
+    setAttachmentErrors(newErrors);
+
     // Reset the input so the same file can be selected again
     e.target.value = '';
   };
 
-  const canSubmit = editor && editor.document.length > 0 && !createPost.isPending && !isUploading;
-
+  const canSubmit = isValid && !createPost.isPending && !isUploading;
   const buttonText =
     initialType === PostType.Exercise
       ? t('feed.creator.actions.createHomework')
@@ -190,7 +248,7 @@ export const PostCreator = ({
           <DialogTitle>{t('feed.creator.dialog.title')}</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={onSubmit} className="space-y-6">
           {/* Post Type */}
           <div className="space-y-3">
             <Label className="text-sm font-medium">{t('feed.creator.labels.postType')}</Label>
@@ -217,14 +275,22 @@ export const PostCreator = ({
           {/* Content Editor */}
           <div className="space-y-2">
             <Label className="text-sm font-medium">{t('feed.creator.labels.content')}</Label>
-            <div className="rounded-lg border">
+            <div
+              className={`rounded-lg border ${errors.content ? 'border-red-500 ring-2 ring-red-200' : ''}`}
+            >
               <RichTextEditor
                 editor={editor}
                 minimalToolbar={true}
                 sideMenu={false}
                 className="min-h-[150px] p-2 md:min-h-[200px] md:p-3"
+                onChange={handleEditorChange}
               />
             </div>
+            {errors.content && (
+              <p className="text-sm text-red-600">
+                {t((errors.content.message as any) ?? 'feed.creator.validation.contentRequired')}
+              </p>
+            )}
           </div>
           <Separator />
           {/* Conditional Fields based on Post Type */}
@@ -486,6 +552,15 @@ export const PostCreator = ({
                             <X className="h-3 w-3" />
                           </Button>
                         </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Attachment validation errors */}
+                  {attachmentErrors.length > 0 && (
+                    <div className="mt-2 space-y-1 text-sm text-red-600">
+                      {attachmentErrors.map((err, idx) => (
+                        <p key={idx}>{err}</p>
                       ))}
                     </div>
                   )}

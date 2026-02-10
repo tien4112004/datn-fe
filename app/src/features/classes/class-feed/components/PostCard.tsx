@@ -2,8 +2,10 @@ import { UserAvatar } from '@/components/common/UserAvatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
+import { parseDateSafe } from '@/shared/utils/date';
 import { format, formatDistanceToNow } from 'date-fns';
-import { Clock, FileText, ClipboardList, MessageCircleMore, Pin } from 'lucide-react';
+import { ClipboardList, Clock, FileText, MessageCircleMore, Pin } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
@@ -11,8 +13,8 @@ import { type Post, PostType } from '../types';
 import { AttachmentPreview } from './AttachmentPreview';
 import { LinkedResourcesPreview } from './LinkedResourcesPreview';
 import { PostActions } from './PostActions';
-import { parseDateSafe } from '@/shared/utils/date';
 import { useAssignmentByPost } from '@/features/assignment';
+import PostEditor from './PostEditor';
 
 interface PostCardProps {
   post: Post;
@@ -20,11 +22,44 @@ interface PostCardProps {
   onDelete?: () => void;
   onPin?: (pinned: boolean) => void;
   onComment?: () => void;
+  /** Called when edited content should be saved */
+  onUpdate?: (content: string) => Promise<void> | void;
   className?: string;
 }
 
-export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className = '' }: PostCardProps) => {
+export const PostCard = ({
+  post,
+  onEdit,
+  onDelete,
+  onPin,
+  onComment,
+  onUpdate,
+  className = '',
+}: PostCardProps) => {
   const { t } = useTranslation('classes');
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Edit helpers
+  const handleStartEdit = () => {
+    onEdit?.();
+    setIsEditing(true);
+  };
+
+  const handleSave = async (content: string) => {
+    if (!onUpdate) {
+      setIsEditing(false);
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await onUpdate(content);
+      setIsEditing(false);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   // Fetch assignment details if this is an Exercise post with an assignmentId
   const { data: assignment, isLoading: isAssignmentLoading } = useAssignmentByPost(post.id);
@@ -120,17 +155,26 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
               </p>
             </div>
 
-            <PostActions post={post} onEdit={onEdit} onDelete={onDelete} onPin={onPin} />
+            <PostActions post={post} onEdit={handleStartEdit} onDelete={onDelete} onPin={onPin} />
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <Link to={getPostDetailPath()} className="mb-2 ml-9 block md:mb-3 md:ml-[52px]">
-        <article className="prose prose-sm !max-w-none">
-          <ReactMarkdown>{post.content}</ReactMarkdown>
-        </article>
-      </Link>
+      {isEditing ? (
+        <PostEditor
+          initialContent={post.content}
+          isSaving={isSaving}
+          onCancel={() => setIsEditing(false)}
+          onSave={handleSave}
+        />
+      ) : (
+        <Link to={getPostDetailPath()} className="mb-2 ml-9 block md:mb-3 md:ml-[52px]">
+          <article className="prose prose-sm !max-w-none">
+            <ReactMarkdown>{post.content}</ReactMarkdown>
+          </article>
+        </Link>
+      )}
 
       {/* Attachments */}
       {post.attachments && post.attachments.length > 0 && (

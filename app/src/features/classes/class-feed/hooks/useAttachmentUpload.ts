@@ -38,28 +38,32 @@ export function useAttachmentUpload(): UseAttachmentUploadReturn {
    * Add files to the pending list after validation
    * Returns validation results for each file
    */
-  const addFiles = useCallback((files: File[]): ValidationResult[] => {
-    const results: ValidationResult[] = [];
-    const validFiles: PendingFile[] = [];
+  const addFiles = useCallback(
+    (files: File[]): ValidationResult[] => {
+      const results: ValidationResult[] = [];
+      const validFiles: PendingFile[] = [];
 
-    for (const file of files) {
-      const validation = validateAttachment(file);
-      results.push(validation);
+      for (const file of files) {
+        // Pass current pending count so validateAttachment can enforce max attachments
+        const validation = validateAttachment(file, pendingFiles.length + validFiles.length);
+        results.push(validation);
 
-      if (validation.valid) {
-        validFiles.push({
-          file,
-          id: `${file.name}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        });
+        if (validation.valid) {
+          validFiles.push({
+            file,
+            id: `${file.name}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          });
+        }
       }
-    }
 
-    if (validFiles.length > 0) {
-      setPendingFiles((prev) => [...prev, ...validFiles]);
-    }
+      if (validFiles.length > 0) {
+        setPendingFiles((prev) => [...prev, ...validFiles]);
+      }
 
-    return results;
-  }, []);
+      return results;
+    },
+    [pendingFiles.length]
+  );
 
   /**
    * Remove an uploaded URL by index

@@ -1094,6 +1094,19 @@ export default {
         comment: 'Write a comment...',
         selectDeadline: 'Select deadline',
       },
+      validation: {
+        contentRequired: 'Post content is required',
+        contentTooShort: 'Content must be at least 10 characters',
+        contentTooLong: 'Content must be less than 10000 characters',
+        assignmentRequired: 'Assignment is required for exercises',
+        dueDateRequired: 'Due date is required for exercises',
+        dueDatePast: 'Due date must be in the future',
+        attachmentInvalid: 'Invalid attachment: {{fileName}}',
+        attachmentTooLarge: 'File "{{fileName}}" exceeds {{maxSize}}MB limit',
+        attachmentTypeNotAllowed: 'File type "{{extension}}" is not allowed',
+        maxAttachmentsExceeded: 'Maximum {{max}} attachments allowed',
+        uploadFailed: 'Failed to upload: {{fileName}}',
+      },
       postType: {
         post: 'Post',
         exercise: 'Exercise',
@@ -1179,6 +1192,18 @@ export default {
         delete: 'Delete post',
         comment: 'comment',
         comments: 'comments',
+      },
+      edit: {
+        save: 'Save',
+        cancel: 'Cancel',
+        saving: 'Saving...',
+        empty: 'Post content cannot be empty',
+        saveFailed: 'Failed to save changes. Please try again',
+        validation: {
+          contentRequired: 'Post content is required',
+          contentTooShort: 'Content must be at least 10 characters',
+          contentTooLong: 'Content must be less than 10000 characters',
+        },
       },
       confirm: {
         deletePost: 'Are you sure you want to delete this post?',

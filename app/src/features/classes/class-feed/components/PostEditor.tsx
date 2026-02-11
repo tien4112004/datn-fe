@@ -52,7 +52,7 @@ export const PostEditor = ({ initialContent, onCancel, onSave, isSaving = false 
       const parsed = postEditorSchema.safeParse({ content: md });
       if (!parsed.success) {
         const key = parsed.error.errors[0]?.message || 'feed.post.edit.empty';
-        const msg = t(key as string);
+        const msg = t(key as any);
         toast.error(msg);
         setError(msg);
         return;

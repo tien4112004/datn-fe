@@ -103,42 +103,6 @@ export function getMediaCategory(filename: string): MediaCategory | null {
   return null;
 }
 
-export interface ValidationError {
-  type: 'invalid_extension' | 'file_too_large';
-  extension?: string;
-  sizeMB?: string;
-}
-
-/**
- * Validate a file for upload
- * Returns validation result with error type instead of localized message
- */
-export function validateAttachment(
-  file: File
-): ValidationResult & { errorType?: ValidationError['type']; errorData?: any } {
-  if (!isValidFileExtension(file.name)) {
-    const extension = getFileExtension(file.name) || 'unknown';
-    return {
-      valid: false,
-      error: 'invalid_extension',
-      errorType: 'invalid_extension',
-      errorData: { extension },
-    };
-  }
-
-  if (!isValidFileSize(file)) {
-    const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-    return {
-      valid: false,
-      error: 'file_too_large',
-      errorType: 'file_too_large',
-      errorData: { sizeMB },
-    };
-  }
-
-  return { valid: true };
-}
-
 /**
  * Generate the accept attribute string for file input
  */

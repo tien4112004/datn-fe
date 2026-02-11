@@ -288,7 +288,7 @@ export const PostCreator = ({
             </div>
             {errors.content && (
               <p className="text-sm text-red-600">
-                {t((errors.content.message as any) ?? 'feed.creator.validation.contentRequired')}
+                {t(((errors.content.message as string) ?? 'feed.creator.validation.contentRequired') as any)}
               </p>
             )}
           </div>

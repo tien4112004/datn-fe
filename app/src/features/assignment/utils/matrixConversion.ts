@@ -21,12 +21,13 @@ import type { MatrixCell, ApiMatrix, AssignmentTopic, MatrixDimensionTopic } fro
 // ============================================================================
 
 /**
- * Convert flat MatrixCell array to API matrix format with topic > subtopic hierarchy.
+ * Convert flat MatrixCell array to API matrix format.
+ * Topics are the first dimension (no subtopic hierarchy).
  *
  * @param cells - Flat array of MatrixCell from UI
  * @param metadata - Matrix metadata (grade, subject)
- * @param topics - Store topics (subtopics with optional parentTopic grouping)
- * @returns ApiMatrix with topic > subtopic dimensions
+ * @param topics - Store topics (topics with optional subtopics metadata)
+ * @returns ApiMatrix with topics as first dimension
  */
 export function cellsToApiMatrix(
   cells: MatrixCell[],
@@ -36,15 +37,11 @@ export function cellsToApiMatrix(
   },
   topics: AssignmentTopic[]
 ): ApiMatrix {
-  // Extract unique dimensions from cells
-  const subtopicsMap = new Map<string, { id: string; name: string }>();
+  // Extract unique difficulties and question types from cells
   const difficultiesSet = new Set<Difficulty>();
   const questionTypesSet = new Set<QuestionType>();
 
   cells.forEach((cell) => {
-    if (!subtopicsMap.has(cell.topicId)) {
-      subtopicsMap.set(cell.topicId, { id: cell.topicId, name: cell.topicName });
-    }
     difficultiesSet.add(cell.difficulty);
     questionTypesSet.add(cell.questionType);
   });
@@ -52,29 +49,19 @@ export function cellsToApiMatrix(
   const difficulties = Array.from(difficultiesSet);
   const questionTypes = Array.from(questionTypesSet);
 
-  // Build topic > subtopic hierarchy from store topics
-  const groupMap = new Map<string, { id: string; name: string }[]>();
-  const groupOrder: string[] = [];
-  topics.forEach((t) => {
-    const group = t.parentTopic || t.name;
-    if (!groupMap.has(group)) {
-      groupMap.set(group, []);
-      groupOrder.push(group);
-    }
-    groupMap.get(group)!.push({ id: t.id, name: t.name });
-  });
-  const dimensionTopics: MatrixDimensionTopic[] = groupOrder.map((name) => ({
-    name,
-    subtopics: groupMap.get(name)!,
+  // Map topics directly (no grouping by parentTopic)
+  const dimensionTopics: MatrixDimensionTopic[] = topics.map((t) => ({
+    id: t.id,
+    name: t.name,
+    subtopics: t.subtopics, // Pass through informational subtopics
   }));
 
-  // Build 3D matrix — rows are flattened subtopics in group order
-  const orderedSubtopics = dimensionTopics.flatMap((t) => t.subtopics);
-  const matrix: string[][][] = orderedSubtopics.map((subtopic) =>
+  // Build 3D matrix — rows are topics (not subtopics)
+  const matrix: string[][][] = topics.map((topic) =>
     difficulties.map((difficulty) =>
       questionTypes.map((questionType) => {
         const cell = cells.find(
-          (c) => c.topicId === subtopic.id && c.difficulty === difficulty && c.questionType === questionType
+          (c) => c.topicId === topic.id && c.difficulty === difficulty && c.questionType === questionType
         );
         if (!cell || cell.requiredCount === 0) return '0:0';
         return `${cell.requiredCount}:${cell.requiredCount.toFixed(1)}`;
@@ -106,50 +93,29 @@ export function cellsToApiMatrix(
 
 /**
  * Merge API matrix required counts into a full matrix cell grid.
- * Flattens topic > subtopic hierarchy to match matrix row indexing.
+ * Topics are already flat in new structure (no subtopic flattening needed).
  *
- * @param apiMatrix - Matrix from API (with topic > subtopic dimensions)
- * @param fullCells - Full grid of MatrixCell (one per subtopic × difficulty × questionType)
+ * @param apiMatrix - Matrix from API (with flat topics)
+ * @param fullCells - Full grid of MatrixCell (one per topic × difficulty × questionType)
  * @returns Updated cells with requiredCount from API
  */
 export function mergeApiMatrixIntoCells(apiMatrix: ApiMatrix, fullCells: MatrixCell[]): MatrixCell[] {
   const { dimensions, matrix } = apiMatrix;
 
-  // Flatten subtopics — matrix rows correspond to flattened subtopics
-  const flatSubtopics = dimensions.topics.flatMap((t) => t.subtopics ?? []);
-
-  // Ensure all subtopics have IDs
-  flatSubtopics.forEach((sub) => {
-    if (!sub.id) {
-      sub.id = createTopicId();
-    }
-  });
-
-  // Create a map for quick lookup by subtopic index
-  const cellsBySubtopicIndex = new Map<number, MatrixCell[]>();
-  fullCells.forEach((cell) => {
-    const subIdx = flatSubtopics.findIndex((s) => s.id === cell.topicId);
-    if (subIdx >= 0) {
-      if (!cellsBySubtopicIndex.has(subIdx)) {
-        cellsBySubtopicIndex.set(subIdx, []);
-      }
-      cellsBySubtopicIndex.get(subIdx)!.push(cell);
-    }
-  });
-
-  // Update requiredCount from API matrix
-  flatSubtopics.forEach((_, subIdx) => {
-    const subCells = cellsBySubtopicIndex.get(subIdx) || [];
-
+  // Topics are already flat in new structure
+  dimensions.topics.forEach((topic, topicIdx) => {
     dimensions.difficulties.forEach((difficultyApi, diffIdx) => {
       dimensions.questionTypes.forEach((questionTypeApi, qtIdx) => {
-        const cellValue = matrix[subIdx]?.[diffIdx]?.[qtIdx] || '0:0';
+        const cellValue = matrix[topicIdx]?.[diffIdx]?.[qtIdx] || '0:0';
         const { count } = parseCellValue(cellValue);
 
         const difficulty = difficultyFromApi(difficultyApi);
         const questionType = questionTypeFromApi(questionTypeApi);
 
-        const cell = subCells.find((c) => c.difficulty === difficulty && c.questionType === questionType);
+        const cell = fullCells.find(
+          (c) => c.topicId === topic.id && c.difficulty === difficulty && c.questionType === questionType
+        );
+
         if (cell) {
           cell.requiredCount = count;
         }
@@ -163,7 +129,7 @@ export function mergeApiMatrixIntoCells(apiMatrix: ApiMatrix, fullCells: MatrixC
 
 /**
  * Convert ApiMatrix to flat MatrixCell array + AssignmentTopic array for viewer.
- * Handles the 3D matrix → flat cells conversion and extracts topic hierarchy.
+ * Topics are already flat (no parentTopic grouping).
  */
 export function apiMatrixToViewData(
   apiMatrix: ApiMatrix,
@@ -174,19 +140,12 @@ export function apiMatrixToViewData(
 } {
   const { dimensions, matrix } = apiMatrix;
 
-  // Build topics with parentTopic grouping from dimension hierarchy
-  const topics: AssignmentTopic[] = dimensions.topics.flatMap((topic) =>
-    (topic.subtopics ?? [])
-      .filter((sub) => sub.name?.trim())
-      .map((sub) => ({
-        id: sub.id || createTopicId(),
-        name: sub.name,
-        parentTopic: topic.name,
-      }))
-  );
-
-  // Flatten subtopics in order matching matrix row indices
-  const flatSubtopics = dimensions.topics.flatMap((t) => t.subtopics ?? []);
+  // Topics are already flat - just map to AssignmentTopic
+  const topics: AssignmentTopic[] = dimensions.topics.map((topic) => ({
+    id: topic.id || createTopicId(),
+    name: topic.name,
+    subtopics: topic.subtopics, // Carry over informational data
+  }));
 
   // Count questions per cell if questions are provided
   const counts = new Map<string, number>();
@@ -201,20 +160,20 @@ export function apiMatrixToViewData(
   }
 
   const cells: MatrixCell[] = [];
-  flatSubtopics.forEach((sub, subIdx) => {
+  dimensions.topics.forEach((topic, topicIdx) => {
     dimensions.difficulties.forEach((difficultyRaw, diffIdx) => {
       dimensions.questionTypes.forEach((questionTypeRaw, qtIdx) => {
-        const cellValue = matrix[subIdx]?.[diffIdx]?.[qtIdx] || '0:0';
+        const cellValue = matrix[topicIdx]?.[diffIdx]?.[qtIdx] || '0:0';
         const { count, points } = parseCellValue(cellValue);
 
         const difficulty = difficultyFromApi(difficultyRaw);
         const questionType = questionTypeFromApi(questionTypeRaw);
-        const cellId = createCellId(sub.id || '', difficulty, questionType);
+        const cellId = createCellId(topic.id || '', difficulty, questionType);
 
         cells.push({
           id: cellId,
-          topicId: sub.id || '',
-          topicName: sub.name,
+          topicId: topic.id || '',
+          topicName: topic.name,
           difficulty,
           questionType,
           requiredCount: count,

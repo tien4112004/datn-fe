@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
+import { Badge } from '@/shared/components/ui/badge';
 import {
   getAllDifficulties,
   getAllQuestionTypes,
@@ -31,19 +32,6 @@ export const MatrixGridView = ({ topics, matrixCells }: MatrixGridViewProps) => 
 
   const difficulties = getAllDifficulties();
   const questionTypes = getAllQuestionTypes();
-  const totalDataCols = difficulties.length * questionTypes.length;
-
-  // Group topics by parentTopic
-  const groups = new Map<string, AssignmentTopic[]>();
-  const groupOrder: string[] = [];
-  topics.forEach((topic) => {
-    const group = topic.parentTopic || topic.name;
-    if (!groups.has(group)) {
-      groups.set(group, []);
-      groupOrder.push(group);
-    }
-    groups.get(group)!.push(topic);
-  });
 
   return (
     <div className="overflow-x-auto rounded-lg border">
@@ -88,49 +76,45 @@ export const MatrixGridView = ({ topics, matrixCells }: MatrixGridViewProps) => 
           </TableRow>
         </TableHeader>
         <TableBody>
-          {groupOrder.map((groupName) => {
-            const subtopics = groups.get(groupName)!;
-            return (
-              <React.Fragment key={groupName}>
-                {/* Topic group header */}
-                <TableRow className="bg-gray-100 dark:bg-gray-800">
-                  <TableCell colSpan={1 + totalDataCols} className="font-semibold">
-                    {groupName}
-                  </TableCell>
-                </TableRow>
-                {/* Subtopic rows */}
-                {subtopics.map((topic) => (
-                  <TableRow key={topic.id}>
-                    <TableCell className="w-[160px] pl-6 align-top font-medium">
-                      <div className="whitespace-normal break-words">{topic.name}</div>
+          {topics.map((topic) => (
+            <TableRow key={topic.id}>
+              <TableCell className="w-[160px] align-top font-medium">
+                <div className="space-y-1">
+                  <div className="whitespace-normal break-words">{topic.name}</div>
+                  {/* Display subtopics as informational chips */}
+                  {topic.subtopics && topic.subtopics.length > 0 && (
+                    <div className="flex flex-wrap gap-1 pt-1">
+                      {topic.subtopics.map((subtopic, idx) => (
+                        <Badge key={idx} variant="secondary" className="text-xs">
+                          {subtopic}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </TableCell>
+              {difficulties.map((difficulty, difficultyIndex) =>
+                questionTypes.map((questionType) => {
+                  const cell = matrixCells.find(
+                    (c) =>
+                      c.topicId === topic.id &&
+                      c.difficulty === difficulty.value &&
+                      c.questionType === questionType.value
+                  );
+                  const bgColor =
+                    difficultyIndex % 2 === 0 ? 'bg-white dark:bg-gray-950' : 'bg-gray-50 dark:bg-gray-900';
+                  return (
+                    <TableCell
+                      key={`${topic.id}-${difficulty.value}-${questionType.value}`}
+                      className={`w-[70px] p-1 text-center ${bgColor}`}
+                    >
+                      <MatrixCellView cell={cell} />
                     </TableCell>
-                    {difficulties.map((difficulty, difficultyIndex) =>
-                      questionTypes.map((questionType) => {
-                        const cell = matrixCells.find(
-                          (c) =>
-                            c.topicId === topic.id &&
-                            c.difficulty === difficulty.value &&
-                            c.questionType === questionType.value
-                        );
-                        const bgColor =
-                          difficultyIndex % 2 === 0
-                            ? 'bg-white dark:bg-gray-950'
-                            : 'bg-gray-50 dark:bg-gray-900';
-                        return (
-                          <TableCell
-                            key={`${topic.id}-${difficulty.value}-${questionType.value}`}
-                            className={`w-[70px] p-1 text-center ${bgColor}`}
-                          >
-                            <MatrixCellView cell={cell} />
-                          </TableCell>
-                        );
-                      })
-                    )}
-                  </TableRow>
-                ))}
-              </React.Fragment>
-            );
-          })}
+                  );
+                })
+              )}
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </div>

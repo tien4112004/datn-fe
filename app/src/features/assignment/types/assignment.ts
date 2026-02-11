@@ -27,13 +27,14 @@ export interface AssignmentTopic {
   id: string;
   name: string;
   description?: string;
-  parentTopic?: string; // Parent topic name for matrix grouping
+  subtopics?: string[]; // Informational subtopic names (not used for filtering)
 }
 
-// Matrix dimension topic (topic > subtopic hierarchy for API)
+// Matrix dimension topic (topics are the first dimension, subtopics are informational)
 export interface MatrixDimensionTopic {
+  id: string;
   name: string;
-  subtopics: { id: string; name: string }[];
+  subtopics?: string[]; // Informational subtopic names
 }
 
 // Matrix cell (topic × difficulty × questionType) - flat representation for UI

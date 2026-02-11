@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { FileQuestion, Clock, Eye, Edit, Trophy, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSubmissionsByPost } from '@/features/assignment/hooks';
 import { SubmissionStatusBadge } from '@/features/assignment/components/SubmissionStatusBadge';
-import { formatDistanceToNow } from 'date-fns';
+import { useFormattedDistance } from '@/shared/lib/date-utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface SubmissionStatisticsProps {
@@ -15,33 +16,10 @@ interface SubmissionStatisticsProps {
 
 export const SubmissionStatistics = ({ postId }: SubmissionStatisticsProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('classes', { keyPrefix: 'submissionStatistics' });
+  const { formatDistanceToNow } = useFormattedDistance();
   const { data: submissions = [], isLoading } = useSubmissionsByPost(postId);
   const [showTable, setShowTable] = useState(true);
-
-  const stats = useMemo(() => {
-    const total = submissions.length;
-    const graded = submissions.filter((s) => s.status === 'graded').length;
-    const pending = submissions.filter((s) => s.status === 'submitted').length;
-    const inProgress = submissions.filter((s) => s.status === 'in_progress').length;
-
-    // Calculate average score for graded submissions
-    const gradedSubmissions = submissions.filter(
-      (s) => s.status === 'graded' && s.score !== undefined && s.maxScore !== undefined
-    );
-    const avgScore =
-      gradedSubmissions.length > 0
-        ? gradedSubmissions.reduce((sum, s) => sum + (s.score! / s.maxScore!) * 100, 0) /
-          gradedSubmissions.length
-        : 0;
-
-    return {
-      total,
-      graded,
-      pending,
-      inProgress,
-      avgScore: Math.round(avgScore),
-    };
-  }, [submissions]);
 
   if (isLoading) {
     return (
@@ -69,12 +47,12 @@ export const SubmissionStatistics = ({ postId }: SubmissionStatisticsProps) => {
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <FileQuestion className="text-muted-foreground h-5 w-5" />
-          <h3 className="text-lg font-semibold">Submissions</h3>
+          <h3 className="text-lg font-semibold">{t('title')}</h3>
         </div>
-        {stats.total > 0 && (
+        {submissions.length > 0 && (
           <Button variant="outline" size="sm" onClick={() => setShowTable(!showTable)}>
             {showTable ? <ChevronUp className="mr-2 h-4 w-4" /> : <ChevronDown className="mr-2 h-4 w-4" />}
-            {showTable ? 'Hide' : 'Show'} Table
+            {showTable ? t('hideTable') : t('showTable')} {t('table')}
           </Button>
         )}
       </div>
@@ -85,11 +63,11 @@ export const SubmissionStatistics = ({ postId }: SubmissionStatisticsProps) => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Student</TableHead>
-                <TableHead>Submitted</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Score</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t('tableHeaders.student')}</TableHead>
+                <TableHead>{t('tableHeaders.submitted')}</TableHead>
+                <TableHead>{t('tableHeaders.status')}</TableHead>
+                <TableHead>{t('tableHeaders.score')}</TableHead>
+                <TableHead className="text-right">{t('tableHeaders.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -104,7 +82,7 @@ export const SubmissionStatistics = ({ postId }: SubmissionStatisticsProps) => {
                         <p className="text-muted-foreground text-xs">{submission.student.email}</p>
                       </div>
                     ) : (
-                      <p className="text-muted-foreground">Unknown Student</p>
+                      <p className="text-muted-foreground">{t('unknownStudent')}</p>
                     )}
                   </TableCell>
                   <TableCell>
@@ -134,7 +112,7 @@ export const SubmissionStatistics = ({ postId }: SubmissionStatisticsProps) => {
                         </span>
                       </div>
                     ) : (
-                      <span className="text-muted-foreground text-sm">Not graded</span>
+                      <span className="text-muted-foreground text-sm">{t('notGraded')}</span>
                     )}
                   </TableCell>
                   <TableCell className="text-right">
@@ -147,7 +125,7 @@ export const SubmissionStatistics = ({ postId }: SubmissionStatisticsProps) => {
                             onClick={() => navigate(`/submissions/${submission.id}/grade`)}
                           >
                             <Eye className="mr-2 h-4 w-4" />
-                            View
+                            {t('actions.view')}
                           </Button>
                           <Button
                             variant="ghost"
@@ -164,7 +142,7 @@ export const SubmissionStatistics = ({ postId }: SubmissionStatisticsProps) => {
                           onClick={() => navigate(`/submissions/${submission.id}/grade`)}
                         >
                           <Edit className="mr-2 h-4 w-4" />
-                          Grade
+                          {t('actions.grade')}
                         </Button>
                       )}
                     </div>

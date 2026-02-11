@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/components/ui/button';
 import { Separator } from '@/shared/components/ui/separator';
 import { cn } from '@/shared/lib/utils';
@@ -17,13 +18,16 @@ import {
 import { QuestionRenderer } from '../../question/components/QuestionRenderer';
 import type { Question } from '@aiprimary/core';
 import { VIEW_MODE } from '@aiprimary/core';
-import { formatDistanceToNow } from 'date-fns';
+import { useFormattedDistance } from '@/shared/lib/date-utils';
 import { useSubmission } from '../hooks';
 import { useAssignmentPublic } from '../hooks/useAssignmentApi';
 
 export const SubmissionResultPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation('assignment', { keyPrefix: 'submissions.result' });
+  const { t: tActions } = useTranslation('assignment', { keyPrefix: 'submissions.actions' });
+  const { formatDistanceToNow } = useFormattedDistance();
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
@@ -47,9 +51,9 @@ export const SubmissionResultPage = () => {
     return (
       <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
         <div className="text-center">
-          <p className="text-lg font-semibold">Submission not found</p>
+          <p className="text-lg font-semibold">{t('notFound')}</p>
           <Button onClick={() => navigate(-1)} className="mt-4">
-            Go Back
+            {tActions('goBack')}
           </Button>
         </div>
       </div>
@@ -112,7 +116,7 @@ export const SubmissionResultPage = () => {
       <div className="border-b px-6 py-4 md:hidden">
         <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="-ml-2 mb-2">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
+          {tActions('back')}
         </Button>
         <h1 className="truncate text-lg font-semibold">{assignment.title}</h1>
         <div className="mt-2 flex items-center gap-4">
@@ -121,7 +125,7 @@ export const SubmissionResultPage = () => {
           >
             {submission.score !== undefined && submission.maxScore !== undefined
               ? `${submission.score}/${submission.maxScore}`
-              : 'Not graded'}
+              : t('notGraded')}
           </span>
           {submission.score !== undefined && (
             <span className="text-muted-foreground text-sm">({percentage}%)</span>
@@ -135,11 +139,11 @@ export const SubmissionResultPage = () => {
         <div className="space-y-4 border-b p-6">
           <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="-ml-2">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            {tActions('back')}
           </Button>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">{assignment.title}</h1>
-            <p className="text-muted-foreground mt-1 text-sm">Your Graded Submission</p>
+            <p className="text-muted-foreground mt-1 text-sm">{t('yourGradedSubmission')}</p>
           </div>
         </div>
 
@@ -163,16 +167,16 @@ export const SubmissionResultPage = () => {
             >
               {submission.score !== undefined && submission.maxScore !== undefined
                 ? `${submission.score}/${submission.maxScore}`
-                : 'Not graded'}
+                : t('notGraded')}
             </p>
             <p className="text-muted-foreground mt-1 text-sm">
               {percentage >= 90
-                ? 'Excellent!'
+                ? t('excellent')
                 : percentage >= 80
-                  ? 'Great job!'
+                  ? t('greatJob')
                   : percentage >= 70
-                    ? 'Good work!'
-                    : 'Keep practicing!'}
+                    ? t('goodWork')
+                    : t('keepPracticing')}
             </p>
           </div>
 
@@ -180,11 +184,11 @@ export const SubmissionResultPage = () => {
 
           <div className="space-y-3 text-sm">
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Questions</span>
+              <span className="text-muted-foreground">{t('questions')}</span>
               <span className="font-medium">{questions.length}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Total Points</span>
+              <span className="text-muted-foreground">{t('totalPoints')}</span>
               <span className="font-medium">{totalPoints}</span>
             </div>
           </div>
@@ -195,19 +199,21 @@ export const SubmissionResultPage = () => {
           <div className="text-muted-foreground flex items-center gap-2">
             <Clock className="h-4 w-4" />
             <span>
-              Submitted {formatDistanceToNow(new Date(submission.submittedAt), { addSuffix: true })}
+              {t('submitted')} {formatDistanceToNow(new Date(submission.submittedAt), { addSuffix: true })}
             </span>
           </div>
           {submission.gradedAt && (
             <div className="text-muted-foreground flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              <span>Graded {formatDistanceToNow(new Date(submission.gradedAt), { addSuffix: true })}</span>
+              <span>
+                {t('graded')} {formatDistanceToNow(new Date(submission.gradedAt), { addSuffix: true })}
+              </span>
             </div>
           )}
           <div className="text-muted-foreground flex items-center gap-2">
             <User className="h-4 w-4" />
             <span>
-              Graded by {teacher.firstName} {teacher.lastName}
+              {t('gradedBy')} {teacher.firstName} {teacher.lastName}
             </span>
           </div>
         </div>
@@ -258,10 +264,10 @@ export const SubmissionResultPage = () => {
                 <div className="flex-1">
                   <div className="mb-2 flex items-center gap-2">
                     <span className="text-muted-foreground text-sm font-medium">
-                      Question {currentQuestionIndex + 1}
+                      {t('question')} {currentQuestionIndex + 1}
                     </span>
                     <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                      {currentQuestion.points} points
+                      {currentQuestion.points} {t('points')}
                     </span>
                   </div>
                 </div>
@@ -274,7 +280,7 @@ export const SubmissionResultPage = () => {
                           : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300'
                       }`}
                     >
-                      You earned: {currentGrade.points}/{currentQuestion.points}
+                      {t('youEarned')} {currentGrade.points}/{currentQuestion.points}
                     </span>
                   </div>
                 )}
@@ -294,7 +300,7 @@ export const SubmissionResultPage = () => {
                   <div className="mb-2 flex items-center gap-2">
                     <User className="h-4 w-4 text-blue-600" />
                     <span className="text-sm font-semibold text-blue-900 dark:text-blue-100">
-                      Teacher Feedback
+                      {t('teacherFeedback')}
                     </span>
                   </div>
                   <p className="text-sm text-blue-800 dark:text-blue-200">{currentGrade.feedback}</p>
@@ -308,7 +314,7 @@ export const SubmissionResultPage = () => {
                 <div className="mb-3 flex items-center gap-2">
                   <User className="h-5 w-5 text-blue-600" />
                   <h3 className="text-base font-semibold text-blue-900 dark:text-blue-100">
-                    Overall Feedback from Teacher
+                    {t('overallFeedback')}
                   </h3>
                 </div>
                 <p className="whitespace-pre-wrap text-sm text-blue-800 dark:text-blue-200">
@@ -321,11 +327,11 @@ export const SubmissionResultPage = () => {
             <div className="mt-6 flex items-center justify-between">
               <Button variant="outline" onClick={handlePrevious} disabled={currentQuestionIndex === 0}>
                 <ChevronLeft className="mr-2 h-4 w-4" />
-                Previous
+                {tActions('previous')}
               </Button>
 
               <Button onClick={handleNext} disabled={currentQuestionIndex === questions.length - 1}>
-                Next
+                {tActions('next')}
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             </div>

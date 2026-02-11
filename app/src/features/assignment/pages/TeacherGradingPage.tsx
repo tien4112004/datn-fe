@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/components/ui/button';
 import { Textarea } from '@/shared/components/ui/textarea';
 import { Label } from '@/shared/components/ui/label';
@@ -10,13 +11,16 @@ import { QuestionRenderer } from '../../question/components/QuestionRenderer';
 import type { Question, Grade } from '@aiprimary/core';
 import { VIEW_MODE } from '@aiprimary/core';
 import { toast } from 'sonner';
-import { formatDistanceToNow } from 'date-fns';
+import { useFormattedDistance } from '@/shared/lib/date-utils';
 import { useSubmission, useGradeSubmission } from '../hooks';
 import { useAssignmentPublic } from '../hooks/useAssignmentApi';
 
 export const TeacherGradingPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation('assignment', { keyPrefix: 'submissions.grading' });
+  const { t: tActions } = useTranslation('assignment', { keyPrefix: 'submissions.actions' });
+  const { formatDistanceToNow } = useFormattedDistance();
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [grades, setGrades] = useState<Grade[]>([]);
@@ -140,7 +144,7 @@ export const TeacherGradingPage = () => {
     const ungradedQuestions = questions.filter((q) => !grades.some((g) => g.questionId === q.question.id));
 
     if (ungradedQuestions.length > 0) {
-      toast.warning(`Please grade all questions (${ungradedQuestions.length} remaining)`);
+      toast.warning(t('pleaseGradeAll', { count: ungradedQuestions.length }));
       return;
     }
 
@@ -170,7 +174,7 @@ export const TeacherGradingPage = () => {
         },
       }
     );
-  }, [submission, questions, grades, overallFeedback, gradeSubmission, navigate]);
+  }, [submission, questions, grades, overallFeedback, gradeSubmission, navigate, t]);
 
   // Loading state - now after all hooks
   if (isLoadingSubmission || isLoadingAssignment) {
@@ -186,9 +190,9 @@ export const TeacherGradingPage = () => {
     return (
       <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
         <div className="text-center">
-          <p className="text-lg font-semibold">Submission not found</p>
+          <p className="text-lg font-semibold">{t('notFound')}</p>
           <Button onClick={() => navigate(-1)} className="mt-4">
-            Go Back
+            {tActions('goBack')}
           </Button>
         </div>
       </div>
@@ -199,11 +203,11 @@ export const TeacherGradingPage = () => {
     <div className="flex h-full flex-col md:h-[calc(100vh-4rem)] md:flex-row">
       {/* Mobile Header */}
       <div className="border-b px-6 py-4 md:hidden">
-        <h1 className="text-lg font-semibold">Grade Submission</h1>
+        <h1 className="text-lg font-semibold">{t('title')}</h1>
         <p className="text-muted-foreground mt-1 text-sm">{assignment.title}</p>
         <div className="mt-2 flex items-center justify-between">
           <span className="text-muted-foreground text-sm">
-            {gradedCount}/{questions.length} graded
+            {gradedCount}/{questions.length} {t('graded')}
           </span>
           <span className="text-lg font-bold">
             {totalScore}/{totalPoints}
@@ -216,7 +220,7 @@ export const TeacherGradingPage = () => {
         {/* Header */}
         <div className="space-y-4 border-b p-6">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Grade Submission</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
             <p className="text-muted-foreground mt-1 text-sm">{assignment.title}</p>
           </div>
         </div>
@@ -234,7 +238,8 @@ export const TeacherGradingPage = () => {
               <div className="text-muted-foreground flex items-center gap-1 text-sm">
                 <Clock className="h-3 w-3" />
                 <span>
-                  Submitted {formatDistanceToNow(new Date(submission.submittedAt), { addSuffix: true })}
+                  {t('submitted')}{' '}
+                  {formatDistanceToNow(new Date(submission.submittedAt), { addSuffix: true })}
                 </span>
               </div>
             </div>
@@ -245,9 +250,9 @@ export const TeacherGradingPage = () => {
         <div className="space-y-4 border-b p-6">
           <div>
             <div className="mb-2 flex items-center justify-between text-sm">
-              <span className="font-medium">Grading Progress</span>
+              <span className="font-medium">{t('gradingProgress')}</span>
               <span className="text-muted-foreground">
-                {gradedCount}/{questions.length} graded
+                {gradedCount}/{questions.length} {t('graded')}
               </span>
             </div>
             <div className="bg-muted h-2 overflow-hidden rounded-full">
@@ -261,7 +266,7 @@ export const TeacherGradingPage = () => {
           <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-950/20">
             <div className="mb-2 flex items-center gap-2">
               <Trophy className="h-4 w-4 text-blue-600" />
-              <span className="text-sm font-semibold">Current Score</span>
+              <span className="text-sm font-semibold">{t('currentScore')}</span>
             </div>
             <p className="text-2xl font-bold text-blue-600">
               {totalScore}/{totalPoints}
@@ -276,16 +281,14 @@ export const TeacherGradingPage = () => {
         <div className="space-y-4 p-6">
           <div>
             <Label htmlFor="overall-feedback" className="text-sm font-semibold">
-              Overall Feedback (Optional)
+              {t('overallFeedback')}
             </Label>
-            <p className="text-muted-foreground mb-2 text-xs">
-              Provide general comments about the student's work
-            </p>
+            <p className="text-muted-foreground mb-2 text-xs">{t('feedbackDescription')}</p>
             <Textarea
               id="overall-feedback"
               value={overallFeedback}
               onChange={(e) => setOverallFeedback(e.target.value)}
-              placeholder="Great work! You demonstrated a good understanding..."
+              placeholder={t('overallFeedbackPlaceholder')}
               className="min-h-[120px]"
             />
           </div>
@@ -298,11 +301,11 @@ export const TeacherGradingPage = () => {
             size="lg"
           >
             <Save className="mr-2 h-4 w-4" />
-            {isSaving ? 'Saving...' : 'Save Grading'}
+            {isSaving ? tActions('saving') : tActions('save')}
           </Button>
 
           {gradedCount < questions.length && (
-            <p className="text-muted-foreground text-center text-xs">Grade all questions before saving</p>
+            <p className="text-muted-foreground text-center text-xs">{t('gradeAllQuestions')}</p>
           )}
         </div>
       </aside>
@@ -342,10 +345,10 @@ export const TeacherGradingPage = () => {
               {/* Question Header */}
               <div className="flex items-center gap-2 border-b pb-3">
                 <span className="text-muted-foreground text-sm font-medium">
-                  Question {currentQuestionIndex + 1}
+                  {t('question')} {currentQuestionIndex + 1}
                 </span>
                 <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                  Worth {currentQuestion.points} points
+                  {t('worth')} {currentQuestion.points} {t('points')}
                 </span>
               </div>
 
@@ -364,7 +367,7 @@ export const TeacherGradingPage = () => {
               <div className="rounded-lg border-2 border-blue-200 bg-blue-50/50 p-6 dark:border-blue-900 dark:bg-blue-950/20">
                 <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-blue-900 dark:text-blue-100">
                   <Trophy className="h-4 w-4" />
-                  Grading
+                  {t('grading')}
                 </h3>
 
                 <div className="space-y-4">
@@ -374,7 +377,7 @@ export const TeacherGradingPage = () => {
                       htmlFor={`points-${currentQuestion.question.id}`}
                       className="mb-2 block text-sm font-medium"
                     >
-                      Points Awarded
+                      {t('pointsAwarded')}
                     </Label>
                     <div className="flex items-center gap-3">
                       <input
@@ -394,7 +397,8 @@ export const TeacherGradingPage = () => {
                         className="w-24 rounded-md border border-gray-300 px-3 py-2 text-center text-lg font-semibold focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
                       />
                       <span className="text-muted-foreground text-sm">
-                        out of <span className="font-semibold">{currentQuestion.points}</span> points
+                        {t('outOf')} <span className="font-semibold">{currentQuestion.points}</span>{' '}
+                        {t('points')}
                       </span>
                       {currentGrade && currentGrade.points === currentQuestion.points && (
                         <CheckCircle2 className="h-5 w-5 text-green-600" />
@@ -408,7 +412,7 @@ export const TeacherGradingPage = () => {
                       htmlFor={`feedback-${currentQuestion.question.id}`}
                       className="mb-2 block text-sm font-medium"
                     >
-                      Feedback for this question (Optional)
+                      {t('feedbackForQuestion')}
                     </Label>
                     <Textarea
                       id={`feedback-${currentQuestion.question.id}`}
@@ -419,7 +423,7 @@ export const TeacherGradingPage = () => {
                           feedback: e.target.value,
                         });
                       }}
-                      placeholder="Add specific feedback about this answer..."
+                      placeholder={t('questionFeedbackPlaceholder')}
                       className="min-h-[80px]"
                     />
                   </div>
@@ -431,11 +435,11 @@ export const TeacherGradingPage = () => {
             <div className="mt-6 flex items-center justify-between">
               <Button variant="outline" onClick={handlePrevious} disabled={currentQuestionIndex === 0}>
                 <ChevronLeft className="mr-2 h-4 w-4" />
-                Previous
+                {tActions('previous')}
               </Button>
 
               <Button onClick={handleNext} disabled={currentQuestionIndex === questions.length - 1}>
-                Next
+                {tActions('next')}
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             </div>

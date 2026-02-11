@@ -14,7 +14,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import type { Submission } from '@aiprimary/core';
-import { formatDistanceToNow } from 'date-fns';
+import { useFormattedDistance } from '@/shared/lib/date-utils';
 import { useAssignmentPublic } from '../hooks/useAssignmentApi';
 import { useSubmissionsByAssignment } from '../hooks';
 import { useAuth } from '@/shared/context/auth';
@@ -24,7 +24,10 @@ export const StudentSubmissionsPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  useTranslation('assignment');
+  const { t } = useTranslation('assignment', { keyPrefix: 'submissions' });
+  const { t: tStudent } = useTranslation('assignment', { keyPrefix: 'submissions.studentSubmissions' });
+  const { t: tActions } = useTranslation('assignment', { keyPrefix: 'submissions.actions' });
+  const { formatDistanceToNow } = useFormattedDistance();
 
   // Get postId from query params (for homework flow)
   const postId = searchParams.get('postId');
@@ -52,9 +55,9 @@ export const StudentSubmissionsPage = () => {
     return (
       <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
         <div className="text-center">
-          <p className="text-lg font-semibold">Assignment not found</p>
+          <p className="text-lg font-semibold">{tStudent('notFound')}</p>
           <Button onClick={() => navigate(-1)} className="mt-4">
-            Go Back
+            {tActions('goBack')}
           </Button>
         </div>
       </div>
@@ -78,21 +81,21 @@ export const StudentSubmissionsPage = () => {
         return (
           <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-300">
             <CheckCircle2 className="h-3 w-3" />
-            Graded
+            {t('status.graded')}
           </span>
         );
       case 'submitted':
         return (
           <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
             <FileCheck className="h-3 w-3" />
-            Submitted
+            {t('status.submitted')}
           </span>
         );
       case 'in_progress':
         return (
           <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">
             <Clock className="h-3 w-3" />
-            In Progress
+            {t('status.inProgress')}
           </span>
         );
     }
@@ -117,22 +120,23 @@ export const StudentSubmissionsPage = () => {
       <div className="border-b px-6 py-4 md:hidden">
         <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="-ml-2 mb-2">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
+          {tActions('back')}
         </Button>
         <h1 className="truncate text-lg font-semibold">{assignment.title}</h1>
         <div className="mt-2 flex items-center gap-4">
           <span className="text-muted-foreground text-sm">
-            {sortedSubmissions.length} submission{sortedSubmissions.length !== 1 ? 's' : ''}
+            {sortedSubmissions.length}{' '}
+            {sortedSubmissions.length !== 1 ? tStudent('submission_plural') : tStudent('submission')}
           </span>
           {bestScore > 0 && (
             <span className={`text-lg font-bold ${getScoreColor(bestScore, totalPoints)}`}>
-              Best: {bestScore}/{totalPoints}
+              {tStudent('best')} {bestScore}/{totalPoints}
             </span>
           )}
         </div>
         {!postId && (
           <div className="mt-2 rounded bg-yellow-100 px-3 py-1 text-xs text-yellow-800 dark:bg-yellow-950 dark:text-yellow-200">
-            Preview mode: Access through class homework to view submissions
+            {tStudent('previewMode')}
           </div>
         )}
       </div>
@@ -143,7 +147,7 @@ export const StudentSubmissionsPage = () => {
         <div className="space-y-4 border-b p-6">
           <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="-ml-2">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            {tActions('back')}
           </Button>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">{assignment.title}</h1>
@@ -158,12 +162,16 @@ export const StudentSubmissionsPage = () => {
           {assignment.availableUntil && (
             <div className="text-muted-foreground flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              <span>Due: {new Date(assignment.availableUntil).toLocaleDateString()}</span>
+              <span>
+                {tStudent('due')} {new Date(assignment.availableUntil).toLocaleDateString()}
+              </span>
             </div>
           )}
           <div className="text-muted-foreground flex items-center gap-2">
             <Trophy className="h-4 w-4" />
-            <span>{totalPoints} points</span>
+            <span>
+              {totalPoints} {tStudent('points')}
+            </span>
           </div>
         </div>
 
@@ -172,17 +180,21 @@ export const StudentSubmissionsPage = () => {
           <div>
             <div className="mb-2 flex items-center gap-2">
               <FileQuestion className="h-4 w-4 text-blue-600" />
-              <span className="text-sm font-semibold">Total Submissions</span>
+              <span className="text-sm font-semibold">{tStudent('totalSubmissions')}</span>
             </div>
             <p className="text-2xl font-bold">{sortedSubmissions.length}</p>
-            {maxSubmissions && <p className="text-muted-foreground mt-1 text-xs">Max: {maxSubmissions}</p>}
+            {maxSubmissions && (
+              <p className="text-muted-foreground mt-1 text-xs">
+                {tStudent('max')} {maxSubmissions}
+              </p>
+            )}
           </div>
 
           {bestScore > 0 && (
             <div>
               <div className="mb-2 flex items-center gap-2">
                 <Trophy className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-semibold">Best Score</span>
+                <span className="text-sm font-semibold">{tStudent('bestScore')}</span>
               </div>
               <p className={`text-2xl font-bold ${getScoreColor(bestScore, totalPoints)}`}>
                 {bestScore}/{totalPoints}
@@ -197,12 +209,12 @@ export const StudentSubmissionsPage = () => {
             <div>
               <div className="mb-2 flex items-center gap-2">
                 <FileCheck className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-semibold">Latest Status</span>
+                <span className="text-sm font-semibold">{tStudent('latestStatus')}</span>
               </div>
               <div className="mt-2">{getStatusBadge(latestSubmission.status)}</div>
               {latestSubmission.score !== undefined && (
                 <p className="text-muted-foreground mt-1 text-xs">
-                  Score: {latestSubmission.score}/{latestSubmission.maxScore}
+                  {tStudent('score')} {latestSubmission.score}/{latestSubmission.maxScore}
                 </p>
               )}
             </div>
@@ -218,22 +230,22 @@ export const StudentSubmissionsPage = () => {
               size="lg"
             >
               <PlusCircle className="mr-2 h-4 w-4" />
-              New Attempt
+              {tActions('newAttempt')}
             </Button>
           ) : !postId ? (
             <Button disabled className="w-full" size="lg">
               <AlertCircle className="mr-2 h-4 w-4" />
-              Preview Mode
+              {tStudent('previewModeButton')}
             </Button>
           ) : (
             <Button disabled className="w-full" size="lg">
               <AlertCircle className="mr-2 h-4 w-4" />
-              Max Submissions Reached
+              {tStudent('maxSubmissionsReached')}
             </Button>
           )}
           {allowRetake && maxSubmissions && (
             <p className="text-muted-foreground text-center text-xs">
-              {sortedSubmissions.length} / {maxSubmissions} attempts used
+              {sortedSubmissions.length} / {maxSubmissions} {tStudent('attemptsUsed')}
             </p>
           )}
         </div>
@@ -243,21 +255,19 @@ export const StudentSubmissionsPage = () => {
       <main className="flex flex-1 flex-col overflow-y-auto">
         <div className="flex-1 p-6 md:p-8">
           <div className="mx-auto max-w-4xl">
-            <h2 className="mb-6 text-xl font-semibold">Submission History</h2>
+            <h2 className="mb-6 text-xl font-semibold">{tStudent('submissionHistory')}</h2>
 
             {sortedSubmissions.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
                 <FileQuestion className="text-muted-foreground mb-4 h-12 w-12" />
-                <p className="text-muted-foreground mb-2 text-lg font-medium">No submissions yet</p>
+                <p className="text-muted-foreground mb-2 text-lg font-medium">{tStudent('noSubmissions')}</p>
                 <p className="text-muted-foreground mb-4 text-sm">
-                  {postId
-                    ? 'Start your first attempt to complete this assignment'
-                    : 'Access through class homework to submit'}
+                  {postId ? tStudent('startFirstAttempt') : tStudent('accessThroughHomework')}
                 </p>
                 {postId && (
                   <Button onClick={() => navigate(`/student/assignments/${id}/do?postId=${postId}`)}>
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    Start Assignment
+                    {tActions('startAssignment')}
                   </Button>
                 )}
               </div>
@@ -270,11 +280,13 @@ export const StudentSubmissionsPage = () => {
                   >
                     <div className="flex-1">
                       <div className="mb-2 flex items-center gap-3">
-                        <h3 className="text-lg font-semibold">Attempt #{sortedSubmissions.length - index}</h3>
+                        <h3 className="text-lg font-semibold">
+                          {tStudent('attempt', { number: sortedSubmissions.length - index })}
+                        </h3>
                         {getStatusBadge(submission.status)}
                         {index === 0 && (
                           <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                            Latest
+                            {tStudent('latest')}
                           </span>
                         )}
                       </div>
@@ -283,7 +295,7 @@ export const StudentSubmissionsPage = () => {
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4" />
                           <span>
-                            Submitted{' '}
+                            {tStudent('submitted')}{' '}
                             {formatDistanceToNow(new Date(submission.submittedAt), { addSuffix: true })}
                           </span>
                         </div>
@@ -293,7 +305,7 @@ export const StudentSubmissionsPage = () => {
                             <div className="flex items-center gap-2">
                               <Trophy className="h-4 w-4" />
                               <span className={getScoreColor(submission.score, submission.maxScore!)}>
-                                Score: {submission.score}/{submission.maxScore} (
+                                {tStudent('score')} {submission.score}/{submission.maxScore} (
                                 {Math.round((submission.score / submission.maxScore!) * 100)}%)
                               </span>
                             </div>
@@ -301,7 +313,7 @@ export const StudentSubmissionsPage = () => {
                               <div className="flex items-center gap-2">
                                 <CheckCircle2 className="h-4 w-4" />
                                 <span>
-                                  Graded{' '}
+                                  {tStudent('graded')}{' '}
                                   {formatDistanceToNow(new Date(submission.gradedAt), { addSuffix: true })}
                                 </span>
                               </div>
@@ -318,12 +330,12 @@ export const StudentSubmissionsPage = () => {
                           onClick={() => navigate(`/student/submissions/${submission.id}/result`)}
                         >
                           <Eye className="mr-2 h-4 w-4" />
-                          View Result
+                          {tActions('viewResult')}
                         </Button>
                       ) : (
                         <Button variant="outline" disabled>
                           <Clock className="mr-2 h-4 w-4" />
-                          Pending
+                          {t('status.pending')}
                         </Button>
                       )}
                     </div>

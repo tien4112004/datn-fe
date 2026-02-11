@@ -1245,4 +1245,53 @@ export default {
       footer: 'Generated on {{date}}',
     },
   },
+
+  submissionStatistics: {
+    title: 'Submissions',
+    hideTable: 'Hide',
+    showTable: 'Show',
+    table: 'Table',
+    tableHeaders: {
+      student: 'Student',
+      submitted: 'Submitted',
+      status: 'Status',
+      score: 'Score',
+      actions: 'Actions',
+    },
+    unknownStudent: 'Unknown Student',
+    notGraded: 'Not graded',
+    actions: {
+      view: 'View',
+      grade: 'Grade',
+    },
+  },
+
+  studentAssignmentActions: {
+    status: {
+      graded: 'Graded',
+      submitted: 'Submitted',
+      inProgress: 'In Progress',
+      notStarted: 'Not Started',
+    },
+    actions: {
+      startAssignment: 'Start Assignment',
+      continue: 'Continue',
+      retake: 'Retake',
+      viewResult: 'View Result',
+      pending: 'Pending',
+    },
+    score: 'Score:',
+    submitted: 'Submitted',
+    attempt: 'Attempt',
+    attempt_plural: 'Attempts',
+    latest: 'Latest',
+    notGraded: 'Not graded',
+    tableHeaders: {
+      attempt: 'Attempt',
+      submitted: 'Submitted',
+      status: 'Status',
+      score: 'Score',
+      actions: 'Actions',
+    },
+  },
 };

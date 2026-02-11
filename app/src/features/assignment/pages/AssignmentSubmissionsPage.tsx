@@ -1,5 +1,6 @@
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/components/ui/button';
 import {
   ArrowLeft,
@@ -15,7 +16,7 @@ import {
 } from 'lucide-react';
 import { useSubmissionsByPost } from '../hooks';
 import { useAssignmentPublic } from '../hooks/useAssignmentApi';
-import { formatDistanceToNow } from 'date-fns';
+import { useFormattedDistance } from '@/shared/lib/date-utils';
 import type { Submission } from '@aiprimary/core';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
 
@@ -23,6 +24,10 @@ export const AssignmentSubmissionsPage = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { t } = useTranslation('assignment', { keyPrefix: 'submissions.assignmentSubmissions' });
+  const { t: tActions } = useTranslation('assignment', { keyPrefix: 'submissions.actions' });
+  const { t: tStatus } = useTranslation('assignment', { keyPrefix: 'submissions.status' });
+  const { formatDistanceToNow } = useFormattedDistance();
 
   // Get postId from query params
   const postId = searchParams.get('postId');
@@ -63,21 +68,21 @@ export const AssignmentSubmissionsPage = () => {
         return (
           <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-300">
             <CheckCircle2 className="h-3 w-3" />
-            Graded
+            {tStatus('graded')}
           </span>
         );
       case 'submitted':
         return (
           <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
             <FileCheck className="h-3 w-3" />
-            Submitted
+            {tStatus('submitted')}
           </span>
         );
       default:
         return (
           <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700 dark:bg-gray-950 dark:text-gray-300">
             <Clock className="h-3 w-3" />
-            In Progress
+            {tStatus('inProgress')}
           </span>
         );
     }
@@ -103,9 +108,9 @@ export const AssignmentSubmissionsPage = () => {
     return (
       <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
         <div className="text-center">
-          <p className="text-lg font-semibold">Assignment not found</p>
+          <p className="text-lg font-semibold">{t('notFound')}</p>
           <Button onClick={() => navigate(-1)} className="mt-4">
-            Go Back
+            {tActions('goBack')}
           </Button>
         </div>
       </div>
@@ -115,29 +120,29 @@ export const AssignmentSubmissionsPage = () => {
   const statCards = [
     {
       icon: Users,
-      label: 'Total Submissions',
+      label: t('totalSubmissions'),
       value: stats.total,
       color: 'text-blue-600 dark:text-blue-400',
       bgColor: 'bg-blue-50 dark:bg-blue-950/20',
     },
     {
       icon: CheckCircle2,
-      label: 'Graded',
+      label: t('graded'),
       value: stats.graded,
       color: 'text-green-600 dark:text-green-400',
       bgColor: 'bg-green-50 dark:bg-green-950/20',
     },
     {
       icon: Clock,
-      label: 'Pending Review',
+      label: t('pendingReview'),
       value: stats.pending,
       color: 'text-yellow-600 dark:text-yellow-400',
       bgColor: 'bg-yellow-50 dark:bg-yellow-950/20',
     },
     {
       icon: TrendingUp,
-      label: 'Average Score',
-      value: stats.graded > 0 ? `${stats.avgScore}%` : 'N/A',
+      label: t('averageScore'),
+      value: stats.graded > 0 ? `${stats.avgScore}%` : t('notAvailable'),
       color: stats.graded > 0 ? getScoreColor(stats.avgScore, 100) : 'text-gray-600 dark:text-gray-400',
       bgColor: stats.graded > 0 ? 'bg-purple-50 dark:bg-purple-950/20' : 'bg-gray-50 dark:bg-gray-950/20',
     },
@@ -149,11 +154,11 @@ export const AssignmentSubmissionsPage = () => {
       <div className="mb-6">
         <Button onClick={() => navigate(-1)} variant="ghost" size="sm" className="mb-4">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
+          {tActions('back')}
         </Button>
 
         <div>
-          <h1 className="text-3xl font-bold">Submissions</h1>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground mt-2">{assignment.title}</p>
         </div>
       </div>
@@ -178,8 +183,7 @@ export const AssignmentSubmissionsPage = () => {
       {stats.pending > 0 && (
         <div className="mb-6 rounded-lg border-l-4 border-yellow-500 bg-yellow-50 p-4 dark:bg-yellow-950/20">
           <p className="text-sm text-yellow-800 dark:text-yellow-200">
-            <strong>{stats.pending}</strong> {stats.pending === 1 ? 'submission' : 'submissions'} waiting for
-            review
+            <strong>{stats.pending}</strong> {t('waitingForReview')}
           </p>
         </div>
       )}
@@ -189,18 +193,18 @@ export const AssignmentSubmissionsPage = () => {
         {submissions.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12">
             <Users className="text-muted-foreground mb-4 h-12 w-12" />
-            <p className="text-muted-foreground mb-2 text-lg font-medium">No submissions yet</p>
-            <p className="text-muted-foreground text-sm">Students haven't submitted their work yet</p>
+            <p className="text-muted-foreground mb-2 text-lg font-medium">{t('noSubmissions')}</p>
+            <p className="text-muted-foreground text-sm">{t('studentsHaventSubmitted')}</p>
           </div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Student</TableHead>
-                <TableHead>Submitted</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Score</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t('tableHeaders.student')}</TableHead>
+                <TableHead>{t('tableHeaders.submitted')}</TableHead>
+                <TableHead>{t('tableHeaders.status')}</TableHead>
+                <TableHead>{t('tableHeaders.score')}</TableHead>
+                <TableHead className="text-right">{t('tableHeaders.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -215,7 +219,7 @@ export const AssignmentSubmissionsPage = () => {
                         <p className="text-muted-foreground text-xs">{submission.student.email}</p>
                       </div>
                     ) : (
-                      <p className="text-muted-foreground">Unknown Student</p>
+                      <p className="text-muted-foreground">{t('unknownStudent')}</p>
                     )}
                   </TableCell>
                   <TableCell>
@@ -243,7 +247,7 @@ export const AssignmentSubmissionsPage = () => {
                         </span>
                       </div>
                     ) : (
-                      <span className="text-muted-foreground text-sm">Not graded</span>
+                      <span className="text-muted-foreground text-sm">{t('notGraded')}</span>
                     )}
                   </TableCell>
                   <TableCell className="text-right">
@@ -256,7 +260,7 @@ export const AssignmentSubmissionsPage = () => {
                             onClick={() => navigate(`/submissions/${submission.id}/grade`)}
                           >
                             <Eye className="mr-2 h-4 w-4" />
-                            View
+                            {tActions('view')}
                           </Button>
                           <Button
                             variant="ghost"
@@ -273,7 +277,7 @@ export const AssignmentSubmissionsPage = () => {
                           onClick={() => navigate(`/submissions/${submission.id}/grade`)}
                         >
                           <Edit className="mr-2 h-4 w-4" />
-                          Grade
+                          {tActions('grade')}
                         </Button>
                       )}
                     </div>
@@ -287,7 +291,7 @@ export const AssignmentSubmissionsPage = () => {
 
       {!postId && (
         <div className="mt-4 rounded-lg bg-yellow-100 px-4 py-3 text-sm text-yellow-800 dark:bg-yellow-950 dark:text-yellow-200">
-          Preview mode: Access through a specific homework post to see submissions
+          {t('previewMode')}
         </div>
       )}
     </div>

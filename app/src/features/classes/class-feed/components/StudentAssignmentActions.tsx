@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   PlayCircle,
   FileCheck,
@@ -13,7 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useSubmissionsByPost } from '@/features/assignment/hooks';
 import { useAuth } from '@/context/auth';
-import { formatDistanceToNow } from 'date-fns';
+import { useFormattedDistance } from '@/shared/lib/date-utils';
 import type { Submission } from '@aiprimary/core';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
@@ -25,6 +26,8 @@ interface StudentAssignmentActionsProps {
 export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssignmentActionsProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation('classes', { keyPrefix: 'studentAssignmentActions' });
+  const { formatDistanceToNow } = useFormattedDistance();
   const { data: submissions = [] } = useSubmissionsByPost(postId);
   const [showHistory, setShowHistory] = useState(false);
 
@@ -63,7 +66,7 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
       case 'graded':
         return {
           icon: Trophy,
-          label: 'Graded',
+          label: t('status.graded'),
           color: 'text-green-600 dark:text-green-400',
           bgColor: 'bg-green-50 dark:bg-green-950/20',
           borderColor: 'border-green-200 dark:border-green-900',
@@ -71,7 +74,7 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
       case 'submitted':
         return {
           icon: FileCheck,
-          label: 'Submitted',
+          label: t('status.submitted'),
           color: 'text-blue-600 dark:text-blue-400',
           bgColor: 'bg-blue-50 dark:bg-blue-950/20',
           borderColor: 'border-blue-200 dark:border-blue-900',
@@ -79,7 +82,7 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
       case 'in_progress':
         return {
           icon: Clock,
-          label: 'In Progress',
+          label: t('status.inProgress'),
           color: 'text-yellow-600 dark:text-yellow-400',
           bgColor: 'bg-yellow-50 dark:bg-yellow-950/20',
           borderColor: 'border-yellow-200 dark:border-yellow-900',
@@ -87,7 +90,7 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
       default:
         return {
           icon: PlayCircle,
-          label: 'Not Started',
+          label: t('status.notStarted'),
           color: 'text-gray-600 dark:text-gray-400',
           bgColor: 'bg-gray-50 dark:bg-gray-950/20',
           borderColor: 'border-gray-200 dark:border-gray-900',
@@ -115,12 +118,12 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
                     latestSubmission.score !== undefined &&
                     latestSubmission.maxScore !== undefined && (
                       <span>
-                        Score: {latestSubmission.score}/{latestSubmission.maxScore}
+                        {t('score')} {latestSubmission.score}/{latestSubmission.maxScore}
                       </span>
                     )}
                   {status === 'submitted' && (
                     <span>
-                      Submitted{' '}
+                      {t('submitted')}{' '}
                       {formatDistanceToNow(new Date(latestSubmission.submittedAt), { addSuffix: true })}
                     </span>
                   )}
@@ -134,20 +137,20 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
             {status === 'not_started' && (
               <Button onClick={handleStartAssignment} size="sm">
                 <PlayCircle className="mr-2 h-4 w-4" />
-                Start Assignment
+                {t('actions.startAssignment')}
               </Button>
             )}
 
             {status === 'in_progress' && (
               <Button onClick={handleStartAssignment} size="sm" variant="outline">
-                Continue
+                {t('actions.continue')}
               </Button>
             )}
 
             {status === 'submitted' && (
               <Button onClick={handleStartAssignment} size="sm" variant="outline">
                 <PlayCircle className="mr-2 h-4 w-4" />
-                Retake
+                {t('actions.retake')}
               </Button>
             )}
 
@@ -155,10 +158,10 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
               <>
                 <Button onClick={handleViewResult} size="sm">
                   <CheckCircle2 className="mr-2 h-4 w-4" />
-                  View Result
+                  {t('actions.viewResult')}
                 </Button>
                 <Button onClick={handleStartAssignment} size="sm" variant="outline">
-                  Retake
+                  {t('actions.retake')}
                 </Button>
               </>
             )}
@@ -170,7 +173,7 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
                 ) : (
                   <ChevronDown className="mr-2 h-4 w-4" />
                 )}
-                {mySubmissions.length} {mySubmissions.length === 1 ? 'Attempt' : 'Attempts'}
+                {mySubmissions.length} {t('attempt', { count: mySubmissions.length })}
               </Button>
             )}
           </div>
@@ -183,11 +186,11 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Attempt</TableHead>
-                <TableHead>Submitted</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Score</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t('tableHeaders.attempt')}</TableHead>
+                <TableHead>{t('tableHeaders.submitted')}</TableHead>
+                <TableHead>{t('tableHeaders.status')}</TableHead>
+                <TableHead>{t('tableHeaders.score')}</TableHead>
+                <TableHead className="text-right">{t('tableHeaders.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -197,7 +200,7 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
                     return (
                       <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-300">
                         <CheckCircle2 className="h-3 w-3" />
-                        Graded
+                        {t('status.graded')}
                       </span>
                     );
                   }
@@ -205,14 +208,14 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
                     return (
                       <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
                         <FileCheck className="h-3 w-3" />
-                        Submitted
+                        {t('status.submitted')}
                       </span>
                     );
                   }
                   return (
                     <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700 dark:bg-gray-950 dark:text-gray-300">
                       <Clock className="h-3 w-3" />
-                      In Progress
+                      {t('status.inProgress')}
                     </span>
                   );
                 };
@@ -232,7 +235,7 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
                         <span>#{mySubmissions.length - index}</span>
                         {index === 0 && (
                           <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                            Latest
+                            {t('latest')}
                           </span>
                         )}
                       </div>
@@ -262,7 +265,7 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
                           </span>
                         </div>
                       ) : (
-                        <span className="text-muted-foreground text-sm">Not graded</span>
+                        <span className="text-muted-foreground text-sm">{t('notGraded')}</span>
                       )}
                     </TableCell>
                     <TableCell className="text-right">
@@ -273,12 +276,12 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
                           onClick={() => navigate(`/student/submissions/${submission.id}/result`)}
                         >
                           <Eye className="mr-2 h-4 w-4" />
-                          View Result
+                          {t('actions.viewResult')}
                         </Button>
                       ) : (
                         <Button variant="outline" size="sm" disabled>
                           <Clock className="mr-2 h-4 w-4" />
-                          Pending
+                          {t('actions.pending')}
                         </Button>
                       )}
                     </TableCell>

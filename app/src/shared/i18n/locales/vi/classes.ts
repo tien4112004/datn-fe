@@ -1271,4 +1271,53 @@ export default {
       footer: 'Tạo ngày {{date}}',
     },
   },
+
+  submissionStatistics: {
+    title: 'Bài nộp',
+    hideTable: 'Ẩn',
+    showTable: 'Hiện',
+    table: 'Bảng',
+    tableHeaders: {
+      student: 'Học sinh',
+      submitted: 'Đã nộp',
+      status: 'Trạng thái',
+      score: 'Điểm',
+      actions: 'Thao tác',
+    },
+    unknownStudent: 'Học sinh không xác định',
+    notGraded: 'Chưa chấm',
+    actions: {
+      view: 'Xem',
+      grade: 'Chấm điểm',
+    },
+  },
+
+  studentAssignmentActions: {
+    status: {
+      graded: 'Đã chấm điểm',
+      submitted: 'Đã nộp',
+      inProgress: 'Đang làm',
+      notStarted: 'Chưa bắt đầu',
+    },
+    actions: {
+      startAssignment: 'Bắt đầu bài tập',
+      continue: 'Tiếp tục',
+      retake: 'Làm lại',
+      viewResult: 'Xem kết quả',
+      pending: 'Đang chờ',
+    },
+    score: 'Điểm:',
+    submitted: 'Đã nộp',
+    attempt: 'Lần làm',
+    attempt_plural: 'Lần làm',
+    latest: 'Mới nhất',
+    notGraded: 'Chưa chấm',
+    tableHeaders: {
+      attempt: 'Lần làm',
+      submitted: 'Đã nộp',
+      status: 'Trạng thái',
+      score: 'Điểm',
+      actions: 'Thao tác',
+    },
+  },
 };

@@ -48,7 +48,8 @@ export const AssignmentDoingPage = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  useTranslation('assignment');
+  const { t } = useTranslation('assignment', { keyPrefix: 'submissions.doing' });
+  const { t: tActions } = useTranslation('assignment', { keyPrefix: 'submissions.actions' });
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Answer[]>([]);
@@ -115,16 +116,16 @@ export const AssignmentDoingPage = () => {
 
   const handleSubmitAttempt = useCallback(() => {
     if (!allQuestionsAnswered) {
-      toast.warning('Please answer all questions before submitting');
+      toast.warning(t('answerAllQuestions'));
       return;
     }
     setShowSubmitDialog(true);
-  }, [allQuestionsAnswered]);
+  }, [allQuestionsAnswered, t]);
 
   const handleSubmitConfirm = useCallback(async () => {
     if (!postId) {
       // Mock: No postId available, show error
-      toast.error('Cannot submit: This assignment must be accessed through class homework');
+      toast.error(t('cannotSubmit'));
       setShowSubmitDialog(false);
       return;
     }
@@ -141,7 +142,7 @@ export const AssignmentDoingPage = () => {
         },
       }
     );
-  }, [postId, createSubmission, answers, navigate]);
+  }, [postId, createSubmission, answers, navigate, t]);
 
   // Loading state - now after all hooks
   if (isLoading) {
@@ -157,9 +158,9 @@ export const AssignmentDoingPage = () => {
     return (
       <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
         <div className="text-center">
-          <p className="text-lg font-semibold">Assignment not found</p>
+          <p className="text-lg font-semibold">{t('notFound')}</p>
           <Button onClick={() => navigate(-1)} className="mt-4">
-            Go Back
+            {tActions('goBack')}
           </Button>
         </div>
       </div>
@@ -173,9 +174,12 @@ export const AssignmentDoingPage = () => {
         <h1 className="truncate text-lg font-semibold">{assignment.title}</h1>
         <div className="text-muted-foreground mt-2 flex items-center gap-4 text-sm">
           <span>
-            {currentQuestionIndex + 1} of {questions.length}
+            {currentQuestionIndex + 1} {t('of')} {questions.length}
           </span>
-          <span>{Math.round(progress)}% complete</span>
+          <span>
+            {Math.round(progress)}
+            {t('complete')}
+          </span>
         </div>
       </div>
 
@@ -195,12 +199,16 @@ export const AssignmentDoingPage = () => {
             {assignment.availableUntil && (
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
-                <span>Due: {new Date(assignment.availableUntil).toLocaleDateString()}</span>
+                <span>
+                  {t('due')} {new Date(assignment.availableUntil).toLocaleDateString()}
+                </span>
               </div>
             )}
             <div className="flex items-center gap-2">
               <Trophy className="h-4 w-4" />
-              <span>{totalPoints} points</span>
+              <span>
+                {totalPoints} {t('points')}
+              </span>
             </div>
           </div>
         </div>
@@ -209,9 +217,9 @@ export const AssignmentDoingPage = () => {
         <div className="space-y-4 border-b p-6">
           <div>
             <div className="mb-2 flex items-center justify-between text-sm">
-              <span className="font-medium">Progress</span>
+              <span className="font-medium">{t('progress')}</span>
               <span className="text-muted-foreground">
-                {answeredCount}/{questions.length} answered
+                {answeredCount}/{questions.length} {t('answered')}
               </span>
             </div>
             <div className="bg-muted h-2 overflow-hidden rounded-full">
@@ -224,15 +232,18 @@ export const AssignmentDoingPage = () => {
 
           <div className="text-muted-foreground text-sm">
             <p>
-              Question {currentQuestionIndex + 1} of {questions.length}
+              {t('question')} {currentQuestionIndex + 1} {t('of')} {questions.length}
             </p>
-            <p className="mt-1">{Math.round(progress)}% complete</p>
+            <p className="mt-1">
+              {Math.round(progress)}
+              {t('complete')}
+            </p>
           </div>
         </div>
 
         {/* Question Navigation Grid */}
         <div className="p-6">
-          <h3 className="mb-4 text-sm font-semibold">Questions</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('questions')}</h3>
           <div className="grid grid-cols-5 gap-2">
             {questions.map((q, index) => {
               const isAnswered = answers.some((a) => a.questionId === q.question.id && isAnswerValid(a));
@@ -250,7 +261,11 @@ export const AssignmentDoingPage = () => {
                         ? 'border-green-600 bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300'
                         : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800'
                   )}
-                  title={`Question ${index + 1}${isAnswered ? ' (Answered)' : ''}`}
+                  title={
+                    isAnswered
+                      ? t('questionAnswered', { number: index + 1 })
+                      : `${t('question')} ${index + 1}`
+                  }
                 >
                   {index + 1}
                   {isAnswered && !isCurrent && <CheckCircle2 className="ml-1 h-3 w-3" />}
@@ -271,10 +286,10 @@ export const AssignmentDoingPage = () => {
                 <div className="flex-1">
                   <div className="mb-2 flex items-center gap-2">
                     <span className="text-muted-foreground text-sm font-medium">
-                      Question {currentQuestionIndex + 1}
+                      {t('question')} {currentQuestionIndex + 1}
                     </span>
                     <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                      {currentQuestion.points} points
+                      {currentQuestion.points} {t('points')}
                     </span>
                   </div>
                 </div>
@@ -294,18 +309,18 @@ export const AssignmentDoingPage = () => {
             <div className="flex items-center justify-between">
               <Button variant="outline" onClick={handlePrevious} disabled={currentQuestionIndex === 0}>
                 <ChevronLeft className="mr-2 h-4 w-4" />
-                Previous
+                {tActions('previous')}
               </Button>
 
               {currentQuestionIndex < questions.length - 1 ? (
                 <Button onClick={handleNext}>
-                  Next
+                  {tActions('next')}
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
                 <Button onClick={handleSubmitAttempt} className="bg-green-600 hover:bg-green-700">
                   <Send className="mr-2 h-4 w-4" />
-                  Submit Assignment
+                  {tActions('submit')}
                 </Button>
               )}
             </div>
@@ -316,11 +331,9 @@ export const AssignmentDoingPage = () => {
                 <AlertCircle className="h-5 w-5 flex-shrink-0 text-yellow-600" />
                 <div>
                   <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                    Some questions are not answered
+                    {t('someQuestionsUnanswered')}
                   </p>
-                  <p className="text-muted-foreground mt-1 text-sm">
-                    Please review and answer all questions before submitting.
-                  </p>
+                  <p className="text-muted-foreground mt-1 text-sm">{t('reviewBeforeSubmit')}</p>
                 </div>
               </div>
             )}
@@ -332,41 +345,38 @@ export const AssignmentDoingPage = () => {
       <Dialog open={showSubmitDialog} onOpenChange={setShowSubmitDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Submit Assignment?</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to submit this assignment? You won't be able to change your answers after
-              submission.
-            </DialogDescription>
+            <DialogTitle>{t('submitDialog.title')}</DialogTitle>
+            <DialogDescription>{t('submitDialog.description')}</DialogDescription>
           </DialogHeader>
           <div className="my-4 space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Total Questions:</span>
+              <span className="text-muted-foreground">{t('submitDialog.totalQuestions')}</span>
               <span className="font-medium">{questions.length}</span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Answered:</span>
+              <span className="text-muted-foreground">{t('submitDialog.answered')}</span>
               <span className="font-medium">{answeredCount}</span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Total Points:</span>
+              <span className="text-muted-foreground">{t('submitDialog.totalPoints')}</span>
               <span className="font-medium">{totalPoints}</span>
             </div>
             {!postId && (
               <div className="rounded bg-yellow-100 px-3 py-2 text-xs text-yellow-800 dark:bg-yellow-950 dark:text-yellow-200">
-                Preview mode: Access through class homework to submit
+                {t('submitDialog.previewMode')}
               </div>
             )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowSubmitDialog(false)} disabled={isSubmitting}>
-              Cancel
+              {tActions('cancel')}
             </Button>
             <Button
               onClick={handleSubmitConfirm}
               disabled={isSubmitting}
               className="bg-green-600 hover:bg-green-700"
             >
-              {isSubmitting ? 'Submitting...' : 'Submit'}
+              {isSubmitting ? tActions('submitting') : tActions('submit')}
             </Button>
           </DialogFooter>
         </DialogContent>

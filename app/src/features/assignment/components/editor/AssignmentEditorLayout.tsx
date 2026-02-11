@@ -1,4 +1,4 @@
-import { Save, Wand2, Database, Plus, Library } from 'lucide-react';
+import { Save, Wand2, Database, Plus, Library, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/components/ui/button';
 import LoadingButton from '@/shared/components/common/LoadingButton';
@@ -13,6 +13,7 @@ import { QuestionListDialog } from './QuestionListDialog';
 import { QuestionsListViewPanel } from '../viewer/QuestionsListViewPanel';
 import { GenerateQuestionsManager } from './GenerateQuestionsManager';
 import { GenerateMatrixManager } from './GenerateMatrixManager';
+import { FillMatrixGapsManager } from './FillMatrixGapsManager';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 
@@ -54,6 +55,13 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
           <GenerateQuestionsManager />
         ) : mainView === 'generateMatrix' ? (
           <GenerateMatrixManager />
+        ) : mainView === 'fillMatrixGaps' ? (
+          <FillMatrixGapsManager
+            onClose={() => setMainView('matrix')}
+            onQuestionsAdded={() => {
+              setMainView('matrix');
+            }}
+          />
         ) : null}
       </div>
 
@@ -151,6 +159,23 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>{tActions('tooltips.generateMatrix')}</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setMainView('fillMatrixGaps')}
+                      className="w-full"
+                    >
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      {t('actions.fillMatrixGaps')}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{t('actions.tooltips.fillMatrixGaps')}</p>
                   </TooltipContent>
                 </Tooltip>
               </div>

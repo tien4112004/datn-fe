@@ -10,7 +10,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/shar
 import { useGenerateMatrix } from '@/features/assignment/hooks/useAssignmentApi';
 import { useModels, MODEL_TYPES } from '@/features/model';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
-import { GenerationSummary } from './GenerationSummary';
 import type { GenerateMatrixRequest, GenerateMatrixResponse } from '@/features/assignment/types/assignment';
 import { Wand2, Loader2, Zap, BookOpen, GraduationCap, X, Plus, Check, HelpCircle } from 'lucide-react';
 import { toast } from 'sonner';
@@ -277,15 +276,6 @@ export function GenerateMatrixPanel({
               </div>
             </RadioGroup>
           </div>
-
-          {/* Generation Summary */}
-          <GenerationSummary
-            totalQuestions={totalQuestions}
-            totalPoints={totalPoints}
-            difficulties={selectedDifficulties}
-            questionTypes={selectedQuestionTypes}
-            prompt={prompt}
-          />
 
           {/* Grade and Subject */}
           <div className="grid grid-cols-2 gap-4">

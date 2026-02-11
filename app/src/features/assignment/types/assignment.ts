@@ -204,6 +204,46 @@ export interface GenerateMatrixResponse {
   totalPoints: number;
 }
 
+// Generate exam from matrix - Request
+export interface GenerateExamFromMatrixRequest {
+  matrixId?: string; // Reference to saved matrix (optional)
+  matrix?: ApiMatrix; // Inline matrix (optional - one required)
+  subject: string; // Required: "T", "TV", "TA"
+  title: string; // Required: Exam title
+  description?: string; // Optional: Exam description
+  timeLimitMinutes?: number; // Optional: Time limit
+  missingStrategy?: 'REPORT_GAPS' | 'GENERATE_WITH_AI' | 'FAIL_FAST'; // Default: REPORT_GAPS
+  includePersonalQuestions?: boolean; // Default: true
+  provider?: string; // For GENERATE_WITH_AI (default: "google")
+  model?: string; // For GENERATE_WITH_AI (default: "gemini-2.5-flash-lite")
+}
+
+// Matrix gap - Used in exam draft response
+export interface MatrixGapDto {
+  topic: string; // Topic name
+  difficulty: string; // "KNOWLEDGE" | "COMPREHENSION" | "APPLICATION"
+  questionType: string; // "MULTIPLE_CHOICE" | "FILL_IN_BLANK" | "MATCHING" | "OPEN_ENDED"
+  requiredCount: number; // How many needed
+  availableCount: number; // How many found
+  gapCount: number; // Computed: requiredCount - availableCount
+}
+
+// Generate exam from matrix - Response
+export interface ExamDraftDto {
+  id: string; // Draft ID
+  title: string; // Exam title
+  description?: string; // Exam description
+  duration?: number; // Time limit in minutes
+  ownerId: string; // Teacher ID
+  subject: string; // Subject code
+  grade: string; // Grade level
+  questions: AssignmentQuestion[]; // Selected questions from bank
+  missingQuestions: MatrixGapDto[]; // Unfilled requirements (gaps)
+  totalPoints: number; // Calculated total points
+  totalQuestions: number; // Calculated total questions count
+  isComplete: boolean; // true if no gaps
+}
+
 // Re-export core types for convenience
 // Note: MatrixDimensionTopic is defined locally above, so not re-exported from core
 export type {

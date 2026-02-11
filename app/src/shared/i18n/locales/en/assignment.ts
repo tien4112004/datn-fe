@@ -590,17 +590,6 @@ export default {
         merge: 'Merge',
         cancel: 'Cancel',
       },
-      summary: {
-        willGenerate:
-          'Will generate ~{{questions}} questions (~{{points}} points) across {{difficulties}} difficulty level(s) and {{types}} question type(s)',
-        warnings: {
-          largeMatrix: 'Large matrix may take longer to generate',
-        },
-        info: {
-          singleDifficulty: 'Consider adding more difficulty levels for variety',
-          emptyPrompt: 'Add context for better results',
-        },
-      },
       savePreset: {
         title: 'Save as Preset',
         description: 'Save current configuration for reuse later',
@@ -616,6 +605,54 @@ export default {
           nameTooLong: 'Preset name must not exceed 50 characters',
         },
         save: 'Save Preset',
+      },
+      fillMatrixGaps: {
+        title: 'Fill Matrix Gaps',
+        detecting: 'Detecting gaps...',
+        noGaps: 'No gaps found! Matrix is complete.',
+        gapsFound: 'Found {{count}} gap(s) requiring {{total}} questions',
+        selectGaps: 'Select which gaps to fill',
+        generatingQuestions: 'Generating questions for {{count}} gap(s)...',
+        success: 'Successfully filled {{count}} gap(s)',
+        status: {
+          allRequirementsMet: 'All matrix requirements have been met',
+        },
+        gapDetails: {
+          title: 'Gap Details',
+          topic: 'Topic',
+          difficulty: 'Difficulty',
+          type: 'Question Type',
+          needed: 'Need {{count}} more questions',
+          available: '{{available}} / {{required}}',
+          selected: 'Selected',
+          select: 'Select',
+        },
+        errors: {
+          noMatrix: 'No matrix exists. Please create a matrix first.',
+          noRequirements: 'Matrix has no requirements. Please add requirements to the matrix.',
+          noGapsSelected: 'Please select at least one gap to fill',
+          modelRequired: 'Please select an AI model before generating questions',
+          detectionFailed: 'Failed to detect gaps',
+          generationFailed: 'Failed to generate questions',
+        },
+        actions: {
+          selectAll: 'Select All',
+          clearAll: 'Clear All',
+          backToMatrix: 'Back to Matrix',
+          backToReview: 'Back to Review',
+          generateQuestions: 'Generate Questions',
+          fillMatrixGaps: 'Fill Matrix Gaps',
+        },
+        fields: {
+          model: 'AI Model',
+          modelPlaceholder: 'Select AI model',
+          additionalPrompt: 'Additional Prompt',
+          additionalPromptPlaceholder: 'E.g., Focus on practical applications',
+          promptHint: 'Provide additional context to guide question generation',
+        },
+        tooltips: {
+          fillMatrixGaps: 'Detect and fill gaps in the matrix',
+        },
       },
     },
 

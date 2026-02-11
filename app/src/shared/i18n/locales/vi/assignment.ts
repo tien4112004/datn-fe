@@ -579,17 +579,6 @@ export default {
         merge: 'Gộp',
         cancel: 'Hủy',
       },
-      summary: {
-        willGenerate:
-          'Sẽ tạo ~{{questions}} câu hỏi (~{{points}} điểm) trên {{difficulties}} mức độ khó và {{types}} loại câu hỏi',
-        warnings: {
-          largeMatrix: 'Ma trận lớn có thể mất nhiều thời gian hơn để tạo',
-        },
-        info: {
-          singleDifficulty: 'Hãy xem xét thêm nhiều mức độ khó để tạo đa dạng',
-          emptyPrompt: 'Hãy thêm bối cảnh để kết quả tốt hơn',
-        },
-      },
       savePreset: {
         title: 'Lưu cấu hình là mẫu',
         description: 'Lưu cấu hình hiện tại để sử dụng lại sau này',
@@ -605,6 +594,54 @@ export default {
           nameTooLong: 'Tên mẫu không được vượt quá 50 ký tự',
         },
         save: 'Lưu mẫu',
+      },
+      fillMatrixGaps: {
+        title: 'Điền khoảng trống ma trận',
+        detecting: 'Đang phát hiện khoảng trống...',
+        noGaps: 'Không có khoảng trống! Ma trận đã hoàn chỉnh.',
+        gapsFound: 'Phát hiện {{count}} khoảng trống cần {{total}} câu hỏi',
+        selectGaps: 'Chọn khoảng trống để điền',
+        generatingQuestions: 'Đang tạo câu hỏi cho {{count}} khoảng trống...',
+        success: 'Điền thành công {{count}} khoảng trống',
+        status: {
+          allRequirementsMet: 'Tất cả yêu cầu ma trận đã được đáp ứng',
+        },
+        gapDetails: {
+          title: 'Chi tiết khoảng trống',
+          topic: 'Chủ đề',
+          difficulty: 'Mức độ khó',
+          type: 'Loại câu hỏi',
+          needed: 'Cần {{count}} câu hỏi nữa',
+          available: '{{available}} / {{required}}',
+          selected: 'Đã chọn',
+          select: 'Chọn',
+        },
+        errors: {
+          noMatrix: 'Không có ma trận. Vui lòng tạo ma trận trước.',
+          noRequirements: 'Ma trận không có yêu cầu nào. Vui lòng thêm yêu cầu vào ma trận.',
+          noGapsSelected: 'Vui lòng chọn ít nhất một khoảng trống để điền',
+          modelRequired: 'Vui lòng chọn mô hình AI trước khi tạo câu hỏi',
+          detectionFailed: 'Không thể phát hiện khoảng trống',
+          generationFailed: 'Không thể tạo câu hỏi',
+        },
+        actions: {
+          selectAll: 'Chọn tất cả',
+          clearAll: 'Bỏ chọn',
+          backToMatrix: 'Quay lại ma trận',
+          backToReview: 'Quay lại xem xét',
+          generateQuestions: 'Tạo câu hỏi',
+          fillMatrixGaps: 'Điền khoảng trống',
+        },
+        fields: {
+          model: 'Mô hình AI',
+          modelPlaceholder: 'Chọn mô hình AI',
+          additionalPrompt: 'Yêu cầu bổ sung',
+          additionalPromptPlaceholder: 'VD: Tập trung vào các ứng dụng thực tế',
+          promptHint: 'Nhập bối cảnh bổ sung để hướng dẫn việc tạo câu hỏi',
+        },
+        tooltips: {
+          fillMatrixGaps: 'Phát hiện và điền các khoảng trống trong ma trận',
+        },
       },
     },
 

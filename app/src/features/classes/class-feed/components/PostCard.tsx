@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { format, formatDistanceToNow } from 'date-fns';
-import { Clock, FileText, ClipboardList, MessageCircleMore, Pin, ExternalLink } from 'lucide-react';
+import { Clock, FileText, ClipboardList, MessageCircleMore, Pin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
@@ -12,7 +12,7 @@ import { AttachmentPreview } from './AttachmentPreview';
 import { LinkedResourcesPreview } from './LinkedResourcesPreview';
 import { PostActions } from './PostActions';
 import { parseDateSafe } from '@/shared/utils/date';
-import { useAssignmentPublic } from '@/features/assignment';
+import { useAssignmentByPost } from '@/features/assignment';
 
 interface PostCardProps {
   post: Post;
@@ -27,7 +27,7 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
   const { t } = useTranslation('classes');
 
   // Fetch assignment details if this is an Exercise post with an assignmentId
-  const { data: assignment, isLoading: isAssignmentLoading } = useAssignmentPublic(post.assignmentId ?? '');
+  const { data: assignment, isLoading: isAssignmentLoading } = useAssignmentByPost(post.id);
 
   // Determine the appropriate link path based on whether we're in student or teacher mode
   const getPostDetailPath = () => {
@@ -158,13 +158,10 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
                 <span>{t('feed.post.loadingAssignment')}</span>
               </div>
             ) : assignment ? (
-              <Link to={`/assignment/${post.assignmentId}`} className="block space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <ClipboardList className="h-5 w-5 text-purple-600" />
-                    <span className="font-semibold">{assignment.title}</span>
-                  </div>
-                  <ExternalLink className="text-muted-foreground h-4 w-4 flex-shrink-0" />
+              <Link to={getPostDetailPath()} className="block space-y-2">
+                <div className="flex items-center gap-2">
+                  <ClipboardList className="h-5 w-5 text-purple-600" />
+                  <span className="font-semibold">{assignment.title}</span>
                 </div>
                 {assignment.description && (
                   <p className="text-muted-foreground line-clamp-2 text-sm">{assignment.description}</p>

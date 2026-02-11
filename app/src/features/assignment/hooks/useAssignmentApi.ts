@@ -74,6 +74,27 @@ export const useAssignmentPublic = (id?: string) => {
 };
 
 /**
+ * Hook to fetch assignment data via post ID
+ * Uses the post-based endpoint that joins through assignment_post table
+ * Should be used in feed contexts where post ID is readily available
+ * @param postId - Post ID (optional, query disabled if undefined)
+ * @returns Query result with assignment details
+ */
+export const useAssignmentByPost = (postId?: string) => {
+  const service = getAssignmentApiService();
+
+  return useQuery({
+    queryKey: postId ? [...assignmentKeys.detail('post'), postId] : [...assignmentKeys.details(), 'post'],
+    queryFn: async () => {
+      if (!postId) throw new Error('Missing post id');
+      return service.getAssignmentByPostId(postId);
+    },
+    staleTime: 60 * 1000, // 1 minute
+    enabled: !!postId,
+  });
+};
+
+/**
  * Hook to create a new assignment
  * Automatically invalidates assignment lists after successful creation
  * @returns Mutation function and state

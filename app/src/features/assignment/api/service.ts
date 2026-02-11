@@ -42,6 +42,17 @@ export default class AssignmentService implements AssignmentApiService {
     return this.normalizeAssignment(response.data.data);
   }
 
+  /**
+   * Get assignment by post ID using new post-based endpoint
+   * This endpoint fetches assignment data through the post relationship
+   * Should be used in feed contexts where post ID is available
+   * @param postId - The post ID that links to the assignment
+   */
+  async getAssignmentByPostId(postId: string): Promise<Assignment> {
+    const response = await this.apiClient.get(`${this.baseUrl}/api/posts/${postId}/assignment`);
+    return this.normalizeAssignment(response.data.data);
+  }
+
   /** Normalize questions from flat API format to nested { question, points } structure */
   private normalizeAssignment(assignment: any): Assignment {
     if (assignment.questions) {

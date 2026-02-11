@@ -4,6 +4,7 @@ export {
   useAssignmentList,
   useAssignment,
   useAssignmentPublic,
+  useAssignmentByPost,
   useCreateAssignment,
   useUpdateAssignment,
   useDeleteAssignment,

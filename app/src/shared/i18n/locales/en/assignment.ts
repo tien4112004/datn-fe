@@ -534,18 +534,33 @@ export default {
       fields: {
         name: 'Matrix Name',
         namePlaceholder: 'Enter matrix name',
+        nameHelp: 'A unique name to identify this matrix',
         grade: 'Grade',
         gradePlaceholder: 'Select grade',
+        gradeHelp: 'Grade level affects suggested difficulty levels and question types',
         subject: 'Subject',
         subjectPlaceholder: 'Select subject',
+        subjectHelp: 'Filter questions by subject to create a relevant matrix',
         totalQuestions: 'Total Questions',
+        totalQuestionsHelp: 'The total number of questions you want in the matrix',
         totalPoints: 'Total Points',
+        totalPointsHelp: 'Total points across all questions',
         difficulties: 'Difficulty Levels',
+        difficultiesHelp:
+          'KNOWLEDGE: Recall information. COMPREHENSION: Explain ideas. APPLICATION: Use ideas',
         questionTypes: 'Question Types',
+        questionTypesHelp:
+          'MULTIPLE_CHOICE: Pick one answer. FILL_IN_BLANK: Fill in missing text. MATCHING: Match pairs. OPEN_ENDED: Written response',
         prompt: 'Prompt',
         promptPlaceholder: 'Describe what you want the matrix to focus on...',
+        promptHelp: 'Example: "Focus on chapters 1-3", "Emphasize practical applications"',
+        language: 'Language',
+        languageVietnamese: 'Tiếng Việt',
+        languageEnglish: 'English',
+        languageHelp: 'Language to use for generated topics',
         model: 'AI Model',
         modelPlaceholder: 'Select AI model',
+        modelHelp: 'Different models have different speed and accuracy tradeoffs',
       },
       actions: {
         cancel: 'Cancel',
@@ -574,6 +589,33 @@ export default {
         replace: 'Replace',
         merge: 'Merge',
         cancel: 'Cancel',
+      },
+      summary: {
+        willGenerate:
+          'Will generate ~{{questions}} questions (~{{points}} points) across {{difficulties}} difficulty level(s) and {{types}} question type(s)',
+        warnings: {
+          largeMatrix: 'Large matrix may take longer to generate',
+        },
+        info: {
+          singleDifficulty: 'Consider adding more difficulty levels for variety',
+          emptyPrompt: 'Add context for better results',
+        },
+      },
+      savePreset: {
+        title: 'Save as Preset',
+        description: 'Save current configuration for reuse later',
+        fields: {
+          name: 'Preset Name',
+          namePlaceholder: 'Enter preset name (max 50 characters)',
+          description: 'Description',
+          descriptionPlaceholder: 'Brief description of this preset (optional)',
+          icon: 'Icon',
+        },
+        errors: {
+          nameRequired: 'Preset name is required',
+          nameTooLong: 'Preset name must not exceed 50 characters',
+        },
+        save: 'Save Preset',
       },
     },
 

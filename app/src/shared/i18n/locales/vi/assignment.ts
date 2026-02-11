@@ -523,18 +523,33 @@ export default {
       fields: {
         name: 'Tên ma trận',
         namePlaceholder: 'Nhập tên ma trận',
+        nameHelp: 'Một tên duy nhất để xác định ma trận này',
         grade: 'Khối lớp',
         gradePlaceholder: 'Chọn khối lớp',
+        gradeHelp: 'Khối lớp sẽ ảnh hưởng đến độ khó và loại câu hỏi được đề xuất',
         subject: 'Môn học',
         subjectPlaceholder: 'Chọn môn học',
+        subjectHelp: 'Lọc câu hỏi theo môn học để tạo ra ma trận phù hợp',
         totalQuestions: 'Tổng số câu hỏi',
+        totalQuestionsHelp: 'Tổng số câu hỏi mà bạn muốn có trong ma trận',
         totalPoints: 'Tổng điểm',
+        totalPointsHelp: 'Tổng điểm cho tất cả câu hỏi',
         difficulties: 'Mức độ khó',
+        difficultiesHelp:
+          'KIẾN THỨC: Nhớ lại thông tin. HIỂU BIẾT: Giải thích ý tưởng. ỨNG DỤNG: Sử dụng ý tưởng',
         questionTypes: 'Loại câu hỏi',
+        questionTypesHelp:
+          'TRẮC NGHIỆM: Chọn 1 câu trả lời. ĐIỀN ĐẠO: Điền từ/câu thiếu. GHÉP ĐÔI: Ghép cặp. TỰ LUẬN: Câu trả lời mở',
         prompt: 'Yêu cầu',
         promptPlaceholder: 'Mô tả những gì bạn muốn ma trận tập trung vào...',
+        promptHelp: 'Ví dụ: "Tập trung vào chương 1-3", "Nhấn mạnh các ứng dụng thực tế"',
+        language: 'Ngôn ngữ',
+        languageVietnamese: 'Tiếng Việt',
+        languageEnglish: 'English',
+        languageHelp: 'Ngôn ngữ được sử dụng cho các chủ đề được tạo',
         model: 'Mô hình AI',
         modelPlaceholder: 'Chọn mô hình AI',
+        modelHelp: 'Các mô hình khác nhau có tốc độ và độ chính xác khác nhau',
       },
       actions: {
         cancel: 'Hủy',
@@ -563,6 +578,33 @@ export default {
         replace: 'Thay thế',
         merge: 'Gộp',
         cancel: 'Hủy',
+      },
+      summary: {
+        willGenerate:
+          'Sẽ tạo ~{{questions}} câu hỏi (~{{points}} điểm) trên {{difficulties}} mức độ khó và {{types}} loại câu hỏi',
+        warnings: {
+          largeMatrix: 'Ma trận lớn có thể mất nhiều thời gian hơn để tạo',
+        },
+        info: {
+          singleDifficulty: 'Hãy xem xét thêm nhiều mức độ khó để tạo đa dạng',
+          emptyPrompt: 'Hãy thêm bối cảnh để kết quả tốt hơn',
+        },
+      },
+      savePreset: {
+        title: 'Lưu cấu hình là mẫu',
+        description: 'Lưu cấu hình hiện tại để sử dụng lại sau này',
+        fields: {
+          name: 'Tên mẫu',
+          namePlaceholder: 'Nhập tên mẫu (tối đa 50 ký tự)',
+          description: 'Mô tả',
+          descriptionPlaceholder: 'Mô tả ngắn về mẫu này (tùy chọn)',
+          icon: 'Biểu tượng',
+        },
+        errors: {
+          nameRequired: 'Tên mẫu là bắt buộc',
+          nameTooLong: 'Tên mẫu không được vượt quá 50 ký tự',
+        },
+        save: 'Lưu mẫu',
       },
     },
 

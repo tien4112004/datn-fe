@@ -175,7 +175,7 @@ export interface GenerateMatrixRequest {
   totalPoints: number;
   difficulties?: string[];
   questionTypes?: string[];
-  additionalRequirements?: string;
+  prompt?: string;
   language?: string;
   provider?: string;
   model?: string;

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useUserProfileApiService } from '../api';
+import { authKeys } from '@/features/auth/hooks/useAuth';
 import type { UserProfileUpdateRequest } from '../types';
 
 const USER_PROFILE_QUERY_KEY = ['userProfile'];
@@ -33,6 +34,10 @@ export const useUpdateUserAvatar = () => {
       queryClient.invalidateQueries({
         queryKey: [userProfileApiService.getType(), ...USER_PROFILE_QUERY_KEY],
       });
+      // Also invalidate auth profile to update sidebar
+      queryClient.invalidateQueries({
+        queryKey: authKeys.profile,
+      });
     },
   });
 };
@@ -46,6 +51,10 @@ export const useRemoveUserAvatar = () => {
       // Invalidate user profile to refetch with default avatar
       queryClient.invalidateQueries({
         queryKey: [userProfileApiService.getType(), ...USER_PROFILE_QUERY_KEY],
+      });
+      // Also invalidate auth profile to update sidebar
+      queryClient.invalidateQueries({
+        queryKey: authKeys.profile,
       });
     },
   });

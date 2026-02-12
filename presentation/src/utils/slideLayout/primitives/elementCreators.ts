@@ -6,6 +6,7 @@ import {
   type SlideTheme,
   SHAPE_PATH_FORMULAS_KEYS,
   type ImageElementClip,
+  type TextType,
 } from '@/types/slides';
 import { getImageSize } from '../../image';
 import { SHAPE_PATH_FORMULAS } from '../../../configs/shapes';
@@ -19,6 +20,46 @@ import { calculateLargestOptimalFontSize, applyFontSizeToElement } from './eleme
 import type { FontSizeRange } from '@aiprimary/core/templates';
 import { measureElement } from './elementMeasurement';
 import type { TextStyleConfig } from '@aiprimary/core/templates';
+
+/**
+ * Maps container label to appropriate TextType for theme application.
+ * This ensures text elements receive correct font styling based on their semantic role.
+ *
+ * Mapping logic:
+ * - 'label', 'itemTitle' → 'itemTitle' (uses labelFontColor/labelFontName)
+ * - 'itemNumber', 'partNumber', 'pageNumber' → corresponding type (uses labelFontColor/labelFontName)
+ * - 'title' → 'title' (uses titleFontColor/titleFontName)
+ * - 'subtitle' → 'subtitle' (uses fontColor/fontName)
+ * - 'item', 'content', or unknown → 'content' (uses fontColor/fontName)
+ *
+ * @param label - Container label string from template config
+ * @returns Appropriate TextType for theme styling
+ */
+export function mapLabelToTextType(label: string | undefined): TextType {
+  if (!label) return 'content';
+
+  const labelLower = label.toLowerCase();
+
+  // Label-type elements (use labelFontColor/labelFontName)
+  if (labelLower === 'label' || labelLower === 'itemtitle') {
+    return 'itemTitle';
+  }
+
+  // Number-type elements (also use labelFontColor/labelFontName)
+  if (labelLower === 'itemnumber') return 'itemNumber';
+  if (labelLower === 'partnumber') return 'partNumber';
+  if (labelLower === 'pagenumber') return 'pageNumber';
+
+  // Title elements
+  if (labelLower === 'title') return 'title';
+  if (labelLower === 'subtitle') return 'subtitle';
+
+  // List items
+  if (labelLower === 'item') return 'item';
+
+  // Default to content for everything else
+  return 'content';
+}
 
 /**
  * Creates a PPT text element with automatically optimized font size.
@@ -39,7 +80,8 @@ import type { TextStyleConfig } from '@aiprimary/core/templates';
 export function createTextElement(
   content: string,
   container: TextLayoutBlockInstance,
-  fontSizeRange?: FontSizeRange
+  fontSizeRange?: FontSizeRange,
+  textType?: TextType
 ): PPTTextElement {
   // Create initial text element with default styling
   const initialElement = createHtmlElement(
@@ -71,6 +113,7 @@ export function createTextElement(
     top: position.top,
     width: dimensions.width,
     height: dimensions.height,
+    textType: textType || 'content',
   } as PPTTextElement;
 }
 
@@ -139,16 +182,20 @@ function createListHtmlElement(
  * @param contents - Array of HTML content for each item (already formatted with pattern)
  * @param container - Container with bounds and styling
  * @param fontSizeRange - Optional font size constraints
- * @param listType - Type of list: 'ul' for unordered or 'ol' for ordered (default: 'ul')
+ * @param textType - Optional explicit textType (if not provided, maps from container.label)
  * @returns Array of PPT text elements (1 if fits, 2 if column wrap needed)
  */
 export function createListElements(
   contents: string[],
   container: TextLayoutBlockInstance,
-  fontSizeRange?: FontSizeRange
+  fontSizeRange?: FontSizeRange,
+  textType?: TextType
 ): PPTTextElement[] {
   const paragraphSpace = 25; // Spacing between list items
   const listType = container.combined?.ordered ? 'ol' : 'ul';
+
+  // Determine textType: use explicit parameter or map from label
+  const finalTextType = textType || mapLabelToTextType(container.label);
 
   // Create HTML elements for each content item
   const htmlElements = contents.map((content) => createHtmlElement(content, 32, container.text || {}));
@@ -264,6 +311,7 @@ export function createListElements(
         height: container.bounds.height,
         paragraphSpace,
         rotate: 0,
+        textType: finalTextType,
         _combined: {
           isCombined: true,
           label: container.label,
@@ -283,6 +331,7 @@ export function createListElements(
         height: container.bounds.height,
         paragraphSpace,
         rotate: 0,
+        textType: finalTextType,
         _combined: {
           isCombined: true,
           label: container.label,
@@ -338,6 +387,7 @@ export function createListElements(
       height: container.bounds.height,
       paragraphSpace,
       rotate: 0,
+      textType: finalTextType,
       _combined: {
         isCombined: true,
         label: container.label,
@@ -458,18 +508,29 @@ export function createCard(container: LayoutBlockInstance): PPTShapeElement {
       : undefined,
     shadow: container.shadow,
     keypoints,
+    shapeType: 'card',
   } as PPTShapeElement;
 }
 
 /**
  * Create a text PPT element
+ * @param content - HTML element containing the text
+ * @param block - Text layout block instance
+ * @param textType - Optional explicit textType (if not provided, maps from block.label)
  */
-export function createTextPPTElement(content: HTMLElement, block: TextLayoutBlockInstance): PPTTextElement {
+export function createTextPPTElement(
+  content: HTMLElement,
+  block: TextLayoutBlockInstance,
+  textType?: TextType
+): PPTTextElement {
   const dimensions = measureElement(content, block);
 
   const position = layoutItemsInBlock([dimensions], block)[0];
 
   const textConfig = block.text || {};
+
+  // Use explicit textType or map from label
+  const finalTextType = textType || mapLabelToTextType(block.label);
 
   return {
     id: crypto.randomUUID(),
@@ -481,7 +542,7 @@ export function createTextPPTElement(content: HTMLElement, block: TextLayoutBloc
     top: position.top,
     width: block.bounds.width,
     height: block.bounds.height,
-    textType: 'title',
+    textType: finalTextType,
     lineHeight: textConfig.lineHeight,
   } as PPTTextElement;
 }

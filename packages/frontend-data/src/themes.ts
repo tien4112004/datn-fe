@@ -134,14 +134,14 @@ export const THEMES_DATA: Record<string, SlideTheme> = {
     backgroundColor: {
       type: 'linear',
       colors: [
-        { color: '#d7d0ffff', pos: 0 },
-        { color: '#f7f4f7ff', pos: 100 },
+        { color: '#d7d0ff', pos: 0 },
+        { color: '#f7f4f7', pos: 100 },
       ],
       rotate: 45,
     },
     themeColors: ['#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6'],
     fontColor: '#581c87',
-    fontName: 'Poppins',
+    fontName: 'Lexend',
     outline: {
       style: 'solid',
       width: 2,
@@ -369,7 +369,7 @@ export const THEMES_DATA: Record<string, SlideTheme> = {
     backgroundColor: '#FFF9F5',
     themeColors: ['#FF5722', '#FF6B35', '#F4A261', '#343752', '#FFB74D'],
     fontColor: '#2D3748',
-    fontName: 'Poppins',
+    fontName: 'Lexend',
     outline: {
       style: 'solid',
       width: 2,
@@ -384,7 +384,7 @@ export const THEMES_DATA: Record<string, SlideTheme> = {
     titleFontColor: '#D84315',
     titleFontName: 'Raleway',
     labelFontColor: '#FF6B35',
-    labelFontName: 'Poppins',
+    labelFontName: 'Lexend',
     accentImageShape: 'default',
     card: {
       enabled: true,

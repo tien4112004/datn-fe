@@ -414,6 +414,7 @@ export interface PPTShapeElement extends PPTBaseElement {
   shadow?: PPTElementShadow;
   special?: boolean;
   text?: ShapeText;
+  shapeType?: 'card';
   pathFormula?: ShapePathFormulasKeys;
   keypoints?: number[];
 }

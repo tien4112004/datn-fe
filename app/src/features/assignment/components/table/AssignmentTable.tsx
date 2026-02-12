@@ -20,7 +20,6 @@ import { ActionContent } from '@/features/presentation/components';
 import { format } from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
-import { Badge } from '@/components/ui/badge';
 
 const columnHelper = createColumnHelper<Assignment>();
 
@@ -57,26 +56,6 @@ const AssignmentTable = () => {
   const data = useMemo(() => assignmentsResponse?.assignments || [], [assignmentsResponse]);
   const totalItems = assignmentsResponse?.total || 0;
 
-  const getStatusBadge = (status: Assignment['status']) => {
-    const variants: Record<Assignment['status'], 'default' | 'secondary' | 'outline'> = {
-      draft: 'outline',
-      published: 'default',
-      archived: 'secondary',
-    };
-
-    const labels: Record<Assignment['status'], string> = {
-      draft: t('assignment.statusDraft'),
-      published: t('assignment.statusPublished'),
-      archived: t('assignment.statusArchived'),
-    };
-
-    return (
-      <Badge variant={variants[status]} className="capitalize">
-        {labels[status]}
-      </Badge>
-    );
-  };
-
   const columns = useMemo(
     () => [
       columnHelper.accessor('title', {
@@ -86,12 +65,7 @@ const AssignmentTable = () => {
         meta: { isGrow: true },
         enableSorting: true,
       }),
-      columnHelper.accessor('status', {
-        header: t('assignment.status'),
-        cell: (info) => getStatusBadge(info.getValue()),
-        size: 120,
-        enableSorting: true,
-      }),
+
       columnHelper.accessor('createdAt', {
         header: t('assignment.createdAt'),
         cell: (info) =>

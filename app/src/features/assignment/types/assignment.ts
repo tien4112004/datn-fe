@@ -76,13 +76,19 @@ export interface Assignment {
   grade?: Grade;
   topics?: AssignmentTopic[];
   contexts?: AssignmentContext[];
-  questions: (AssignmentQuestion | AssignmentQuestionWithTopic)[];
+  questions?: (AssignmentQuestion | AssignmentQuestionWithTopic)[];
   matrix?: ApiMatrix;
   totalPoints?: number;
   shuffleQuestions?: boolean;
-  status: 'draft' | 'published' | 'archived';
   createdAt?: string;
   updatedAt?: string;
+  maxSubmissions?: number;
+  allowRetake?: boolean;
+  showCorrectAnswers?: boolean;
+  showScoreImmediately?: boolean;
+  passingScore?: number;
+  availableFrom?: string;
+  availableUntil?: string;
 }
 
 // Question item for API request (flat structure matching backend)
@@ -132,6 +138,7 @@ export interface CreateAssignmentRequest {
   topics?: TopicRequest[];
   contexts?: AssignmentContext[];
   matrix?: ApiMatrix; // Full 3D matrix structure with lowercase enums
+  shuffleQuestions?: boolean;
 }
 
 export interface UpdateAssignmentRequest {
@@ -143,6 +150,7 @@ export interface UpdateAssignmentRequest {
   topics?: TopicRequest[];
   contexts?: AssignmentContext[];
   matrix?: ApiMatrix; // Full 3D matrix structure with lowercase enums
+  shuffleQuestions?: boolean;
 }
 
 // Generate matrix request (calls POST /api/exams/generate-matrix)

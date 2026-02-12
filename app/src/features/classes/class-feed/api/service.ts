@@ -39,6 +39,12 @@ export default class ClassFeedService implements ClassFeedApiService {
     return response.data;
   }
 
+  async getPostById(postId: string): Promise<Post> {
+    const response = await this.apiClient.get<ApiResponse<Post>>(`${this.baseUrl}/api/posts/${postId}`);
+
+    return response.data.data;
+  }
+
   async createPost(request: PostCreateRequest): Promise<Post> {
     // Backend expects JSON, not FormData
     // If files need to be uploaded, handle separately via media endpoint

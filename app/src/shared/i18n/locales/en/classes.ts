@@ -1096,10 +1096,37 @@ export default {
       },
       postType: {
         post: 'Post',
-        homework: 'Exercise',
+        exercise: 'Exercise',
       },
       selectResources: 'Select resources...',
       resourcesSelected: '{{count}} resource(s) selected',
+      assignmentSettings: {
+        title: 'Assignment Settings',
+        displaySettings: {
+          shuffleQuestions: 'Shuffle Questions',
+          shuffleQuestionsDescription: 'Randomize question order for each student',
+          showCorrectAnswers: 'Show Correct Answers',
+          showCorrectAnswersDescription: 'Students can see correct answers after submission',
+          showScoreImmediately: 'Show Score Immediately',
+          showScoreImmediatelyDescription: 'Display score right after submission',
+        },
+        submissionSettings: {
+          allowRetakes: 'Allow Retakes',
+          allowRetakesDescription: 'Students can submit multiple times',
+          maxSubmissions: 'Max Submissions (optional)',
+          maxSubmissionsPlaceholder: 'Unlimited',
+          maxSubmissionsDescription: 'Leave empty for unlimited attempts',
+        },
+        grading: {
+          passingScore: 'Passing Score (%)',
+          passingScorePlaceholder: 'None',
+          passingScoreDescription: 'Minimum percentage to pass',
+        },
+        timing: {
+          availableFrom: 'Available From',
+          availableUntil: 'Available Until',
+        },
+      },
     },
     resourceSelector: {
       title: 'Link Resources',
@@ -1164,6 +1191,7 @@ export default {
       },
     },
     comments: {
+      title: 'Comments',
       loading: 'Loading comments...',
       empty: 'No comments yet',
     },
@@ -1215,6 +1243,55 @@ export default {
       title: 'Student Account Credentials',
       subtitle: 'Please keep these credentials secure and provide them to the students.',
       footer: 'Generated on {{date}}',
+    },
+  },
+
+  submissionStatistics: {
+    title: 'Submissions',
+    hideTable: 'Hide',
+    showTable: 'Show',
+    table: 'Table',
+    tableHeaders: {
+      student: 'Student',
+      submitted: 'Submitted',
+      status: 'Status',
+      score: 'Score',
+      actions: 'Actions',
+    },
+    unknownStudent: 'Unknown Student',
+    notGraded: 'Not graded',
+    actions: {
+      view: 'View',
+      grade: 'Grade',
+    },
+  },
+
+  studentAssignmentActions: {
+    status: {
+      graded: 'Graded',
+      submitted: 'Submitted',
+      inProgress: 'In Progress',
+      notStarted: 'Not Started',
+    },
+    actions: {
+      startAssignment: 'Start Assignment',
+      continue: 'Continue',
+      retake: 'Retake',
+      viewResult: 'View Result',
+      pending: 'Pending',
+    },
+    score: 'Score:',
+    submitted: 'Submitted',
+    attempt: 'Attempt',
+    attempt_plural: 'Attempts',
+    latest: 'Latest',
+    notGraded: 'Not graded',
+    tableHeaders: {
+      attempt: 'Attempt',
+      submitted: 'Submitted',
+      status: 'Status',
+      score: 'Score',
+      actions: 'Actions',
     },
   },
 };

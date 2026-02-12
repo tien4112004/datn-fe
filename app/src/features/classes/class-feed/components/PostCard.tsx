@@ -3,16 +3,16 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { format, formatDistanceToNow } from 'date-fns';
-import { Clock, FileText, ClipboardList, MessageCircleMore, Pin, ExternalLink } from 'lucide-react';
+import { Clock, FileText, ClipboardList, MessageCircleMore, Pin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
-import type { Post } from '../types';
+import { type Post, PostType } from '../types';
 import { AttachmentPreview } from './AttachmentPreview';
 import { LinkedResourcesPreview } from './LinkedResourcesPreview';
 import { PostActions } from './PostActions';
 import { parseDateSafe } from '@/shared/utils/date';
-import { useAssignment } from '@/features/assignment/hooks';
+import { useAssignmentByPost } from '@/features/assignment';
 
 interface PostCardProps {
   post: Post;
@@ -27,7 +27,16 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
   const { t } = useTranslation('classes');
 
   // Fetch assignment details if this is an Exercise post with an assignmentId
-  const { data: assignment, isLoading: isAssignmentLoading } = useAssignment(post.assignmentId ?? '');
+  const { data: assignment, isLoading: isAssignmentLoading } = useAssignmentByPost(post.id);
+
+  // Determine the appropriate link path based on whether we're in student or teacher mode
+  const getPostDetailPath = () => {
+    const isStudentMode = window.location.pathname.includes('/student/');
+    if (isStudentMode) {
+      return `/student/classes/${post.classId}/posts/${post.id}`;
+    }
+    return `/classes/${post.classId}/posts/${post.id}`;
+  };
 
   return (
     <article
@@ -69,14 +78,14 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
                 </p>
 
                 {/* Type Badge */}
-                {post.type === 'Post' && (
+                {post.type === PostType.Post && (
                   <Badge variant="secondary" className="gap-1 text-[10px] md:text-xs">
                     <FileText className="h-3 w-3" />
                     {t('feed.post.badges.post')}
                   </Badge>
                 )}
 
-                {post.type === 'Exercise' && (
+                {post.type === PostType.Exercise && (
                   <Badge
                     variant="default"
                     className="gap-1 bg-purple-600 text-[10px] hover:bg-purple-700 md:text-xs"
@@ -86,10 +95,11 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
                   </Badge>
                 )}
 
-                {post.type === 'Exercise' && post.dueDate && (
+                {post.type === PostType.Exercise && post.dueDate && (
                   <Badge variant="outline" className="gap-1 text-[10px] md:text-xs">
                     <Clock className="h-3 w-3" />
-                    {t('feed.post.badges.dueDate')}: {format(parseDateSafe(post.dueDate), 'MMM d, yyyy')}
+                    {t('feed.post.badges.dueDate')}:{' '}
+                    {format(parseDateSafe(post.dueDate), 'PP', { locale: getLocaleDateFns() })}
                   </Badge>
                 )}
 
@@ -116,11 +126,11 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
       </div>
 
       {/* Content */}
-      <div className="mb-2 ml-9 md:mb-3 md:ml-[52px]">
+      <Link to={getPostDetailPath()} className="mb-2 ml-9 block md:mb-3 md:ml-[52px]">
         <article className="prose prose-sm !max-w-none">
           <ReactMarkdown>{post.content}</ReactMarkdown>
         </article>
-      </div>
+      </Link>
 
       {/* Attachments */}
       {post.attachments && post.attachments.length > 0 && (
@@ -139,7 +149,7 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
       )}
 
       {/* Linked Assignment (for Exercise posts) */}
-      {post.type === 'Exercise' && post.assignmentId && (
+      {post.type === PostType.Exercise && post.assignmentId && (
         <div className="mb-2 ml-9 w-fit md:mb-3 md:ml-[52px]">
           <div className="rounded-lg border border-purple-200 bg-purple-50/50 p-3 transition-colors hover:bg-purple-50 dark:border-purple-900 dark:bg-purple-950/30 dark:hover:bg-purple-950/50">
             {isAssignmentLoading ? (
@@ -148,13 +158,10 @@ export const PostCard = ({ post, onEdit, onDelete, onPin, onComment, className =
                 <span>{t('feed.post.loadingAssignment')}</span>
               </div>
             ) : assignment ? (
-              <Link to={`/assignment/${post.assignmentId}`} className="block space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <ClipboardList className="h-5 w-5 text-purple-600" />
-                    <span className="font-semibold">{assignment.title}</span>
-                  </div>
-                  <ExternalLink className="text-muted-foreground h-4 w-4 flex-shrink-0" />
+              <Link to={getPostDetailPath()} className="block space-y-2">
+                <div className="flex items-center gap-2">
+                  <ClipboardList className="h-5 w-5 text-purple-600" />
+                  <span className="font-semibold">{assignment.title}</span>
                 </div>
                 {assignment.description && (
                   <p className="text-muted-foreground line-clamp-2 text-sm">{assignment.description}</p>

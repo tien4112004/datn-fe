@@ -14,7 +14,7 @@ import { RenameFileDialog } from '@/shared/components/modals/RenameFileDialog';
 import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfirmationDialog';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 import { toast } from 'sonner';
-import { Badge } from '@/components/ui/badge';
+
 import { format } from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 
@@ -56,26 +56,6 @@ const AssignmentGrid = () => {
     if (!date) return '';
     return format(new Date(date), 'E, P', { locale: getLocaleDateFns() });
   }, []);
-
-  const getStatusBadge = (status: Assignment['status']) => {
-    const variants: Record<Assignment['status'], 'default' | 'secondary' | 'outline'> = {
-      draft: 'outline',
-      published: 'default',
-      archived: 'secondary',
-    };
-
-    const labels: Record<Assignment['status'], string> = {
-      draft: t('assignment.statusDraft'),
-      published: t('assignment.statusPublished'),
-      archived: t('assignment.statusArchived'),
-    };
-
-    return (
-      <Badge variant={variants[status]} className="capitalize">
-        {labels[status]}
-      </Badge>
-    );
-  };
 
   const columns = useMemo(
     () => [
@@ -149,7 +129,7 @@ const AssignmentGrid = () => {
       >
         <ClipboardList className="mb-3 h-12 w-12 text-indigo-500" />
         <div className="text-center">
-          <div className="mb-2">{getStatusBadge(assignment.status)}</div>
+          <div className="mb-2 font-medium text-gray-700">{assignment.title}</div>
         </div>
 
         <div className="absolute right-2 top-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">

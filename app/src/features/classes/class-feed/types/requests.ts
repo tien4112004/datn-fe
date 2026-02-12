@@ -1,9 +1,10 @@
 import type { LinkedResourceRequest } from '@/features/projects/types/resource';
+import type { PostType } from './post';
 
 // Request types
 export interface PostCreateRequest {
   classId: string;
-  type: 'Post' | 'Exercise';
+  type: PostType;
   content: string;
   attachments?: string[]; // CDN URLs from upload endpoint
   linkedResources?: LinkedResourceRequest[];
@@ -11,12 +12,22 @@ export interface PostCreateRequest {
   assignmentId?: string; // For Exercise type posts
   dueDate?: string; // ISO string for Exercise type posts
   allowComments?: boolean;
+
+  // Assignment settings (only for Homework type)
+  maxSubmissions?: number;
+  allowRetake?: boolean;
+  shuffleQuestions?: boolean;
+  showCorrectAnswers?: boolean;
+  showScoreImmediately?: boolean;
+  passingScore?: number;
+  availableFrom?: string;
+  availableUntil?: string;
 }
 
 export interface PostUpdateRequest {
   id: string;
   content?: string;
-  type?: 'Post' | 'Exercise';
+  type?: PostType;
   attachments?: string[]; // CDN URLs from upload endpoint
   linkedResources?: LinkedResourceRequest[];
   linkedLessonId?: string;
@@ -33,7 +44,7 @@ export interface CommentCreateRequest {
 
 // Feed Filter
 export interface FeedFilter {
-  type: 'all' | 'Post' | 'Exercise';
+  type: 'all' | PostType;
   search?: string;
   startDate?: Date;
   endDate?: Date;

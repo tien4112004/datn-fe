@@ -1122,10 +1122,37 @@ export default {
       },
       postType: {
         post: 'Bài Đăng',
-        homework: 'Bài Tập',
+        exercise: 'Bài Tập',
       },
       selectResources: 'Chọn tài nguyên...',
       resourcesSelected: '{{count}} tài nguyên đã chọn',
+      assignmentSettings: {
+        title: 'Cài đặt bài tập',
+        displaySettings: {
+          shuffleQuestions: 'Xáo trộn câu hỏi',
+          shuffleQuestionsDescription: 'Thay đổi thứ tự câu hỏi cho mỗi học sinh',
+          showCorrectAnswers: 'Hiển thị đáp án đúng',
+          showCorrectAnswersDescription: 'Học sinh có thể xem đáp án đúng sau khi nộp bài',
+          showScoreImmediately: 'Hiển thị điểm ngay lập tức',
+          showScoreImmediatelyDescription: 'Hiển thị điểm ngay sau khi nộp bài',
+        },
+        submissionSettings: {
+          allowRetakes: 'Cho phép làm lại',
+          allowRetakesDescription: 'Học sinh có thể nộp bài nhiều lần',
+          maxSubmissions: 'Số lần nộp tối đa (tùy chọn)',
+          maxSubmissionsPlaceholder: 'Không giới hạn',
+          maxSubmissionsDescription: 'Để trống để không giới hạn số lần làm',
+        },
+        grading: {
+          passingScore: 'Điểm đạt (%)',
+          passingScorePlaceholder: 'Không có',
+          passingScoreDescription: 'Phần trăm tối thiểu để đạt',
+        },
+        timing: {
+          availableFrom: 'Có hiệu lực từ',
+          availableUntil: 'Có hiệu lực đến',
+        },
+      },
     },
     resourceSelector: {
       title: 'Liên Kết Tài Nguyên',
@@ -1190,6 +1217,7 @@ export default {
       },
     },
     comments: {
+      title: 'Bình luận',
       loading: 'Đang tải bình luận...',
       empty: 'Chưa có bình luận nào',
     },
@@ -1241,6 +1269,55 @@ export default {
       title: 'Thông tin tài khoản học sinh',
       subtitle: 'Vui lòng giữ thông tin này an toàn và cung cấp cho học sinh.',
       footer: 'Tạo ngày {{date}}',
+    },
+  },
+
+  submissionStatistics: {
+    title: 'Bài nộp',
+    hideTable: 'Ẩn',
+    showTable: 'Hiện',
+    table: 'Bảng',
+    tableHeaders: {
+      student: 'Học sinh',
+      submitted: 'Đã nộp',
+      status: 'Trạng thái',
+      score: 'Điểm',
+      actions: 'Thao tác',
+    },
+    unknownStudent: 'Học sinh không xác định',
+    notGraded: 'Chưa chấm',
+    actions: {
+      view: 'Xem',
+      grade: 'Chấm điểm',
+    },
+  },
+
+  studentAssignmentActions: {
+    status: {
+      graded: 'Đã chấm điểm',
+      submitted: 'Đã nộp',
+      inProgress: 'Đang làm',
+      notStarted: 'Chưa bắt đầu',
+    },
+    actions: {
+      startAssignment: 'Bắt đầu bài tập',
+      continue: 'Tiếp tục',
+      retake: 'Làm lại',
+      viewResult: 'Xem kết quả',
+      pending: 'Đang chờ',
+    },
+    score: 'Điểm:',
+    submitted: 'Đã nộp',
+    attempt: 'Lần làm',
+    attempt_plural: 'Lần làm',
+    latest: 'Mới nhất',
+    notGraded: 'Chưa chấm',
+    tableHeaders: {
+      attempt: 'Lần làm',
+      submitted: 'Đã nộp',
+      status: 'Trạng thái',
+      score: 'Điểm',
+      actions: 'Thao tác',
     },
   },
 };

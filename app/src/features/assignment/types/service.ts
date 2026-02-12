@@ -20,10 +20,11 @@ export interface AssignmentApiService {
   // CRUD operations
   getAssignments(request: AssignmentCollectionRequest): Promise<ApiResponse<Assignment[]>>;
   getAssignmentById(id: string): Promise<Assignment>;
+  getAssignmentByIdPublic(id: string): Promise<Assignment>;
+  getAssignmentByPostId(postId: string): Promise<Assignment>;
   createAssignment(data: CreateAssignmentRequest): Promise<Assignment>;
   updateAssignment(id: string, data: UpdateAssignmentRequest): Promise<Assignment>;
   deleteAssignment(id: string): Promise<void>;
-
   // Submission operations
   submitAssignment(assignmentId: string, submission: Submission): Promise<Submission>;
   getSubmission(assignmentId: string, studentId: string): Promise<Submission>;

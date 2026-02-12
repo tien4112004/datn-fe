@@ -23,7 +23,7 @@ export default class QuestionBankService implements QuestionBankApiService {
   async getQuestions(filters?: QuestionBankFilters): Promise<QuestionBankApiResponse> {
     // Build query params matching backend API expectations
     // Field names must match Spring Boot controller parameters exactly
-    const queryParams: Record<string, any> = {};
+    const queryParams: Record<string, string | string[] | number | undefined> = {};
 
     // Required field
     queryParams.bankType = filters?.bankType || 'personal';
@@ -112,8 +112,13 @@ export default class QuestionBankService implements QuestionBankApiService {
     // Client-side implementation: fetch question then create a copy
     const original = await this.getQuestionById(id);
 
-    // Strip fields that backend generates
-    const { id: _id, createdAt, updatedAt, ...questionData } = original;
+    // Strip fields that backend generates (prefix with _ to indicate unused)
+    const {
+      id: _originalId,
+      createdAt: _originalCreatedAt,
+      updatedAt: _originalUpdatedAt,
+      ...questionData
+    } = original;
 
     // Create new question with same data
     return this.createQuestion(questionData);
@@ -175,8 +180,10 @@ export default class QuestionBankService implements QuestionBankApiService {
 
     // Create questions using batch method
     try {
-      const toCreate = questions.map(({ id: _id, createdAt, updatedAt, ...data }) => data);
-      await this.createQuestions(toCreate as any);
+      const toCreate = questions.map(
+        ({ id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data }) => data
+      );
+      await this.createQuestions(toCreate);
       return { success: questions.length, failed: 0 };
     } catch (error) {
       return {

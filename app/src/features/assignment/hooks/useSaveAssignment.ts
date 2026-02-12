@@ -67,6 +67,7 @@ export function useSaveAssignment({ id, onSaveSuccess, onSaveError }: UseSaveAss
           name: topic.name,
           description: topic.description,
         })),
+        shuffleQuestions: data.shuffleQuestions,
         contexts: data.contexts,
         matrix: apiMatrix,
       };

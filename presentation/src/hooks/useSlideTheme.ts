@@ -1,8 +1,7 @@
 import tinycolor from 'tinycolor2';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
-import type { Slide } from '@/types/slides';
-import type { PresetTheme } from '@/configs/theme';
+import type { Slide, SlideTheme } from '@/types/slides';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
 import { getLineElementLength } from '@/utils/element';
 
@@ -294,8 +293,8 @@ export default () => {
   };
 
   // Set slide theme
-  const setSlideTheme = (slide: Slide, theme: PresetTheme) => {
-    const colorMap = createSlideThemeColorMap(slide, theme.colors);
+  const setSlideTheme = (slide: Slide, theme: SlideTheme) => {
+    const colorMap = createSlideThemeColorMap(slide, theme.themeColors);
 
     const getColor = (color: string) => {
       const alpha = tinycolor(color).getAlpha();
@@ -304,10 +303,17 @@ export default () => {
     };
 
     if (!slide.background || slide.background.type !== 'image') {
-      slide.background = {
-        type: 'solid',
-        color: theme.background,
-      };
+      if (typeof theme.backgroundColor === 'string') {
+        slide.background = {
+          type: 'solid',
+          color: theme.backgroundColor,
+        };
+      } else {
+        slide.background = {
+          type: 'gradient',
+          gradient: theme.backgroundColor,
+        };
+      }
     }
     for (const el of slide.elements) {
       if (el.type === 'shape') {
@@ -315,7 +321,7 @@ export default () => {
         if (el.gradient) delete el.gradient;
         if (el.text) {
           el.text.defaultColor = theme.fontColor;
-          el.text.defaultFontName = theme.fontname;
+          el.text.defaultFontName = theme.fontName;
           if (el.text.content) {
             el.text.content = el.text.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '');
           }
@@ -324,12 +330,12 @@ export default () => {
       if (el.type === 'text') {
         if (el.fill) el.fill = getColor(el.fill);
         el.defaultColor = theme.fontColor;
-        el.defaultFontName = theme.fontname;
+        el.defaultFontName = theme.fontName;
 
         // Handle label text types
         if (el.textType === 'itemTitle' || el.textType === 'itemNumber' || el.textType === 'partNumber') {
           el.defaultColor = theme.fontColor;
-          el.defaultFontName = theme.fontname;
+          el.defaultFontName = theme.fontName;
         }
 
         if (el.content) {
@@ -345,13 +351,13 @@ export default () => {
           for (const cell of rowCells) {
             if (cell.style) {
               cell.style.color = theme.fontColor;
-              cell.style.fontname = theme.fontname;
+              cell.style.fontname = theme.fontName;
             }
           }
         }
       }
       if (el.type === 'chart') {
-        el.themeColors = [...theme.colors];
+        el.themeColors = [...theme.themeColors];
         el.textColor = theme.fontColor;
       }
       if (el.type === 'line') el.color = getColor(el.color);
@@ -359,23 +365,15 @@ export default () => {
       if (el.type === 'latex') el.color = theme.fontColor;
 
       if ('outline' in el && el.outline) {
-        el.outline.color = theme.borderColor;
+        el.outline.color = theme.outline.color;
       }
     }
   };
 
   // Apply preset theme
-  const applyPresetTheme = (theme: PresetTheme, resetSlides = false) => {
+  const applyPresetTheme = (theme: SlideTheme, resetSlides = false) => {
     slidesStore.setTheme({
-      backgroundColor: theme.background,
-      themeColors: theme.colors,
-      fontColor: theme.fontColor,
-      outline: {
-        width: 2,
-        style: 'solid',
-        color: theme.borderColor,
-      },
-      fontName: theme.fontname,
+      ...theme,
     });
 
     if (resetSlides) {

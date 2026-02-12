@@ -157,7 +157,7 @@ const execCommand = ({ target, action }: RichTextCommand) => {
       addMark(editorView, mark);
 
       if (item.value && !document.fonts.check(`16px ${item.value}`)) {
-        message.warning(t('prosemirrorEditor.font_loading_wait'));
+        // message.warning(t('prosemirrorEditor.font_loading_wait'));
       }
     } else if (item.command === 'fontsize' && item.value) {
       const mark = editorView.state.schema.marks.fontsize.create({

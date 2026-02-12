@@ -34,6 +34,7 @@ import { usePresentationProcessor } from '@/hooks/usePresentationProcessor';
 import { useGenerationStore } from '@/store/generation';
 import { useSavePresentation } from '@/hooks/useSavePresentation';
 import { getPresentationApi } from '@/services/presentation/api';
+import useGlobalHotkey from '@/hooks/useGlobalHotkey';
 
 const _isPC = isPC();
 
@@ -66,6 +67,19 @@ const isLoading = computed(() => {
   return isProcessing.value || generationStore.isStreaming;
 });
 
+// Get pinia instance and setup save presentation at top level
+const instance = getCurrentInstance();
+const pinia = instance?.appContext.config.globalProperties.$pinia;
+
+let saveFn: (() => Promise<void>) | undefined;
+if (pinia) {
+  const result = useSavePresentation(props.presentation.id, pinia);
+  saveFn = result.savePresentation;
+}
+
+// Setup global hotkey at top level (required for composable lifecycle)
+useGlobalHotkey(saveFn);
+
 onMounted(async () => {
   if (props.presentation.title) {
     slidesStore.setTitle(props.presentation.title);
@@ -77,16 +91,6 @@ onMounted(async () => {
 
   if (props.presentation.viewport) {
     slidesStore.setViewportSize(props.presentation.viewport.width);
-  }
-
-  // Get pinia instance
-  const instance = getCurrentInstance();
-  const pinia = instance?.appContext.config.globalProperties.$pinia;
-
-  // Create save hook and provide to child components
-  if (pinia) {
-    const { savePresentation: saveFn } = useSavePresentation(props.presentation.id, pinia);
-    provide('savePresentationFn', saveFn);
   }
 
   const processorResult = usePresentationProcessor(

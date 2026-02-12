@@ -25,6 +25,8 @@ const contextIcon = computed(() => {
       if (props.context.elementType === 'text') return Type;
       if (props.context.elementType === 'image') return Image;
       return Square;
+    case 'combined-text':
+      return Layers;
     case 'elements':
       return Layers;
     case 'generate':
@@ -43,6 +45,8 @@ const contextText = computed(() => {
       if (props.context.elementType === 'text') return 'Text Element';
       if (props.context.elementType === 'image') return 'Image Element';
       return 'Selected Element';
+    case 'combined-text':
+      return 'Combined Text Items';
     case 'elements':
       return `${props.context.count || 0} Elements`;
     case 'generate':
@@ -64,13 +68,13 @@ const contextText = computed(() => {
   border-radius: 4px;
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--presentation-foreground);
+  color: var(--presentation-secondary-foreground);
 }
 
 .context-icon {
   width: 14px;
   height: 14px;
-  color: var(--presentation-primary);
+  color: var(--presentation-secondary-foreground);
 }
 
 .context-text {

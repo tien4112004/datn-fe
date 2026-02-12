@@ -463,6 +463,15 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
         description: 'Left/right slide padding',
       },
       {
+        key: 'COLUMN_SPACING',
+        label: 'Column Spacing (px)',
+        defaultValue: 40,
+        min: 0,
+        max: 200,
+        step: 1,
+        description: 'Horizontal spacing between image and content',
+      },
+      {
         key: 'IMAGE_WIDTH',
         label: 'Image Width (px)',
         defaultValue: 360,
@@ -505,7 +514,7 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
           },
           height: 300,
           left: {
-            expr: 'SIDE_PADDING + ((SLIDE_WIDTH - SIDE_PADDING * 2) / 2 - IMAGE_WIDTH) / 2',
+            expr: 'SIDE_PADDING + COLUMN_SPACING / 2',
           },
           top: {
             expr: 'after',
@@ -524,13 +533,13 @@ export const twoColumnWithImageTemplates: SlideTemplate[] = [
         type: 'block',
         bounds: {
           left: {
-            expr: 'SIDE_PADDING + (SLIDE_WIDTH - SIDE_PADDING * 2) / 2',
+            expr: 'SIDE_PADDING + IMAGE_WIDTH + COLUMN_SPACING',
           },
           top: {
             expr: 'image.top',
           },
           width: {
-            expr: '(SLIDE_WIDTH - SIDE_PADDING * 2) / 2 - 30',
+            expr: 'SLIDE_WIDTH - SIDE_PADDING * 2 - IMAGE_WIDTH - COLUMN_SPACING - 30',
           },
           height: {
             expr: 'SLIDE_HEIGHT - image.top - 50',

@@ -157,8 +157,6 @@ export default {
         // Generation Actions
         generateFromTopic: 'Generate from Topic',
         generateFromTopicDesc: 'Create slides about a topic',
-        expandSlide: 'Expand Current Slide',
-        expandSlideDesc: 'Create supporting slides',
         createConclusion: 'Create Conclusion Slide',
         createConclusionDesc: 'Summary from presentation',
         createAgenda: 'Create Agenda/TOC',

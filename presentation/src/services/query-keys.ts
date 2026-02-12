@@ -45,4 +45,12 @@ export const queryKeys = {
     all: ['users'] as const,
     search: (query: string) => [...queryKeys.users.all, 'search', query] as const,
   },
+
+  // Model keys
+  models: {
+    all: ['models'] as const,
+    lists: () => [...queryKeys.models.all, 'list'] as const,
+    list: (modelType: string) => [...queryKeys.models.lists(), modelType] as const,
+    default: (modelType: string) => [...queryKeys.models.all, 'default', modelType] as const,
+  },
 } as const;

@@ -304,7 +304,7 @@ export function usePresentationProcessor(
 
       const imageUrl = response.imageUrl;
       if (imageUrl) {
-        await updateSlideImageInStore(slideId, imageElement.id, imageUrl);
+        await updateSlideImageInStore(slideId, imageElement.id, imageUrl, prompt);
         return { success: true };
       } else {
         console.error('No image URL in response for slide:', slideId);
@@ -336,7 +336,7 @@ export function usePresentationProcessor(
   }
 
   // Helper to update store specific image
-  async function updateSlideImageInStore(slideId: string, elementId: string, url: string) {
+  async function updateSlideImageInStore(slideId: string, elementId: string, url: string, prompt?: string) {
     const slideIndex = slidesStore.slides.findIndex((s) => s.id === slideId);
 
     if (slideIndex === -1) {
@@ -361,6 +361,24 @@ export function usePresentationProcessor(
     );
     slide.elements = [...slide.elements];
     slide.elements[elementIndex] = updatedElement;
+
+    // Update slide layout data if available
+    if (slide.layout?.schema?.data) {
+      // Create a deep copy of layout to avoid mutation issues
+      const updatedLayout = JSON.parse(JSON.stringify(slide.layout));
+
+      // Update image URL in schema
+      if ('image' in updatedLayout.schema.data) {
+        updatedLayout.schema.data.image = url;
+      }
+
+      // Store original prompt if provided
+      if (prompt) {
+        updatedLayout.schema.data.prompt = prompt;
+      }
+
+      slide.layout = updatedLayout;
+    }
 
     const newSlides = [...slidesStore.slides];
     newSlides[slideIndex] = slide;

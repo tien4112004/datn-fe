@@ -397,6 +397,5 @@ provide(injectKeySlideScale, canvasScale);
   justify-content: center;
   z-index: 5000;
   pointer-events: none;
-  border: 2px dashed rgba(100, 100, 255, 0.3);
 }
 </style>

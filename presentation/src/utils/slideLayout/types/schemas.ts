@@ -4,6 +4,7 @@ export interface TwoColumnWithImageLayoutSchema {
   data: {
     image: string;
     items: string[];
+    prompt?: string;
   };
 }
 
@@ -12,6 +13,7 @@ export interface MainImageLayoutSchema {
   data: {
     image: string;
     content: string;
+    prompt?: string;
   };
 }
 

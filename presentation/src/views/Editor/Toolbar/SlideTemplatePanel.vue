@@ -137,10 +137,10 @@ const isInPreviewMode = computed(() => isCurrentSlideLocked.value);
 
 // Update canSwitch when currentSlide changes
 watch(
-  currentSlide,
-  async (slide) => {
-    if (slide?.id) {
-      canSwitch.value = await canSwitchTemplate(slide.id);
+  () => [currentSlide.value?.id, currentSlide.value?.layout?.layoutType],
+  async ([slideId, layoutType]) => {
+    if (slideId && layoutType) {
+      canSwitch.value = await canSwitchTemplate(slideId);
     } else {
       canSwitch.value = false;
     }
@@ -257,11 +257,11 @@ const generatePreviews = async () => {
   }
 };
 
-// Regenerate previews when slide changes
+// Regenerate previews when slide changes or when switching capability is confirmed
 watch(
-  () => currentSlide.value?.id,
-  async (newId) => {
-    if (!newId || !canSwitch.value) {
+  [() => currentSlide.value?.id, canSwitch],
+  async ([newId, can]) => {
+    if (!newId || !can) {
       templatePreviews.value = [];
       return;
     }
@@ -274,9 +274,9 @@ watch(
 // Regenerate previews when images change
 watch(
   () =>
-    (currentSlide.value?.elements.filter((el) => el.type === 'image') as PPTImageElement[]).map(
-      (el) => el.src
-    ),
+    (currentSlide.value?.elements || [])
+      .filter((el) => el.type === 'image')
+      .map((el) => (el as PPTImageElement).src),
   async (newImages, oldImages) => {
     // Only regenerate if images actually changed and we have previews
     if (

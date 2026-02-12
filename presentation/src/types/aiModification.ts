@@ -1,7 +1,7 @@
 import type { Component } from 'vue';
 
 // Context types
-export type AIContextType = 'slide' | 'element' | 'elements' | 'generate';
+export type AIContextType = 'slide' | 'element' | 'elements' | 'combined-text' | 'generate';
 export type ElementType = 'text' | 'image' | 'shape' | 'chart' | 'table' | 'video' | 'audio' | 'latex';
 
 // Action categories
@@ -75,6 +75,8 @@ export interface AIModificationRequest {
     elementContent?: unknown;
   };
   parameters: Record<string, string | number>;
+  model: string;
+  provider: string;
 }
 
 export interface AIModificationResponse {
@@ -85,7 +87,10 @@ export interface AIModificationResponse {
     suggestions?: unknown[];
     refinedText?: string;
     imageUrl?: string;
+    schema?: unknown;
+    schemas?: unknown[];
     [key: string]: any; // Allow additional properties
   };
+  message?: string;
   error?: string;
 }

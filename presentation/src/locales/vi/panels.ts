@@ -157,8 +157,6 @@ export default {
         // Hành động tạo mới
         generateFromTopic: 'Tạo từ chủ đề',
         generateFromTopicDesc: 'Tạo trang chiếu về một chủ đề',
-        expandSlide: 'Mở rộng trang chiếu hiện tại',
-        expandSlideDesc: 'Tạo trang chiếu hỗ trợ',
         createConclusion: 'Tạo trang chiếu kết luận',
         createConclusionDesc: 'Tóm tắt từ bài thuyết trình',
         createAgenda: 'Tạo chương trình/Mục lục',

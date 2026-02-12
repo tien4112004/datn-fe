@@ -24,13 +24,39 @@ export function useAIModificationState(): {
     // Check if elements are selected
     if (activeElementIdList.value && activeElementIdList.value.length > 0) {
       if (activeElementIdList.value.length === 1) {
-        // Single element selected
-        const elementType = handleElement.value?.type || 'text';
-        return {
-          type: 'element',
-          elementType: elementType as any,
-          data: handleElement.value,
-        };
+        const element = handleElement.value;
+        const slideData = currentSlide.value;
+
+        // Check if this is a combined text element in template preview mode
+        if (
+          (element as any)?._combined?.isCombined &&
+          slideData?.layout?.isTemplatePreview &&
+          slideData?.layout?.schema
+        ) {
+          const itemsArray = slideData.layout.schema.data?.items;
+          if (itemsArray && Array.isArray(itemsArray)) {
+            return {
+              type: 'combined-text',
+              data: {
+                items: itemsArray,
+                schema: slideData.layout.schema,
+                layoutType: slideData.layout.layoutType,
+                slideType: slideData.layout.layoutType,
+                label: (element as any)._combined.label,
+              },
+            };
+          }
+        }
+
+        // Regular single element
+        if (element) {
+          const elementType = element.type || 'text';
+          return {
+            type: 'element',
+            elementType: elementType as any,
+            data: element,
+          };
+        }
       } else {
         // Multiple elements selected
         return {

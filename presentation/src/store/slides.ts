@@ -222,19 +222,6 @@ export const useSlidesStore = defineStore('slides', {
       this.slides = slides;
     },
 
-    /**
-     * Replace a single slide with one or multiple new slides
-     * Used for "Split Slide" functionality
-     */
-    replaceSlide(slideId: string, newSlides: Slide[]) {
-      const index = this.slides.findIndex((item) => item.id === slideId);
-      if (index === -1) return;
-
-      this.slides.splice(index, 1, ...newSlides);
-      // Update index to point to the first of the new slides
-      this.slideIndex = index;
-    },
-
     updateSlideIndex(index: number) {
       this.slideIndex = index;
     },

@@ -196,31 +196,6 @@ function mockTransformLayout(request: AIModificationRequest): AIModificationResp
   return { success: true, data: { schema: newSchema } };
 }
 
-function mockExpandSlide(request: AIModificationRequest): AIModificationResponse {
-  const schema = request.context.slideSchema as any;
-  const count = Number(request.parameters.count) || 2;
-
-  if (!schema) {
-    return { success: false, data: {}, error: 'No slideSchema provided' };
-  }
-
-  const title = schema.title || schema.data?.title || '';
-  const items = extractTextItems(schema);
-  const imageUrl = request.context.currentImageSrc;
-  const schemaType = schema.type || 'list';
-  const itemsPerSlide = Math.max(1, Math.ceil(items.length / count));
-
-  const schemas: any[] = [];
-  for (let i = 0; i < count; i++) {
-    const portion = items.slice(i * itemsPerSlide, (i + 1) * itemsPerSlide);
-    const partTitle = title ? `${title} (Part ${i + 1} of ${count})` : `Part ${i + 1}`;
-    const partItems = portion.length > 0 ? portion : [`Content for Part ${i + 1}`];
-    schemas.push(buildSchemaForType(schemaType, partTitle, partItems, imageUrl));
-  }
-
-  return { success: true, data: { schemas } };
-}
-
 // --- Exported mock service ---
 
 export const mockAIModificationService = {
@@ -232,8 +207,6 @@ export const mockAIModificationService = {
         return mockRefineContent(request);
       case 'transform-layout':
         return mockTransformLayout(request);
-      case 'expand-slide':
-        return mockExpandSlide(request);
       default:
         return { success: false, data: {}, error: `Unsupported action: ${request.action}` };
     }
@@ -271,5 +244,35 @@ export const mockAIModificationService = {
     const imageUrl = `https://picsum.photos/seed/${seed}/800/450`;
 
     return { success: true, data: { imageUrl } };
+  },
+
+  async refineCombinedText(request: {
+    slideId: string;
+    items: any[];
+    instruction: string;
+    slideSchema?: unknown;
+    slideType?: string;
+    operation?: string;
+  }): Promise<AIModificationResponse> {
+    await delay();
+
+    const expandedItems = request.items.map((item: any) => {
+      if (typeof item === 'string') {
+        return transformPlainText(item, request.instruction);
+      }
+      if (typeof item === 'object' && item !== null) {
+        const transformed = { ...item };
+        if (typeof transformed.content === 'string') {
+          transformed.content = transformPlainText(transformed.content, request.instruction);
+        }
+        if (typeof transformed.label === 'string') {
+          transformed.label = transformPlainText(transformed.label, request.instruction);
+        }
+        return transformed;
+      }
+      return item;
+    });
+
+    return { success: true, data: { expandedItems } };
   },
 };

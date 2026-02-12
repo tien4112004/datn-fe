@@ -78,12 +78,16 @@ export function useSavePresentation(presentationId: string, pinia: Pinia) {
     const data = {
       title: overrides?.title ?? slidesStore.title,
       slides: overrides?.slides ?? slidesStore.slides,
+      theme: overrides?.theme ?? slidesStore.theme,
+      viewport,
       isParsed: false,
       metadata: {},
       // Include thumbnail URL if we're not uploading a new file (i.e., it's already an R2 URL)
       // This prevents the backend from setting thumbnail to null when no file is uploaded
       ...(thumbnailBlob ? {} : { thumbnail: thumbnailToUse }),
     };
+
+    console.log(data);
 
     // Create FormData for multipart upload
     const formData = new FormData();

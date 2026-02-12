@@ -157,7 +157,7 @@ export function createListElements(
   const listFontSize = htmlElements.map((el) =>
     calculateLargestOptimalFontSize(el, container, fontSizeRange)
   );
-  const optimalFontSize = Math.min(...listFontSize);
+  const optimalFontSize = Math.min(...listFontSize) - 1;
 
   // Create wrapper list element with optimal font size (with marginTop for measurement)
   const listElement = createListHtmlElement(contents, listType, optimalFontSize, container, {
@@ -199,7 +199,7 @@ export function createListElements(
     const columnFontSizes = columnHtmlElements.map((el) =>
       calculateLargestOptimalFontSize(el, columnContainer, fontSizeRange)
     );
-    let columnOptimalFontSize = Math.min(...columnFontSizes);
+    let columnOptimalFontSize = Math.min(...columnFontSizes) - 1;
 
     // Create temporary left column to verify height constraint
     let leftList = createListHtmlElement(
@@ -264,7 +264,13 @@ export function createListElements(
         height: container.bounds.height,
         paragraphSpace,
         rotate: 0,
-      },
+        _combined: {
+          isCombined: true,
+          label: container.label,
+          columnIndex: 0,
+          totalColumns: 2,
+        },
+      } as any,
       {
         id: crypto.randomUUID(),
         type: 'text',
@@ -277,7 +283,13 @@ export function createListElements(
         height: container.bounds.height,
         paragraphSpace,
         rotate: 0,
-      },
+        _combined: {
+          isCombined: true,
+          label: container.label,
+          columnIndex: 1,
+          totalColumns: 2,
+        },
+      } as any,
     ];
   }
 
@@ -326,7 +338,13 @@ export function createListElements(
       height: container.bounds.height,
       paragraphSpace,
       rotate: 0,
-    },
+      _combined: {
+        isCombined: true,
+        label: container.label,
+        columnIndex: 0,
+        totalColumns: 1,
+      },
+    } as any,
   ];
 }
 

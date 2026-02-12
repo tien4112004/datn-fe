@@ -222,36 +222,27 @@ export class PresentationApiService implements ApiService {
     const page = (params?.page ?? 0) + 1;
     const limit = params?.limit ?? 10;
 
-    const response = await this.apiClient.get<ApiResponse<any>>(
+    const response = await this.apiClient.get<ApiResponse<SlideTheme[]>>(
       `${this.baseUrl}/api/slide-themes?page=${page}&limit=${limit}`
     );
 
-    const responseData = response.data.data;
+    const pagination = response.data.pagination;
+    if (pagination) {
+      const backendPage = pagination.currentPage ?? page;
+      const backendLimit = pagination.pageSize ?? limit;
+      const total = pagination.totalItems ?? 0;
 
-    // Handle both paginated and non-paginated responses for backward compatibility
-    if (Array.isArray(responseData)) {
-      // Old API response format (no pagination)
       return {
-        data: responseData,
-        total: responseData.length,
-        page: 0,
-        limit: responseData.length,
-        hasMore: false,
+        data: response.data.data,
+        total,
+        page: Math.max(0, backendPage - 1),
+        limit: backendLimit,
+        hasMore: backendPage * backendLimit < total,
       };
     }
 
-    // New paginated API response
-    const backendPage = responseData.page ?? page;
-    const backendLimit = responseData.limit ?? responseData.size ?? limit;
-    const total = responseData.total || responseData.totalElements || 0;
-
-    return {
-      data: responseData.data || responseData.content || [],
-      total,
-      page: backendPage - 1, // Convert from 1-based (backend) to 0-based (frontend)
-      limit: backendLimit,
-      hasMore: responseData.hasMore ?? backendPage * backendLimit < total,
-    };
+    // Last-resort fallback: return empty list
+    return { data: [], total: 0, page: 0, limit: 0, hasMore: false };
   }
 
   _mapPresentationItem(data: any): Presentation {

@@ -16,10 +16,16 @@ export const aiModificationService = {
   /**
    * Process an AI modification request
    * @param request The modification request
+   * @param model The AI model to use (defaults to gemini-2.0-flash-exp)
+   * @param provider The AI provider to use (defaults to google)
    * @returns Promise resolving to the modification response
    */
-  async processModification(request: AIModificationRequest): Promise<AIModificationResponse> {
-    console.log(`[AI] processModification → ${request.action}`, { payload: request });
+  async processModification(
+    request: AIModificationRequest,
+    model: string = 'gemini-2.0-flash-exp',
+    provider: string = 'google'
+  ): Promise<AIModificationResponse> {
+    console.log(`[AI] processModification → ${request.action}`, { payload: request, model, provider });
     if (USE_MOCK) return mockAIModificationService.processModification(request);
     try {
       let endpoint = '';
@@ -32,10 +38,13 @@ export const aiModificationService = {
           payload = {
             schema: request.context.slideSchema,
             instruction: request.parameters.instruction,
+            operation: request.parameters.operation,
             context: {
               slideId: request.context.slideId,
               slideType: request.context.slideType,
             },
+            model,
+            provider,
           };
           break;
 
@@ -44,14 +53,8 @@ export const aiModificationService = {
           payload = {
             currentSchema: request.context.slideSchema,
             targetType: request.parameters.targetType,
-          };
-          break;
-
-        case 'expand-slide':
-          endpoint = '/api/ai/expand-slide';
-          payload = {
-            currentSchema: request.context.slideSchema,
-            count: request.parameters.count,
+            model,
+            provider,
           };
           break;
 
@@ -86,19 +89,30 @@ export const aiModificationService = {
 
   /**
    * Refine text content of a specific text element
+   * @param request The refinement request
+   * @param model The AI model to use (defaults to gemini-2.0-flash-exp)
+   * @param provider The AI provider to use (defaults to google)
    */
-  async refineElementText(request: {
-    slideId: string;
-    elementId: string;
-    currentText: string;
-    instruction: string;
-    slideSchema?: unknown;
-    slideType?: string;
-  }): Promise<AIModificationResponse> {
-    console.log('[AI] refineElementText', { payload: request });
+  async refineElementText(
+    request: {
+      slideId: string;
+      elementId: string;
+      currentText: string;
+      instruction: string;
+      slideSchema?: unknown;
+      slideType?: string;
+    },
+    model: string = 'gemini-2.0-flash-exp',
+    provider: string = 'google'
+  ): Promise<AIModificationResponse> {
+    console.log('[AI] refineElementText', { payload: request, model, provider });
     if (USE_MOCK) return mockAIModificationService.refineElementText(request);
     try {
-      const response = await api.post<ApiResponse<any>>(`${BASE_URL}/api/ai/refine-element-text`, request);
+      const response = await api.post<ApiResponse<any>>(`${BASE_URL}/api/ai/refine-element-text`, {
+        ...request,
+        model,
+        provider,
+      });
 
       if (response.data && response.data.success !== false) {
         return {
@@ -124,20 +138,32 @@ export const aiModificationService = {
 
   /**
    * Replace image of a specific image element
+   * @param request The replacement request
+   * @param model The AI model to use (defaults to gemini-2.0-flash-exp)
+   * @param provider The AI provider to use (defaults to google)
    */
-  async replaceElementImage(request: {
-    slideId: string;
-    elementId: string;
-    description: string;
-    style: string;
-    matchSlideTheme?: boolean;
-    slideSchema?: unknown;
-    slideType?: string;
-  }): Promise<AIModificationResponse> {
-    console.log('[AI] replaceElementImage', { payload: request });
+  async replaceElementImage(
+    request: {
+      slideId: string;
+      elementId: string;
+      description: string;
+      style: string;
+      themeDescription?: string;
+      artDescription?: string;
+      slideSchema?: unknown;
+      slideType?: string;
+    },
+    model: string = 'gemini-2.0-flash-exp',
+    provider: string = 'google'
+  ): Promise<AIModificationResponse> {
+    console.log('[AI] replaceElementImage', { payload: request, model, provider });
     if (USE_MOCK) return mockAIModificationService.replaceElementImage(request);
     try {
-      const response = await api.post<ApiResponse<any>>(`${BASE_URL}/api/ai/replace-element-image`, request);
+      const response = await api.post<ApiResponse<any>>(`${BASE_URL}/api/ai/replace-element-image`, {
+        ...request,
+        model,
+        provider,
+      });
 
       if (response.data && response.data.success !== false) {
         return {
@@ -153,6 +179,55 @@ export const aiModificationService = {
       }
     } catch (err: any) {
       console.error('Image replacement error:', err);
+      return {
+        success: false,
+        data: {},
+        error: err.response?.data?.message || err.message || 'Network error',
+      };
+    }
+  },
+
+  /**
+   * Expand content of combined text items
+   * @param request The expansion request
+   * @param model The AI model to use (defaults to gemini-2.0-flash-exp)
+   * @param provider The AI provider to use (defaults to google)
+   */
+  async refineCombinedText(
+    request: {
+      slideId: string;
+      items: any[];
+      instruction: string;
+      slideSchema?: unknown;
+      slideType?: string;
+      operation?: string;
+    },
+    model: string = 'gemini-2.0-flash-exp',
+    provider: string = 'google'
+  ): Promise<AIModificationResponse> {
+    console.log('[AI] refineCombinedText', { payload: request, model, provider });
+    if (USE_MOCK) return mockAIModificationService.refineCombinedText(request);
+    try {
+      const response = await api.post<ApiResponse<any>>(`${BASE_URL}/api/ai/refine-combined-text`, {
+        ...request,
+        model,
+        provider,
+      });
+
+      if (response.data && response.data.success !== false) {
+        return {
+          success: true,
+          data: response.data.data,
+        };
+      } else {
+        return {
+          success: false,
+          data: {},
+          error: response.data.message || 'Failed to refine combined text',
+        };
+      }
+    } catch (err: any) {
+      console.error('Combined text expansion error:', err);
       return {
         success: false,
         data: {},

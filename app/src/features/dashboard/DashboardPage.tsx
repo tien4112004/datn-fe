@@ -1,9 +1,10 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/components/ui/button';
 import { Plus } from 'lucide-react';
 import { ClassListSimpleTable } from './components/ClassListSimpleTable';
-import { DashboardCalendar } from './components/DashboardCalendar';
+import { EnhancedCalendar } from './components/EnhancedCalendar';
 import { QuickNavigation } from './components/QuickNavigation';
 import { RecentDocuments } from './components/RecentDocuments';
+import { SummaryMetrics } from './components/SummaryMetrics';
 import { useAuth } from '@/shared/context/auth';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -32,6 +33,15 @@ export const DashboardPage = () => {
       <div className="flex flex-1 flex-col lg:flex-row lg:overflow-hidden">
         {/* Left Main Content */}
         <div className="flex-1 space-y-6 p-4 sm:space-y-8 sm:p-6 lg:overflow-y-auto lg:p-8">
+          {/* Dashboard Header */}
+          <div>
+            <h1 className="text-2xl font-bold sm:text-3xl">Dashboard</h1>
+            <p className="text-muted-foreground">Welcome back! Here's what's happening today.</p>
+          </div>
+
+          {/* Summary Metrics */}
+          <SummaryMetrics />
+
           {/* Quick Navigation Section */}
           <QuickNavigation />
 
@@ -41,7 +51,7 @@ export const DashboardPage = () => {
 
         {/* Right Sidebar */}
         <div className="bg-muted/10 w-full space-y-6 border-t p-4 sm:p-6 lg:w-[380px] lg:overflow-y-auto lg:border-l lg:border-t-0">
-          <DashboardCalendar />
+          <EnhancedCalendar />
 
           {/* My Classes Section */}
           <div className="space-y-4">

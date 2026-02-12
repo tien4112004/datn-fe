@@ -1194,6 +1194,7 @@ export default {
     // Assignment submissions page (teacher view)
     assignmentSubmissions: {
       title: 'Submissions',
+      notFound: 'Assignment not found',
       totalSubmissions: 'Total Submissions',
       graded: 'Graded',
       pendingReview: 'Pending Review',

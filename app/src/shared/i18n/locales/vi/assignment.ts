@@ -1171,6 +1171,7 @@ export default {
     // Trang danh sách bài nộp (dành cho giáo viên)
     assignmentSubmissions: {
       title: 'Bài nộp',
+      notFound: 'Không tìm thấy bài tập',
       totalSubmissions: 'Tổng số bài nộp',
       graded: 'Đã chấm',
       pendingReview: 'Chờ duyệt',

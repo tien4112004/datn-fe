@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/shared/context/auth';
+import GlobalSpinner from '@/shared/components/common/GlobalSpinner';
 
 interface StudentRouteProps {
   children: React.ReactNode;
@@ -10,11 +11,7 @@ export function StudentRoute({ children }: StudentRouteProps) {
 
   // Show loading state while checking authentication
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-muted-foreground">Loading...</div>
-      </div>
-    );
+    return <GlobalSpinner />;
   }
 
   // Redirect to login if not authenticated

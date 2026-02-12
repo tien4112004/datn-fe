@@ -8,11 +8,12 @@ import {
 import { useAtRiskStudents } from '../hooks/useAtRiskStudents';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
 import { Badge } from '@/shared/components/ui/badge';
-import { School, Users, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
+import { School, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
 import { ScrollArea } from '@/shared/components/ui/scroll-area';
 import { useState } from 'react';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import type { ClassAtRiskStudents } from '../api/types';
+import { useTranslation } from 'react-i18next';
 
 interface ClassesOverviewModalProps {
   isOpen: boolean;
@@ -54,10 +55,11 @@ const getRiskConfig = (riskLevel: string) => {
 
 const ClassCard = ({ classData }: { classData: ClassAtRiskStudents }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { t } = useTranslation('dashboard');
 
   return (
     <Card>
-      <CardContent className="p-4">
+      <CardContent>
         <div
           className="flex cursor-pointer items-center justify-between"
           onClick={() => setIsExpanded(!isExpanded)}
@@ -68,7 +70,9 @@ const ClassCard = ({ classData }: { classData: ClassAtRiskStudents }) => {
             </div>
             <div>
               <h3 className="font-semibold">{classData.className}</h3>
-              <p className="text-sm text-muted-foreground">{classData.totalStudents} students</p>
+              <p className="text-muted-foreground text-sm">
+                {t('classesOverview.students', { count: classData.totalStudents })}
+              </p>
             </div>
           </div>
 
@@ -76,20 +80,22 @@ const ClassCard = ({ classData }: { classData: ClassAtRiskStudents }) => {
             {classData.atRiskCount > 0 && (
               <Badge variant="destructive" className="gap-1">
                 <AlertTriangle className="h-3 w-3" />
-                {classData.atRiskCount} at risk
+                {t('classesOverview.atRisk', { count: classData.atRiskCount })}
               </Badge>
             )}
             {isExpanded ? (
-              <ChevronUp className="h-4 w-4 text-muted-foreground" />
+              <ChevronUp className="text-muted-foreground h-4 w-4" />
             ) : (
-              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              <ChevronDown className="text-muted-foreground h-4 w-4" />
             )}
           </div>
         </div>
 
         {isExpanded && classData.atRiskStudents.length > 0 && (
           <div className="mt-4 space-y-2 border-t pt-4">
-            <h4 className="text-sm font-medium text-muted-foreground">At-Risk Students:</h4>
+            <h4 className="text-muted-foreground text-sm font-medium">
+              {t('classesOverview.atRiskStudents')}
+            </h4>
             {classData.atRiskStudents.map((student) => {
               const riskConfig = getRiskConfig(student.riskLevel);
               return (
@@ -109,8 +115,11 @@ const ClassCard = ({ classData }: { classData: ClassAtRiskStudents }) => {
                       <p className="text-sm font-medium">
                         {student.student.firstName} {student.student.lastName}
                       </p>
-                      <p className="text-xs text-muted-foreground">
-                        {student.missedSubmissions} missed, {student.lateSubmissions} late
+                      <p className="text-muted-foreground text-xs">
+                        {t('classesOverview.missedLate', {
+                          missed: student.missedSubmissions,
+                          late: student.lateSubmissions,
+                        })}
                       </p>
                     </div>
                   </div>
@@ -132,16 +141,16 @@ const ClassCard = ({ classData }: { classData: ClassAtRiskStudents }) => {
 
 const ShimmerCard = () => (
   <Card>
-    <CardContent className="p-4">
+    <CardContent>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 animate-pulse rounded-lg bg-muted" />
+          <div className="bg-muted h-10 w-10 animate-pulse rounded-lg" />
           <div className="space-y-2">
-            <div className="h-4 w-32 animate-pulse rounded bg-muted" />
-            <div className="h-3 w-24 animate-pulse rounded bg-muted" />
+            <div className="bg-muted h-4 w-32 animate-pulse rounded" />
+            <div className="bg-muted h-3 w-24 animate-pulse rounded" />
           </div>
         </div>
-        <div className="h-6 w-20 animate-pulse rounded-full bg-muted" />
+        <div className="bg-muted h-6 w-20 animate-pulse rounded-full" />
       </div>
     </CardContent>
   </Card>
@@ -149,16 +158,17 @@ const ShimmerCard = () => (
 
 export const ClassesOverviewModal = ({ isOpen, onClose }: ClassesOverviewModalProps) => {
   const { classes, totalAtRiskCount, isLoading } = useAtRiskStudents();
+  const { t } = useTranslation('dashboard');
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-h-[80vh] max-w-3xl">
+      <DialogContent className="max-h-[80vh] !max-w-3xl">
         <DialogHeader>
-          <DialogTitle>Classes Overview</DialogTitle>
+          <DialogTitle>{t('classesOverview.title')}</DialogTitle>
           <DialogDescription>
             {totalAtRiskCount > 0
-              ? `${totalAtRiskCount} students need attention across your classes`
-              : 'All students are performing well'}
+              ? t('classesOverview.description.atRisk', { count: totalAtRiskCount })
+              : t('classesOverview.description.allGood')}
           </DialogDescription>
         </DialogHeader>
 
@@ -172,9 +182,9 @@ export const ClassesOverviewModal = ({ isOpen, onClose }: ClassesOverviewModalPr
               </>
             ) : classes.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <School className="mb-4 h-12 w-12 text-muted-foreground" />
-                <h3 className="text-lg font-semibold">No Classes Yet</h3>
-                <p className="text-sm text-muted-foreground">Create your first class to get started</p>
+                <School className="text-muted-foreground mb-4 h-12 w-12" />
+                <h3 className="text-lg font-semibold">{t('classesOverview.empty.title')}</h3>
+                <p className="text-muted-foreground text-sm">{t('classesOverview.empty.description')}</p>
               </div>
             ) : (
               classes.map((classData) => <ClassCard key={classData.classId} classData={classData} />)

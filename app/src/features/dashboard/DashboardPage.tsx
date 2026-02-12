@@ -35,8 +35,8 @@ export const DashboardPage = () => {
         <div className="flex-1 space-y-6 p-4 sm:space-y-8 sm:p-6 lg:overflow-y-auto lg:p-8">
           {/* Dashboard Header */}
           <div>
-            <h1 className="text-2xl font-bold sm:text-3xl">Dashboard</h1>
-            <p className="text-muted-foreground">Welcome back! Here's what's happening today.</p>
+            <h1 className="text-2xl font-bold sm:text-3xl">{t('header.title')}</h1>
+            <p className="text-muted-foreground">{t('header.welcome')}</p>
           </div>
 
           {/* Summary Metrics */}

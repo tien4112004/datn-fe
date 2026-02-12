@@ -1,7 +1,18 @@
 import { ChevronLeft, ChevronRight, Clock, AlertCircle } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { useTranslation } from 'react-i18next';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isToday, parseISO } from 'date-fns';
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isSameMonth,
+  isSameDay,
+  addMonths,
+  subMonths,
+  isToday,
+  parseISO,
+} from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { useState, useMemo } from 'react';
 import { useTeacherCalendar } from '../hooks/useTeacherCalendar';
@@ -52,11 +63,14 @@ export const EnhancedCalendar = () => {
 
     // Add next month days to complete the grid
     const totalCells = [...prevMonthDays, ...days].length;
-    const nextMonthDays = totalCells % 7 === 0 ? [] : Array.from({ length: 7 - (totalCells % 7) }, (_, i) => {
-      const date = new Date(monthEnd);
-      date.setDate(date.getDate() + i + 1);
-      return date;
-    });
+    const nextMonthDays =
+      totalCells % 7 === 0
+        ? []
+        : Array.from({ length: 7 - (totalCells % 7) }, (_, i) => {
+            const date = new Date(monthEnd);
+            date.setDate(date.getDate() + i + 1);
+            return date;
+          });
 
     return [...prevMonthDays, ...days, ...nextMonthDays];
   }, [currentDate]);
@@ -115,21 +129,11 @@ export const EnhancedCalendar = () => {
       <div className="bg-card rounded-lg border p-3 sm:p-4">
         {/* Calendar Header */}
         <div className="mb-3 flex items-center justify-between sm:mb-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 sm:h-8 sm:w-8"
-            onClick={handlePrevMonth}
-          >
+          <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={handlePrevMonth}>
             <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
           <span className="text-xs font-medium sm:text-sm">{monthString}</span>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 sm:h-8 sm:w-8"
-            onClick={handleNextMonth}
-          >
+          <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={handleNextMonth}>
             <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
         </div>
@@ -159,11 +163,11 @@ export const EnhancedCalendar = () => {
                   key={index}
                   onClick={() => handleDateClick(day)}
                   className={cn(
-                    'relative aspect-square rounded-md p-0 text-[10px] sm:text-sm transition-colors',
+                    'relative aspect-square rounded-md p-0 text-[10px] transition-colors sm:text-sm',
                     !isCurrentMonth && 'text-muted-foreground/50',
                     isCurrentMonth && 'hover:bg-muted',
                     isSelected && 'bg-primary text-primary-foreground hover:bg-primary/90',
-                    isTodayDate && !isSelected && 'font-bold border-2 border-primary'
+                    isTodayDate && !isSelected && 'border-primary border-2 font-bold'
                   )}
                 >
                   <span>{format(day, 'd')}</span>
@@ -194,21 +198,23 @@ export const EnhancedCalendar = () => {
               {format(selectedDate, 'MMMM d, yyyy', { locale: getLocaleDateFns() })}
             </h4>
             {selectedDateEvents.length === 0 ? (
-              <p className="text-xs text-muted-foreground">No events scheduled</p>
+              <p className="text-muted-foreground text-xs">{t('calendar.noEvents')}</p>
             ) : (
               <div className="space-y-2">
                 {selectedDateEvents.map((event) => (
-                  <div
-                    key={event.id}
-                    className="flex items-start gap-2 rounded-md border p-2 text-xs"
-                  >
-                    <div className={cn('mt-0.5 h-2 w-2 rounded-full flex-shrink-0', getEventColor(event.type as CalendarEventType, event.status))} />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{event.title}</p>
-                      <p className="text-muted-foreground text-[10px] truncate">{event.className}</p>
+                  <div key={event.id} className="flex items-start gap-2 rounded-md border p-2 text-xs">
+                    <div
+                      className={cn(
+                        'mt-0.5 h-2 w-2 flex-shrink-0 rounded-full',
+                        getEventColor(event.type as CalendarEventType, event.status)
+                      )}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium">{event.title}</p>
+                      <p className="text-muted-foreground truncate text-[10px]">{event.className}</p>
                     </div>
                     {event.status === 'overdue' && (
-                      <AlertCircle className="h-3 w-3 text-red-500 flex-shrink-0" />
+                      <AlertCircle className="h-3 w-3 flex-shrink-0 text-red-500" />
                     )}
                   </div>
                 ))}
@@ -219,9 +225,9 @@ export const EnhancedCalendar = () => {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="mt-4 flex items-center justify-center py-2 text-xs text-muted-foreground">
+          <div className="text-muted-foreground mt-4 flex items-center justify-center py-2 text-xs">
             <Clock className="mr-2 h-3 w-3 animate-spin" />
-            Loading events...
+            {t('calendar.loading')}
           </div>
         )}
       </div>

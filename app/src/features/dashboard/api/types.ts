@@ -80,15 +80,17 @@ export interface ClassAtRiskStudents {
   atRiskStudents: AtRiskStudent[];
 }
 
-export enum CalendarEventType {
-  DEADLINE = 'DEADLINE',
-  GRADING_REMINDER = 'GRADING_REMINDER',
-  ASSIGNMENT_RETURNED = 'ASSIGNMENT_RETURNED',
-  CLASS_SESSION = 'CLASS_SESSION',
-  EXAM = 'EXAM',
-  MEETING = 'MEETING',
-  OTHER = 'OTHER',
-}
+export const CalendarEventType = {
+  DEADLINE: 'DEADLINE',
+  GRADING_REMINDER: 'GRADING_REMINDER',
+  ASSIGNMENT_RETURNED: 'ASSIGNMENT_RETURNED',
+  CLASS_SESSION: 'CLASS_SESSION',
+  EXAM: 'EXAM',
+  MEETING: 'MEETING',
+  OTHER: 'OTHER',
+} as const;
+
+export type CalendarEventType = (typeof CalendarEventType)[keyof typeof CalendarEventType];
 
 export interface CalendarEvent {
   id: string;

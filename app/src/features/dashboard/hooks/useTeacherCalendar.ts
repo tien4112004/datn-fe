@@ -4,8 +4,7 @@ import type { CalendarEvent } from '../api/types';
 import type { ApiResponse } from '@aiprimary/api';
 import { format } from 'date-fns';
 
-export interface UseTeacherCalendarReturn
-  extends Omit<UseQueryResult<ApiResponse<CalendarEvent[]>>, 'data'> {
+export interface UseTeacherCalendarReturn extends Omit<UseQueryResult<ApiResponse<CalendarEvent[]>>, 'data'> {
   events: CalendarEvent[];
   isLoading: boolean;
 }

@@ -3,8 +3,10 @@ import { useDashboardApiService } from '../api';
 import type { ClassAtRiskStudents } from '../api/types';
 import type { ApiResponse } from '@aiprimary/api';
 
-export interface UseAtRiskStudentsReturn
-  extends Omit<UseQueryResult<ApiResponse<ClassAtRiskStudents[]>>, 'data'> {
+export interface UseAtRiskStudentsReturn extends Omit<
+  UseQueryResult<ApiResponse<ClassAtRiskStudents[]>>,
+  'data'
+> {
   classes: ClassAtRiskStudents[];
   totalAtRiskCount: number;
   isLoading: boolean;

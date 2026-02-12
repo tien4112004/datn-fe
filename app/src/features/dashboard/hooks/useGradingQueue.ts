@@ -3,8 +3,7 @@ import { useDashboardApiService } from '../api';
 import type { GradingQueueItem } from '../api/types';
 import type { ApiResponse } from '@aiprimary/api';
 
-export interface UseGradingQueueReturn
-  extends Omit<UseQueryResult<ApiResponse<GradingQueueItem[]>>, 'data'> {
+export interface UseGradingQueueReturn extends Omit<UseQueryResult<ApiResponse<GradingQueueItem[]>>, 'data'> {
   queue: GradingQueueItem[];
   isLoading: boolean;
 }

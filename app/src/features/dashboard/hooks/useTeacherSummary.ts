@@ -3,8 +3,7 @@ import { useDashboardApiService } from '../api';
 import type { TeacherSummary } from '../api/types';
 import type { ApiResponse } from '@aiprimary/api';
 
-export interface UseTeacherSummaryReturn
-  extends Omit<UseQueryResult<ApiResponse<TeacherSummary>>, 'data'> {
+export interface UseTeacherSummaryReturn extends Omit<UseQueryResult<ApiResponse<TeacherSummary>>, 'data'> {
   summary: TeacherSummary | null;
   isLoading: boolean;
 }

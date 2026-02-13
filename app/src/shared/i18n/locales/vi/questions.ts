@@ -105,6 +105,7 @@ export default {
     characterRemaining_plural: 'Còn lại {{count}} ký tự',
     correct: 'Đúng!',
     incorrect: 'Sai',
+    partialCredit: 'Điểm một phần',
     scoreDisplay: 'Điểm: {{score}}/{{total}} điểm',
     pointsAbbreviation: 'điểm',
     pointsAbbreviation_plural: 'điểm',

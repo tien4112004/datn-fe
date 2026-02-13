@@ -49,6 +49,8 @@ export const CurrentQuestionView = () => {
   const questionViewModes = useAssignmentEditorStore((state) => state.questionViewModes);
   const toggleQuestionViewMode = useAssignmentEditorStore((state) => state.toggleQuestionViewMode);
 
+  const validationErrors = useAssignmentFormStore((state) => state.validationErrors);
+
   // Build contexts map from assignment's cloned contexts
   const contextsMap = useMemo(() => {
     const map = new Map<string, AssignmentContext>();
@@ -282,6 +284,42 @@ export const CurrentQuestionView = () => {
         </div>
       </div>
 
+      {/* Validation Errors */}
+      {(() => {
+        const currentErrors = question?.id ? validationErrors?.questions[question.id] : undefined;
+        return (
+          <>
+            {currentErrors && currentErrors.errors.length > 0 && (
+              <div className="border-destructive/50 bg-destructive/5 rounded-lg border p-3">
+                <ul className="space-y-1">
+                  {currentErrors.errors.map((error, i) => (
+                    <li key={i} className="text-destructive flex items-start gap-2 text-sm">
+                      <span className="bg-destructive mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" />
+                      {error}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {currentErrors && currentErrors.warnings.length > 0 && currentErrors.errors.length === 0 && (
+              <div className="rounded-lg border border-yellow-500/50 bg-yellow-50 p-3 dark:bg-yellow-950/30">
+                <ul className="space-y-1">
+                  {currentErrors.warnings.map((warning, i) => (
+                    <li
+                      key={i}
+                      className="flex items-start gap-2 text-sm text-yellow-700 dark:text-yellow-400"
+                    >
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-yellow-500" />
+                      {warning}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </>
+        );
+      })()}
+
       {/* Question Details */}
       <div className="space-y-4">
         {/* Topic, Difficulty, and Points - Only show in editing mode */}
@@ -493,6 +531,7 @@ export const CurrentQuestionView = () => {
             viewMode={viewMode}
             points={points}
             onChange={handleQuestionChange}
+            validationErrors={question?.id ? validationErrors?.questions[question.id] : undefined}
           />
         </div>
       </div>

@@ -11,9 +11,14 @@ import { useTranslation } from 'react-i18next';
 interface MultipleChoiceEditingProps {
   question: MultipleChoiceQuestion;
   onChange: (updated: MultipleChoiceQuestion) => void;
+  validationErrors?: { errors: string[]; warnings: string[] };
 }
 
-export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEditingProps) => {
+export const MultipleChoiceEditing = ({
+  question,
+  onChange,
+  validationErrors,
+}: MultipleChoiceEditingProps) => {
   const { t } = useTranslation('questions', { keyPrefix: 'multipleChoice.editing' });
   const { t: tQuestions } = useTranslation('questions');
 
@@ -63,6 +68,11 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
 
   const correctOptionId = question.data.options.find((o) => o.isCorrect)?.id || '';
 
+  // Validation field flags
+  const hasErrors = (validationErrors?.errors.length ?? 0) > 0;
+  const titleInvalid = hasErrors && !question.title?.trim();
+  const isOptionEmpty = (option: MultipleChoiceOption) => hasErrors && !option.text?.trim();
+
   return (
     <div className="space-y-2 p-2">
       <div className="flex items-center justify-between">
@@ -79,6 +89,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
             onChange={(title) => updateQuestion({ title })}
             placeholder={t('titlePlaceholder')}
             className="pr-9"
+            invalid={titleInvalid}
           />
           {question.titleImageUrl != null ? (
             <Button
@@ -149,6 +160,7 @@ export const MultipleChoiceEditing = ({ question, onChange }: MultipleChoiceEdit
                       placeholder={t('optionPlaceholder', { letter: String.fromCharCode(65 + index) })}
                       minHeight={50}
                       className="pr-9"
+                      invalid={isOptionEmpty(option)}
                     />
                     {option.imageUrl != null ? (
                       <Button

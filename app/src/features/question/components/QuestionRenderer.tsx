@@ -46,6 +46,7 @@ interface QuestionRendererProps {
   onAnswerChange?: (answer: Answer) => void;
   onGradeChange?: (grade: { points: number; feedback?: string }) => void;
   onContextChange?: (contextId: string | undefined) => void; // Callback for context changes in EDITING mode
+  validationErrors?: { errors: string[]; warnings: string[] }; // Validation errors for this question (EDITING mode)
   number?: number;
   compact?: boolean;
 }
@@ -61,6 +62,7 @@ export const QuestionRenderer = ({
   onAnswerChange,
   onGradeChange,
   onContextChange,
+  validationErrors,
   number,
   compact,
 }: QuestionRendererProps) => {
@@ -77,7 +79,13 @@ export const QuestionRenderer = ({
     if (type === QUESTION_TYPE.MULTIPLE_CHOICE) {
       const mcQuestion = question as any;
       if (viewMode === VIEW_MODE.EDITING) {
-        return <MultipleChoiceEditing question={mcQuestion} onChange={onChange!} />;
+        return (
+          <MultipleChoiceEditing
+            question={mcQuestion}
+            onChange={onChange!}
+            validationErrors={validationErrors}
+          />
+        );
       }
       if (viewMode === VIEW_MODE.VIEWING) {
         return <MultipleChoiceViewing question={mcQuestion} number={number} compact={compact} />;
@@ -120,7 +128,9 @@ export const QuestionRenderer = ({
     if (type === QUESTION_TYPE.MATCHING) {
       const mQuestion = question as any;
       if (viewMode === VIEW_MODE.EDITING) {
-        return <MatchingEditing question={mQuestion} onChange={onChange!} />;
+        return (
+          <MatchingEditing question={mQuestion} onChange={onChange!} validationErrors={validationErrors} />
+        );
       }
       if (viewMode === VIEW_MODE.VIEWING) {
         return <MatchingViewing question={mQuestion} number={number} compact={compact} />;
@@ -163,7 +173,9 @@ export const QuestionRenderer = ({
     if (type === QUESTION_TYPE.OPEN_ENDED) {
       const oeQuestion = question as any;
       if (viewMode === VIEW_MODE.EDITING) {
-        return <OpenEndedEditing question={oeQuestion} onChange={onChange!} />;
+        return (
+          <OpenEndedEditing question={oeQuestion} onChange={onChange!} validationErrors={validationErrors} />
+        );
       }
       if (viewMode === VIEW_MODE.VIEWING) {
         return <OpenEndedViewing question={oeQuestion} number={number} compact={compact} />;
@@ -206,7 +218,13 @@ export const QuestionRenderer = ({
     if (type === QUESTION_TYPE.FILL_IN_BLANK) {
       const fibQuestion = question as any;
       if (viewMode === VIEW_MODE.EDITING) {
-        return <FillInBlankEditing question={fibQuestion} onChange={onChange!} />;
+        return (
+          <FillInBlankEditing
+            question={fibQuestion}
+            onChange={onChange!}
+            validationErrors={validationErrors}
+          />
+        );
       }
       if (viewMode === VIEW_MODE.VIEWING) {
         return <FillInBlankViewing question={fibQuestion} number={number} compact={compact} />;

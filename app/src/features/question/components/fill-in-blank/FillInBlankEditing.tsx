@@ -13,6 +13,7 @@ import { generateId } from '@/shared/lib/utils';
 interface FillInBlankEditingProps {
   question: FillInBlankQuestion;
   onChange: (updated: FillInBlankQuestion) => void;
+  validationErrors?: { errors: string[]; warnings: string[] };
 }
 
 // Parse text with {{}} syntax into segments
@@ -93,7 +94,7 @@ const segmentsToText = (segments: BlankSegment[]): string => {
     .join('');
 };
 
-export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingProps) => {
+export const FillInBlankEditing = ({ question, onChange, validationErrors }: FillInBlankEditingProps) => {
   const { t } = useTranslation('questions');
   const [questionText, setQuestionText] = useState(() => segmentsToText(question.data.segments));
 
@@ -110,6 +111,12 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
   // Get only blank segments for alternative answers section
   const blankSegments = question.data.segments.filter((s) => s.type === 'blank');
 
+  // Validation field flags
+  const hasErrors = (validationErrors?.errors.length ?? 0) > 0;
+  const titleInvalid = hasErrors && !question.title?.trim();
+  const segmentsInvalid =
+    hasErrors && (blankSegments.length === 0 || blankSegments.some((b) => !b.content?.trim()));
+
   return (
     <div className="space-y-4 p-2">
       {/* Title */}
@@ -121,6 +128,7 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
             onChange={(e) => updateQuestion({ title: e.target.value })}
             placeholder={t('fillInBlank.editing.titlePlaceholder')}
             className="h-9 pr-9"
+            aria-invalid={titleInvalid}
           />
           {question.titleImageUrl != null ? (
             <Button
@@ -178,6 +186,7 @@ export const FillInBlankEditing = ({ question, onChange }: FillInBlankEditingPro
           onChange={(e) => handleQuestionTextChange(e.target.value)}
           placeholder={t('fillInBlank.editing.questionTextPlaceholder')}
           className="min-h-[100px] font-mono text-sm"
+          aria-invalid={segmentsInvalid}
         />
         <p className="text-xs text-gray-500">
           {t('fillInBlank.editing.questionTextInstruction')} {t('fillInBlank.editing.questionTextExample')}

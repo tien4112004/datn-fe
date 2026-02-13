@@ -23,6 +23,10 @@ export const AssignmentMetadataPanel = () => {
   const setSubject = useAssignmentFormStore((state) => state.setSubject);
   const setGrade = useAssignmentFormStore((state) => state.setGrade);
   const setShuffleQuestions = useAssignmentFormStore((state) => state.setShuffleQuestions);
+  const validationErrors = useAssignmentFormStore((state) => state.validationErrors);
+  const titleError = validationErrors?.assignment?.title;
+  const subjectError = validationErrors?.assignment?.subject;
+
   const subjects = getAllSubjects();
   const grades = getElementaryGrades();
 
@@ -56,7 +60,9 @@ export const AssignmentMetadataPanel = () => {
               onChange={(e) => setTitle(e.target.value)}
               className="h-9 text-sm"
               placeholder={t('fields.titlePlaceholder')}
+              aria-invalid={!!titleError}
             />
+            {titleError && <p className="text-destructive mt-1 text-sm">{titleError}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -75,7 +81,7 @@ export const AssignmentMetadataPanel = () => {
                 </Tooltip>
               </div>
               <Select value={subject} onValueChange={setSubject}>
-                <SelectTrigger id="subject" className="h-9 text-sm">
+                <SelectTrigger id="subject" className="h-9 text-sm" aria-invalid={!!subjectError}>
                   <SelectValue placeholder={t('fields.subjectPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -86,6 +92,7 @@ export const AssignmentMetadataPanel = () => {
                   ))}
                 </SelectContent>
               </Select>
+              {subjectError && <p className="text-destructive mt-1 text-sm">{subjectError}</p>}
             </div>
 
             <div>

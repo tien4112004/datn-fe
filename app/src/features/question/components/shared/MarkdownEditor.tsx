@@ -9,6 +9,7 @@ interface MarkdownEditorProps {
   minHeight?: number;
   className?: string;
   disabled?: boolean;
+  invalid?: boolean;
 }
 
 export const MarkdownEditor = ({
@@ -18,6 +19,7 @@ export const MarkdownEditor = ({
   minHeight = 100,
   className,
   disabled = false,
+  invalid = false,
 }: MarkdownEditorProps) => {
   const { t } = useTranslation('questions');
   const defaultPlaceholder = t('common.markdownPlaceholder');
@@ -28,7 +30,11 @@ export const MarkdownEditor = ({
       placeholder={placeholder || defaultPlaceholder}
       minHeight={minHeight}
       disabled={disabled}
-      className={cn('font-mono text-sm', className)}
+      className={cn(
+        'font-mono text-sm',
+        invalid && 'border-destructive ring-destructive/20 ring-2',
+        className
+      )}
     />
   );
 };

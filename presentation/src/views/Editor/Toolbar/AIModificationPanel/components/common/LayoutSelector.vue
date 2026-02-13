@@ -1,6 +1,6 @@
 <template>
   <div class="section-group">
-    <div class="section-title">Layout</div>
+    <div class="section-title">{{ t('panels.aiModification.layout.label') }}</div>
     <div class="layout-row">
       <button
         v-for="layout in layoutTypes"
@@ -19,6 +19,10 @@
 </template>
 
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+
 interface LayoutType {
   label: string;
   value: string;
@@ -38,7 +42,8 @@ interface Emits {
 
 withDefaults(defineProps<Props>(), {
   isTransforming: false,
-  getLayoutTooltip: () => (layoutType: string) => `Change slide layout to ${layoutType}`,
+  getLayoutTooltip: () => (layoutType: string) =>
+    t('panels.aiModification.layout.changeTooltip', { layoutType }),
 });
 
 defineEmits<Emits>();

@@ -12,19 +12,22 @@
       v-model="chatInput"
       :is-processing="isProcessing"
       :feedback="{ message: refineMessage, type: refineType }"
-      placeholder="Describe how to modify these items..."
+      :placeholder="t('panels.aiModification.contextHints.modifyItems')"
       @submit="handleRefine"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
 import type { CurrentContext } from '@/types/aiModification';
 import { useTextRefinement } from '../composables/useTextRefinement';
 import { useQuickActions } from '../composables/useQuickActions';
 import ContextBadge from '../ContextBadge.vue';
 import QuickActionsRow from './common/QuickActionsRow.vue';
 import ChatInterface from './common/ChatInterface.vue';
+
+const { t } = useI18n();
 
 interface Props {
   context: CurrentContext;

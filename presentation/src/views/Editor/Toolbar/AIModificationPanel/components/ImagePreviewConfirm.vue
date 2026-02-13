@@ -1,24 +1,29 @@
 <template>
   <div class="image-preview-confirm">
     <div class="step-indicator">
-      <span class="step-label">Generated Image Preview</span>
+      <span class="step-label">{{ t('panels.aiModification.imageGeneration.generatedPreview') }}</span>
     </div>
 
-    <ImagePreview :src="generatedUrl" alt="Generated image" />
+    <ImagePreview :src="generatedUrl" :alt="t('panels.aiModification.imageGeneration.imagePreviewAlt')" />
 
     <div class="button-group">
       <Button variant="default" fullWidth @click="$emit('confirm')" :disabled="isProcessing">
-        <IconImage class="btn-icon" /> Replace Image
+        <IconImage class="btn-icon" /> {{ t('panels.aiModification.buttons.replaceImage') }}
       </Button>
-      <Button variant="outline" fullWidth @click="$emit('cancel')" :disabled="isProcessing"> Cancel </Button>
+      <Button variant="outline" fullWidth @click="$emit('cancel')" :disabled="isProcessing">
+        {{ t('panels.aiModification.buttons.cancel') }}
+      </Button>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
 import { Image as IconImage } from 'lucide-vue-next';
 import Button from '@/components/Button.vue';
 import ImagePreview from './common/ImagePreview.vue';
+
+const { t } = useI18n();
 
 interface Props {
   generatedUrl: string;

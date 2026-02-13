@@ -1,20 +1,25 @@
 <template>
-  <InputGroup label="Image Generation Model">
-    <div v-if="isLoading" class="loading-state">Loading models...</div>
+  <InputGroup :label="t('panels.aiModification.imageGenerationModel.label')">
+    <div v-if="isLoading" class="loading-state">
+      {{ t('panels.aiModification.imageGeneration.loadingModels') }}
+    </div>
     <select v-else v-model="selectedModel" class="model-select" :disabled="isProcessing">
       <option v-for="model in models" :key="`${model.provider}-${model.name}`" :value="model">
         {{ model.displayName || model.name }} ({{ model.provider }})
       </option>
     </select>
     <div v-if="models.length === 0 && !isLoading" class="warning-text">
-      No IMAGE models available. Using default.
+      {{ t('panels.aiModification.imageGeneration.noModels') }}
     </div>
   </InputGroup>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import InputGroup from './InputGroup.vue';
+
+const { t } = useI18n();
 
 interface Model {
   name: string;

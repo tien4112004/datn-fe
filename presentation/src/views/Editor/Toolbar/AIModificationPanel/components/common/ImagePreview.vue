@@ -1,17 +1,27 @@
 <template>
   <div class="image-preview">
-    <img :src="src" :alt="alt" class="preview-img" />
+    <img :src="src" :alt="altText" class="preview-img" />
   </div>
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+
 interface Props {
   src: string;
   alt?: string;
 }
 
-withDefaults(defineProps<Props>(), {
-  alt: 'Image preview',
+const props = withDefaults(defineProps<Props>(), {
+  alt: undefined,
+});
+
+// Fallback to translated default if alt is not provided
+const altText = computed(() => {
+  return props.alt || t('panels.aiModification.imageGeneration.imagePreviewAlt');
 });
 </script>
 

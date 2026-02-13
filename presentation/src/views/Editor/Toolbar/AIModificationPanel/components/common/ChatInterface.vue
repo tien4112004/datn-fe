@@ -5,7 +5,7 @@
         :value="modelValue"
         @input="$emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
         class="chat-textarea"
-        :placeholder="placeholder"
+        :placeholder="effectivePlaceholder"
         :disabled="isProcessing"
         @keydown.enter.prevent="$emit('submit')"
       ></textarea>
@@ -21,8 +21,12 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { Send as IconSend } from 'lucide-vue-next';
 import FeedbackMessage from './FeedbackMessage.vue';
+
+const { t } = useI18n();
 
 interface Props {
   modelValue: string;
@@ -36,13 +40,18 @@ interface Emits {
   (e: 'submit'): void;
 }
 
-withDefaults(defineProps<Props>(), {
-  placeholder: 'Type your instruction...',
+const props = withDefaults(defineProps<Props>(), {
+  placeholder: undefined,
   isProcessing: false,
   feedback: null,
 });
 
 defineEmits<Emits>();
+
+// Compute effective placeholder
+const effectivePlaceholder = computed(() => {
+  return props.placeholder || t('panels.aiModification.chat.defaultPlaceholder');
+});
 </script>
 
 <style lang="scss" scoped>

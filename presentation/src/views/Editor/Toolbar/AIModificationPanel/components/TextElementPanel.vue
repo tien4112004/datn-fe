@@ -2,7 +2,7 @@
   <div class="text-element-panel">
     <div class="context-hint">
       <IconText class="hint-icon" />
-      <span>Refining selected text element</span>
+      <span>{{ t('panels.aiModification.contextHints.refiningText') }}</span>
     </div>
 
     <QuickActionsRow :actions="textQuickActions" :disabled="isProcessing" @action-click="handleQuickAction" />
@@ -11,19 +11,22 @@
       v-model="chatInput"
       :is-processing="isProcessing"
       :feedback="{ message: refineMessage, type: refineType }"
-      placeholder="Describe how to modify this text..."
+      :placeholder="t('panels.aiModification.contextHints.modifyText')"
       @submit="handleRefine"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
 import type { PPTTextElement } from '@/types/slides';
 import { Type as IconText } from 'lucide-vue-next';
 import { useTextRefinement } from '../composables/useTextRefinement';
 import { useQuickActions } from '../composables/useQuickActions';
 import QuickActionsRow from './common/QuickActionsRow.vue';
 import ChatInterface from './common/ChatInterface.vue';
+
+const { t } = useI18n();
 
 interface Props {
   element: PPTTextElement;

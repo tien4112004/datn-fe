@@ -105,8 +105,11 @@ export default {
       context: {
         slide: 'Trang chiếu hiện tại',
         element: 'Thành phần đã chọn',
+        textElement: 'Thành phần văn bản',
+        imageElement: 'Thành phần hình ảnh',
         elements: '{count} Thành phần',
-        generate: 'Tạo trang chiếu',
+        combinedText: 'Các mục văn bản kết hợp',
+        generate: 'Tạo mới',
       },
       categories: {
         text: 'Văn bản',
@@ -223,15 +226,57 @@ export default {
         cancel: 'Hủy',
         apply: 'Áp dụng',
         preview: 'Xem trước',
+        replaceImage: 'Thay thế hình ảnh',
       },
       states: {
         processing: 'AI đang xử lý...',
         selectAction: 'Chọn một hành động để bắt đầu',
         noActions: 'Không có hành động nào cho ngữ cảnh này',
+        selectSingleElement: 'Chọn một thành phần để sử dụng sửa đổi AI',
+        noActionsForElementType: 'Không có hành động AI nào cho loại thành phần này',
       },
       errors: {
         processingFailed: 'Xử lý AI thất bại. Vui lòng thử lại.',
         retry: 'Thử lại',
+      },
+      // Gợi ý ngữ cảnh
+      contextHints: {
+        refiningText: 'Tinh chỉnh thành phần văn bản đã chọn',
+        modifyText: 'Mô tả cách sửa đổi văn bản này...',
+        modifySlide: 'Mô tả cách thay đổi trang chiếu này...',
+        modifyItems: 'Mô tả cách sửa đổi các mục này...',
+      },
+      // Tạo hình ảnh
+      imageGeneration: {
+        replaceImage: 'Thay thế hình ảnh này',
+        imageDescription: 'Mô tả hình ảnh mới',
+        describeImage: 'Mô tả hình ảnh mới...',
+        matchSlideTheme: 'Khớp với chủ đề trang chiếu',
+        generating: 'Đang tạo...',
+        generateImage: 'Tạo hình ảnh',
+        generatedPreview: 'Xem trước hình ảnh được tạo',
+        loadingModels: 'Đang tải mô hình...',
+        noModels: 'Không có mô hình IMAGE nào có sẵn. Sử dụng mặc định.',
+        imagePreviewAlt: 'Xem trước hình ảnh',
+      },
+      // Bố cục & Tạo kiểu
+      layout: {
+        label: 'Bố cục',
+        changeTooltip: 'Thay đổi bố cục trang chiếu thành {layoutType}',
+      },
+      artStyle: {
+        label: 'Phong cách nghệ thuật',
+      },
+      imageGenerationModel: {
+        label: 'Mô hình tạo hình ảnh',
+      },
+      // Chat/Input
+      chat: {
+        defaultPlaceholder: 'Nhập hướng dẫn của bạn...',
+      },
+      // Xem trước
+      preview: {
+        label: 'Xem trước:',
       },
     },
   },

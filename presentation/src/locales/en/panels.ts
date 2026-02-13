@@ -105,8 +105,11 @@ export default {
       context: {
         slide: 'Current Slide',
         element: 'Selected Element',
+        textElement: 'Text Element',
+        imageElement: 'Image Element',
         elements: '{count} Elements',
-        generate: 'Generate Slides',
+        combinedText: 'Combined Text Items',
+        generate: 'Generate New',
       },
       categories: {
         text: 'Text',
@@ -223,15 +226,57 @@ export default {
         cancel: 'Cancel',
         apply: 'Apply',
         preview: 'Preview',
+        replaceImage: 'Replace Image',
       },
       states: {
         processing: 'AI is processing...',
         selectAction: 'Select an action to get started',
         noActions: 'No actions available for this context',
+        selectSingleElement: 'Select a single element to use AI modifications',
+        noActionsForElementType: 'No AI actions available for this element type',
       },
       errors: {
         processingFailed: 'AI processing failed. Please try again.',
         retry: 'Retry',
+      },
+      // Context hints
+      contextHints: {
+        refiningText: 'Refining selected text element',
+        modifyText: 'Describe how to modify this text...',
+        modifySlide: 'Describe how to change this slide...',
+        modifyItems: 'Describe how to modify these items...',
+      },
+      // Image generation
+      imageGeneration: {
+        replaceImage: 'Replace This Image',
+        imageDescription: 'New Image Description',
+        describeImage: 'Describe the new image...',
+        matchSlideTheme: 'Match slide theme',
+        generating: 'Generating...',
+        generateImage: 'Generate Image',
+        generatedPreview: 'Generated Image Preview',
+        loadingModels: 'Loading models...',
+        noModels: 'No IMAGE models available. Using default.',
+        imagePreviewAlt: 'Image preview',
+      },
+      // Layout & Styling
+      layout: {
+        label: 'Layout',
+        changeTooltip: 'Change slide layout to {layoutType}',
+      },
+      artStyle: {
+        label: 'Art Style',
+      },
+      imageGenerationModel: {
+        label: 'Image Generation Model',
+      },
+      // Chat/Input
+      chat: {
+        defaultPlaceholder: 'Type your instruction...',
+      },
+      // Preview
+      preview: {
+        label: 'Preview:',
       },
     },
   },

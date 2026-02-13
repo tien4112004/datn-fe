@@ -5,7 +5,7 @@
       <InfoMessage
         v-if="currentContext.type === 'elements'"
         :icon="IconInfo"
-        message="Select a single element to use AI modifications"
+        :message="t('panels.aiModification.states.selectSingleElement')"
       />
 
       <!-- Combined Text Context -->
@@ -27,7 +27,7 @@
       <InfoMessage
         v-else-if="currentContext.type === 'element'"
         :icon="IconInfo"
-        message="No AI actions available for this element type"
+        :message="t('panels.aiModification.states.noActionsForElementType')"
       />
 
       <!-- Slide Context -->
@@ -38,6 +38,7 @@
 
 <script lang="ts" setup>
 import { watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useModelStore } from '@/stores/modelStore';
 import { useDefaultModel, useModels } from '@/services/model/queries';
 import { useAIModificationState } from './AIModificationPanel/useAIModificationState';
@@ -48,6 +49,8 @@ import CombinedTextPanel from './AIModificationPanel/components/CombinedTextPane
 import TextElementPanel from './AIModificationPanel/components/TextElementPanel.vue';
 import ImageElementPanel from './AIModificationPanel/components/ImageElementPanel.vue';
 import SlidePanel from './AIModificationPanel/components/SlidePanel.vue';
+
+const { t } = useI18n();
 
 const modelStore = useModelStore();
 const { currentContext } = useAIModificationState();

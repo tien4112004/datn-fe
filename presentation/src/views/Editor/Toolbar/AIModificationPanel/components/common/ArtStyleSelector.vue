@@ -1,5 +1,5 @@
 <template>
-  <InputGroup label="Art Style">
+  <InputGroup :label="t('panels.aiModification.artStyle.label')">
     <div class="style-grid">
       <button
         v-for="style in artStyleOptions"
@@ -16,7 +16,10 @@
 </template>
 
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
 import InputGroup from './InputGroup.vue';
+
+const { t } = useI18n();
 
 interface ArtStyle {
   value: string;

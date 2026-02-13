@@ -10,7 +10,7 @@
       v-model="chatInput"
       :is-processing="isProcessing"
       :feedback="{ message: refineMessage, type: refineType }"
-      placeholder="Describe how to change this slide..."
+      :placeholder="t('panels.aiModification.contextHints.modifySlide')"
       @submit="handleChatSubmit"
     />
 
@@ -25,12 +25,15 @@
 </template>
 
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
 import { useTextRefinement } from '../composables/useTextRefinement';
 import { useLayoutTransformation } from '../composables/useLayoutTransformation';
 import { useQuickActions } from '../composables/useQuickActions';
 import QuickActionsRow from './common/QuickActionsRow.vue';
 import ChatInterface from './common/ChatInterface.vue';
 import LayoutSelector from './common/LayoutSelector.vue';
+
+const { t } = useI18n();
 
 const { chatInput, isProcessing, refineMessage, refineType, currentOperation, refineSlideContent } =
   useTextRefinement();

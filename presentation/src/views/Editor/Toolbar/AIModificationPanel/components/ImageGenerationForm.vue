@@ -1,11 +1,15 @@
 <template>
   <div class="image-generation-form">
-    <div class="section-title">Replace This Image</div>
+    <div class="section-title">{{ t('panels.aiModification.imageGeneration.replaceImage') }}</div>
 
-    <ImagePreview :src="currentImage" alt="Current image" />
+    <ImagePreview :src="currentImage" :alt="t('panels.aiModification.imageGeneration.imagePreviewAlt')" />
 
-    <InputGroup label="New Image Description">
-      <input v-model="imagePrompt" class="panel-input" placeholder="Describe the new image..." />
+    <InputGroup :label="t('panels.aiModification.imageGeneration.imageDescription')">
+      <input
+        v-model="imagePrompt"
+        class="panel-input"
+        :placeholder="t('panels.aiModification.imageGeneration.describeImage')"
+      />
     </InputGroup>
 
     <ArtStyleSelector v-model="selectedStyle" :art-style-options="artStyleOptions" :disabled="isProcessing" />
@@ -17,17 +21,25 @@
       :is-processing="isProcessing"
     />
 
-    <ToggleRow v-model="matchSlideTheme" label="Match slide theme" />
+    <ToggleRow
+      v-model="matchSlideTheme"
+      :label="t('panels.aiModification.imageGeneration.matchSlideTheme')"
+    />
 
     <Button variant="default" fullWidth @click="$emit('generate')" :disabled="isProcessing || !imagePrompt">
       <IconImage class="btn-icon" />
-      {{ isProcessing ? 'Generating...' : 'Generate Image' }}
+      {{
+        isProcessing
+          ? t('panels.aiModification.imageGeneration.generating')
+          : t('panels.aiModification.imageGeneration.generateImage')
+      }}
     </Button>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import { useModelStore } from '@/stores/modelStore';
 import { useModels } from '@/services/model/queries';
@@ -38,6 +50,8 @@ import InputGroup from './common/InputGroup.vue';
 import ArtStyleSelector from './common/ArtStyleSelector.vue';
 import ModelSelector from './common/ModelSelector.vue';
 import ToggleRow from './common/ToggleRow.vue';
+
+const { t } = useI18n();
 
 interface Props {
   currentImage: string;

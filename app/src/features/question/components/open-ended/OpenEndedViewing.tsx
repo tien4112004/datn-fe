@@ -1,27 +1,21 @@
 import { useTranslation } from 'react-i18next';
 import type { OpenEndedQuestion } from '@/features/assignment/types';
-import { MarkdownPreview, QuestionNumber } from '../shared';
+import { MarkdownPreview, QuestionTitle } from '../shared';
 import { Label } from '@/shared/components/ui/label';
 import { cn } from '@/shared/lib/utils';
 
 interface OpenEndedViewingProps {
   question: OpenEndedQuestion;
-  number?: number;
   compact?: boolean;
 }
 
-export const OpenEndedViewing = ({ question, number, compact }: OpenEndedViewingProps) => {
+export const OpenEndedViewing = ({ question, compact }: OpenEndedViewingProps) => {
   const { t } = useTranslation('questions');
   return (
     <div className={cn(compact ? 'space-y-2' : 'space-y-4')}>
-      {number !== undefined && (
-        <div className={cn('flex items-center', compact ? 'gap-2' : 'gap-3')}>
-          <QuestionNumber number={number} className={compact ? 'h-6 w-6 text-xs' : undefined} />
-        </div>
-      )}
       {/* Question */}
       <div className="space-y-1">
-        <MarkdownPreview content={question.title} />
+        <QuestionTitle content={question.title} />
         {question.titleImageUrl && (
           <img
             src={question.titleImageUrl}

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import type { MultipleChoiceQuestion } from '@/features/assignment/types';
-import { MarkdownPreview, QuestionNumber } from '../shared';
+import { MarkdownPreview, QuestionTitle } from '../shared';
 import { Label } from '@/shared/components/ui/label';
 import { Badge } from '@/shared/components/ui/badge';
 import { Shuffle, CheckCircle2 } from 'lucide-react';
@@ -8,22 +8,16 @@ import { cn } from '@/shared/lib/utils';
 
 interface MultipleChoiceViewingProps {
   question: MultipleChoiceQuestion;
-  number?: number;
   compact?: boolean;
 }
 
-export const MultipleChoiceViewing = ({ question, number, compact }: MultipleChoiceViewingProps) => {
+export const MultipleChoiceViewing = ({ question, compact }: MultipleChoiceViewingProps) => {
   const { t } = useTranslation('questions');
   return (
     <div className={cn(compact ? 'space-y-2' : 'space-y-4')}>
-      {number !== undefined && (
-        <div className={cn('flex items-center', compact ? 'gap-2' : 'gap-3')}>
-          <QuestionNumber number={number} className={compact ? 'h-6 w-6 text-xs' : undefined} />
-        </div>
-      )}
       {/* Question Title */}
       <div className="space-y-1">
-        <MarkdownPreview content={question.title} />
+        <QuestionTitle content={question.title} />
         {question.titleImageUrl && (
           <img
             src={question.titleImageUrl}

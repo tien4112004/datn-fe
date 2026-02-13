@@ -1,29 +1,23 @@
 import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion } from '@/features/assignment/types';
-import { QuestionNumber, ExplanationSection } from '../shared';
+import { ExplanationSection, QuestionTitle } from '../shared';
 import { Label } from '@/shared/components/ui/label';
 import { Badge } from '@/shared/components/ui/badge';
 import { cn } from '@/shared/lib/utils';
 
 interface FillInBlankViewingProps {
   question: FillInBlankQuestion;
-  number?: number;
   compact?: boolean;
 }
 
-export const FillInBlankViewing = ({ question, number, compact }: FillInBlankViewingProps) => {
+export const FillInBlankViewing = ({ question, compact }: FillInBlankViewingProps) => {
   const { t } = useTranslation('questions');
   return (
     <div className={cn(compact ? 'space-y-2' : 'space-y-4')}>
-      {number !== undefined && (
-        <div className={cn('flex items-center', compact ? 'gap-2' : 'gap-3')}>
-          <QuestionNumber number={number} className={compact ? 'h-6 w-6 text-xs' : undefined} />
-        </div>
-      )}
       {/* Title */}
       {question.title && (
         <div className="space-y-1">
-          <p className={cn('font-medium', compact && 'text-sm')}>{question.title}</p>
+          <QuestionTitle content={question.title} variant="plain" className={compact ? 'text-sm' : ''} />
           {question.titleImageUrl && (
             <img
               src={question.titleImageUrl}

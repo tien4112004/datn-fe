@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import type { MultipleChoiceQuestion, MultipleChoiceAnswer } from '@/features/assignment/types';
-import { MarkdownPreview, QuestionNumber } from '../shared';
+import { MarkdownPreview, QuestionTitle } from '../shared';
 
 import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
 import { Label } from '@/shared/components/ui/label';
@@ -11,19 +10,10 @@ import { cn } from '@/shared/lib/utils';
 interface MultipleChoiceDoingProps {
   question: MultipleChoiceQuestion;
   answer?: MultipleChoiceAnswer;
-  points?: number; // Optional points for display
   onAnswerChange: (answer: MultipleChoiceAnswer) => void;
-  number?: number;
 }
 
-export const MultipleChoiceDoing = ({
-  question,
-  answer,
-  points,
-  onAnswerChange,
-  number,
-}: MultipleChoiceDoingProps) => {
-  const { t } = useTranslation('questions');
+export const MultipleChoiceDoing = ({ question, answer, onAnswerChange }: MultipleChoiceDoingProps) => {
   const [selectedId, setSelectedId] = useState<string>(answer?.selectedOptionId || '');
 
   useEffect(() => {
@@ -41,14 +31,9 @@ export const MultipleChoiceDoing = ({
 
   return (
     <div className="space-y-4">
-      {number !== undefined && (
-        <div className="flex items-center gap-3">
-          <QuestionNumber number={number} />
-        </div>
-      )}
       {/* Question Title */}
       <div className="space-y-2">
-        <MarkdownPreview content={question.title} />
+        <QuestionTitle content={question.title} />
         {question.titleImageUrl && (
           <img src={question.titleImageUrl} alt="Question" className="mt-2 max-h-64 rounded-md border" />
         )}
@@ -61,7 +46,7 @@ export const MultipleChoiceDoing = ({
             <div
               key={option.id}
               className={cn(
-                'hover:border-primary/50 flex items-center gap-3 rounded-md border-2 p-3 transition-colors',
+                'hover:border-primary/50 flex items-center gap-3 rounded-md border-2 px-3 py-2 transition-colors',
                 selectedId === option.id
                   ? 'border-primary bg-primary/5'
                   : 'border-gray-300 dark:border-gray-600'
@@ -69,7 +54,6 @@ export const MultipleChoiceDoing = ({
             >
               <RadioGroupItem value={option.id} id={option.id} className="flex-shrink-0" />
               <Label htmlFor={option.id} className="min-w-0 flex-1 cursor-pointer">
-                <div className="mb-1 font-medium">{String.fromCharCode(65 + index)}</div>
                 <MarkdownPreview content={option.text} />
                 {option.imageUrl && (
                   <img
@@ -83,13 +67,6 @@ export const MultipleChoiceDoing = ({
           ))}
         </div>
       </RadioGroup>
-
-      {/* Points */}
-      {points && (
-        <p className="text-muted-foreground text-sm">
-          {t('common.points')}: {points}
-        </p>
-      )}
     </div>
   );
 };

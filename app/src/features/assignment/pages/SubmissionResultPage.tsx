@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/components/ui/button';
@@ -18,6 +18,9 @@ import {
 import { QuestionRenderer } from '../../question/components/QuestionRenderer';
 import type { Question } from '@aiprimary/core';
 import { VIEW_MODE } from '@aiprimary/core';
+import { groupQuestionsByContext } from '../utils/questionGrouping';
+import { ContextDisplay } from '../../context/components/ContextDisplay';
+import type { AssignmentContext } from '../types/assignment';
 import { useFormattedDistance } from '@/shared/lib/date-utils';
 import { useSubmission } from '../hooks';
 import { useAssignmentPublic } from '../hooks/useAssignmentApi';
@@ -36,6 +39,59 @@ export const SubmissionResultPage = () => {
 
   // Fetch assignment data - use public endpoint since submissions reference cloned assignments
   const { data: assignment, isLoading: isLoadingAssignment } = useAssignmentPublic(submission?.assignmentId);
+
+  // Derived state - build contexts map and groups
+  const questions = useMemo(() => assignment?.questions || [], [assignment?.questions]);
+
+  const contextsMap = useMemo(() => {
+    const map = new Map<string, AssignmentContext>();
+    if (assignment?.contexts) {
+      assignment.contexts.forEach((ctx) => map.set(ctx.id, ctx));
+    }
+    return map;
+  }, [assignment?.contexts]);
+
+  const questionGroups = useMemo(() => {
+    return groupQuestionsByContext(questions as any, contextsMap);
+  }, [questions, contextsMap]);
+
+  // Flatten all questions from groups into a single array
+  const allQuestions = useMemo(() => {
+    return questionGroups.flatMap((group) => group.questions);
+  }, [questionGroups]);
+
+  // Safe access to current question with useMemo to ensure consistent calculation
+  const currentQuestion = useMemo(() => {
+    if (allQuestions.length === 0) return undefined;
+    const validIndex = Math.max(0, Math.min(currentQuestionIndex, allQuestions.length - 1));
+    return allQuestions[validIndex];
+  }, [allQuestions, currentQuestionIndex]);
+
+  // All hooks must be called unconditionally BEFORE any early returns
+  const handleNext = useCallback(() => {
+    if (currentQuestionIndex < allQuestions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    }
+  }, [currentQuestionIndex, allQuestions.length]);
+
+  const handlePrevious = useCallback(() => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  }, [currentQuestionIndex]);
+
+  const percentage = useMemo(
+    () =>
+      submission?.maxScore && submission?.score !== undefined
+        ? Math.round((submission.score / submission.maxScore) * 100)
+        : 0,
+    [submission?.maxScore, submission?.score]
+  );
+
+  const totalPoints = useMemo(
+    () => assignment?.totalPoints || questions.reduce((sum, q) => sum + (q.points || 0), 0),
+    [assignment?.totalPoints, questions]
+  );
 
   // Loading state
   if (isLoadingSubmission || isLoadingAssignment) {
@@ -60,39 +116,12 @@ export const SubmissionResultPage = () => {
     );
   }
 
-  const questions = assignment.questions || [];
-  const currentQuestion = questions[currentQuestionIndex];
-
   // Mock teacher data (backend doesn't provide teacher details)
   const teacher = {
     id: submission.gradedBy || 'teacher-1',
     firstName: 'Teacher',
     lastName: '',
   };
-
-  // Get current answer for the question
-  const currentAnswer = submission.answers?.find((a) => a.questionId === currentQuestion.question.id);
-
-  // Get current grade for the question
-  const currentGrade = submission.grades?.find((g) => g.questionId === currentQuestion.question.id);
-
-  const handleNext = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex((prev) => prev + 1);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex((prev) => prev - 1);
-    }
-  };
-
-  const percentage =
-    submission.maxScore && submission.score !== undefined
-      ? Math.round((submission.score / submission.maxScore) * 100)
-      : 0;
-  const totalPoints = assignment.totalPoints || questions.reduce((sum, q) => sum + (q.points || 0), 0);
 
   const getScoreColor = (score: number, maxScore: number) => {
     const pct = (score / maxScore) * 100;
@@ -199,14 +228,20 @@ export const SubmissionResultPage = () => {
           <div className="text-muted-foreground flex items-center gap-2">
             <Clock className="h-4 w-4" />
             <span>
-              {t('submitted')} {formatDistanceToNow(new Date(submission.submittedAt), { addSuffix: true })}
+              {t('submitted')}{' '}
+              {formatDistanceToNow(new Date(submission.submittedAt), {
+                addSuffix: true,
+              })}
             </span>
           </div>
           {submission.gradedAt && (
             <div className="text-muted-foreground flex items-center gap-2">
               <Calendar className="h-4 w-4" />
               <span>
-                {t('graded')} {formatDistanceToNow(new Date(submission.gradedAt), { addSuffix: true })}
+                {t('graded')}{' '}
+                {formatDistanceToNow(new Date(submission.gradedAt), {
+                  addSuffix: true,
+                })}
               </span>
             </div>
           )}
@@ -223,16 +258,16 @@ export const SubmissionResultPage = () => {
       <main className="flex flex-1 flex-col overflow-y-auto">
         <div className="flex-1 p-6 md:p-8">
           <div className="mx-auto max-w-4xl">
-            {/* Question Navigation Grid */}
-            <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-2">
-              {questions.map((q, index) => {
-                const grade = submission.grades?.find((g) => g.questionId === q.question.id);
+            {/* Question Navigation - Compact numbered buttons */}
+            <div className="mb-6 flex flex-wrap gap-2">
+              {allQuestions.map((aq, index) => {
                 const isCurrent = index === currentQuestionIndex;
-                const isCorrect = grade && grade.points === q.points;
+                const grade = submission.grades?.find((g) => g.questionId === aq.question.id);
+                const isCorrect = grade && grade.points === aq.points;
 
                 return (
                   <button
-                    key={q.question.id}
+                    key={aq.question.id}
                     onClick={() => setCurrentQuestionIndex(index)}
                     className={cn(
                       'flex h-10 min-w-[40px] items-center justify-center rounded-lg border-2 text-sm font-medium transition-colors',
@@ -258,55 +293,43 @@ export const SubmissionResultPage = () => {
               })}
             </div>
 
-            {/* Question Content */}
-            <div className="rounded-lg border bg-white p-6 dark:bg-gray-900">
-              <div className="mb-4 flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="mb-2 flex items-center gap-2">
-                    <span className="text-muted-foreground text-sm font-medium">
-                      {t('question')} {currentQuestionIndex + 1}
-                    </span>
-                    <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                      {currentQuestion.points} {t('points')}
-                    </span>
-                  </div>
-                </div>
-                {currentGrade && (
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`rounded px-2 py-0.5 text-xs font-medium ${
-                        currentGrade.points === currentQuestion.points
-                          ? 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300'
-                          : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300'
-                      }`}
-                    >
-                      {t('youEarned')} {currentGrade.points}/{currentQuestion.points}
-                    </span>
-                  </div>
-                )}
-              </div>
+            {/* Question Content - Always show individual question */}
+            {currentQuestion &&
+              (() => {
+                // Find the group this question belongs to
+                const group = questionGroups.find((g) =>
+                  g.questions.some((q) => q.question.id === currentQuestion.question.id)
+                );
 
-              <QuestionRenderer
-                question={currentQuestion.question as Question}
-                viewMode={VIEW_MODE.AFTER_ASSESSMENT}
-                answer={currentAnswer}
-                points={currentQuestion.points}
-                number={currentQuestionIndex + 1}
-              />
+                const answer = submission?.answers?.find((a) => a.questionId === currentQuestion.question.id);
+                const grade = submission?.grades?.find((g) => g.questionId === currentQuestion.question.id);
 
-              {/* Teacher Feedback */}
-              {currentGrade?.feedback && (
-                <div className="mt-6 rounded-lg border-l-4 border-blue-500 bg-blue-50 p-4 dark:bg-blue-950/20">
-                  <div className="mb-2 flex items-center gap-2">
-                    <User className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm font-semibold text-blue-900 dark:text-blue-100">
-                      {t('teacherFeedback')}
-                    </span>
+                return (
+                  <div className="space-y-6">
+                    {/* Show context reading passage if question belongs to a context */}
+                    {group && group.type === 'context' && group.context && (
+                      <div className="rounded-lg border bg-white p-6 dark:bg-gray-900">
+                        <ContextDisplay
+                          context={{ ...group.context, subject: assignment?.subject || 'General' }}
+                          defaultCollapsed={false}
+                        />
+                      </div>
+                    )}
+
+                    {/* Show the individual question */}
+                    <div className="rounded-lg border bg-white p-6 dark:bg-gray-900">
+                      <QuestionRenderer
+                        question={currentQuestion.question as Question}
+                        viewMode={VIEW_MODE.AFTER_ASSESSMENT}
+                        answer={answer}
+                        points={currentQuestion.points}
+                        grade={grade}
+                        number={currentQuestionIndex + 1}
+                      />
+                    </div>
                   </div>
-                  <p className="text-sm text-blue-800 dark:text-blue-200">{currentGrade.feedback}</p>
-                </div>
-              )}
-            </div>
+                );
+              })()}
 
             {/* Overall Feedback - Always show if available */}
             {submission.feedback && (
@@ -330,7 +353,7 @@ export const SubmissionResultPage = () => {
                 {tActions('previous')}
               </Button>
 
-              <Button onClick={handleNext} disabled={currentQuestionIndex === questions.length - 1}>
+              <Button onClick={handleNext} disabled={currentQuestionIndex === allQuestions.length - 1}>
                 {tActions('next')}
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Button>

@@ -9,16 +9,23 @@ import type { Context } from '../types';
 interface ContextDisplayProps {
   context: Context;
   defaultCollapsed?: boolean;
+  showQuestionNumbers?: boolean;
+  questionNumbers?: number[];
 }
 
-export const ContextDisplay = ({ context, defaultCollapsed = false }: ContextDisplayProps) => {
+export const ContextDisplay = ({
+  context,
+  defaultCollapsed = false,
+  showQuestionNumbers = false,
+  questionNumbers = [],
+}: ContextDisplayProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'context' });
   const [isOpen, setIsOpen] = useState(!defaultCollapsed);
 
   return (
-    <div className="mb-4 border-l-4 border-l-blue-400 pl-4">
+    <div className="border-l-4 border-l-blue-400 pl-4">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <div className="flex items-center justify-between py-2">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             <h3 className="text-base font-semibold text-blue-900 dark:text-blue-100">
@@ -38,8 +45,14 @@ export const ContextDisplay = ({ context, defaultCollapsed = false }: ContextDis
             <span>{context.author}</span>
           </div>
         )}
+        {showQuestionNumbers && questionNumbers.length > 0 && (
+          <div className="text-muted-foreground mt-2 text-xs">
+            <span className="font-medium">Questions:</span>{' '}
+            {questionNumbers.map((num) => `Q${num}`).join(', ')}
+          </div>
+        )}
         <CollapsibleContent>
-          <div className="py-2">
+          <div>
             <MarkdownPreview content={context.content} className="text-gray-800 dark:text-gray-200" />
           </div>
         </CollapsibleContent>

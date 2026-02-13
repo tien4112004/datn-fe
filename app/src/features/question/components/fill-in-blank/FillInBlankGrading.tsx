@@ -1,30 +1,32 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion, FillInBlankAnswer } from '@/features/assignment/types';
-
-import { Input } from '@/shared/components/ui/input';
+import { QuestionTitle } from '../shared';
 import { Label } from '@/shared/components/ui/label';
 import { Textarea } from '@/shared/components/ui/textarea';
-import { CheckCircle2, XCircle } from 'lucide-react';
+import { CheckCircle2, XCircle, Trophy } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
-import { QuestionNumber } from '../shared';
 
 interface FillInBlankGradingProps {
   question: FillInBlankQuestion;
   answer?: FillInBlankAnswer;
   points?: number; // Points allocated for this question in the assignment
-  onGradeChange?: (grade: { points: number; feedback?: string }) => void;
-  number?: number;
+  grade?: { points: number; feedback?: string }; // Current grade data
+  onGradeChange?: (grade: { points: number; feedback?: string }) => void; // Callback when grade changes
 }
 
 export const FillInBlankGrading = ({
   question,
   answer,
   points = 0,
+  grade,
   onGradeChange,
-  number,
 }: FillInBlankGradingProps) => {
   const { t } = useTranslation('questions');
+  const { t: tGrading } = useTranslation('assignment', { keyPrefix: 'submissions.grading' });
+
+  const [awardedPoints, setAwardedPoints] = useState<number>(grade?.points ?? 0);
+  const [feedback, setFeedback] = useState<string>(grade?.feedback || '');
 
   // Calculate score: each correct blank gets equal points
   const blankSegments = question.data.segments.filter((s) => s.type === 'blank');
@@ -69,22 +71,6 @@ export const FillInBlankGrading = ({
   });
   const autoScore = correctBlanks * pointsPerBlank;
 
-  const [awardedPoints, setAwardedPoints] = useState<number>(autoScore);
-  const [feedback, setFeedback] = useState<string>('');
-
-  const handlePointsChange = (value: string) => {
-    const numValue = parseFloat(value);
-    if (!isNaN(numValue)) {
-      setAwardedPoints(numValue);
-      onGradeChange?.({ points: numValue, feedback });
-    }
-  };
-
-  const handleFeedbackChange = (value: string) => {
-    setFeedback(value);
-    onGradeChange?.({ points: awardedPoints, feedback: value });
-  };
-
   const getStudentAnswer = (segmentId: string): string => {
     const blank = answer?.blanks.find((b) => b.segmentId === segmentId);
     return blank?.value || '';
@@ -92,15 +78,10 @@ export const FillInBlankGrading = ({
 
   return (
     <div className="space-y-4">
-      {number !== undefined && (
-        <div className="flex items-center gap-3">
-          <QuestionNumber number={number} />
-        </div>
-      )}
       {/* Question Title */}
       {question.title && (
         <div className="space-y-2">
-          <p className="font-medium">{question.title}</p>
+          <QuestionTitle content={question.title} variant="plain" />
           {question.titleImageUrl && (
             <img src={question.titleImageUrl} alt="Question" className="mt-2 max-h-64 rounded-md border" />
           )}
@@ -224,42 +205,58 @@ export const FillInBlankGrading = ({
         </p>
       </div>
 
-      {/* Grading Interface */}
-      <div className="space-y-3 border-t pt-4">
-        <h4 className="text-sm font-semibold">{t('fillInBlank.grading.grading')}</h4>
+      {/* Grading Section */}
+      <div className="rounded-lg border-2 border-blue-200 bg-blue-50/50 p-6 dark:border-blue-900 dark:bg-blue-950/20">
+        <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-blue-900 dark:text-blue-100">
+          <Trophy className="h-4 w-4" />
+          {tGrading('grading')}
+        </h3>
 
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="points" className="text-sm">
-              {t('fillInBlank.grading.pointsAwarded')}
+        <div className="space-y-4">
+          {/* Points Input */}
+          <div>
+            <Label htmlFor={`points-${question.id}`} className="mb-2 block text-sm font-medium">
+              {tGrading('pointsAwarded')}
             </Label>
-            <Input
-              id="points"
-              type="number"
-              min={0}
-              max={points || 100}
-              step={0.5}
-              value={awardedPoints}
-              onChange={(e) => handlePointsChange(e.target.value)}
-              className="h-9"
-            />
-            <p className="text-muted-foreground text-xs">
-              {t('fillInBlank.grading.maxPoints', { points: points || 0 })}
-            </p>
+            <div className="flex items-center gap-3">
+              <input
+                id={`points-${question.id}`}
+                type="number"
+                min="0"
+                max={points || 100}
+                step="0.5"
+                value={awardedPoints}
+                onChange={(e) => {
+                  const newPoints = parseFloat(e.target.value) || 0;
+                  const clampedPoints = Math.min(Math.max(0, newPoints), points || 100);
+                  setAwardedPoints(clampedPoints);
+                  onGradeChange?.({ points: clampedPoints, feedback });
+                }}
+                className="w-24 rounded-md border border-gray-300 px-3 py-2 text-center text-lg font-semibold focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
+              />
+              <span className="text-muted-foreground text-sm">
+                {tGrading('outOf')} <span className="font-semibold">{points || 0}</span> {tGrading('points')}
+              </span>
+              {awardedPoints === (points || 0) && <CheckCircle2 className="h-5 w-5 text-green-600" />}
+            </div>
           </div>
-        </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="feedback" className="text-sm">
-            {t('fillInBlank.grading.teacherFeedback')}
-          </Label>
-          <Textarea
-            id="feedback"
-            value={feedback}
-            onChange={(e) => handleFeedbackChange(e.target.value)}
-            placeholder={t('fillInBlank.grading.feedbackPlaceholder')}
-            className="min-h-[80px] resize-none"
-          />
+          {/* Feedback Input */}
+          <div>
+            <Label htmlFor={`feedback-${question.id}`} className="mb-2 block text-sm font-medium">
+              {tGrading('feedbackForQuestion')}
+            </Label>
+            <Textarea
+              id={`feedback-${question.id}`}
+              value={feedback}
+              onChange={(e) => {
+                setFeedback(e.target.value);
+                onGradeChange?.({ points: awardedPoints, feedback: e.target.value });
+              }}
+              placeholder={tGrading('questionFeedbackPlaceholder')}
+              className="min-h-[80px]"
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next';
 import { ScrollArea } from '@/shared/components/ui/scroll-area';
 import { QuestionRenderer } from '@/features/question/components/QuestionRenderer';
 import { ContextDisplay, type Context } from '@/features/context';
@@ -6,6 +5,7 @@ import { EditableContextDisplay } from './EditableContextDisplay';
 import type { AssignmentQuestionWithTopic, AssignmentContext, ViewMode } from '../../types';
 import type { Answer, Question } from '@aiprimary/core';
 import type { GroupingContext } from '../../utils/questionGrouping';
+import { Separator } from '@/components/ui/separator';
 
 interface ContextGroupViewProps {
   context: GroupingContext;
@@ -36,8 +36,6 @@ export const ContextGroupView = ({
   onContextUpdate,
   answers,
 }: ContextGroupViewProps) => {
-  const { t } = useTranslation('assignment', { keyPrefix: 'context' });
-
   // Check if editing is enabled (AssignmentContext with update callback)
   const isAssignmentContext = !!onContextUpdate;
 
@@ -57,30 +55,16 @@ export const ContextGroupView = ({
         )}
       </div>
 
+      <Separator className="my-4" />
       {/* Questions - Scrollable */}
-      <ScrollArea className="mt-4 flex-1">
-        <div className="space-y-6 pr-4">
+      <ScrollArea className="mt-2 flex-1">
+        <div className="space-y-4 pr-4">
           {questions.map((aq, index) => {
             const questionNumber = startNumber + index;
             const answer = answers?.get(aq.question.id);
 
             return (
-              <div
-                key={aq.question.id}
-                className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900"
-              >
-                <div className="mb-4 flex items-center justify-between">
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {t('questionInGroup', {
-                      current: index + 1,
-                      total: questions.length,
-                      number: questionNumber,
-                    })}
-                  </h3>
-                  <span className="text-muted-foreground text-sm">
-                    {aq.points} {t('points')}
-                  </span>
-                </div>
+              <div key={aq.question.id} className="bg-white dark:border-gray-700 dark:bg-gray-900">
                 <QuestionRenderer
                   question={aq.question as Question}
                   viewMode={viewMode}

@@ -6,10 +6,23 @@ import { Textarea } from '@/shared/components/ui/textarea';
 import { Label } from '@/shared/components/ui/label';
 
 import { cn } from '@/shared/lib/utils';
-import { ChevronLeft, ChevronRight, Save, User, Clock, Trophy, CheckCircle2, Loader2 } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Save,
+  User,
+  Clock,
+  Trophy,
+  CheckCircle2,
+  FileText,
+  Loader2,
+} from 'lucide-react';
 import { QuestionRenderer } from '../../question/components/QuestionRenderer';
 import type { Question, Grade } from '@aiprimary/core';
 import { VIEW_MODE } from '@aiprimary/core';
+import { groupQuestionsByContext } from '../utils/questionGrouping';
+import { ContextDisplay } from '../../context/components/ContextDisplay';
+import type { AssignmentContext } from '../types/assignment';
 import { toast } from 'sonner';
 import { useFormattedDistance } from '@/shared/lib/date-utils';
 import { useSubmission, useGradeSubmission } from '../hooks';
@@ -38,7 +51,30 @@ export const TeacherGradingPage = () => {
 
   // Derived state - all hooks must be called before any early returns
   const questions = useMemo(() => assignment?.questions || [], [assignment?.questions]);
-  const currentQuestion = useMemo(() => questions[currentQuestionIndex], [questions, currentQuestionIndex]);
+
+  // Build contexts map from assignment
+  const contextsMap = useMemo(() => {
+    const map = new Map<string, AssignmentContext>();
+    if (assignment?.contexts) {
+      assignment.contexts.forEach((ctx) => map.set(ctx.id, ctx));
+    }
+    return map;
+  }, [assignment?.contexts]);
+
+  // Group questions by context - cast to ensure type compatibility
+  const questionGroups = useMemo(() => {
+    return groupQuestionsByContext(questions as any, contextsMap);
+  }, [questions, contextsMap]);
+
+  // Flatten all questions from groups into a single array
+  const allQuestions = useMemo(() => {
+    return questionGroups.flatMap((group) => group.questions);
+  }, [questionGroups]);
+
+  const currentQuestion =
+    allQuestions.length > 0
+      ? allQuestions[Math.min(currentQuestionIndex, allQuestions.length - 1)]
+      : undefined;
   const totalPoints = useMemo(
     () => assignment?.totalPoints || questions.reduce((sum, q) => sum + (q.points || 0), 0),
     [assignment?.totalPoints, questions]
@@ -55,18 +91,6 @@ export const TeacherGradingPage = () => {
     }),
     [submission]
   );
-
-  // Get current answer for the question
-  const currentAnswer = useMemo(() => {
-    if (!submission || !currentQuestion) return undefined;
-    return submission.answers?.find((a) => a.questionId === currentQuestion.question.id);
-  }, [submission, currentQuestion]);
-
-  // Get current grade for the question
-  const currentGrade = useMemo(() => {
-    if (!currentQuestion) return undefined;
-    return grades.find((g) => g.questionId === currentQuestion.question.id);
-  }, [grades, currentQuestion]);
 
   // Calculate total score
   const totalScore = useMemo(() => {
@@ -103,13 +127,11 @@ export const TeacherGradingPage = () => {
   }
 
   const handleGradeChange = useCallback(
-    (grade: { points: number; feedback?: string }) => {
-      if (!currentQuestion) return;
-
+    (questionId: string, grade: { points: number; feedback?: string }) => {
       setGrades((prev) => {
-        const existing = prev.findIndex((g) => g.questionId === currentQuestion.question.id);
+        const existing = prev.findIndex((g) => g.questionId === questionId);
         const newGrade: Grade = {
-          questionId: currentQuestion.question.id,
+          questionId,
           points: grade.points,
           feedback: grade.feedback,
         };
@@ -122,18 +144,18 @@ export const TeacherGradingPage = () => {
         return [...prev, newGrade];
       });
     },
-    [currentQuestion]
+    []
   );
 
   const handleNext = useCallback(() => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex((prev) => prev + 1);
+    if (currentQuestionIndex < allQuestions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
-  }, [currentQuestionIndex, questions.length]);
+  }, [currentQuestionIndex, allQuestions.length]);
 
   const handlePrevious = useCallback(() => {
     if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex((prev) => prev - 1);
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   }, [currentQuestionIndex]);
 
@@ -186,7 +208,7 @@ export const TeacherGradingPage = () => {
   }
 
   // Error state
-  if (!submission || !assignment || !currentQuestion) {
+  if (!submission || !assignment || questions.length === 0) {
     return (
       <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
         <div className="text-center">
@@ -258,7 +280,7 @@ export const TeacherGradingPage = () => {
             <div className="bg-muted h-2 overflow-hidden rounded-full">
               <div
                 className="h-full bg-green-600 transition-all duration-300"
-                style={{ width: `${(gradedCount / questions.length) * 100}%` }}
+                style={{ width: `${questions.length > 0 ? (gradedCount / questions.length) * 100 : 0}%` }}
               />
             </div>
           </div>
@@ -314,15 +336,15 @@ export const TeacherGradingPage = () => {
       <main className="flex flex-1 flex-col overflow-y-auto">
         <div className="flex-1 p-6 md:p-8">
           <div className="mx-auto max-w-4xl">
-            {/* Question Navigation Grid */}
-            <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-2">
-              {questions.map((q, index) => {
-                const isGraded = grades.some((g) => g.questionId === q.question.id);
+            {/* Question Navigation - Compact numbered buttons */}
+            <div className="mb-6 flex flex-wrap gap-2">
+              {allQuestions.map((aq, index) => {
                 const isCurrent = index === currentQuestionIndex;
+                const isGraded = grades.some((g) => g.questionId === aq.question.id);
 
                 return (
                   <button
-                    key={q.question.id}
+                    key={aq.question.id}
                     onClick={() => setCurrentQuestionIndex(index)}
                     className={cn(
                       'flex h-10 min-w-[40px] items-center justify-center rounded-lg border-2 text-sm font-medium transition-colors',
@@ -330,106 +352,67 @@ export const TeacherGradingPage = () => {
                         ? 'border-blue-600 bg-blue-600 text-white'
                         : isGraded
                           ? 'border-green-600 bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300'
-                          : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800'
+                          : 'border-yellow-600 bg-yellow-50 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300'
                     )}
                   >
                     {index + 1}
-                    {isGraded && !isCurrent && <CheckCircle2 className="ml-1 h-3 w-3" />}
+                    {!isCurrent && (
+                      <>
+                        {isGraded ? (
+                          <CheckCircle2 className="ml-1 h-3 w-3" />
+                        ) : (
+                          <FileText className="ml-1 h-3 w-3" />
+                        )}
+                      </>
+                    )}
                   </button>
                 );
               })}
             </div>
 
             {/* Question Display Section */}
-            <div className="space-y-6">
-              {/* Question Header */}
-              <div className="flex items-center gap-2 border-b pb-3">
-                <span className="text-muted-foreground text-sm font-medium">
-                  {t('question')} {currentQuestionIndex + 1}
-                </span>
-                <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                  {t('worth')} {currentQuestion.points} {t('points')}
-                </span>
-              </div>
+            {currentQuestion &&
+              (() => {
+                // Find the group this question belongs to
+                const group = questionGroups.find((g) =>
+                  g.questions.some((q) => q.question.id === currentQuestion.question.id)
+                );
 
-              {/* Question & Answer Section */}
-              <div className="rounded-lg border bg-white p-6 dark:bg-gray-900">
-                <QuestionRenderer
-                  question={currentQuestion.question as Question}
-                  viewMode={VIEW_MODE.AFTER_ASSESSMENT}
-                  answer={currentAnswer}
-                  points={currentQuestion.points}
-                  number={currentQuestionIndex + 1}
-                />
-              </div>
+                const answer = submission?.answers?.find((a) => a.questionId === currentQuestion.question.id);
+                const grade = grades.find((g) => g.questionId === currentQuestion.question.id);
 
-              {/* Grading Section */}
-              <div className="rounded-lg border-2 border-blue-200 bg-blue-50/50 p-6 dark:border-blue-900 dark:bg-blue-950/20">
-                <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-blue-900 dark:text-blue-100">
-                  <Trophy className="h-4 w-4" />
-                  {t('grading')}
-                </h3>
+                return (
+                  <div className="space-y-6">
+                    {/* Show context reading passage if question belongs to a context */}
+                    {group && group.type === 'context' && group.context && (
+                      <div className="rounded-lg border bg-white p-6 dark:bg-gray-900">
+                        <ContextDisplay
+                          context={{
+                            ...group.context,
+                            subject: assignment?.subject || 'General',
+                          }}
+                          defaultCollapsed={false}
+                        />
+                      </div>
+                    )}
 
-                <div className="space-y-4">
-                  {/* Points Input */}
-                  <div>
-                    <Label
-                      htmlFor={`points-${currentQuestion.question.id}`}
-                      className="mb-2 block text-sm font-medium"
-                    >
-                      {t('pointsAwarded')}
-                    </Label>
-                    <div className="flex items-center gap-3">
-                      <input
-                        id={`points-${currentQuestion.question.id}`}
-                        type="number"
-                        min="0"
-                        max={currentQuestion.points}
-                        step="0.5"
-                        value={currentGrade?.points ?? 0}
-                        onChange={(e) => {
-                          const points = parseFloat(e.target.value) || 0;
-                          handleGradeChange({
-                            points: Math.min(Math.max(0, points), currentQuestion.points),
-                            feedback: currentGrade?.feedback,
-                          });
-                        }}
-                        className="w-24 rounded-md border border-gray-300 px-3 py-2 text-center text-lg font-semibold focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
+                    {/* Question & Answer Section */}
+                    <div className="rounded-lg border bg-white p-6 dark:bg-gray-900">
+                      <QuestionRenderer
+                        question={currentQuestion.question as Question}
+                        viewMode={VIEW_MODE.GRADING}
+                        answer={answer}
+                        points={currentQuestion.points}
+                        grade={grade}
+                        onGradeChange={(gradeData) =>
+                          handleGradeChange(currentQuestion.question.id, gradeData)
+                        }
+                        number={currentQuestionIndex + 1}
                       />
-                      <span className="text-muted-foreground text-sm">
-                        {t('outOf')} <span className="font-semibold">{currentQuestion.points}</span>{' '}
-                        {t('points')}
-                      </span>
-                      {currentGrade && currentGrade.points === currentQuestion.points && (
-                        <CheckCircle2 className="h-5 w-5 text-green-600" />
-                      )}
                     </div>
                   </div>
-
-                  {/* Feedback Input */}
-                  <div>
-                    <Label
-                      htmlFor={`feedback-${currentQuestion.question.id}`}
-                      className="mb-2 block text-sm font-medium"
-                    >
-                      {t('feedbackForQuestion')}
-                    </Label>
-                    <Textarea
-                      id={`feedback-${currentQuestion.question.id}`}
-                      value={currentGrade?.feedback || ''}
-                      onChange={(e) => {
-                        handleGradeChange({
-                          points: currentGrade?.points ?? 0,
-                          feedback: e.target.value,
-                        });
-                      }}
-                      placeholder={t('questionFeedbackPlaceholder')}
-                      className="min-h-[80px]"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+                );
+              })()}
 
             {/* Navigation Buttons */}
             <div className="mt-6 flex items-center justify-between">
@@ -438,7 +421,7 @@ export const TeacherGradingPage = () => {
                 {tActions('previous')}
               </Button>
 
-              <Button onClick={handleNext} disabled={currentQuestionIndex === questions.length - 1}>
+              <Button onClick={handleNext} disabled={currentQuestionIndex === allQuestions.length - 1}>
                 {tActions('next')}
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Button>

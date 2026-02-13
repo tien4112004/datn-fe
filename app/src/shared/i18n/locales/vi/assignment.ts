@@ -313,6 +313,14 @@ export default {
       noTopicError: 'Vui lòng thêm ít nhất một chủ đề trước khi thêm câu hỏi từ ngân hàng',
       questionsAdded: 'Đã thêm {{count}} câu hỏi vào bài tập',
       contextFetchError: 'Không thể tải đoạn văn đọc hiểu cho câu hỏi đã nhập',
+
+      // Submission-related
+      submitSuccess: 'Nộp bài thành công!',
+      submitError: 'Không thể nộp bài: {{message}}',
+      gradingSaved: 'Lưu điểm thành công!',
+      gradingError: 'Không thể lưu điểm: {{message}}',
+      submissionDeleted: 'Đã xóa bài nộp thành công!',
+      submissionDeleteError: 'Không thể xóa bài nộp: {{message}}',
     },
 
     // Bảng điều khiển câu hỏi

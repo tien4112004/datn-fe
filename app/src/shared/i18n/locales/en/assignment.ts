@@ -313,6 +313,14 @@ export default {
       noTopicError: 'Please add at least one topic before adding questions from the bank',
       questionsAdded: '{{count}} question(s) added to the assignment',
       contextFetchError: 'Failed to fetch reading passages for imported questions',
+
+      // Submission-related
+      submitSuccess: 'Assignment submitted successfully!',
+      submitError: 'Failed to submit assignment: {{message}}',
+      gradingSaved: 'Grading saved successfully!',
+      gradingError: 'Failed to save grading: {{message}}',
+      submissionDeleted: 'Submission deleted successfully!',
+      submissionDeleteError: 'Failed to delete submission: {{message}}',
     },
 
     // Questions panel and toolbar

@@ -1,10 +1,12 @@
 import { useTranslation } from 'react-i18next';
-import type { Question, Answer } from '@aiprimary/core';
+import type { Question, Answer, Grade } from '@aiprimary/core';
 import type { ViewMode } from '@/features/assignment/types';
 import type { Context } from '@/features/context';
 import { QUESTION_TYPE, VIEW_MODE } from '@/features/assignment/types';
 import { ContextDisplay, useContext as useContextQuery } from '@/features/context';
 import { Label } from '@/shared/components/ui/label';
+import { cn } from '@/shared/lib/utils';
+import { QuestionNumber } from './shared/QuestionNumber';
 import { ContextSelector } from './shared/ContextSelector';
 import {
   MultipleChoiceEditing,
@@ -42,6 +44,7 @@ interface QuestionRendererProps {
   contextId?: string; // Context ID for EDITING mode - used to fetch and display context
   answer?: Answer;
   points?: number; // Points for this question in assignment context (required for grading/after-assessment modes)
+  grade?: Grade; // Grade for this question (used in AFTER_ASSESSMENT mode)
   onChange?: (question: Question) => void;
   onAnswerChange?: (answer: Answer) => void;
   onGradeChange?: (grade: { points: number; feedback?: string }) => void;
@@ -57,6 +60,7 @@ export const QuestionRenderer = ({
   contextId,
   answer,
   points,
+  grade,
   onChange,
   onAnswerChange,
   onGradeChange,
@@ -69,6 +73,7 @@ export const QuestionRenderer = ({
   // Fetch context when contextId is provided (for EDITING mode)
   const { data: fetchedContext } = useContextQuery(contextId);
   const displayContext = context || fetchedContext;
+
   // Render question content based on type and view mode
   const renderQuestionContent = () => {
     const type = question?.type?.toUpperCase();
@@ -80,16 +85,14 @@ export const QuestionRenderer = ({
         return <MultipleChoiceEditing question={mcQuestion} onChange={onChange!} />;
       }
       if (viewMode === VIEW_MODE.VIEWING) {
-        return <MultipleChoiceViewing question={mcQuestion} number={number} compact={compact} />;
+        return <MultipleChoiceViewing question={mcQuestion} compact={compact} />;
       }
       if (viewMode === VIEW_MODE.DOING) {
         return (
           <MultipleChoiceDoing
             question={mcQuestion}
             answer={answer as any}
-            points={points}
             onAnswerChange={onAnswerChange!}
-            number={number}
           />
         );
       }
@@ -99,7 +102,7 @@ export const QuestionRenderer = ({
             question={mcQuestion}
             answer={answer as any}
             points={points}
-            number={number}
+            grade={grade}
           />
         );
       }
@@ -109,8 +112,8 @@ export const QuestionRenderer = ({
             question={mcQuestion}
             answer={answer as any}
             points={points}
-            onGradeChange={onGradeChange!}
-            number={number}
+            grade={grade}
+            onGradeChange={onGradeChange}
           />
         );
       }
@@ -123,18 +126,10 @@ export const QuestionRenderer = ({
         return <MatchingEditing question={mQuestion} onChange={onChange!} />;
       }
       if (viewMode === VIEW_MODE.VIEWING) {
-        return <MatchingViewing question={mQuestion} number={number} compact={compact} />;
+        return <MatchingViewing question={mQuestion} compact={compact} />;
       }
       if (viewMode === VIEW_MODE.DOING) {
-        return (
-          <MatchingDoing
-            question={mQuestion}
-            answer={answer as any}
-            points={points}
-            onAnswerChange={onAnswerChange!}
-            number={number}
-          />
-        );
+        return <MatchingDoing question={mQuestion} answer={answer as any} onAnswerChange={onAnswerChange!} />;
       }
       if (viewMode === VIEW_MODE.AFTER_ASSESSMENT) {
         return (
@@ -142,7 +137,7 @@ export const QuestionRenderer = ({
             question={mQuestion}
             answer={answer as any}
             points={points}
-            number={number}
+            grade={grade}
           />
         );
       }
@@ -152,8 +147,8 @@ export const QuestionRenderer = ({
             question={mQuestion}
             answer={answer as any}
             points={points}
-            onGradeChange={onGradeChange!}
-            number={number}
+            grade={grade}
+            onGradeChange={onGradeChange}
           />
         );
       }
@@ -166,17 +161,11 @@ export const QuestionRenderer = ({
         return <OpenEndedEditing question={oeQuestion} onChange={onChange!} />;
       }
       if (viewMode === VIEW_MODE.VIEWING) {
-        return <OpenEndedViewing question={oeQuestion} number={number} compact={compact} />;
+        return <OpenEndedViewing question={oeQuestion} compact={compact} />;
       }
       if (viewMode === VIEW_MODE.DOING) {
         return (
-          <OpenEndedDoing
-            question={oeQuestion}
-            answer={answer as any}
-            points={points}
-            onAnswerChange={onAnswerChange!}
-            number={number}
-          />
+          <OpenEndedDoing question={oeQuestion} answer={answer as any} onAnswerChange={onAnswerChange!} />
         );
       }
       if (viewMode === VIEW_MODE.AFTER_ASSESSMENT) {
@@ -185,7 +174,7 @@ export const QuestionRenderer = ({
             question={oeQuestion}
             answer={answer as any}
             points={points}
-            number={number}
+            grade={grade}
           />
         );
       }
@@ -195,8 +184,8 @@ export const QuestionRenderer = ({
             question={oeQuestion}
             answer={answer as any}
             points={points}
-            onGradeChange={onGradeChange!}
-            number={number}
+            grade={grade}
+            onGradeChange={onGradeChange}
           />
         );
       }
@@ -209,17 +198,11 @@ export const QuestionRenderer = ({
         return <FillInBlankEditing question={fibQuestion} onChange={onChange!} />;
       }
       if (viewMode === VIEW_MODE.VIEWING) {
-        return <FillInBlankViewing question={fibQuestion} number={number} compact={compact} />;
+        return <FillInBlankViewing question={fibQuestion} compact={compact} />;
       }
       if (viewMode === VIEW_MODE.DOING) {
         return (
-          <FillInBlankDoing
-            question={fibQuestion}
-            answer={answer as any}
-            points={points}
-            onAnswerChange={onAnswerChange!}
-            number={number}
-          />
+          <FillInBlankDoing question={fibQuestion} answer={answer as any} onAnswerChange={onAnswerChange!} />
         );
       }
       if (viewMode === VIEW_MODE.AFTER_ASSESSMENT) {
@@ -228,7 +211,7 @@ export const QuestionRenderer = ({
             question={fibQuestion}
             answer={answer as any}
             points={points}
-            number={number}
+            grade={grade}
           />
         );
       }
@@ -238,8 +221,8 @@ export const QuestionRenderer = ({
             question={fibQuestion}
             answer={answer as any}
             points={points}
-            onGradeChange={onGradeChange!}
-            number={number}
+            grade={grade}
+            onGradeChange={onGradeChange}
           />
         );
       }
@@ -254,6 +237,24 @@ export const QuestionRenderer = ({
 
   // Render with optional context display
   const questionContent = renderQuestionContent();
+
+  // Wrap non-EDITING mode content with number and points badges
+  const wrappedContent =
+    viewMode !== VIEW_MODE.EDITING ? (
+      <div className={cn(compact ? 'space-y-2' : 'space-y-4')}>
+        {/* Question Number at top */}
+        {number !== undefined && (
+          <div className={cn('flex items-center', compact ? 'gap-2' : 'gap-3')}>
+            <QuestionNumber number={number} className={compact ? 'h-6 w-6 text-xs' : undefined} />
+          </div>
+        )}
+
+        {/* Type-specific content */}
+        {questionContent}
+      </div>
+    ) : (
+      questionContent
+    );
 
   // EDITING mode: show context selector (if enabled) and read-only context display
   if (viewMode === VIEW_MODE.EDITING) {
@@ -271,11 +272,11 @@ export const QuestionRenderer = ({
           {displayContext && <ContextDisplay context={displayContext} defaultCollapsed={false} />}
 
           {/* Question editing content */}
-          {questionContent}
+          {wrappedContent}
         </div>
       );
     }
-    return questionContent;
+    return wrappedContent;
   }
 
   // Non-EDITING modes: show context if provided
@@ -283,10 +284,10 @@ export const QuestionRenderer = ({
     return (
       <div className="space-y-4">
         <ContextDisplay context={displayContext} />
-        {questionContent}
+        {wrappedContent}
       </div>
     );
   }
 
-  return questionContent;
+  return wrappedContent;
 };

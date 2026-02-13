@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import type { MatchingQuestion } from '@/features/assignment/types';
-import { MarkdownPreview, QuestionNumber } from '../shared';
+import { MarkdownPreview, QuestionTitle } from '../shared';
 import { Label } from '@/shared/components/ui/label';
 import { Badge } from '@/shared/components/ui/badge';
 import { Shuffle } from 'lucide-react';
@@ -8,22 +8,16 @@ import { cn } from '@/shared/lib/utils';
 
 interface MatchingViewingProps {
   question: MatchingQuestion;
-  number?: number;
   compact?: boolean;
 }
 
-export const MatchingViewing = ({ question, number, compact }: MatchingViewingProps) => {
+export const MatchingViewing = ({ question, compact }: MatchingViewingProps) => {
   const { t } = useTranslation('questions');
   return (
     <div className={cn(compact ? 'space-y-2' : 'space-y-4')}>
-      {number !== undefined && (
-        <div className={cn('flex items-center', compact ? 'gap-2' : 'gap-3')}>
-          <QuestionNumber number={number} className={compact ? 'h-6 w-6 text-xs' : undefined} />
-        </div>
-      )}
       {/* Question Title */}
       <div className="space-y-1">
-        <MarkdownPreview content={question.title} />
+        <QuestionTitle content={question.title} />
         {question.titleImageUrl && (
           <img
             src={question.titleImageUrl}
@@ -58,7 +52,7 @@ export const MatchingViewing = ({ question, number, compact }: MatchingViewingPr
               key={`left-${pair.id}`}
               className={cn(
                 'flex items-center rounded-md border bg-blue-50 dark:bg-blue-900/20',
-                compact ? 'gap-2 p-1.5' : 'gap-3 p-3'
+                compact ? 'gap-2 p-1.5' : 'gap-3 px-3 py-2'
               )}
             >
               <div
@@ -93,7 +87,7 @@ export const MatchingViewing = ({ question, number, compact }: MatchingViewingPr
               key={`right-${pair.id}`}
               className={cn(
                 'flex items-center rounded-md border bg-green-50 dark:bg-green-900/20',
-                compact ? 'gap-2 p-1.5' : 'gap-3 p-3'
+                compact ? 'gap-2 p-1.5' : 'gap-3 px-3 py-2'
               )}
             >
               <div
@@ -124,7 +118,7 @@ export const MatchingViewing = ({ question, number, compact }: MatchingViewingPr
         <div
           className={cn(
             'space-y-1 rounded-lg border border-gray-300 bg-blue-50 dark:border-gray-600 dark:bg-blue-900/20',
-            compact ? 'p-2' : 'space-y-2 p-3'
+            compact ? 'p-2' : 'space-y-2 px-3 py-2'
           )}
         >
           <Label className={cn('font-medium', compact ? 'text-xs' : 'text-sm')}>

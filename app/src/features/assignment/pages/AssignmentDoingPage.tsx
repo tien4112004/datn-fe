@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/components/ui/button';
@@ -12,10 +12,15 @@ import {
   Send,
   Trophy,
   Loader2,
+  BookOpen,
 } from 'lucide-react';
 import { QuestionRenderer } from '../../question/components/QuestionRenderer';
 import type { Answer, Question } from '@aiprimary/core';
 import { VIEW_MODE } from '@aiprimary/core';
+import { groupQuestionsByContext, type QuestionGroup } from '../utils/questionGrouping';
+import { ContextGroupView } from '../components/context/ContextGroupView';
+import { ContextDisplay } from '../../context/components/ContextDisplay';
+import type { AssignmentContext } from '../types/assignment';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -44,6 +49,32 @@ const isAnswerValid = (answer: Answer): boolean => {
   }
 };
 
+// Get question number for a specific question in a group (sequential across all groups)
+const getQuestionNumber = (groups: QuestionGroup[], groupId: string, indexInGroup: number): number => {
+  let number = 1;
+  for (const g of groups) {
+    if (g.id === groupId) return number + indexInGroup;
+    number += g.questions.length;
+  }
+  return number;
+};
+
+// Find question by ID and return its metadata
+const findQuestionById = (groups: QuestionGroup[], questionId: string) => {
+  for (const group of groups) {
+    const idx = group.questions.findIndex((q) => q.question.id === questionId);
+    if (idx >= 0) {
+      return {
+        group,
+        question: group.questions[idx],
+        questionNumber: getQuestionNumber(groups, group.id, idx),
+        indexInGroup: idx,
+      };
+    }
+  }
+  return { group: null, question: null, questionNumber: -1, indexInGroup: -1 };
+};
+
 export const AssignmentDoingPage = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
@@ -51,7 +82,8 @@ export const AssignmentDoingPage = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'submissions.doing' });
   const { t: tActions } = useTranslation('assignment', { keyPrefix: 'submissions.actions' });
 
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [currentQuestionId, setCurrentQuestionId] = useState<string | null>(null);
+  const [currentContextId, setCurrentContextId] = useState<string | null>(null);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
 
@@ -66,27 +98,37 @@ export const AssignmentDoingPage = () => {
 
   // Derived state - all hooks must be called before any early returns
   const questions = useMemo(() => assignment?.questions || [], [assignment?.questions]);
-  const currentQuestion = useMemo(() => questions[currentQuestionIndex], [questions, currentQuestionIndex]);
+
+  // Initialize to first question on load
+  useEffect(() => {
+    if (!currentQuestionId && !currentContextId && questions.length > 0) {
+      setCurrentQuestionId(questions[0].question.id);
+    }
+  }, [currentQuestionId, currentContextId, questions]);
+
+  // Build contexts map from assignment
+  const contextsMap = useMemo(() => {
+    const map = new Map<string, AssignmentContext>();
+    if (assignment?.contexts) {
+      assignment.contexts.forEach((ctx) => map.set(ctx.id, ctx));
+    }
+    return map;
+  }, [assignment?.contexts]);
+
+  // Group questions by context - cast to ensure type compatibility
+  const questionGroups = useMemo(() => {
+    return groupQuestionsByContext(questions as any, contextsMap);
+  }, [questions, contextsMap]);
+
   const totalPoints = useMemo(
     () => assignment?.totalPoints || questions.reduce((sum, q) => sum + (q.points || 0), 0),
     [assignment?.totalPoints, questions]
   );
 
-  // Get current answer for the question
-  const currentAnswer = useMemo(() => {
-    if (!currentQuestion) return undefined;
-    return answers.find((a) => a.questionId === currentQuestion.question.id);
-  }, [answers, currentQuestion]);
-
   // Check if all questions are answered
   const allQuestionsAnswered = useMemo(() => {
     return questions.every((q) => answers.some((a) => a.questionId === q.question.id && isAnswerValid(a)));
   }, [answers, questions]);
-
-  const progress = useMemo(
-    () => (questions.length > 0 ? ((currentQuestionIndex + 1) / questions.length) * 100 : 0),
-    [currentQuestionIndex, questions.length]
-  );
 
   const answeredCount = useMemo(() => answers.filter((a) => isAnswerValid(a)).length, [answers]);
 
@@ -102,17 +144,58 @@ export const AssignmentDoingPage = () => {
     });
   }, []);
 
+  const handleContextClick = useCallback((contextId: string) => {
+    setCurrentContextId(contextId);
+    setCurrentQuestionId(null);
+  }, []);
+
+  const handleQuestionClick = useCallback((questionId: string) => {
+    setCurrentQuestionId(questionId);
+    setCurrentContextId(null);
+  }, []);
+
   const handleNext = useCallback(() => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex((prev) => prev + 1);
+    // Simple approach: find next question and navigate to it
+    const allQuestions = questionGroups.flatMap((group) =>
+      group.questions.map((aq) => ({ id: aq.question.id, groupId: group.id }))
+    );
+
+    if (currentQuestionId) {
+      const currentIdx = allQuestions.findIndex((q) => q.id === currentQuestionId);
+      if (currentIdx >= 0 && currentIdx < allQuestions.length - 1) {
+        setCurrentQuestionId(allQuestions[currentIdx + 1].id);
+        setCurrentContextId(null);
+      }
+    } else if (currentContextId) {
+      // Move to first question after this context
+      const contextGroup = questionGroups.find((g) => g.contextId === currentContextId);
+      if (contextGroup) {
+        const lastQuestionInContext = contextGroup.questions[contextGroup.questions.length - 1];
+        const lastIdx = allQuestions.findIndex((q) => q.id === lastQuestionInContext.question.id);
+        if (lastIdx >= 0 && lastIdx < allQuestions.length - 1) {
+          setCurrentQuestionId(allQuestions[lastIdx + 1].id);
+          setCurrentContextId(null);
+        }
+      }
+    } else if (allQuestions.length > 0) {
+      setCurrentQuestionId(allQuestions[0].id);
+      setCurrentContextId(null);
     }
-  }, [currentQuestionIndex, questions.length]);
+  }, [currentQuestionId, currentContextId, questionGroups]);
 
   const handlePrevious = useCallback(() => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex((prev) => prev - 1);
+    const allQuestions = questionGroups.flatMap((group) =>
+      group.questions.map((aq) => ({ id: aq.question.id, groupId: group.id }))
+    );
+
+    if (currentQuestionId) {
+      const currentIdx = allQuestions.findIndex((q) => q.id === currentQuestionId);
+      if (currentIdx > 0) {
+        setCurrentQuestionId(allQuestions[currentIdx - 1].id);
+        setCurrentContextId(null);
+      }
     }
-  }, [currentQuestionIndex]);
+  }, [currentQuestionId, questionGroups]);
 
   const handleSubmitAttempt = useCallback(() => {
     if (!allQuestionsAnswered) {
@@ -154,7 +237,7 @@ export const AssignmentDoingPage = () => {
   }
 
   // Error state
-  if (!assignment || !currentQuestion) {
+  if (!assignment || questions.length === 0) {
     return (
       <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
         <div className="text-center">
@@ -174,10 +257,10 @@ export const AssignmentDoingPage = () => {
         <h1 className="truncate text-lg font-semibold">{assignment.title}</h1>
         <div className="text-muted-foreground mt-2 flex items-center gap-4 text-sm">
           <span>
-            {currentQuestionIndex + 1} {t('of')} {questions.length}
+            {answeredCount} {t('of')} {questions.length}
           </span>
           <span>
-            {Math.round(progress)}
+            {questions.length > 0 ? Math.round((answeredCount / questions.length) * 100) : 0}
             {t('complete')}
           </span>
         </div>
@@ -225,52 +308,119 @@ export const AssignmentDoingPage = () => {
             <div className="bg-muted h-2 overflow-hidden rounded-full">
               <div
                 className="h-full bg-blue-600 transition-all duration-300"
-                style={{ width: `${(answeredCount / questions.length) * 100}%` }}
+                style={{
+                  width: questions.length > 0 ? `${(answeredCount / questions.length) * 100}%` : '0%',
+                }}
               />
             </div>
           </div>
 
           <div className="text-muted-foreground text-sm">
             <p>
-              {t('question')} {currentQuestionIndex + 1} {t('of')} {questions.length}
+              {answeredCount}/{questions.length} {t('answered')}
             </p>
             <p className="mt-1">
-              {Math.round(progress)}
+              {questions.length > 0 ? Math.round((answeredCount / questions.length) * 100) : 0}
               {t('complete')}
             </p>
           </div>
         </div>
 
-        {/* Question Navigation Grid */}
+        {/* Question Navigation - Dual-level with context headers and individual questions */}
         <div className="p-6">
           <h3 className="mb-4 text-sm font-semibold">{t('questions')}</h3>
-          <div className="grid grid-cols-5 gap-2">
-            {questions.map((q, index) => {
-              const isAnswered = answers.some((a) => a.questionId === q.question.id && isAnswerValid(a));
-              const isCurrent = index === currentQuestionIndex;
+          <div className="space-y-2">
+            {questionGroups.map((group, groupIdx) => {
+              if (group.type === 'context' && group.contextId) {
+                // Context group: header button + individual question buttons
+                const isContextActive = currentContextId === group.contextId;
+                const allContextQuestionsAnswered = group.questions.every((q) =>
+                  answers.some((a) => a.questionId === q.question.id && isAnswerValid(a))
+                );
 
-              return (
-                <button
-                  key={q.question.id}
-                  onClick={() => setCurrentQuestionIndex(index)}
-                  className={cn(
-                    'flex h-10 items-center justify-center rounded-lg border-2 text-sm font-medium transition-colors',
-                    isCurrent
-                      ? 'border-blue-600 bg-blue-600 text-white'
-                      : isAnswered
-                        ? 'border-green-600 bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300'
-                        : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800'
-                  )}
-                  title={
-                    isAnswered
-                      ? t('questionAnswered', { number: index + 1 })
-                      : `${t('question')} ${index + 1}`
-                  }
-                >
-                  {index + 1}
-                  {isAnswered && !isCurrent && <CheckCircle2 className="ml-1 h-3 w-3" />}
-                </button>
-              );
+                return (
+                  <div key={group.id} className="space-y-1">
+                    {/* Context Header Button - click to view ALL questions together */}
+                    <button
+                      onClick={() => handleContextClick(group.contextId!)}
+                      className={cn(
+                        'w-full rounded-lg border-2 px-4 py-3 text-left transition-colors',
+                        isContextActive
+                          ? 'border-blue-600 bg-blue-50 dark:bg-blue-950'
+                          : 'border-blue-300 bg-blue-50/50 hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-950/30'
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <BookOpen className="h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate font-medium">
+                            {group.context?.title || `Context ${groupIdx + 1}`}
+                          </div>
+                          <div className="text-muted-foreground text-xs">
+                            {group.questions.length} {group.questions.length === 1 ? 'question' : 'questions'}
+                          </div>
+                        </div>
+                        {allContextQuestionsAnswered && (
+                          <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-green-600" />
+                        )}
+                      </div>
+                    </button>
+
+                    {/* Individual Question Buttons - indented under context */}
+                    {group.questions.map((aq, idx) => {
+                      const questionNumber = getQuestionNumber(questionGroups, group.id, idx);
+                      const isQuestionActive = currentQuestionId === aq.question.id;
+                      const isAnswered = answers.some(
+                        (a) => a.questionId === aq.question.id && isAnswerValid(a)
+                      );
+
+                      return (
+                        <button
+                          key={aq.question.id}
+                          onClick={() => handleQuestionClick(aq.question.id)}
+                          className={cn(
+                            'ml-6 w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors',
+                            isQuestionActive
+                              ? 'border-blue-600 bg-blue-50 dark:bg-blue-950'
+                              : 'border-blue-200 hover:bg-blue-50/50 dark:border-blue-800 dark:hover:bg-blue-950/30'
+                          )}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="font-medium text-blue-700 dark:text-blue-300">
+                              Q{questionNumber}
+                            </span>
+                            {isAnswered && <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-green-600" />}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                );
+              } else {
+                // Standalone question (no context)
+                const aq = group.questions[0];
+                const questionNumber = getQuestionNumber(questionGroups, group.id, 0);
+                const isActive = currentQuestionId === aq.question.id;
+                const isAnswered = answers.some((a) => a.questionId === aq.question.id && isAnswerValid(a));
+
+                return (
+                  <button
+                    key={group.id}
+                    onClick={() => handleQuestionClick(aq.question.id)}
+                    className={cn(
+                      'w-full rounded-lg border-2 px-4 py-2 text-left transition-colors',
+                      isActive
+                        ? 'border-blue-600 bg-blue-50 dark:bg-blue-950'
+                        : 'border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800'
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="font-medium">Q{questionNumber}</span>
+                      {isAnswered && <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-green-600" />}
+                    </div>
+                  </button>
+                );
+              }
             })}
           </div>
         </div>
@@ -279,54 +429,92 @@ export const AssignmentDoingPage = () => {
       {/* Main Content Area */}
       <main className="flex flex-1 flex-col overflow-y-auto">
         <div className="flex-1 p-6 md:p-8">
-          {/* Question Content */}
+          {/* Question Content - Render based on navigation state */}
           <div className="mx-auto max-w-4xl">
-            <div className="mb-6 rounded-lg border bg-white p-6 dark:bg-gray-900">
-              <div className="mb-4 flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="mb-2 flex items-center gap-2">
-                    <span className="text-muted-foreground text-sm font-medium">
-                      {t('question')} {currentQuestionIndex + 1}
-                    </span>
-                    <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                      {currentQuestion.points} {t('points')}
-                    </span>
-                  </div>
-                </div>
-              </div>
+            {currentContextId
+              ? // Viewing entire context: show ALL questions in context with reading passage
+                (() => {
+                  const group = questionGroups.find(
+                    (g) => g.type === 'context' && g.contextId === currentContextId
+                  );
+                  if (!group || !group.context) return null;
 
-              <QuestionRenderer
-                question={currentQuestion.question as Question}
-                viewMode={VIEW_MODE.DOING}
-                answer={currentAnswer}
-                points={currentQuestion.points}
-                onAnswerChange={handleAnswerChange}
-                number={currentQuestionIndex + 1}
-              />
-            </div>
+                  const startNumber = getQuestionNumber(questionGroups, group.id, 0);
+
+                  return (
+                    <ContextGroupView
+                      context={group.context}
+                      questions={group.questions}
+                      viewMode={VIEW_MODE.DOING}
+                      startNumber={startNumber}
+                      onAnswerChange={(_questionId, answer) => handleAnswerChange(answer)}
+                      answers={new Map(answers.map((a) => [a.questionId, a]))}
+                    />
+                  );
+                })()
+              : currentQuestionId
+                ? // Viewing single question - show ONLY this question (with context passage if applicable)
+                  (() => {
+                    const result = findQuestionById(questionGroups, currentQuestionId);
+                    if (!result.question) return null;
+
+                    const { group, question: aq, questionNumber } = result;
+                    const answer = answers.find((a) => a.questionId === aq.question.id);
+
+                    return (
+                      <div className="space-y-6">
+                        {/* Show context reading passage if question belongs to a context */}
+                        {group && group.type === 'context' && group.context && (
+                          <div className="rounded-lg border bg-white p-6 dark:bg-gray-900">
+                            <ContextDisplay
+                              context={{
+                                ...group.context,
+                                subject: assignment?.subject || 'General',
+                              }}
+                              defaultCollapsed={false}
+                              showQuestionNumbers={true}
+                              questionNumbers={group.questions.map((_, idx) =>
+                                getQuestionNumber(questionGroups, group.id, idx)
+                              )}
+                            />
+                          </div>
+                        )}
+
+                        {/* Show the individual question */}
+                        <QuestionRenderer
+                          question={aq.question as Question}
+                          viewMode={VIEW_MODE.DOING}
+                          answer={answer}
+                          points={aq.points}
+                          onAnswerChange={handleAnswerChange}
+                          number={questionNumber}
+                        />
+                      </div>
+                    );
+                  })()
+                : null}
 
             {/* Navigation Buttons */}
-            <div className="flex items-center justify-between">
-              <Button variant="outline" onClick={handlePrevious} disabled={currentQuestionIndex === 0}>
+            <div className="mt-8 flex items-center justify-between">
+              <Button variant="outline" onClick={handlePrevious} disabled={!currentQuestionId}>
                 <ChevronLeft className="mr-2 h-4 w-4" />
                 {tActions('previous')}
               </Button>
 
-              {currentQuestionIndex < questions.length - 1 ? (
-                <Button onClick={handleNext}>
+              <div className="flex items-center gap-2">
+                <Button onClick={handleNext} variant="outline">
                   {tActions('next')}
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
-              ) : (
                 <Button onClick={handleSubmitAttempt} className="bg-green-600 hover:bg-green-700">
                   <Send className="mr-2 h-4 w-4" />
                   {tActions('submit')}
                 </Button>
-              )}
+              </div>
             </div>
 
             {/* Warning if not all answered */}
-            {!allQuestionsAnswered && currentQuestionIndex === questions.length - 1 && (
+            {!allQuestionsAnswered && (
               <div className="mt-6 flex items-start gap-2 rounded-lg border-l-4 border-yellow-500 bg-yellow-50 p-4 dark:bg-yellow-950/20">
                 <AlertCircle className="h-5 w-5 flex-shrink-0 text-yellow-600" />
                 <div>

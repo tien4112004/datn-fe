@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import type { MultipleChoiceQuestion, MultipleChoiceAnswer } from '@/features/assignment/types';
-import { MarkdownPreview, AnswerFeedback, QuestionNumber } from '../shared';
+import type { Grade } from '@aiprimary/core';
+import { MarkdownPreview, QuestionTitle, GradeFeedback } from '../shared';
 
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
@@ -9,16 +10,16 @@ interface MultipleChoiceAfterAssessmentProps {
   question: MultipleChoiceQuestion;
   answer?: MultipleChoiceAnswer;
   points?: number; // Points allocated for this question in the assignment
+  grade?: Grade; // Grade for this question
   hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
-  number?: number;
 }
 
 export const MultipleChoiceAfterAssessment = ({
   question,
   answer,
   points = 0,
+  grade,
   hideHeader = false,
-  number,
 }: MultipleChoiceAfterAssessmentProps) => {
   const { t } = useTranslation('questions');
   const selectedOption = answer
@@ -28,22 +29,22 @@ export const MultipleChoiceAfterAssessment = ({
 
   return (
     <div className="space-y-4">
-      {number !== undefined && (
-        <div className="flex items-center gap-3">
-          <QuestionNumber number={number} />
-        </div>
-      )}
       {/* Question Title */}
       <div className="space-y-2">
-        <MarkdownPreview content={question.title} />
+        <QuestionTitle content={question.title} />
         {question.titleImageUrl && (
           <img src={question.titleImageUrl} alt="Question" className="mt-2 max-h-64 rounded-md border" />
         )}
       </div>
 
-      {/* Answer Feedback */}
+      {/* Grade Feedback */}
       {!hideHeader && (
-        <AnswerFeedback isCorrect={isCorrect} score={isCorrect ? points : 0} totalPoints={points} />
+        <GradeFeedback
+          grade={grade}
+          maxPoints={points}
+          autoScore={isCorrect ? points : 0}
+          isAutoCorrect={isCorrect}
+        />
       )}
 
       {/* Options with feedback */}
@@ -56,7 +57,7 @@ export const MultipleChoiceAfterAssessment = ({
             <div
               key={option.id}
               className={cn(
-                'flex items-center gap-3 rounded-md border p-3',
+                'flex items-center gap-3 rounded-md border px-3 py-1.5',
                 isCorrectOption && 'border-green-200 bg-green-50 dark:bg-green-900/20',
                 isSelected && !isCorrectOption && 'border-red-200 bg-red-50 dark:bg-red-900/20'
               )}
@@ -91,13 +92,6 @@ export const MultipleChoiceAfterAssessment = ({
           <h4 className="mb-2 font-semibold">{t('common.explanation')}:</h4>
           <MarkdownPreview content={question.explanation} />
         </div>
-      )}
-
-      {/* Points */}
-      {points > 0 && (
-        <p className="text-muted-foreground text-sm">
-          {t('common.points')}: {isCorrect ? points : 0}/{points}
-        </p>
       )}
     </div>
   );

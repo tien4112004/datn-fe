@@ -1,5 +1,5 @@
 import type { MultipleChoiceQuestion } from '@/types/questionBank';
-import { MarkdownPreview, QuestionNumber } from '../shared';
+import { MarkdownPreview } from '../shared';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Shuffle, CheckCircle2 } from 'lucide-react';
@@ -7,20 +7,12 @@ import { cn } from '@/lib/utils';
 
 interface MultipleChoiceViewingProps {
   question: MultipleChoiceQuestion;
-  points?: number;
-  number?: number;
   compact?: boolean;
 }
 
-export const MultipleChoiceViewing = ({ question, points, number, compact }: MultipleChoiceViewingProps) => {
+export const MultipleChoiceViewing = ({ question, compact }: MultipleChoiceViewingProps) => {
   return (
     <div className={cn(compact ? 'space-y-2' : 'space-y-4')}>
-      {number !== undefined && (
-        <div className={cn('flex items-center', compact ? 'gap-2' : 'gap-3')}>
-          <QuestionNumber number={number} className={compact ? 'h-6 w-6 text-xs' : undefined} />
-        </div>
-      )}
-
       {/* Question Title */}
       <div className="space-y-1">
         <MarkdownPreview content={question.title} />
@@ -94,11 +86,6 @@ export const MultipleChoiceViewing = ({ question, points, number, compact }: Mul
           <Label className={cn('font-medium', compact ? 'text-xs' : 'text-sm')}>Explanation</Label>
           <MarkdownPreview content={question.explanation} />
         </div>
-      )}
-
-      {/* Points */}
-      {points && (
-        <p className={cn('text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>Points: {points}</p>
       )}
     </div>
   );

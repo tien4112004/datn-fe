@@ -1,30 +1,32 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { MultipleChoiceQuestion, MultipleChoiceAnswer } from '@/features/assignment/types';
-import { MarkdownPreview, QuestionNumber } from '../shared';
-
-import { Input } from '@/shared/components/ui/input';
+import { MarkdownPreview, QuestionTitle } from '../shared';
 import { Label } from '@/shared/components/ui/label';
 import { Textarea } from '@/shared/components/ui/textarea';
-import { CheckCircle2, XCircle } from 'lucide-react';
+import { CheckCircle2, XCircle, Trophy } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
 interface MultipleChoiceGradingProps {
   question: MultipleChoiceQuestion;
   answer?: MultipleChoiceAnswer;
   points?: number; // Points allocated for this question in the assignment
-  onGradeChange?: (grade: { points: number; feedback?: string }) => void;
-  number?: number;
+  grade?: { points: number; feedback?: string }; // Current grade data
+  onGradeChange?: (grade: { points: number; feedback?: string }) => void; // Callback when grade changes
 }
 
 export const MultipleChoiceGrading = ({
   question,
   answer,
   points = 0,
+  grade,
   onGradeChange,
-  number,
 }: MultipleChoiceGradingProps) => {
   const { t } = useTranslation('questions');
+  const { t: tGrading } = useTranslation('assignment', { keyPrefix: 'submissions.grading' });
+
+  const [awardedPoints, setAwardedPoints] = useState<number>(grade?.points ?? 0);
+  const [feedback, setFeedback] = useState<string>(grade?.feedback || '');
 
   const selectedOption = answer
     ? question.data.options.find((o) => o.id === answer.selectedOptionId)
@@ -32,32 +34,11 @@ export const MultipleChoiceGrading = ({
   const isCorrect = selectedOption?.isCorrect || false;
   const autoScore = isCorrect ? points : 0;
 
-  const [awardedPoints, setAwardedPoints] = useState<number>(autoScore);
-  const [feedback, setFeedback] = useState<string>('');
-
-  const handlePointsChange = (value: string) => {
-    const numValue = parseFloat(value);
-    if (!isNaN(numValue)) {
-      setAwardedPoints(numValue);
-      onGradeChange?.({ points: numValue, feedback });
-    }
-  };
-
-  const handleFeedbackChange = (value: string) => {
-    setFeedback(value);
-    onGradeChange?.({ points: awardedPoints, feedback: value });
-  };
-
   return (
     <div className="space-y-4">
-      {number !== undefined && (
-        <div className="flex items-center gap-3">
-          <QuestionNumber number={number} />
-        </div>
-      )}
       {/* Question Title */}
       <div className="space-y-2">
-        <MarkdownPreview content={question.title} />
+        <QuestionTitle content={question.title} />
         {question.titleImageUrl && (
           <img src={question.titleImageUrl} alt="Question" className="mt-2 max-h-64 rounded-md border" />
         )}
@@ -74,7 +55,7 @@ export const MultipleChoiceGrading = ({
             <div
               key={option.id}
               className={cn(
-                'flex items-center gap-3 rounded-md border p-3',
+                'flex items-center gap-3 rounded-md border px-3 py-2',
                 isCorrectOption && 'border-green-200 bg-green-50 dark:bg-green-900/20',
                 isSelected && !isCorrectOption && 'border-red-200 bg-red-50 dark:bg-red-900/20',
                 isSelected && isCorrectOption && 'border-green-300 bg-green-50 dark:bg-green-900/30'
@@ -112,7 +93,7 @@ export const MultipleChoiceGrading = ({
       </div>
 
       {/* Auto Score Info */}
-      <div className="bg-muted/50 rounded-md p-3 text-sm">
+      <div className="bg-muted/50 rounded-md px-3 py-2 text-sm">
         <p>
           <span className="font-semibold">{t('multipleChoice.grading.autoCalculatedScore')}</span>
           {isCorrect ? (
@@ -125,42 +106,58 @@ export const MultipleChoiceGrading = ({
         </p>
       </div>
 
-      {/* Grading Interface */}
-      <div className="space-y-3 border-t pt-4">
-        <h4 className="text-sm font-semibold">{t('multipleChoice.grading.grading')}</h4>
+      {/* Grading Section */}
+      <div className="rounded-lg border-2 border-blue-200 bg-blue-50/50 p-6 dark:border-blue-900 dark:bg-blue-950/20">
+        <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-blue-900 dark:text-blue-100">
+          <Trophy className="h-4 w-4" />
+          {tGrading('grading')}
+        </h3>
 
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="points" className="text-sm">
-              {t('multipleChoice.grading.pointsAwarded')}
+        <div className="space-y-4">
+          {/* Points Input */}
+          <div>
+            <Label htmlFor={`points-${question.id}`} className="mb-2 block text-sm font-medium">
+              {tGrading('pointsAwarded')}
             </Label>
-            <Input
-              id="points"
-              type="number"
-              min={0}
-              max={points || 100}
-              step={0.5}
-              value={awardedPoints}
-              onChange={(e) => handlePointsChange(e.target.value)}
-              className="h-9"
-            />
-            <p className="text-muted-foreground text-xs">
-              {t('multipleChoice.grading.maxPoints', { points: points || 0 })}
-            </p>
+            <div className="flex items-center gap-3">
+              <input
+                id={`points-${question.id}`}
+                type="number"
+                min="0"
+                max={points || 100}
+                step="0.5"
+                value={awardedPoints}
+                onChange={(e) => {
+                  const newPoints = parseFloat(e.target.value) || 0;
+                  const clampedPoints = Math.min(Math.max(0, newPoints), points || 100);
+                  setAwardedPoints(clampedPoints);
+                  onGradeChange?.({ points: clampedPoints, feedback });
+                }}
+                className="w-24 rounded-md border border-gray-300 px-3 py-2 text-center text-lg font-semibold focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
+              />
+              <span className="text-muted-foreground text-sm">
+                {tGrading('outOf')} <span className="font-semibold">{points || 0}</span> {tGrading('points')}
+              </span>
+              {awardedPoints === (points || 0) && <CheckCircle2 className="h-5 w-5 text-green-600" />}
+            </div>
           </div>
-        </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="feedback" className="text-sm">
-            {t('multipleChoice.grading.teacherFeedback')}
-          </Label>
-          <Textarea
-            id="feedback"
-            value={feedback}
-            onChange={(e) => handleFeedbackChange(e.target.value)}
-            placeholder={t('multipleChoice.grading.feedbackPlaceholder')}
-            className="min-h-[80px] resize-none"
-          />
+          {/* Feedback Input */}
+          <div>
+            <Label htmlFor={`feedback-${question.id}`} className="mb-2 block text-sm font-medium">
+              {tGrading('feedbackForQuestion')}
+            </Label>
+            <Textarea
+              id={`feedback-${question.id}`}
+              value={feedback}
+              onChange={(e) => {
+                setFeedback(e.target.value);
+                onGradeChange?.({ points: awardedPoints, feedback: e.target.value });
+              }}
+              placeholder={tGrading('questionFeedbackPlaceholder')}
+              className="min-h-[80px]"
+            />
+          </div>
         </div>
       </div>
     </div>

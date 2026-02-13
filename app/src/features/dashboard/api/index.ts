@@ -11,6 +11,21 @@ export const getDashboardApiService = (apiClient: ApiClient = api): DashboardApi
   return new DashboardService(apiClient, getBackendUrl());
 };
 
+// Export all types
 export type { DashboardApiService } from './types';
-export type { DocumentItem, RecentDocumentsRequest } from './types';
+export type {
+  DocumentItem,
+  RecentDocumentsRequest,
+  TeacherSummary,
+  GradingQueueItem,
+  AtRiskStudent,
+  ClassAtRiskStudents,
+  CalendarEvent,
+  CalendarEventType,
+  ClassPerformance,
+  AssignmentSummary,
+  EngagementMetrics,
+  RecentActivity,
+  UserMinimalInfo,
+} from './types';
 export { default as DashboardService } from './service';

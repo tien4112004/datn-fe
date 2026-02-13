@@ -54,14 +54,47 @@
         v-model:value="mainMenuVisible"
       >
         <template #content>
+          <!-- File Operations (top section) -->
+          <PopoverMenuItem
+            v-if="!hideStudentOptions"
+            @click="
+              handleRequestDuplicate();
+              mainMenuVisible = false;
+            "
+          >
+            <div class="tw-flex tw-items-center tw-gap-2">
+              <IconCopy class="tw-w-4 tw-h-4" />
+              <span>{{ $t('header.buttons.duplicate') }}</span>
+            </div>
+          </PopoverMenuItem>
+          <PopoverMenuItem
+            v-if="!hideStudentOptions"
+            @click="
+              setDialogForExport('pptx');
+              mainMenuVisible = false;
+            "
+          >
+            <div class="tw-flex tw-items-center tw-gap-2">
+              <IconDownload class="tw-w-4 tw-h-4" />
+              <span>{{ $t('header.share.export') }}</span>
+            </div>
+          </PopoverMenuItem>
+          <div v-if="!hideStudentOptions" class="menu-divider"></div>
+
+          <!-- Slide Creation -->
           <PopoverMenuItem
             @click="
               slideCreationDialogVisible = true;
               mainMenuVisible = false;
             "
-            >Create New Slide</PopoverMenuItem
           >
-          <div class="menu-divider"></div>
+            <div class="tw-flex tw-items-center tw-gap-2">
+              <IconPlus class="tw-w-4 tw-h-4" />
+              <span>Create New Slide</span>
+            </div>
+          </PopoverMenuItem>
+
+          <!-- Import Operations -->
           <FileInput
             accept="application/vnd.openxmlformats-officedocument.presentationml.presentation"
             @change="
@@ -71,7 +104,12 @@
               }
             "
           >
-            <PopoverMenuItem>{{ $t('header.file.importPptx') }}</PopoverMenuItem>
+            <PopoverMenuItem>
+              <div class="tw-flex tw-items-center tw-gap-2">
+                <IconUpload class="tw-w-4 tw-h-4" />
+                <span>{{ $t('header.file.importPptx') }}</span>
+              </div>
+            </PopoverMenuItem>
           </FileInput>
           <FileInput
             accept=".pptist"
@@ -82,22 +120,39 @@
               }
             "
           >
-            <PopoverMenuItem>{{ $t('header.file.importPptist') }}</PopoverMenuItem>
+            <PopoverMenuItem>
+              <div class="tw-flex tw-items-center tw-gap-2">
+                <IconUpload class="tw-w-4 tw-h-4" />
+                <span>{{ $t('header.file.importPptist') }}</span>
+              </div>
+            </PopoverMenuItem>
           </FileInput>
+
+          <div class="menu-divider"></div>
+
+          <!-- Tools -->
           <PopoverMenuItem
             @click="
               openMarkupPanel();
               mainMenuVisible = false;
             "
-            >{{ $t('header.tools.slideTypeAnnotation') }}</PopoverMenuItem
           >
+            <div class="tw-flex tw-items-center tw-gap-2">
+              <IconEdit2 class="tw-w-4 tw-h-4" />
+              <span>{{ $t('header.tools.slideTypeAnnotation') }}</span>
+            </div>
+          </PopoverMenuItem>
           <PopoverMenuItem
             @click="
               mainMenuVisible = false;
               hotkeyDrawerVisible = true;
             "
-            >{{ $t('header.tools.quickActions') }}</PopoverMenuItem
           >
+            <div class="tw-flex tw-items-center tw-gap-2">
+              <IconKeyboard class="tw-w-4 tw-h-4" />
+              <span>{{ $t('header.tools.quickActions') }}</span>
+            </div>
+          </PopoverMenuItem>
         </template>
         <div class="menu-item">
           <IconHamburgerButton class="icon" />
@@ -130,24 +185,6 @@
       >
         <IconComments class="icon" />
         <span class="tw-hidden sm:tw-inline">{{ $t('header.buttons.comments') }}</span>
-      </Button>
-      <Button
-        v-if="!hideStudentOptions"
-        class="menu-item"
-        v-tooltip="$t('header.file.duplicatePresentation')"
-        @click="handleRequestDuplicate"
-      >
-        <IconCopy class="icon" />
-        <span class="tw-hidden sm:tw-inline">{{ $t('header.buttons.duplicate') }}</span>
-      </Button>
-      <Button
-        v-if="!hideStudentOptions"
-        class="menu-item"
-        v-tooltip="$t('header.file.exportFile')"
-        @click="setDialogForExport('pptx')"
-      >
-        <IconDownload class="icon" />
-        <span class="tw-hidden sm:tw-inline">{{ $t('header.share.export') }}</span>
       </Button>
       <div class="menu-item" id="language-switcher">
         <LanguageSwitcher />
@@ -206,6 +243,11 @@ import {
   X as IconClose,
   MessageSquare as IconComments,
   Copy as IconCopy,
+  Download as IconDownload,
+  Plus as IconPlus,
+  Upload as IconUpload,
+  PencilLine as IconEdit2,
+  Keyboard as IconKeyboard,
 } from 'lucide-vue-next';
 import message from '@/utils/message';
 import PermissionBadge from '@/components/PermissionBadge.vue';

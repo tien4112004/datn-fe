@@ -38,7 +38,7 @@ export const AvatarUploader = () => {
       </CardHeader>
       <CardContent className="flex flex-col items-center space-y-6 p-6">
         <UserAvatar
-          src={userProfile?.avatarUrl}
+          src={userProfile?.avatarUrl ?? undefined}
           name={`${userProfile?.firstName ?? ''} ${userProfile?.lastName ?? ''}`.trim()}
           size="xl"
           className="h-40 w-40 border-4 border-gray-200 shadow-sm"

@@ -1177,8 +1177,13 @@ export default {
       },
       noResources: 'Không có tài nguyên',
       noSearchResults: 'Không tìm thấy tài nguyên',
+      tryDifferentSearch: 'Thử tìm kiếm bằng từ khóa khác',
       selected: '{{count}} đã chọn',
+      selectedResources: 'Tài Nguyên Đã Chọn',
       clearSelection: 'Xóa',
+      viewOnly: 'Chỉ xem',
+      viewAndComment: 'Xem & Bình luận',
+      setAllPermissions: 'Đặt quyền cho tất cả:',
       confirm: 'Xác nhận',
     },
     list: {

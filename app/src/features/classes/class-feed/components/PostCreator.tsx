@@ -2,6 +2,7 @@ import { ResourceSelectorDialog } from '@/features/projects/components/resource-
 import type { LinkedResource } from '@/features/projects/types/resource';
 import RichTextEditor from '@/shared/components/rte/RichTextEditor';
 import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
+import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Switch } from '@/shared/components/ui/switch';
@@ -45,7 +46,7 @@ import { cn } from '@/shared/lib/utils';
 import { AssignmentListCommand } from './AssignmentListCommand';
 import { format } from 'date-fns/format';
 import type { Assignment } from '@/features/assignment';
-import { Calendar } from 'antd';
+import { Calendar } from '@/components/ui/calendar';
 
 interface PostCreatorProps {
   classId: string;
@@ -101,13 +102,13 @@ export const PostCreator = ({
   const form = useForm<{ content: string }>({
     resolver: zodResolver(postEditorSchema),
     defaultValues: { content: '' },
-    mode: 'onChange',
+    mode: 'onSubmit',
   });
 
   const {
     handleSubmit: handleFormSubmit,
     setValue,
-    formState: { errors, isValid },
+    formState: { errors },
   } = form;
 
   // Keep editor content in sync with the form
@@ -115,7 +116,7 @@ export const PostCreator = ({
     if (!editor) return;
     try {
       const md = await editor.blocksToMarkdownLossy(editor.document);
-      setValue('content', md, { shouldValidate: true, shouldDirty: true });
+      setValue('content', md, { shouldValidate: false, shouldDirty: true });
       setAttachmentErrors([]);
     } catch (err) {
       console.error('Failed to convert blocks to markdown:', err);
@@ -229,7 +230,7 @@ export const PostCreator = ({
     e.target.value = '';
   };
 
-  const canSubmit = isValid && !createPost.isPending && !isUploading;
+  const canSubmit = !createPost.isPending && !isUploading;
   const buttonText =
     initialType === PostType.Exercise
       ? t('feed.creator.actions.createHomework')
@@ -328,6 +329,7 @@ export const PostCreator = ({
                         selected={dueDate}
                         onSelect={setDueDate}
                         disabled={(date: Date) => date < new Date()}
+                        locale={getLocaleDateFns()}
                       />
                     </PopoverContent>
                   </Popover>
@@ -574,17 +576,27 @@ export const PostCreator = ({
                   type="button"
                   variant="outline"
                   onClick={() => setResourceSelectorOpen(true)}
-                  className="w-full justify-start"
+                  className={cn(
+                    'w-full justify-start gap-2',
+                    linkedResources.length > 0 && 'border-primary/50'
+                  )}
                 >
-                  <Link2 className="mr-2 h-4 w-4" />
-                  {linkedResources.length > 0
-                    ? t('feed.creator.resourcesSelected', { count: linkedResources.length })
-                    : t('feed.creator.selectResources')}
+                  <Link2 className="h-4 w-4" />
+                  <span className="flex-1 text-left">
+                    {linkedResources.length > 0
+                      ? t('feed.creator.resourcesSelected', { count: linkedResources.length })
+                      : t('feed.creator.selectResources')}
+                  </span>
+                  {linkedResources.length > 0 && (
+                    <Badge variant="secondary" className="ml-auto">
+                      {linkedResources.length}
+                    </Badge>
+                  )}
                 </Button>
 
                 {/* Selected resources chips */}
                 {linkedResources.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-2">
+                  <div className="mt-3 flex flex-wrap gap-2">
                     {linkedResources.map((resource) => {
                       const Icon =
                         resource.type === 'mindmap'
@@ -594,27 +606,30 @@ export const PostCreator = ({
                             : ClipboardList;
                       const PermissionIcon = resource.permissionLevel === 'comment' ? MessageSquare : Eye;
                       return (
-                        <div
+                        <Badge
                           key={`${resource.type}:${resource.id}`}
-                          className="bg-secondary flex items-center gap-1.5 rounded-full px-3 py-1 text-sm"
+                          variant="secondary"
+                          className="group flex items-center gap-2 py-1.5 pl-2.5 pr-2"
                         >
-                          <Icon className="h-3.5 w-3.5" />
-                          <span className="max-w-[120px] truncate">{resource.title}</span>
-                          <span className="text-muted-foreground flex items-center gap-0.5 text-xs">
-                            <PermissionIcon className="h-3 w-3" />
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setLinkedResources((prev) =>
-                                prev.filter((r) => !(r.type === resource.type && r.id === resource.id))
-                              )
-                            }
-                            className="hover:text-destructive ml-1"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </div>
+                          <Icon className="h-4 w-4 flex-shrink-0" />
+                          <span className="max-w-[120px] truncate font-medium">{resource.title}</span>
+                          <div className="flex items-center gap-1.5 border-l border-current border-opacity-20 pl-1.5">
+                            <PermissionIcon className="h-3.5 w-3.5 flex-shrink-0 opacity-60" />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="hover:bg-destructive/10 hover:text-destructive -mr-0.5 h-5 w-5 opacity-60 hover:opacity-100"
+                              onClick={() =>
+                                setLinkedResources((prev) =>
+                                  prev.filter((r) => !(r.type === resource.type && r.id === resource.id))
+                                )
+                              }
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </Badge>
                       );
                     })}
                   </div>

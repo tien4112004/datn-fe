@@ -1151,8 +1151,13 @@ export default {
       },
       noResources: 'No resources available',
       noSearchResults: 'No resources found',
+      tryDifferentSearch: 'Try a different search term',
       selected: '{{count}} selected',
+      selectedResources: 'Selected Resources',
       clearSelection: 'Clear',
+      viewOnly: 'View only',
+      viewAndComment: 'View & Comment',
+      setAllPermissions: 'Set all permissions:',
       confirm: 'Confirm',
     },
     list: {

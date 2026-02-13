@@ -9,7 +9,7 @@
         :class="{ active: currentLayout === layout.value }"
         @click="$emit('layout-select', layout.value)"
         :disabled="isTransforming"
-        :title="getLayoutTooltip(layout.value)"
+        :title="getLayoutTooltipText(layout.value)"
       >
         <component :is="layout.icon" class="layout-btn-icon" />
         {{ layout.label }}
@@ -40,13 +40,18 @@ interface Emits {
   (e: 'layout-select', layoutType: string): void;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   isTransforming: false,
-  getLayoutTooltip: () => (layoutType: string) =>
-    t('panels.aiModification.layout.changeTooltip', { layoutType }),
 });
 
 defineEmits<Emits>();
+
+const getLayoutTooltipText = (layoutType: string) => {
+  if (props.getLayoutTooltip) {
+    return props.getLayoutTooltip(layoutType);
+  }
+  return t('panels.aiModification.layout.changeTooltip', { layoutType });
+};
 </script>
 
 <style lang="scss" scoped>

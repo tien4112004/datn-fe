@@ -1,5 +1,5 @@
 <template>
-  <template v-if="slides.length">
+  <template>
     <Screen v-if="screening" :isPresentingInitial="presenter" />
     <Editor v-else-if="_isPC" />
     <Mobile v-else />

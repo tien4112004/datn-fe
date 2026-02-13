@@ -16,6 +16,8 @@ import { useTranslation } from 'react-i18next';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
+import { getAllGrades, getAllSubjects } from '@aiprimary/core';
 
 type OutlineWorkspaceProps = {
   onDownload?: () => Promise<void>;
@@ -30,6 +32,14 @@ const OutlineWorkspace = memo(({ onDownload, totalSlide }: OutlineWorkspaceProps
   const swap = useOutlineStore((state) => state.swap);
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace.outline' });
   const [isDownloading, setIsDownloading] = useState(false);
+  const { watch } = usePresentationForm();
+  const grade = watch('grade');
+  const subject = watch('subject');
+  const grades = getAllGrades();
+  const subjects = getAllSubjects();
+
+  const gradeName = grade ? grades.find((g) => g.code === grade)?.name : null;
+  const subjectName = subject ? subjects.find((s) => s.code === subject)?.name : null;
 
   const handleDeleteContent = useCallback(
     (id: string) => {
@@ -83,6 +93,26 @@ const OutlineWorkspace = memo(({ onDownload, totalSlide }: OutlineWorkspaceProps
 
   return (
     <Card className="w-3xl flex flex-col gap-6 rounded-xl p-8">
+      {/* Grade and Subject Info */}
+      {(gradeName || subjectName) && (
+        <div className="flex gap-4 border-b pb-4">
+          {gradeName && (
+            <div className="flex flex-col gap-1">
+              <span className="text-muted-foreground text-sm">{t('grade', { defaultValue: 'Grade' })}</span>
+              <span className="font-medium">{gradeName}</span>
+            </div>
+          )}
+          {subjectName && (
+            <div className="flex flex-col gap-1">
+              <span className="text-muted-foreground text-sm">
+                {t('subject', { defaultValue: 'Subject' })}
+              </span>
+              <span className="font-medium">{subjectName}</span>
+            </div>
+          )}
+        </div>
+      )}
+
       {contentIds.length > 0 && (
         <DndContext sensors={sensors} onDragEnd={handleOutlineCardDragEnd}>
           <SortableContext

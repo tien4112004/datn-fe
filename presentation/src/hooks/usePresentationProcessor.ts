@@ -213,9 +213,23 @@ export function usePresentationProcessor(
       } finally {
         dispatchGeneratingEvent(false);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error processing AI result:', error);
-      dispatchMessage('error', 'Failed to process presentation');
+
+      // Check if it's a 404 error (AI result not found)
+      const is404 =
+        error?.response?.status === 404 || error?.response?.data?.errorCodeName === 'AI_RESULT_NOT_FOUND';
+
+      if (is404) {
+        // 404 is not an error - it means empty presentation (no AI result yet)
+        console.info('[usePresentationProcessor] No AI result found - treating as empty presentation');
+        // Don't dispatch error message for 404
+        // Slides remain empty, EmptyCanvas will show
+      } else {
+        // For 500 errors and other failures, dispatch error event
+        dispatchMessage('error', 'Failed to process presentation');
+        dispatchProcessingError(error);
+      }
     } finally {
       isProcessing.value = false;
     }
@@ -514,5 +528,17 @@ export function usePresentationProcessor(
     );
   }
 
-  return { isProcessing };
+  function dispatchProcessingError(error: any) {
+    window.dispatchEvent(
+      new CustomEvent('app.presentation.processingError', {
+        detail: {
+          error: error?.message || 'Unknown error',
+          statusCode: error?.response?.status,
+          canRetry: error?.response?.status >= 500 || error?.response?.status === undefined,
+        },
+      })
+    );
+  }
+
+  return { isProcessing, processFullAiResult: processFullAiResult as any };
 }

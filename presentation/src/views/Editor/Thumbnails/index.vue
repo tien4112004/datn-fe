@@ -37,75 +37,79 @@
       </ButtonGroup>
     </div>
 
-    <Draggable
-      class="thumbnail-list"
-      ref="thumbnailsRef"
-      :modelValue="slides"
-      :animation="200"
-      :scroll="true"
-      :scrollSensitivity="50"
-      :disabled="!!editingSectionId || mode === 'view'"
-      @end="handleDragEnd"
-      itemKey="id"
-    >
-      <template #item="{ element, index }">
-        <div class="thumbnail-container">
-          <div
-            class="section-title"
-            :data-section-id="element?.sectionTag?.id || ''"
-            v-if="element.sectionTag || (hasSection && index === 0)"
-            v-contextmenu="contextmenusSection"
-          >
-            <input
-              :id="`section-title-input-${element?.sectionTag?.id || 'default'}`"
-              type="text"
-              :value="element?.sectionTag?.title || ''"
-              :placeholder="$t('thumbnails.sections.enterSectionName')"
-              @blur="($event) => saveSection($event)"
-              @keydown.enter.stop="($event) => saveSection($event)"
-              v-if="
-                editingSectionId === element?.sectionTag?.id ||
-                (index === 0 && editingSectionId === 'default')
-              "
-            />
-            <span class="text" v-else>
-              <div class="text-content">
-                {{
-                  element?.sectionTag
-                    ? element?.sectionTag?.title || $t('thumbnails.sections.untitledSection')
-                    : $t('thumbnails.sections.defaultSection')
-                }}
+    <template v-if="slides.length > 0">
+      <Draggable
+        class="thumbnail-list"
+        ref="thumbnailsRef"
+        :modelValue="slides"
+        :animation="200"
+        :scroll="true"
+        :scrollSensitivity="50"
+        :disabled="!!editingSectionId || mode === 'view'"
+        @end="handleDragEnd"
+        itemKey="id"
+      >
+        <template #item="{ element, index }">
+          <div class="thumbnail-container">
+            <div
+              class="section-title"
+              :data-section-id="element?.sectionTag?.id || ''"
+              v-if="element.sectionTag || (hasSection && index === 0)"
+              v-contextmenu="contextmenusSection"
+            >
+              <input
+                :id="`section-title-input-${element?.sectionTag?.id || 'default'}`"
+                type="text"
+                :value="element?.sectionTag?.title || ''"
+                :placeholder="$t('thumbnails.sections.enterSectionName')"
+                @blur="($event) => saveSection($event)"
+                @keydown.enter.stop="($event) => saveSection($event)"
+                v-if="
+                  editingSectionId === element?.sectionTag?.id ||
+                  (index === 0 && editingSectionId === 'default')
+                "
+              />
+              <span class="text" v-else>
+                <div class="text-content">
+                  {{
+                    element?.sectionTag
+                      ? element?.sectionTag?.title || $t('thumbnails.sections.untitledSection')
+                      : $t('thumbnails.sections.defaultSection')
+                  }}
+                </div>
+              </span>
+            </div>
+            <div
+              class="thumbnail-item center"
+              :class="{ active: slideIndex === index, selected: selectedSlidesIndex.includes(index) }"
+              @mousedown="($event) => handleClickSlideThumbnail($event, index)"
+              @dblclick="enterScreening()"
+              v-contextmenu="contextmenusThumbnailItem"
+            >
+              <div class="label" :class="{ 'offset-left': index >= 99 }">
+                {{ fillDigit(index + 1, 2) }}
               </div>
-            </span>
-          </div>
-          <div
-            class="thumbnail-item center"
-            :class="{ active: slideIndex === index, selected: selectedSlidesIndex.includes(index) }"
-            @mousedown="($event) => handleClickSlideThumbnail($event, index)"
-            @dblclick="enterScreening()"
-            v-contextmenu="contextmenusThumbnailItem"
-          >
-            <div class="label" :class="{ 'offset-left': index >= 99 }">
-              {{ fillDigit(index + 1, 2) }}
-            </div>
-            <ThumbnailSlide
-              class="thumbnail"
-              :slide="element"
-              :size="120"
-              :visible="index < slidesLoadLimit"
-            />
+              <ThumbnailSlide
+                class="thumbnail"
+                :slide="element"
+                :size="120"
+                :visible="index < slidesLoadLimit"
+              />
 
-            <div class="note-flag" v-if="element.notes && element.notes.length" @click="openNotesPanel()">
-              {{ element.notes.length }}
+              <div class="note-flag" v-if="element.notes && element.notes.length" @click="openNotesPanel()">
+                {{ element.notes.length }}
+              </div>
             </div>
           </div>
-        </div>
-      </template>
-    </Draggable>
+        </template>
+      </Draggable>
 
-    <div class="page-number">
-      {{ $t('thumbnails.slides.slide') }} {{ slideIndex + 1 }}/{{ slides.length }}
-    </div>
+      <div class="page-number">
+        {{ $t('thumbnails.slides.slide') }} {{ slideIndex + 1 }}/{{ slides.length }}
+      </div>
+    </template>
+
+    <EmptyThumbnails v-else />
   </Card>
 </template>
 
@@ -132,6 +136,7 @@ import Card from '@/components/Card.vue';
 import { useI18n } from 'vue-i18n';
 import ButtonGroup from '@/components/ButtonGroup.vue';
 import Button from '@/components/Button.vue';
+import EmptyThumbnails from '@/components/EmptyThumbnails.vue';
 const { t } = useI18n();
 const mainStore = useMainStore();
 const slidesStore = useSlidesStore();

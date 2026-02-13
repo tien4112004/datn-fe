@@ -1,12 +1,21 @@
+import { storeToRefs } from 'pinia';
 import { useScreenStore, useSlidesStore } from '@/store';
 import { enterFullscreen, exitFullscreen, isFullscreen } from '@/utils/fullscreen';
+import message from '@/utils/message';
+import { useI18n } from 'vue-i18n';
 
 export default () => {
   const screenStore = useScreenStore();
   const slidesStore = useSlidesStore();
+  const { slides } = storeToRefs(slidesStore);
+  const { t } = useI18n();
 
   // Enter presentation mode (start from current slide)
   const enterScreening = () => {
+    if (slides.value.length === 0) {
+      message.warning(t('emptyState.cannotPresent'));
+      return;
+    }
     document.dispatchEvent(new CustomEvent('enableFullscreen', {}));
     enterFullscreen();
     screenStore.setScreening(true);
@@ -14,6 +23,10 @@ export default () => {
   };
 
   const enterPresenterMode = () => {
+    if (slides.value.length === 0) {
+      message.warning(t('emptyState.cannotPresent'));
+      return;
+    }
     document.dispatchEvent(new CustomEvent('enableFullscreen', {}));
     enterFullscreen();
     screenStore.setScreening(true);
@@ -22,9 +35,15 @@ export default () => {
 
   // Enter presentation mode (start from first slide)
   const enterScreeningFromStart = () => {
+    if (slides.value.length === 0) {
+      message.warning(t('emptyState.cannotPresent'));
+      return;
+    }
     document.dispatchEvent(new CustomEvent('enableFullscreen', {}));
     slidesStore.updateSlideIndex(0);
-    enterScreening();
+    enterFullscreen();
+    screenStore.setScreening(true);
+    screenStore.setPresenter(false);
   };
 
   // Open presentation in a new window/tab

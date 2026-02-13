@@ -124,10 +124,15 @@ export default () => {
     addSlidesFromData([slide]);
   };
 
-  // Delete current page, if all pages will be deleted, execute reset slides operation
+  // Delete current page, if all pages will be deleted, set empty array
   const deleteSlide = (targetSlidesId = selectedSlidesId.value) => {
-    if (slides.value.length === targetSlidesId.length) resetSlides();
-    else slidesStore.deleteSlide(targetSlidesId);
+    if (slides.value.length === targetSlidesId.length) {
+      slidesStore.setSlides([]);
+      slidesStore.updateSlideIndex(0);
+      mainStore.setActiveElementIdList([]);
+    } else {
+      slidesStore.deleteSlide(targetSlidesId);
+    }
 
     mainStore.updateSelectedSlidesIndex([]);
 

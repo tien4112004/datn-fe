@@ -1,8 +1,7 @@
 import tinycolor from 'tinycolor2';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
-import type { Slide } from '@/types/slides';
-import type { PresetTheme } from '@/configs/theme';
+import type { Slide, SlideTheme } from '@/types/slides';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
 import { getLineElementLength } from '@/utils/element';
 
@@ -16,6 +15,99 @@ export default () => {
   const { slides, theme } = storeToRefs(slidesStore);
 
   const { addHistorySnapshot } = useHistorySnapshot();
+
+  // Helper function to determine font styling based on textType
+  const getFontStyleForTextType = (
+    textType: string | undefined,
+    themeObj: SlideTheme
+  ): { color: string; fontName: string } => {
+    if (textType === 'title') {
+      return {
+        color: themeObj.titleFontColor,
+        fontName: themeObj.titleFontName,
+      };
+    } else if (textType === 'itemTitle' || textType === 'itemNumber' || textType === 'partNumber') {
+      return {
+        color: themeObj.labelFontColor || themeObj.fontColor,
+        fontName: themeObj.labelFontName || themeObj.fontName,
+      };
+    } else {
+      return {
+        color: themeObj.fontColor,
+        fontName: themeObj.fontName,
+      };
+    }
+  };
+
+  // Check if card theming is enabled and available
+  const isCardThemeEnabled = (themeObj: SlideTheme): boolean => {
+    return !!(themeObj.card && themeObj.card.enabled);
+  };
+
+  // Calculate card fill color based on fill mode
+  const getCardFillColor = (cardConfig: NonNullable<SlideTheme['card']>): string => {
+    const { fill, backgroundColor } = cardConfig;
+
+    if (fill === 'none') {
+      return 'rgba(0, 0, 0, 0)';
+    } else if (fill === 'semi') {
+      return tinycolor(backgroundColor).setAlpha(0.5).toRgbString();
+    } else {
+      // 'full'
+      return backgroundColor;
+    }
+  };
+
+  // Check if a text element is positioned on top of a card shape
+  const isTextOverCard = (textEl: any, cardEl: any): boolean => {
+    // Check if text element's center is within card's bounds
+    const textCenterX = textEl.left + textEl.width / 2;
+    const textCenterY = textEl.top + textEl.height / 2;
+
+    const cardLeft = cardEl.left;
+    const cardRight = cardEl.left + cardEl.width;
+    const cardTop = cardEl.top;
+    const cardBottom = cardEl.top + cardEl.height;
+
+    return (
+      textCenterX >= cardLeft &&
+      textCenterX <= cardRight &&
+      textCenterY >= cardTop &&
+      textCenterY <= cardBottom
+    );
+  };
+
+  // Apply card theme properties to a shape element
+  const applyCardTheme = (el: any, themeObj: SlideTheme): void => {
+    const cardConfig = themeObj.card!;
+
+    // Apply fill based on card fill mode
+    el.fill = getCardFillColor(cardConfig);
+
+    // Apply outline (border)
+    if (!el.outline) el.outline = { width: 0, style: 'solid', color: '' };
+    el.outline.color = themeObj.outline.color;
+    el.outline.width = cardConfig.borderWidth;
+    el.outline.borderRadius = `${cardConfig.borderRadius}`;
+
+    // Apply shadow
+    el.shadow = { ...cardConfig.shadow };
+
+    // Remove gradient (cards use solid fills)
+    if (el.gradient) delete el.gradient;
+
+    // Apply text color if card has its own text
+    if (el.text) {
+      el.text.defaultColor = cardConfig.textColor;
+      // Keep font name from theme
+      const fontStyle = getFontStyleForTextType(el.text.type, themeObj);
+      el.text.defaultFontName = fontStyle.fontName;
+
+      if (el.text.content) {
+        el.text.content = el.text.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '');
+      }
+    }
+  };
 
   // Get the main theme styles within the specified slide and sort them by their proportion
   const getSlidesThemeStyles = (slide: Slide | Slide[]) => {
@@ -294,8 +386,8 @@ export default () => {
   };
 
   // Set slide theme
-  const setSlideTheme = (slide: Slide, theme: PresetTheme) => {
-    const colorMap = createSlideThemeColorMap(slide, theme.colors);
+  const setSlideTheme = (slide: Slide, theme: SlideTheme) => {
+    const colorMap = createSlideThemeColorMap(slide, theme.themeColors);
 
     const getColor = (color: string) => {
       const alpha = tinycolor(color).getAlpha();
@@ -304,18 +396,43 @@ export default () => {
     };
 
     if (!slide.background || slide.background.type !== 'image') {
-      slide.background = {
-        type: 'solid',
-        color: theme.background,
-      };
+      if (typeof theme.backgroundColor === 'string') {
+        slide.background = {
+          type: 'solid',
+          color: theme.backgroundColor,
+        };
+      } else {
+        slide.background = {
+          type: 'gradient',
+          gradient: theme.backgroundColor,
+        };
+      }
     }
+
+    // PASS 1: Collect card shapes and apply card theme
+    const cardShapes: any[] = [];
     for (const el of slide.elements) {
+      if (el.type === 'shape' && el.shapeType === 'card' && isCardThemeEnabled(theme)) {
+        cardShapes.push(el);
+        applyCardTheme(el, theme);
+      }
+    }
+
+    // PASS 2: Process all elements
+    for (const el of slide.elements) {
+      // Skip cards (already processed in pass 1)
+      if (el.type === 'shape' && el.shapeType === 'card' && isCardThemeEnabled(theme)) {
+        continue;
+      }
+
       if (el.type === 'shape') {
         if (el.fill) el.fill = getColor(el.fill);
         if (el.gradient) delete el.gradient;
         if (el.text) {
-          el.text.defaultColor = theme.fontColor;
-          el.text.defaultFontName = theme.fontname;
+          // Apply font styling based on shape text type (note: uses 'type', not 'textType')
+          const fontStyle = getFontStyleForTextType(el.text.type, theme);
+          el.text.defaultColor = fontStyle.color;
+          el.text.defaultFontName = fontStyle.fontName;
           if (el.text.content) {
             el.text.content = el.text.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '');
           }
@@ -323,13 +440,20 @@ export default () => {
       }
       if (el.type === 'text') {
         if (el.fill) el.fill = getColor(el.fill);
-        el.defaultColor = theme.fontColor;
-        el.defaultFontName = theme.fontname;
 
-        // Handle label text types
-        if (el.textType === 'itemTitle' || el.textType === 'itemNumber' || el.textType === 'partNumber') {
-          el.defaultColor = theme.fontColor;
-          el.defaultFontName = theme.fontname;
+        // Check if text is over any card
+        const isOverCard = cardShapes.some((card) => isTextOverCard(el, card));
+
+        if (isOverCard && theme.card) {
+          // Text over card uses card.textColor
+          el.defaultColor = theme.card.textColor;
+          const fontStyle = getFontStyleForTextType(el.textType, theme);
+          el.defaultFontName = fontStyle.fontName;
+        } else {
+          // Regular text uses theme font styling
+          const fontStyle = getFontStyleForTextType(el.textType, theme);
+          el.defaultColor = fontStyle.color;
+          el.defaultFontName = fontStyle.fontName;
         }
 
         if (el.content) {
@@ -345,13 +469,13 @@ export default () => {
           for (const cell of rowCells) {
             if (cell.style) {
               cell.style.color = theme.fontColor;
-              cell.style.fontname = theme.fontname;
+              cell.style.fontname = theme.fontName;
             }
           }
         }
       }
       if (el.type === 'chart') {
-        el.themeColors = [...theme.colors];
+        el.themeColors = [...theme.themeColors];
         el.textColor = theme.fontColor;
       }
       if (el.type === 'line') el.color = getColor(el.color);
@@ -359,23 +483,15 @@ export default () => {
       if (el.type === 'latex') el.color = theme.fontColor;
 
       if ('outline' in el && el.outline) {
-        el.outline.color = theme.borderColor;
+        el.outline.color = theme.outline.color;
       }
     }
   };
 
   // Apply preset theme
-  const applyPresetTheme = (theme: PresetTheme, resetSlides = false) => {
+  const applyPresetTheme = (theme: SlideTheme, resetSlides = false) => {
     slidesStore.setTheme({
-      backgroundColor: theme.background,
-      themeColors: theme.colors,
-      fontColor: theme.fontColor,
-      outline: {
-        width: 2,
-        style: 'solid',
-        color: theme.borderColor,
-      },
-      fontName: theme.fontname,
+      ...theme,
     });
 
     if (resetSlides) {
@@ -412,18 +528,46 @@ export default () => {
         };
       }
 
+      // PASS 1: Collect card shapes and apply card theme
+      const cardShapes: any[] = [];
       for (const el of slide.elements) {
+        if (el.type === 'shape' && el.shapeType === 'card' && isCardThemeEnabled(theme.value)) {
+          cardShapes.push(el as any);
+          applyCardTheme(el as any, theme.value);
+        }
+      }
+
+      // PASS 2: Process all elements
+      for (const el of slide.elements) {
+        // Apply global outline/shadow if requested (but not for cards)
         if (applyAll) {
-          if ('outline' in el && el.outline) el.outline = outline;
-          if ('shadow' in el && el.shadow) el.shadow = shadow;
+          if (
+            'outline' in el &&
+            el.outline &&
+            (el.type !== 'shape' || (el.type === 'shape' && (el as any).shapeType !== 'card'))
+          )
+            el.outline = outline;
+          if (
+            'shadow' in el &&
+            el.shadow &&
+            (el.type !== 'shape' || (el.type === 'shape' && (el as any).shapeType !== 'card'))
+          )
+            el.shadow = shadow;
+        }
+
+        // Skip cards (already processed in pass 1)
+        if (el.type === 'shape' && el.shapeType === 'card' && isCardThemeEnabled(theme.value)) {
+          continue;
         }
 
         if (el.type === 'shape') {
           const alpha = tinycolor(el.fill).getAlpha();
           if (alpha > 0) el.fill = themeColors[0];
           if (el.text) {
-            el.text.defaultColor = fontColor;
-            el.text.defaultFontName = fontName;
+            // Apply font styling based on shape text type
+            const fontStyle = getFontStyleForTextType(el.text.type, theme.value);
+            el.text.defaultColor = fontStyle.color;
+            el.text.defaultFontName = fontStyle.fontName;
             if (el.text.content) {
               el.text.content = el.text.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '');
             }
@@ -435,18 +579,20 @@ export default () => {
             const alpha = tinycolor(el.fill).getAlpha();
             if (alpha > 0) el.fill = themeColors[0];
           }
-          if (el.textType !== 'title') {
-            el.defaultColor = fontColor;
-            el.defaultFontName = fontName;
-          } else {
-            el.defaultColor = titleFontColor;
-            el.defaultFontName = titleFontName;
-          }
 
-          // Handle label text types
-          if (el.textType === 'itemTitle' || el.textType === 'itemNumber' || el.textType === 'partNumber') {
-            el.defaultColor = labelFontColor || fontColor;
-            el.defaultFontName = labelFontName || fontName;
+          // Check if text is over any card
+          const isOverCard = cardShapes.some((card) => isTextOverCard(el, card));
+
+          if (isOverCard && theme.value.card) {
+            // Text over card uses card.textColor
+            el.defaultColor = theme.value.card.textColor;
+            const fontStyle = getFontStyleForTextType(el.textType, theme.value);
+            el.defaultFontName = fontStyle.fontName;
+          } else {
+            // Regular text uses theme font styling
+            const fontStyle = getFontStyleForTextType(el.textType, theme.value);
+            el.defaultColor = fontStyle.color;
+            el.defaultFontName = fontStyle.fontName;
           }
 
           if (el.content) {

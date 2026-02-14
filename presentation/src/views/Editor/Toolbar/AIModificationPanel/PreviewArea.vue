@@ -3,18 +3,20 @@
     <!-- Loading State -->
     <div v-if="isLoading" class="preview-state loading">
       <div class="spinner"></div>
-      <p class="state-message">Processing...</p>
+      <p class="state-message">{{ t('panels.aiModification.states.processing') }}</p>
     </div>
 
     <!-- Error State -->
     <div v-else-if="error" class="preview-state error">
       <p class="state-message error-message">{{ error }}</p>
-      <Button variant="outline" size="small" @click="$emit('retry')"> Retry </Button>
+      <Button variant="outline" size="small" @click="$emit('retry')">
+        {{ t('panels.aiModification.errors.retry') }}
+      </Button>
     </div>
 
     <!-- Preview Content -->
     <div v-else-if="previewData" class="preview-content">
-      <div class="preview-label">Preview:</div>
+      <div class="preview-label">{{ t('panels.aiModification.preview.label') }}</div>
       <div class="preview-data">
         {{ previewData }}
       </div>
@@ -22,14 +24,16 @@
 
     <!-- Empty State -->
     <div v-else class="preview-state empty">
-      <p class="state-message">Select an action to get started</p>
+      <p class="state-message">{{ t('panels.aiModification.states.selectAction') }}</p>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits } from 'vue';
+import { useI18n } from 'vue-i18n';
 import Button from '@/components/Button.vue';
+
+const { t } = useI18n();
 
 interface Props {
   isLoading?: boolean;

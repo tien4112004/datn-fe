@@ -169,6 +169,16 @@ export type TextType =
   | 'pageNumber';
 
 /**
+ * Combined text metadata (for text elements created from combined containers)
+ */
+export interface CombinedTextMetadata {
+  isCombined: boolean;
+  label?: string;
+  columnIndex: number;
+  totalColumns: number;
+}
+
+/**
  * Text element
  *
  * type: element type (text)
@@ -196,6 +206,8 @@ export type TextType =
  * vertical?: vertical text
  *
  * textType?: text type
+ *
+ * _combined?: metadata indicating this element is part of a combined text container
  */
 export interface PPTTextElement extends PPTBaseElement {
   type: 'text';
@@ -211,6 +223,7 @@ export interface PPTTextElement extends PPTBaseElement {
   paragraphSpace?: number;
   vertical?: boolean;
   textType?: TextType;
+  _combined?: CombinedTextMetadata;
 }
 
 /**
@@ -401,6 +414,7 @@ export interface PPTShapeElement extends PPTBaseElement {
   shadow?: PPTElementShadow;
   special?: boolean;
   text?: ShapeText;
+  shapeType?: 'card';
   pathFormula?: ShapePathFormulasKeys;
   keypoints?: number[];
 }
@@ -833,6 +847,7 @@ export interface SlideTheme {
   id?: string;
   name?: string;
   modifiers?: string | null;
+  modifiersStale?: boolean; // Mark when theme colors change and modifiers need regeneration
   backgroundColor: string | Gradient;
   themeColors: string[];
   fontColor: string;

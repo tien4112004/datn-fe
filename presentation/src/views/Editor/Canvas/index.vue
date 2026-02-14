@@ -8,97 +8,91 @@
     v-contextmenu="contextmenus"
     v-click-outside="removeEditorAreaFocus"
   >
-    <!-- Preview Mode Overlay -->
-    <div
-      v-if="isCurrentSlideLocked || mode === 'view'"
-      class="preview-overlay"
-      @click.stop.prevent
-      @mousedown.stop.prevent
-      @mouseup.stop.prevent
-      @dblclick.stop.prevent
-      @contextmenu.stop.prevent
-      @wheel.stop.prevent
-    ></div>
-    <ElementCreateSelection
-      v-if="creatingElement"
-      @created="(data) => insertElementFromCreateSelection(data)"
-    />
-    <ShapeCreateCanvas v-if="creatingCustomShape" @created="(data) => insertCustomShape(data)" />
-    <div
-      class="viewport-wrapper"
-      :style="{
-        width: viewportStyles.width * canvasScale + 'px',
-        height: viewportStyles.height * canvasScale + 'px',
-        left: viewportStyles.left + 'px',
-        top: viewportStyles.top + 'px',
-      }"
-    >
-      <div class="operates">
-        <AlignmentLine
-          v-for="(line, index) in alignmentLines"
-          :key="index"
-          :type="line.type"
-          :axis="line.axis"
-          :length="line.length"
-          :canvasScale="canvasScale"
-        />
-        <MultiSelectOperate
-          v-if="activeElementIdList.length > 1"
-          :elementList="elementList"
-          :scaleMultiElement="scaleMultiElement"
-        />
-        <Operate
-          v-for="element in elementList"
-          :key="element.id"
-          :elementInfo="element"
-          :isSelected="activeElementIdList.includes(element.id)"
-          :isActive="handleElementId === element.id"
-          :isActiveGroupElement="activeGroupElementId === element.id"
-          :isMultiSelect="activeElementIdList.length > 1"
-          :rotateElement="rotateElement"
-          :scaleElement="scaleElement"
-          :openLinkDialog="openLinkDialog"
-          :dragLineElement="dragLineElement"
-          :moveShapeKeypoint="moveShapeKeypoint"
-          v-show="!hiddenElementIdList.includes(element.id)"
-        />
-        <ViewportBackground />
+    <EmptyCanvas v-if="!hasSlides" />
+    <template v-else>
+      <!-- Preview Mode Overlay -->
+      <div v-if="isCurrentSlideLocked || mode === 'view'" class="preview-overlay"></div>
+      <ElementCreateSelection
+        v-if="creatingElement"
+        @created="(data) => insertElementFromCreateSelection(data)"
+      />
+      <ShapeCreateCanvas v-if="creatingCustomShape" @created="(data) => insertCustomShape(data)" />
+      <div
+        class="viewport-wrapper"
+        :style="{
+          width: viewportStyles.width * canvasScale + 'px',
+          height: viewportStyles.height * canvasScale + 'px',
+          left: viewportStyles.left + 'px',
+          top: viewportStyles.top + 'px',
+        }"
+      >
+        <div class="operates">
+          <AlignmentLine
+            v-for="(line, index) in alignmentLines"
+            :key="index"
+            :type="line.type"
+            :axis="line.axis"
+            :length="line.length"
+            :canvasScale="canvasScale"
+          />
+          <MultiSelectOperate
+            v-if="activeElementIdList.length > 1"
+            :elementList="elementList"
+            :scaleMultiElement="scaleMultiElement"
+          />
+          <Operate
+            v-for="element in elementList"
+            :key="element.id"
+            :elementInfo="element"
+            :isSelected="activeElementIdList.includes(element.id)"
+            :isActive="handleElementId === element.id"
+            :isActiveGroupElement="activeGroupElementId === element.id"
+            :isMultiSelect="activeElementIdList.length > 1"
+            :rotateElement="rotateElement"
+            :scaleElement="scaleElement"
+            :openLinkDialog="openLinkDialog"
+            :dragLineElement="dragLineElement"
+            :moveShapeKeypoint="moveShapeKeypoint"
+            v-show="!hiddenElementIdList.includes(element.id)"
+          />
+          <ViewportBackground />
+        </div>
+
+        <div class="viewport" ref="viewportRef" :style="{ transform: `scale(${canvasScale})` }">
+          <MouseSelection
+            v-if="mouseSelectionVisible"
+            :top="mouseSelection.top"
+            :left="mouseSelection.left"
+            :width="mouseSelection.width"
+            :height="mouseSelection.height"
+            :quadrant="mouseSelectionQuadrant"
+          />
+          <EditableElement
+            v-for="(element, index) in elementList"
+            :key="element.id"
+            :elementInfo="element"
+            :elementIndex="index + 1"
+            :isMultiSelect="activeElementIdList.length > 1"
+            :selectElement="selectElement"
+            :openLinkDialog="openLinkDialog"
+            v-show="!hiddenElementIdList.includes(element.id)"
+          />
+        </div>
       </div>
 
-      <div class="viewport" ref="viewportRef" :style="{ transform: `scale(${canvasScale})` }">
-        <MouseSelection
-          v-if="mouseSelectionVisible"
-          :top="mouseSelection.top"
-          :left="mouseSelection.left"
-          :width="mouseSelection.width"
-          :height="mouseSelection.height"
-          :quadrant="mouseSelectionQuadrant"
-        />
-        <EditableElement
-          v-for="(element, index) in elementList"
-          :key="element.id"
-          :elementInfo="element"
-          :elementIndex="index + 1"
-          :isMultiSelect="activeElementIdList.length > 1"
-          :selectElement="selectElement"
-          :openLinkDialog="openLinkDialog"
-          v-show="!hiddenElementIdList.includes(element.id)"
-        />
-      </div>
-    </div>
+      <div class="drag-mask" v-if="spaceKeyState"></div>
 
-    <div class="drag-mask" v-if="spaceKeyState"></div>
+      <Ruler :viewportStyles="viewportStyles" :elementList="elementList" v-if="showRuler" />
 
-    <Ruler :viewportStyles="viewportStyles" :elementList="elementList" v-if="showRuler" />
-
-    <Modal v-model:visible="linkDialogVisible" :width="540">
-      <LinkDialog @close="linkDialogVisible = false" />
-    </Modal>
+      <Modal v-model:visible="linkDialogVisible" :width="540">
+        <LinkDialog @close="linkDialogVisible = false" />
+      </Modal>
+    </template>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onMounted, onUnmounted, provide, ref, watch, watchEffect } from 'vue';
+import { nextTick, onMounted, onUnmounted, provide, ref, watch, watchEffect, computed } from 'vue';
 import { throttle } from 'lodash';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore, useKeyboardStore, useContainerStore } from '@/store';
@@ -141,6 +135,7 @@ import MultiSelectOperate from './Operate/MultiSelectOperate.vue';
 import Operate from './Operate/index.vue';
 import LinkDialog from './LinkDialog.vue';
 import Modal from '@/components/Modal.vue';
+import EmptyCanvas from '@/components/EmptyCanvas.vue';
 
 const { t } = useI18n();
 
@@ -158,9 +153,12 @@ const {
   canvasScale,
   textFormatPainter,
 } = storeToRefs(mainStore);
-const { currentSlide } = storeToRefs(useSlidesStore());
+const slidesStore = useSlidesStore();
+const { currentSlide, slides } = storeToRefs(slidesStore);
 const { ctrlKeyState, spaceKeyState } = storeToRefs(useKeyboardStore());
 const { mode } = storeToRefs(useContainerStore());
+
+const hasSlides = computed(() => slides.value.length > 0);
 
 const viewportRef = ref<HTMLElement>();
 const alignmentLines = ref<AlignmentLineProps[]>([]);
@@ -214,8 +212,12 @@ onMounted(() => {
 // Click on the blank area of the canvas: clear focus elements, set canvas focus, clear text selection, and reset format painter state
 const handleClickBlankArea = (e: MouseEvent) => {
   if (mode.value === 'view') return;
-  // Block all interactions in preview mode
-  if (isCurrentSlideLocked.value) return;
+
+  // In preview mode, only allow deselection
+  if (isCurrentSlideLocked.value) {
+    if (activeElementIdList.value.length) mainStore.setActiveElementIdList([]);
+    return;
+  }
 
   if (activeElementIdList.value.length) mainStore.setActiveElementIdList([]);
 
@@ -401,6 +403,6 @@ provide(injectKeySlideScale, canvasScale);
   align-items: center;
   justify-content: center;
   z-index: 5000;
-  pointer-events: auto;
+  pointer-events: none;
 }
 </style>

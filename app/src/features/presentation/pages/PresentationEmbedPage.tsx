@@ -119,7 +119,7 @@ const PresentationEmbedPage = () => {
   }
 
   return (
-    <>
+    <div className="fixed inset-0 overflow-hidden bg-white">
       <VueRemoteWrapper
         modulePath="editor"
         mountProps={{
@@ -128,7 +128,7 @@ const PresentationEmbedPage = () => {
           mode: 'view', // Always view-only in embed mode
           permission: userPermission || 'read',
         }}
-        className="vue-remote"
+        className="vue-remote !h-full !w-full"
         LoadingComponent={() => <GlobalSpinner text={t('presentation')} />}
         onMountSuccess={handleVueMountSuccess}
         onMountError={handleVueMountError}
@@ -157,7 +157,7 @@ const PresentationEmbedPage = () => {
           userPermission={userPermission || 'read'}
         />
       )}
-    </>
+    </div>
   );
 };
 

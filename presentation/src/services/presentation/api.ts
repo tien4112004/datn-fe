@@ -25,7 +25,6 @@ export interface IPresentationApi {
   upsertSlide(presentationId: string, slide: any): Promise<Presentation>;
   // Upsert multiple slides in a single request
   upsertSlides(presentationId: string, slides: any[]): Promise<Presentation>;
-  setParsed(id: string): Promise<Presentation>;
   streamPresentation(
     request: PresentationGenerationRequest,
     signal: AbortSignal

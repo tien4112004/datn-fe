@@ -7,7 +7,7 @@ import type { PPTImageElement, SlideTheme } from '@/types/slides';
 import { useSlidesStore } from '@/store';
 import { useGenerationStore, type AiResultSlide } from '@/store/generation';
 import { useSaveStore } from '@/store/save';
-import { useAiResult, useSetParsed } from '@/services/presentation/queries';
+import { useAiResult } from '@/services/presentation/queries';
 import { useGenerateImage } from '@/services/image/queries';
 import { queryKeys } from '@/services/query-keys';
 import type { PresentationGenerationRequest } from '@/types/generation';
@@ -37,7 +37,7 @@ export function usePresentationProcessor(
   isGenerating: boolean,
   pinia: Pinia,
   generationRequest?: PresentationGenerationRequest
-): { isProcessing: Ref<boolean> } {
+): { isProcessing: Ref<boolean>; processFullAiResult: () => Promise<void> } {
   const isProcessing = ref(false);
   const processedStreamDataRef = ref<AiResultSlide[]>([]);
   const pendingImageGenerations = ref<Set<Promise<any>>>(new Set());
@@ -46,7 +46,6 @@ export function usePresentationProcessor(
   // API Hooks
   const queryClient = useQueryClient();
   const { refetch: fetchAiResult } = useAiResult(presentationId, { enabled: false });
-  const { mutateAsync: setParsedMutation } = useSetParsed();
   const { mutateAsync: generateImageMutation } = useGenerateImage();
 
   // Wrapper to preserve existing interface and add cache invalidation
@@ -155,6 +154,7 @@ export function usePresentationProcessor(
       }
 
       const theme = presentation?.theme || slidesStore.theme;
+      slidesStore.setTheme(theme);
 
       const slides = await Promise.all(
         aiResultSlides.map(async (slideData: any, i: number) => {
@@ -208,14 +208,26 @@ export function usePresentationProcessor(
             thumbnail: presentation.thumbnail,
           });
         }
-
-        await setParsedMutation(presentationId);
       } finally {
         dispatchGeneratingEvent(false);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error processing AI result:', error);
-      dispatchMessage('error', 'Failed to process presentation');
+
+      // Check if it's a 404 error (AI result not found)
+      const is404 =
+        error?.response?.status === 404 || error?.response?.data?.errorCodeName === 'AI_RESULT_NOT_FOUND';
+
+      if (is404) {
+        // 404 is not an error - it means empty presentation (no AI result yet)
+        console.info('[usePresentationProcessor] No AI result found - treating as empty presentation');
+        // Don't dispatch error message for 404
+        // Slides remain empty, EmptyCanvas will show
+      } else {
+        // For 500 errors and other failures, dispatch error event
+        dispatchMessage('error', 'Failed to process presentation');
+        dispatchProcessingError(error);
+      }
     } finally {
       isProcessing.value = false;
     }
@@ -304,7 +316,7 @@ export function usePresentationProcessor(
 
       const imageUrl = response.imageUrl;
       if (imageUrl) {
-        await updateSlideImageInStore(slideId, imageElement.id, imageUrl);
+        await updateSlideImageInStore(slideId, imageElement.id, imageUrl, prompt);
         return { success: true };
       } else {
         console.error('No image URL in response for slide:', slideId);
@@ -318,25 +330,8 @@ export function usePresentationProcessor(
     }
   }
 
-  // Helper to convert URL to base64
-  async function urlToBase64(url: string): Promise<string> {
-    try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    } catch (error) {
-      console.error('Failed to convert URL to base64:', error);
-      throw error;
-    }
-  }
-
   // Helper to update store specific image
-  async function updateSlideImageInStore(slideId: string, elementId: string, url: string) {
+  async function updateSlideImageInStore(slideId: string, elementId: string, url: string, prompt?: string) {
     const slideIndex = slidesStore.slides.findIndex((s) => s.id === slideId);
 
     if (slideIndex === -1) {
@@ -361,6 +356,24 @@ export function usePresentationProcessor(
     );
     slide.elements = [...slide.elements];
     slide.elements[elementIndex] = updatedElement;
+
+    // Update slide layout data if available
+    if (slide.layout?.schema?.data) {
+      // Create a deep copy of layout to avoid mutation issues
+      const updatedLayout = JSON.parse(JSON.stringify(slide.layout));
+
+      // Update image URL in schema
+      if ('image' in updatedLayout.schema.data) {
+        updatedLayout.schema.data.image = url;
+      }
+
+      // Store original prompt if provided
+      if (prompt) {
+        updatedLayout.schema.data.prompt = prompt;
+      }
+
+      slide.layout = updatedLayout;
+    }
 
     const newSlides = [...slidesStore.slides];
     newSlides[slideIndex] = slide;
@@ -456,8 +469,6 @@ export function usePresentationProcessor(
               viewport,
               thumbnail: presentation?.thumbnail,
             });
-
-            await setParsedMutation(presentationId);
           } finally {
             // Always clear generating state
             dispatchGeneratingEvent(false);
@@ -496,5 +507,17 @@ export function usePresentationProcessor(
     );
   }
 
-  return { isProcessing };
+  function dispatchProcessingError(error: any) {
+    window.dispatchEvent(
+      new CustomEvent('app.presentation.processingError', {
+        detail: {
+          error: error?.message || 'Unknown error',
+          statusCode: error?.response?.status,
+          canRetry: error?.response?.status >= 500 || error?.response?.status === undefined,
+        },
+      })
+    );
+  }
+
+  return { isProcessing, processFullAiResult };
 }

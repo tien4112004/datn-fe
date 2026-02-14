@@ -22,7 +22,12 @@ import {
   layoutItemsInBlock,
   mergeParametersIntoConstants,
 } from '.';
-import { createHtmlElement, createTextPPTElement, createListElements } from './elementCreators';
+import {
+  createHtmlElement,
+  createTextPPTElement,
+  createListElements,
+  mapLabelToTextType,
+} from './elementCreators';
 import {
   DEFAULT_MIN_FONT_SIZE,
   DEFAULT_LABEL_TO_VALUE_RATIO,
@@ -64,7 +69,8 @@ export function buildTitle(title: string, config: TemplateContainerConfig, theme
   const titleElement = createTextElement(
     title,
     titleInstance,
-    titleInstance.text?.fontSizeRange || FONT_SIZE_RANGE_TITLE
+    titleInstance.text?.fontSizeRange || FONT_SIZE_RANGE_TITLE,
+    'title'
   );
 
   return [titleElement];
@@ -76,10 +82,12 @@ export function buildText(content: string, config: TemplateContainerConfig): PPT
     bounds: config.bounds,
   } as TextLayoutBlockInstance;
 
+  // Explicitly pass 'content' as textType for clarity
   const textElement = createTextElement(
     content,
     textInstance,
-    textInstance.text?.fontSizeRange || FONT_SIZE_RANGE_CONTENT
+    textInstance.text?.fontSizeRange || FONT_SIZE_RANGE_CONTENT,
+    'content'
   );
 
   return [textElement];
@@ -101,10 +109,14 @@ export function buildCombinedList(contents: string[], config: TemplateContainerC
     bounds: config.bounds,
   } as TextLayoutBlockInstance;
 
+  // Map label to textType for proper theme application
+  const textType = mapLabelToTextType(textInstance.label);
+
   const listElements = createListElements(
     contents,
     textInstance,
-    textInstance.text?.fontSizeRange || FONT_SIZE_RANGE_CONTENT
+    textInstance.text?.fontSizeRange || FONT_SIZE_RANGE_CONTENT,
+    textType
   );
 
   return listElements;
@@ -544,6 +556,9 @@ function _convertToPPTElements(
   for (const [label, elements] of Object.entries(htmlElements)) {
     const instances = labelGroups.get(label) || [];
 
+    // Map label to textType for consistent theme application
+    const textType = mapLabelToTextType(label);
+
     pptElements[label] = elements
       .map((htmlEl, index) => {
         const instance = instances[index];
@@ -555,7 +570,8 @@ function _convertToPPTElements(
           return null;
         }
 
-        return createTextPPTElement(htmlEl, instance);
+        // Pass textType to ensure correct theme styling
+        return createTextPPTElement(htmlEl, instance, textType);
       })
       .filter((el) => el !== null) as PPTElement[];
   }

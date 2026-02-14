@@ -151,5 +151,17 @@ export const useGenerationStore = defineStore('generation', {
     setError(error: string | null) {
       this.error = error;
     },
+
+    /**
+     * Update generation state
+     */
+    setModifying(isModifying: boolean) {
+      // We can use a separate state for modification if needed,
+      // but for now reusing isStreaming or a new property would be good.
+      // Let's add a new state property dynamically if strict typing allows,
+      // or just trust the caller to handle the UI loading state.
+      // For this implementation, the component handles the loading state (isProcessing),
+      // so we might not strictly need it here unless we want global tracking.
+    },
   },
 });

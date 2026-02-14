@@ -96,7 +96,6 @@
 import { ref, computed, inject, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMainStore, useSlidesStore, useContainerStore } from '@/store';
-import useGlobalHotkey from '@/hooks/useGlobalHotkey';
 import usePasteEvent from '@/hooks/usePasteEvent';
 import useSlideEditLock from '@/hooks/useSlideEditLock';
 import message from '@/utils/message';
@@ -183,10 +182,6 @@ const confirmAllTemplates = () => {
   );
 };
 
-// Inject save function provided by RemoteApp (undefined if not in remote context)
-const savePresentationFn = inject<(() => Promise<void>) | undefined>('savePresentationFn', undefined);
-
-useGlobalHotkey(savePresentationFn);
 usePasteEvent();
 
 // Restore sidebar state from localStorage

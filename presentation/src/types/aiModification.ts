@@ -1,7 +1,7 @@
 import type { Component } from 'vue';
 
 // Context types
-export type AIContextType = 'slide' | 'element' | 'elements' | 'generate';
+export type AIContextType = 'slide' | 'element' | 'elements' | 'combined-text' | 'generate';
 export type ElementType = 'text' | 'image' | 'shape' | 'chart' | 'table' | 'video' | 'audio' | 'latex';
 
 // Action categories
@@ -58,7 +58,7 @@ export interface CurrentContext {
   elementType?: ElementType;
   elementTypes?: ElementType[];
   count?: number;
-  data: unknown;
+  data: any; // Using any for flexibility with different element types
 }
 
 // API Request/Response types
@@ -68,10 +68,15 @@ export interface AIModificationRequest {
     type: AIContextType;
     slideId?: string;
     elementId?: string | string[];
+    slideSchema?: unknown;
+    slideType?: string;
+    currentImageSrc?: string;
     slideContent?: unknown;
     elementContent?: unknown;
   };
   parameters: Record<string, string | number>;
+  model: string;
+  provider: string;
 }
 
 export interface AIModificationResponse {
@@ -80,6 +85,12 @@ export interface AIModificationResponse {
     modifiedContent?: unknown;
     newSlides?: unknown[];
     suggestions?: unknown[];
+    refinedText?: string;
+    imageUrl?: string;
+    schema?: unknown;
+    schemas?: unknown[];
+    [key: string]: any; // Allow additional properties
   };
+  message?: string;
   error?: string;
 }

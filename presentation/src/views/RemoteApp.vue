@@ -1,14 +1,40 @@
 <template>
-  <template v-if="slides.length">
+  <!-- Error State UI -->
+  <div
+    v-if="errorState.hasError && !isLoading"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-white p-4"
+  >
+    <div class="text-center">
+      <div class="error-icon" style="font-size: 64px; color: #ff4d4f; margin-bottom: 16px">⚠️</div>
+      <p class="mb-2 font-bold text-red-500">{{ $t('error.processingFailed') }}</p>
+      <p class="mb-4 text-sm text-gray-600">{{ errorState.message }}</p>
+      <button
+        v-if="errorState.canRetry"
+        @click="retryProcessing"
+        class="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+      >
+        {{ $t('error.retry') }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Existing content -->
+  <template v-else>
     <Screen v-if="screening" :isPresentingInitial="presenter" />
     <Editor v-else-if="_isPC" />
     <Mobile v-else />
   </template>
-  <FullscreenSpin :loading="isLoading" :tip="$t('loading.generatingPresentation')" />
+
+  <!-- Loading spinner with error condition -->
+  <FullscreenSpin
+    v-if="!errorState.hasError"
+    :loading="isLoading"
+    :tip="$t('loading.generatingPresentation')"
+  />
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch, computed, provide, getCurrentInstance } from 'vue';
+import { onMounted, onUnmounted, ref, watch, computed, provide, getCurrentInstance } from 'vue';
 import { storeToRefs } from 'pinia';
 import { nanoid } from 'nanoid';
 import {
@@ -34,6 +60,7 @@ import { usePresentationProcessor } from '@/hooks/usePresentationProcessor';
 import { useGenerationStore } from '@/store/generation';
 import { useSavePresentation } from '@/hooks/useSavePresentation';
 import { getPresentationApi } from '@/services/presentation/api';
+import useGlobalHotkey from '@/hooks/useGlobalHotkey';
 
 const _isPC = isPC();
 
@@ -61,10 +88,59 @@ const { screening, presenter } = storeToRefs(useScreenStore());
 let isInitialLoad = ref(true);
 let isProcessing = ref(false);
 
+// Error state tracking
+let loadingTimeoutId: number | null = null;
+let processorResult: any = null;
+const errorState = ref({
+  hasError: false,
+  message: '',
+  canRetry: false,
+  originalError: null as any,
+});
+
 // Computed loading state that combines processing and streaming states
 const isLoading = computed(() => {
-  return isProcessing.value || generationStore.isStreaming;
+  const loading = isProcessing.value || generationStore.isStreaming;
+
+  // Set timeout when loading starts
+  if (loading && !loadingTimeoutId) {
+    loadingTimeoutId = window.setTimeout(() => {
+      if (isProcessing.value || generationStore.isStreaming) {
+        console.error('[RemoteApp] Processing timeout after 60 seconds');
+        errorState.value = {
+          hasError: true,
+          message: 'Processing took too long. Please try again.',
+          canRetry: true,
+          originalError: new Error('Timeout'),
+        };
+        // Force stop processing
+        isProcessing.value = false;
+        generationStore.stopStreaming();
+      }
+    }, 60000); // 60 seconds
+  }
+
+  // Clear timeout when loading stops
+  if (!loading && loadingTimeoutId) {
+    window.clearTimeout(loadingTimeoutId);
+    loadingTimeoutId = null;
+  }
+
+  return loading;
 });
+
+// Get pinia instance and setup save presentation at top level
+const instance = getCurrentInstance();
+const pinia = instance?.appContext.config.globalProperties.$pinia;
+
+let saveFn: (() => Promise<void>) | undefined;
+if (pinia) {
+  const result = useSavePresentation(props.presentation.id, pinia);
+  saveFn = result.savePresentation;
+}
+
+// Setup global hotkey at top level (required for composable lifecycle)
+useGlobalHotkey(saveFn);
 
 onMounted(async () => {
   if (props.presentation.title) {
@@ -79,17 +155,7 @@ onMounted(async () => {
     slidesStore.setViewportSize(props.presentation.viewport.width);
   }
 
-  // Get pinia instance
-  const instance = getCurrentInstance();
-  const pinia = instance?.appContext.config.globalProperties.$pinia;
-
-  // Create save hook and provide to child components
-  if (pinia) {
-    const { savePresentation: saveFn } = useSavePresentation(props.presentation.id, pinia);
-    provide('savePresentationFn', saveFn);
-  }
-
-  const processorResult = usePresentationProcessor(
+  processorResult = usePresentationProcessor(
     props.presentation,
     props.presentation.id,
     generationStore.isStreaming,
@@ -110,27 +176,60 @@ onMounted(async () => {
     ? JSON.parse(JSON.stringify(containerStore.presentation.slides))
     : [];
 
-  // If presentation has no slides, create a blank slide
-  if (presentationSlides.length === 0) {
-    const { theme } = storeToRefs(slidesStore);
-    const emptySlide: Slide = {
-      id: nanoid(10),
-      elements: [],
-      background: {
-        type: 'solid',
-        color: typeof theme.value.backgroundColor === 'string' ? theme.value.backgroundColor : '#ffffff',
-      },
-    };
-    slidesStore.setSlides([emptySlide]);
-  } else {
-    slidesStore.setSlides(presentationSlides);
-  }
+  // Set slides from presentation (may be empty)
+  slidesStore.setSlides(presentationSlides);
 
   await deleteDiscardedDB();
   snapshotStore.initSnapshotDatabase();
 
   isInitialLoad.value = false;
+
+  // Listen for processing errors
+  const handleProcessingError = (event: CustomEvent) => {
+    const { error, statusCode, canRetry } = event.detail;
+    errorState.value = {
+      hasError: true,
+      message: error || 'An unexpected error occurred',
+      canRetry: canRetry || false,
+      originalError: event.detail,
+    };
+  };
+
+  window.addEventListener('app.presentation.processingError', handleProcessingError as EventListener);
 });
+
+// Cleanup on unmount
+onUnmounted(() => {
+  const handleProcessingError = (event: CustomEvent) => {
+    const { error, statusCode, canRetry } = event.detail;
+    errorState.value = {
+      hasError: true,
+      message: error || 'An unexpected error occurred',
+      canRetry: canRetry || false,
+      originalError: event.detail,
+    };
+  };
+  window.removeEventListener('app.presentation.processingError', handleProcessingError as EventListener);
+  if (loadingTimeoutId) {
+    window.clearTimeout(loadingTimeoutId);
+  }
+});
+
+// Retry function
+const retryProcessing = async () => {
+  // Reset error state
+  errorState.value = {
+    hasError: false,
+    message: '',
+    canRetry: false,
+    originalError: null,
+  };
+
+  // Retry processing
+  if (processorResult?.processFullAiResult) {
+    await processorResult.processFullAiResult();
+  }
+};
 
 watch(
   slides,

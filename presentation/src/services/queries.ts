@@ -19,7 +19,6 @@ export {
   // Mutations
   useUpsertSlide,
   useUpsertSlides,
-  useSetParsed,
   useUpdatePresentation,
   useSharePresentation,
   useRevokeAccess,

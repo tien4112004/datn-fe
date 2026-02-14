@@ -19,7 +19,6 @@ import { convertToSlide, selectRandomTemplate } from '@/utils/slideLayout';
 import type { SlideLayoutSchema } from '@/utils/slideLayout/types';
 import type { PPTImageElement, Presentation } from '@/types/slides';
 import { useGenerateImage } from '@/services/image/queries';
-import { useSetParsed } from '@/services/presentation/queries';
 import { deleteDiscardedDB } from '@/utils/database';
 import { getPresentationApi } from '@/services/presentation/api';
 import { useSavePresentation } from '@/hooks/useSavePresentation';
@@ -50,9 +49,6 @@ const pinia = instance?.appContext.config.globalProperties.$pinia;
 
 // Save presentation hook
 const { savePresentation } = useSavePresentation(props.presentation.id, pinia!);
-
-// Set parsed mutation
-const { mutateAsync: setParsedMutation } = useSetParsed();
 
 const isStreaming = ref(true);
 const abortController = ref<AbortController | null>(null);
@@ -356,11 +352,6 @@ async function startStreaming() {
         thumbnail: props.presentation.thumbnail,
       });
       console.log('[MobileGenerationViewer] Presentation saved successfully');
-
-      // Mark as parsed on backend
-      console.log('[MobileGenerationViewer] Marking presentation as parsed...');
-      await setParsedMutation(props.presentation.id);
-      console.log('[MobileGenerationViewer] Presentation marked as parsed');
     } catch (saveError) {
       console.error('[MobileGenerationViewer] Failed to save presentation:', saveError);
       // Continue anyway - user can still see the slides

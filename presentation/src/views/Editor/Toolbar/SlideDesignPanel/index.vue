@@ -355,17 +355,14 @@
         class="theme-item"
         v-for="(item, index) in presetThemes"
         :key="index"
-        :style="{
-          backgroundColor: item.background,
-          fontFamily: item.fontname,
-        }"
+        :style="getThemeItemStyle(item)"
       >
         <div class="theme-item-content">
           <div class="text" :style="{ color: item.fontColor }">{{ $t('styling.slide.design.textAa') }}</div>
           <div class="colors">
             <div
               class="color-block"
-              v-for="(color, index) in item.colors"
+              v-for="(color, index) in item.themeColors"
               :key="index"
               :style="{ backgroundColor: color }"
             ></div>
@@ -426,7 +423,6 @@ import type {
   SlideBackgroundImageSize,
   LineStyleType,
 } from '@/types/slides';
-import type { PresetTheme } from '@/configs/theme';
 import { FONTS } from '@/configs/font';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
 import useSlideTheme from '@/hooks/useSlideTheme';
@@ -479,20 +475,49 @@ const themeListRef = ref<HTMLElement | null>(null);
 // Use TanStack Query for themes with pagination
 const themesQuery = useSlideThemes(computed(() => ({ page: currentPage.value, limit: themesLimit.value })));
 
-// Map query data to component format
-const presetThemes = computed(() => {
-  if (!themesQuery.data.value?.data) return [];
-  return themesQuery.data.value.data.map((theme) => ({
-    background: typeof theme.backgroundColor === 'string' ? theme.backgroundColor : '#ffffff',
-    fontColor: theme.fontColor,
-    borderColor: theme.outline?.color || '#525252',
-    fontname: theme.fontName,
-    colors: theme.themeColors,
-  }));
+// Accumulate pages from query into a single list for infinite scroll
+const accumulatedThemes = ref<any[]>([]);
+
+const presetThemes = computed(() => accumulatedThemes.value);
+
+// Update accumulatedThemes when query data changes
+watch(
+  () => themesQuery.data.value,
+  (newVal) => {
+    if (!newVal || !newVal.data) return;
+
+    // If we're on the first page, replace the list; otherwise append
+    if ((newVal.page ?? 0) === 0) {
+      accumulatedThemes.value = newVal.data;
+    } else {
+      // avoid duplicates when refetching same page
+      accumulatedThemes.value = [...accumulatedThemes.value, ...newVal.data];
+    }
+  },
+  { immediate: true }
+);
+
+// Reset accumulated list when page is reset to 0 (e.g. new query)
+watch(currentPage, (p) => {
+  if (p === 0) accumulatedThemes.value = [];
+});
+
+// Auto-fetch more if container is not filled and there's more data
+watch(accumulatedThemes, () => {
+  if (hasMoreThemes.value && !themesLoadingMore.value) {
+    // Wait for DOM update
+    setTimeout(() => {
+      const el = themeListRef.value;
+      if (el && el.scrollHeight <= el.clientHeight) {
+        loadMoreThemes();
+      }
+    }, 100);
+  }
 });
 
 const themesLoading = computed(() => themesQuery.isLoading.value && currentPage.value === 0);
-const themesLoadingMore = computed(() => themesQuery.isLoading.value && currentPage.value > 0);
+// Use `isFetching` for subsequent-page loading (isLoading is only for initial load)
+const themesLoadingMore = computed(() => themesQuery.isFetching.value && currentPage.value > 0);
 const themesError = computed(() => (themesQuery.error.value ? 'Failed to load themes' : null));
 const hasMoreThemes = computed(() => themesQuery.data.value?.hasMore ?? false);
 
@@ -503,15 +528,18 @@ const loadMoreThemes = () => {
   }
 };
 
-// Handle scroll event for infinite loading
+// Handle scroll event for infinite loading (use ref target for reliability)
 const handleThemeListScroll = (event: Event) => {
-  const target = event.target as HTMLElement;
-  const scrollTop = target.scrollTop;
-  const scrollHeight = target.scrollHeight;
-  const clientHeight = target.clientHeight;
+  const el = (themeListRef.value as HTMLElement) || (event.target as HTMLElement);
+  if (!el) return;
 
-  // Load more when user scrolls to 80% of the list
-  if (scrollTop + clientHeight >= scrollHeight * 0.8) {
+  const { scrollTop, scrollHeight, clientHeight } = el;
+
+  // Don't trigger if already fetching or no more pages
+  if (themesLoadingMore.value || !hasMoreThemes.value) return;
+
+  // Load more when user scrolls to 50px of the bottom
+  if (scrollTop + clientHeight >= scrollHeight - 50) {
     loadMoreThemes();
   }
 };
@@ -620,6 +648,32 @@ const toFixed = (num: number) => {
     return parseFloat(num.toFixed(1));
   }
   return Math.floor(num);
+};
+
+// Get theme item style with proper gradient handling
+const getThemeItemStyle = (item: any) => {
+  let backgroundColor: string;
+
+  if (typeof item.backgroundColor === 'string') {
+    backgroundColor = item.backgroundColor;
+  } else if (item.backgroundColor && typeof item.backgroundColor === 'object') {
+    const { type, colors, rotate } = item.backgroundColor;
+    const colorStops = colors.map((c: any) => `${c.color} ${c.pos}%`).join(', ');
+
+    if (type === 'radial') {
+      backgroundColor = `radial-gradient(circle, ${colorStops})`;
+    } else {
+      backgroundColor = `linear-gradient(${rotate}deg, ${colorStops})`;
+    }
+  } else {
+    backgroundColor = '#ffffff';
+  }
+
+  return {
+    backgroundColor,
+    background: backgroundColor,
+    fontFamily: item.fontName,
+  };
 };
 
 // Convert theme backgroundColor to CSS string
@@ -739,12 +793,9 @@ const themeBackgroundColor = computed(() => {
   @include flex-grid-layout();
   max-height: 400px;
   overflow-y: auto;
-  padding-right: 5px;
-
-  /* Custom scrollbar styles */
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
+  overflow-x: hidden;
+  padding: 0 5px 10px 0;
+  width: 100%;
 
   &::-webkit-scrollbar-track {
     background: var(--presentation-background);

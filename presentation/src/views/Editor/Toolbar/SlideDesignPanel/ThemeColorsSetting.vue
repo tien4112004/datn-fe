@@ -86,7 +86,8 @@ const setThemeColors = () => {
   let colors = themeColors.value.filter((item) => item !== 'var(--presentation-foreground)00');
   if (!colors.length) colors = ['var(--presentation-foreground)00'];
 
-  slidesStore.setTheme({ themeColors: colors });
+  // Mark modifiers as stale since colors changed
+  slidesStore.setTheme({ themeColors: colors, modifiersStale: true });
   emit('close');
 };
 

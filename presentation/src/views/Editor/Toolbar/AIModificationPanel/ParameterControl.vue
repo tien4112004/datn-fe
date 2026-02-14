@@ -74,7 +74,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits, computed } from 'vue';
+import { computed } from 'vue';
 import type { AIParameter } from '@/types/aiModification';
 import Select from '@/components/Select.vue';
 import Input from '@/components/Input.vue';

@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Users, Settings, MessageSquare, GraduationCap, Calendar, Edit } from 'lucide-react';
+import { Users, Settings, MessageSquare, GraduationCap, Calendar, Edit, FolderOpen } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,7 @@ import { getGradeLabel } from '../../shared/utils/grades';
 
 import { ClassStudentView } from '../../class-student';
 import { ClassSettings } from './ClassSettings';
-import { FeedTab } from '../../class-feed/components';
+import { FeedTab, ClassResourcesTab } from '../../class-feed/components';
 import type { Class } from '../../shared/types';
 import type { ClassTabs } from '../../shared';
 
@@ -21,6 +21,7 @@ interface ClassDetailTabsProps {
 const tabs = [
   { value: 'feed', icon: MessageSquare, labelKey: 'tabs.feed' },
   { value: 'students', icon: Users, labelKey: 'tabs.students' },
+  { value: 'resources', icon: FolderOpen, labelKey: 'tabs.resources' },
   { value: 'settings', icon: Settings, labelKey: 'tabs.settings' },
 ] as const;
 
@@ -168,6 +169,12 @@ export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDet
         {currentTab === 'students' && (
           <div className="p-6">
             <ClassStudentView classData={currentClass} />
+          </div>
+        )}
+
+        {currentTab === 'resources' && (
+          <div className="p-6">
+            <ClassResourcesTab classId={classId} />
           </div>
         )}
 

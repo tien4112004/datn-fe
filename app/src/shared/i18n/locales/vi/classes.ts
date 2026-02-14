@@ -94,6 +94,7 @@ export default {
       schedule: 'Lịch biểu',
       overview: 'Tổng quan',
       students: 'Học sinh',
+      resources: 'Tài liệu',
       settings: 'Cài đặt',
     },
     overview: {
@@ -1079,25 +1080,25 @@ export default {
     },
     creator: {
       actions: {
-        createPost: 'Tạo Bài Đăng',
-        createHomework: 'Tạo Bài Tập',
-        attachFiles: 'Đính Kèm Tập Tin',
-        posting: 'Đang Đăng...',
+        createPost: 'Tạo bài đăng',
+        createHomework: 'Tạo bài tập',
+        attachFiles: 'Đính kèm tập tin',
+        posting: 'Đang đăng...',
         post: 'Đăng',
         cancel: 'Hủy',
         postComment: 'Đăng bình luận',
       },
       dialog: {
-        title: 'Tạo Bài Đăng Mới',
+        title: 'Tạo bài đăng mới',
         description: 'Chia sẻ thông báo hoặc bài đăng với lớp học của bạn.',
       },
       labels: {
-        postType: 'Loại Bài Đăng',
-        content: 'Nội Dung',
-        attachments: 'Tập Tin Đính Kèm',
-        linkLessons: 'Liên Kết Bài Học',
-        linkResources: 'Liên Kết Tài Nguyên',
-        selectAssignment: 'Chọn Bài Tập',
+        postType: 'Loại bài đăng',
+        content: 'Nội dung',
+        attachments: 'Tập tin đính kèm',
+        linkLessons: 'Liên kết bài học',
+        linkResources: 'Liên kết tài nguyên',
+        selectAssignment: 'Chọn bài tập',
         deadline: 'Hạn chót',
         allowComments: 'Cho Phép Bình Luận',
       },
@@ -1348,6 +1349,24 @@ export default {
       status: 'Trạng thái',
       score: 'Điểm',
       actions: 'Thao tác',
+    },
+  },
+
+  resources: {
+    tab: {
+      title: 'Tài liệu lớp học',
+      description: 'Tất cả tài liệu được chia sẻ trong các bài đăng của lớp này',
+      loading: 'Đang tải tài liệu...',
+      error: 'Không thể tải tài liệu',
+      empty: {
+        title: 'Chưa có tài liệu nào',
+        description: 'Tài liệu được chia sẻ trong bài đăng sẽ xuất hiện ở đây',
+      },
+      types: {
+        presentations: 'Bài trình bày',
+        mindmaps: 'Sơ đồ tư duy',
+        assignments: 'Bài tập',
+      },
     },
   },
 };

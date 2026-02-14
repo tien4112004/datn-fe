@@ -3,6 +3,7 @@ export { useAttachmentUpload } from './useAttachmentUpload';
 
 // Individual API hooks
 export {
+  useClassResources,
   useComments,
   useCreateComment,
   useCreatePost,

@@ -90,6 +90,7 @@ export default {
       schedule: 'Schedule',
       overview: 'Overview',
       students: 'Students',
+      resources: 'Resources',
       settings: 'Settings',
     },
     overview: {
@@ -1322,6 +1323,24 @@ export default {
       status: 'Status',
       score: 'Score',
       actions: 'Actions',
+    },
+  },
+
+  resources: {
+    tab: {
+      title: 'Class Resources',
+      description: 'All resources shared across posts in this class',
+      loading: 'Loading resources...',
+      error: 'Failed to load resources',
+      empty: {
+        title: 'No resources yet',
+        description: 'Resources shared in posts will appear here',
+      },
+      types: {
+        presentations: 'Presentations',
+        mindmaps: 'Mindmaps',
+        assignments: 'Assignments',
+      },
     },
   },
 };

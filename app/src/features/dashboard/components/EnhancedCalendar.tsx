@@ -195,7 +195,7 @@ export const EnhancedCalendar = () => {
         {selectedDate && (
           <div className="mt-4 border-t pt-4">
             <h4 className="mb-2 text-sm font-semibold">
-              {format(selectedDate, 'MMMM d, yyyy', { locale: getLocaleDateFns() })}
+              {format(selectedDate, 'PPPP', { locale: getLocaleDateFns() })}
             </h4>
             {selectedDateEvents.length === 0 ? (
               <p className="text-muted-foreground text-xs">{t('calendar.noEvents')}</p>

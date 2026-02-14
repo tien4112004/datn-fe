@@ -49,6 +49,5 @@ const handleChange = (e: Event) => {
 .file-input {
   display: flex;
   align-items: center;
-  justify-content: center;
 }
 </style>

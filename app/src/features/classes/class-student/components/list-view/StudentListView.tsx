@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { Button } from '@ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
@@ -77,7 +78,14 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
     {
       accessorKey: 'fullName',
       header: t('table.fullName'),
-      cell: ({ row }) => <div className="font-medium">{row.getValue('fullName')}</div>,
+      cell: ({ row }) => (
+        <Link
+          to={`/students/${row.original.id}`}
+          className="font-medium hover:underline"
+        >
+          {row.getValue('fullName')}
+        </Link>
+      ),
     },
     {
       accessorKey: 'dateOfBirth',

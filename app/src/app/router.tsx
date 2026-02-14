@@ -117,6 +117,12 @@ const router = createBrowserRouter([
         }),
       },
       {
+        path: 'students/:studentId',
+        lazy: async () => ({
+          Component: (await import('@/features/students/pages/StudentDetailPage')).default,
+        }),
+      },
+      {
         path: 'settings',
         lazy: async () => ({
           Component: (await import('@/features/settings')).default.SettingsPage,

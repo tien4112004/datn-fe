@@ -1,5 +1,6 @@
-import { parseMarkdown } from '@/features/assignment/utils';
 import { cn } from '@/shared/lib/utils';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface MarkdownPreviewProps {
   content: string;
@@ -7,8 +8,6 @@ interface MarkdownPreviewProps {
 }
 
 export const MarkdownPreview = ({ content, className }: MarkdownPreviewProps) => {
-  const html = parseMarkdown(content);
-
   return (
     <div
       className={cn(
@@ -18,7 +17,8 @@ export const MarkdownPreview = ({ content, className }: MarkdownPreviewProps) =>
         'prose-pre:bg-muted prose-pre:p-4 prose-pre:rounded-lg',
         className
       )}
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+    >
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+    </div>
   );
 };

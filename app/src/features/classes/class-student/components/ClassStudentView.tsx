@@ -43,7 +43,7 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Users className="text-muted-foreground h-5 w-5" />
-          <h2 className="text-xl font-semibold">Students</h2>
+          <h2 className="text-xl font-semibold">{t('tabs.students')}</h2>
           <Badge variant="secondary">{students.length}</Badge>
         </div>
         <div className="flex items-center gap-3">

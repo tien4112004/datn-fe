@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { FieldError } from 'react-hook-form';
+import { format } from 'date-fns';
 import {
   Dialog,
   DialogContent,
@@ -13,8 +14,13 @@ import { Button } from '@ui/button';
 import { Input } from '@ui/input';
 import { Label } from '@ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
+import { Calendar } from '@ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/popover';
+import { CalendarIcon } from 'lucide-react';
 import { useStudentForm, type StudentFormData, type StudentFormMode, useStudentMutations } from '../../hooks';
 import type { Student } from '../../types';
+import { cn } from '@/shared/lib/utils';
+import { getLocaleDateFns } from '@/shared/i18n/helper';
 
 export interface StudentFormDialogProps {
   open: boolean;
@@ -83,6 +89,9 @@ export function StudentFormDialog({
     setValue,
     watch,
   } = form;
+
+  const dateOfBirth = watch('dateOfBirth');
+  const hasDateOfBirth = dateOfBirth && dateOfBirth.trim();
 
   // Determine loading state based on mode
   const isSubmitting = mode === 'create' ? isCreating : isUpdating;
@@ -175,7 +184,33 @@ export function StudentFormDialog({
             {/* Date of Birth */}
             <div className="space-y-2">
               <Label htmlFor="dateOfBirth">{t('form.dateOfBirth')}</Label>
-              <Input id="dateOfBirth" type="date" {...register('dateOfBirth')} />
+              <Popover modal={true}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      'w-full justify-start text-left font-normal',
+                      !hasDateOfBirth && 'text-muted-foreground'
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {hasDateOfBirth
+                      ? format(new Date(dateOfBirth), 'PPPP', { locale: getLocaleDateFns() })
+                      : t('form.dateOfBirth')}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={hasDateOfBirth ? new Date(dateOfBirth) : undefined}
+                    onSelect={(date) => {
+                      setValue('dateOfBirth', date ? format(date, 'yyyy-MM-dd') : '');
+                    }}
+                    disabled={(date: Date) => date > new Date()}
+                    locale={getLocaleDateFns()}
+                  />
+                </PopoverContent>
+              </Popover>
               {errors.dateOfBirth && (
                 <p className="text-sm text-red-500">{getErrorMessage(errors.dateOfBirth)}</p>
               )}

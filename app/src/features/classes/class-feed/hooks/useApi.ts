@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/shared/context/auth';
 import { useClassFeedApiService } from '../api';
 import type {
   Comment,
@@ -11,15 +12,39 @@ import type {
   PostCreateRequest,
   PostUpdateRequest,
 } from '../types';
+import type { ApiResponse } from '@aiprimary/api';
 
 // Query Keys
-const feedQueryKeys = {
+export const feedQueryKeys = {
   all: ['class-feed'] as const,
   posts: (classId: string, filter: FeedFilter) => [...feedQueryKeys.all, 'posts', classId, filter] as const,
   post: (postId: string) => [...feedQueryKeys.all, 'post', postId] as const,
   comments: (postId: string) => [...feedQueryKeys.all, 'comments', postId] as const,
   comment: (commentId: string) => [...feedQueryKeys.all, 'comment', commentId] as const,
 };
+
+// Helper to update comment count on a post
+function updatePostCommentCount(
+  queryClient: ReturnType<typeof useQueryClient>,
+  postId: string,
+  delta: number
+): ApiResponse<Post[]> | undefined {
+  const previousData = queryClient.getQueriesData<ApiResponse<Post[]>>({
+    queryKey: feedQueryKeys.all,
+  });
+
+  queryClient.setQueriesData<ApiResponse<Post[]>>({ queryKey: feedQueryKeys.all }, (oldData) => {
+    if (!oldData?.data) return oldData;
+    return {
+      ...oldData,
+      data: oldData.data.map((post) =>
+        post.id === postId ? { ...post, commentCount: Math.max(0, post.commentCount + delta) } : post
+      ),
+    };
+  });
+
+  return previousData[0]?.[1];
+}
 
 /**
  * Hook for managing posts query with filter and pagination state
@@ -132,22 +157,55 @@ export function useCreatePost() {
 
   return useMutation({
     mutationFn: (request: PostCreateRequest) => classFeedApi.createPost(request),
-    onSuccess: (newPost) => {
-      // Invalidate and refetch posts queries
-      queryClient.invalidateQueries({ queryKey: feedQueryKeys.all });
 
-      // Optimistically add the new post to existing queries
-      queryClient.setQueriesData({ queryKey: feedQueryKeys.all }, (oldData: any) => {
+    onMutate: async (request) => {
+      // Cancel ongoing queries
+      await queryClient.cancelQueries({ queryKey: feedQueryKeys.all });
+
+      // Create optimistic post
+      const optimisticPost: Post = {
+        id: `temp-${Date.now()}`,
+        classId: request.classId,
+        authorId: 'current-user',
+        type: request.type,
+        content: request.content,
+        attachments: request.attachments,
+        assignmentId: request.assignmentId,
+        dueDate: request.dueDate,
+        isPinned: false,
+        allowComments: request.allowComments ?? true,
+        commentCount: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      // Save previous state and add optimistic post
+      const previousData = queryClient.getQueriesData<ApiResponse<Post[]>>({
+        queryKey: feedQueryKeys.all,
+      });
+
+      queryClient.setQueriesData<ApiResponse<Post[]>>({ queryKey: feedQueryKeys.all }, (oldData) => {
         if (!oldData) return oldData;
         return {
           ...oldData,
-          data: [newPost, ...(oldData.data || [])],
+          data: [optimisticPost, ...(oldData.data || [])],
         };
       });
 
+      return { previousPosts: previousData[0]?.[1] };
+    },
+
+    onSuccess: () => {
+      // Invalidate to refetch with real server data
+      queryClient.invalidateQueries({ queryKey: feedQueryKeys.all });
       toast.success(t('feed.success.postCreated'));
     },
-    onError: (error) => {
+
+    onError: (error, _request, context) => {
+      // Rollback optimistic update on error
+      if (context?.previousPosts) {
+        queryClient.setQueriesData({ queryKey: feedQueryKeys.all }, context.previousPosts);
+      }
       toast.error(t('feed.errors.createFailed'), {
         description: error instanceof Error ? error.message : t('feed.errors.genericError'),
       });
@@ -165,22 +223,50 @@ export function useUpdatePost() {
 
   return useMutation({
     mutationFn: (request: PostUpdateRequest) => classFeedApi.updatePost(request),
-    onSuccess: (updatedPost: Post) => {
-      // Update the post in all relevant queries
-      queryClient.setQueriesData({ queryKey: feedQueryKeys.all }, (oldData: any) => {
-        if (!oldData) return oldData;
+
+    onMutate: async (request) => {
+      // Cancel ongoing queries
+      await queryClient.cancelQueries({ queryKey: feedQueryKeys.all });
+
+      // Save previous state
+      const previousData = queryClient.getQueriesData<ApiResponse<Post[]>>({
+        queryKey: feedQueryKeys.all,
+      });
+
+      // Optimistically update the post
+      queryClient.setQueriesData<ApiResponse<Post[]>>({ queryKey: feedQueryKeys.all }, (oldData) => {
+        if (!oldData?.data) return oldData;
         return {
           ...oldData,
-          data: oldData.data?.map((post: Post) => (post.id === updatedPost.id ? updatedPost : post)) || [],
+          data: oldData.data.map((post) =>
+            post.id === request.id
+              ? {
+                  ...post,
+                  ...(request.content !== undefined && { content: request.content }),
+                  ...(request.type !== undefined && { type: request.type }),
+                  ...(request.attachments !== undefined && { attachments: request.attachments }),
+                  updatedAt: new Date(),
+                }
+              : post
+          ),
         };
       });
 
       // Update the single post query
-      queryClient.setQueryData(feedQueryKeys.post(updatedPost.id), updatedPost);
+      return { previousPosts: previousData[0]?.[1] };
+    },
 
+    onSuccess: () => {
+      // Invalidate to refetch with real server data
+      queryClient.invalidateQueries({ queryKey: feedQueryKeys.all });
       toast.success(t('feed.success.postUpdated'));
     },
-    onError: (error) => {
+
+    onError: (error, _request, context) => {
+      // Rollback on error
+      if (context?.previousPosts) {
+        queryClient.setQueriesData({ queryKey: feedQueryKeys.all }, context.previousPosts);
+      }
       toast.error(t('feed.errors.updateFailed'), {
         description: error instanceof Error ? error.message : t('feed.errors.genericError'),
       });
@@ -198,19 +284,39 @@ export function useDeletePost() {
 
   return useMutation({
     mutationFn: (postId: string) => classFeedApi.deletePost(postId),
-    onSuccess: (_, postId) => {
-      // Remove the post from all relevant queries
-      queryClient.setQueriesData({ queryKey: feedQueryKeys.all }, (oldData: any) => {
-        if (!oldData) return oldData;
+
+    onMutate: async (postId) => {
+      // Cancel ongoing queries
+      await queryClient.cancelQueries({ queryKey: feedQueryKeys.all });
+
+      // Save previous state
+      const previousData = queryClient.getQueriesData<ApiResponse<Post[]>>({
+        queryKey: feedQueryKeys.all,
+      });
+
+      // Optimistically remove the post
+      queryClient.setQueriesData<ApiResponse<Post[]>>({ queryKey: feedQueryKeys.all }, (oldData) => {
+        if (!oldData?.data) return oldData;
         return {
           ...oldData,
-          data: oldData.data?.filter((post: Post) => post.id !== postId) || [],
+          data: oldData.data.filter((post) => post.id !== postId),
         };
       });
 
+      return { previousPosts: previousData[0]?.[1] };
+    },
+
+    onSuccess: () => {
+      // Invalidate to refetch with real server data
+      queryClient.invalidateQueries({ queryKey: feedQueryKeys.all });
       toast.success(t('feed.success.postDeleted'));
     },
-    onError: (error) => {
+
+    onError: (error, _postId, context) => {
+      // Rollback on error
+      if (context?.previousPosts) {
+        queryClient.setQueriesData({ queryKey: feedQueryKeys.all }, context.previousPosts);
+      }
       toast.error(t('feed.errors.deleteFailed'), {
         description: error instanceof Error ? error.message : t('feed.errors.genericError'),
       });
@@ -229,22 +335,40 @@ export function usePinPost() {
   return useMutation({
     mutationFn: ({ postId, pinned }: { postId: string; pinned: boolean }) =>
       classFeedApi.pinPost(postId, pinned),
-    onSuccess: (updatedPost: Post, variables) => {
-      // Update the post in all relevant queries
-      queryClient.setQueriesData({ queryKey: feedQueryKeys.all }, (oldData: any) => {
-        if (!oldData) return oldData;
+
+    onMutate: async ({ postId, pinned }) => {
+      // Cancel ongoing queries
+      await queryClient.cancelQueries({ queryKey: feedQueryKeys.all });
+
+      // Save previous state
+      const previousData = queryClient.getQueriesData<ApiResponse<Post[]>>({
+        queryKey: feedQueryKeys.all,
+      });
+
+      // Optimistically update pin status
+      queryClient.setQueriesData<ApiResponse<Post[]>>({ queryKey: feedQueryKeys.all }, (oldData) => {
+        if (!oldData?.data) return oldData;
         return {
           ...oldData,
-          data: oldData.data?.map((post: Post) => (post.id === updatedPost.id ? updatedPost : post)) || [],
+          data: oldData.data.map((post) => (post.id === postId ? { ...post, isPinned: pinned } : post)),
         };
       });
 
       // Update the single post query
-      queryClient.setQueryData(feedQueryKeys.post(updatedPost.id), updatedPost);
+      return { previousPosts: previousData[0]?.[1] };
+    },
 
+    onSuccess: (_, variables) => {
+      // Invalidate to refetch (may reorder pinned posts)
+      queryClient.invalidateQueries({ queryKey: feedQueryKeys.all });
       toast.success(variables.pinned ? t('feed.success.postPinned') : t('feed.success.postUnpinned'));
     },
-    onError: (error, variables) => {
+
+    onError: (error, variables, context) => {
+      // Rollback on error
+      if (context?.previousPosts) {
+        queryClient.setQueriesData({ queryKey: feedQueryKeys.all }, context.previousPosts);
+      }
       toast.error(
         variables.pinned ? t('feed.errors.pinFailed', { action: 'pin' }) : t('feed.errors.unpinFailed'),
         {
@@ -262,19 +386,67 @@ export function useCreateComment() {
   const queryClient = useQueryClient();
   const classFeedApi = useClassFeedApiService();
   const { t } = useTranslation('classes');
+  const { user: currentUser } = useAuth();
 
   return useMutation({
     mutationFn: (request: CommentCreateRequest) => classFeedApi.createComment(request),
-    onSuccess: (newComment: Comment) => {
-      // Add the new comment to the comments query
-      queryClient.setQueryData(feedQueryKeys.comments(newComment.postId), (oldComments: Comment[] = []) => [
-        ...oldComments,
-        newComment,
+
+    onMutate: async (request) => {
+      const { postId } = request;
+
+      // Cancel ongoing queries
+      await queryClient.cancelQueries({ queryKey: feedQueryKeys.comments(postId) });
+      await queryClient.cancelQueries({ queryKey: feedQueryKeys.all });
+
+      // Create optimistic comment with real user data to avoid flickering
+      const optimisticComment: Comment = {
+        id: `temp-${Date.now()}`,
+        postId: request.postId,
+        userId: currentUser?.id || 'current-user',
+        user: currentUser
+          ? {
+              id: currentUser.id,
+              firstName: currentUser.firstName || '',
+              lastName: currentUser.lastName || '',
+              email: currentUser.email,
+              avatarUrl: currentUser.avatarUrl || currentUser.avatar || null,
+            }
+          : undefined,
+        content: request.content,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      // Save previous comments
+      const previousComments = queryClient.getQueryData<Comment[]>(feedQueryKeys.comments(postId));
+
+      // Save previous posts and increment comment count
+      const previousPosts = updatePostCommentCount(queryClient, postId, 1);
+
+      // Add optimistic comment
+      queryClient.setQueryData<Comment[]>(feedQueryKeys.comments(postId), (old = []) => [
+        ...old,
+        optimisticComment,
       ]);
 
+      return { previousComments, previousPosts, postId };
+    },
+
+    onSuccess: () => {
+      // Invalidate both comments and posts queries
+      queryClient.invalidateQueries({ queryKey: feedQueryKeys.all });
       toast.success(t('feed.success.commentAdded'));
     },
-    onError: (error) => {
+
+    onError: (error, _request, context) => {
+      // Rollback comments
+      if (context?.previousComments) {
+        queryClient.setQueryData(feedQueryKeys.comments(context.postId), context.previousComments);
+      }
+      // Rollback posts comment count
+      if (context?.previousPosts) {
+        queryClient.setQueriesData({ queryKey: feedQueryKeys.all }, context.previousPosts);
+      }
       toast.error(t('feed.errors.commentFailed'), {
         description: error instanceof Error ? error.message : t('feed.errors.genericError'),
       });
@@ -291,16 +463,43 @@ export function useDeleteComment() {
   const { t } = useTranslation('classes');
 
   return useMutation({
-    mutationFn: (commentId: string) => classFeedApi.deleteComment(commentId),
-    onSuccess: (_, commentId) => {
-      // Remove the comment from all comments queries
-      queryClient.setQueriesData({ queryKey: feedQueryKeys.comments }, (oldComments: Comment[] = []) =>
-        oldComments.filter((comment) => comment.id !== commentId)
+    mutationFn: ({ commentId }: { commentId: string; postId: string }) =>
+      classFeedApi.deleteComment(commentId),
+
+    onMutate: async ({ commentId, postId }) => {
+      // Cancel ongoing queries
+      await queryClient.cancelQueries({ queryKey: feedQueryKeys.comments(postId) });
+      await queryClient.cancelQueries({ queryKey: feedQueryKeys.all });
+
+      // Save previous comments
+      const previousComments = queryClient.getQueryData<Comment[]>(feedQueryKeys.comments(postId));
+
+      // Save previous posts and decrement comment count
+      const previousPosts = updatePostCommentCount(queryClient, postId, -1);
+
+      // Remove comment optimistically
+      queryClient.setQueryData<Comment[]>(feedQueryKeys.comments(postId), (old = []) =>
+        old.filter((c) => c.id !== commentId)
       );
 
+      return { previousComments, previousPosts, postId };
+    },
+
+    onSuccess: () => {
+      // Invalidate both comments and posts queries
+      queryClient.invalidateQueries({ queryKey: feedQueryKeys.all });
       toast.success(t('feed.success.commentDeleted'));
     },
-    onError: (error) => {
+
+    onError: (error, _variables, context) => {
+      // Rollback comments
+      if (context?.previousComments) {
+        queryClient.setQueryData(feedQueryKeys.comments(context.postId), context.previousComments);
+      }
+      // Rollback posts comment count
+      if (context?.previousPosts) {
+        queryClient.setQueriesData({ queryKey: feedQueryKeys.all }, context.previousPosts);
+      }
       toast.error(t('feed.errors.deleteCommentFailed'), {
         description: error instanceof Error ? error.message : t('feed.errors.genericError'),
       });

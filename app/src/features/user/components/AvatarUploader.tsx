@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { useUserProfile, useUpdateUserAvatar, useRemoveUserAvatar } from '../hooks/useApi';
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
+import { UserAvatar } from '@/shared/components/common/UserAvatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Upload, Trash2 } from 'lucide-react';
 import LoadingButton from '@/shared/components/common/LoadingButton';
@@ -30,10 +30,6 @@ export const AvatarUploader = () => {
     }
   };
 
-  const getInitials = (firstName?: string, lastName?: string) => {
-    return `${firstName?.[0] ?? ''}${lastName?.[0] ?? ''}`.toUpperCase();
-  };
-
   return (
     <Card className="border border-gray-200 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md">
       <CardHeader className="border-b border-gray-100 pb-6">
@@ -41,12 +37,12 @@ export const AvatarUploader = () => {
         <p className="mt-2 text-sm text-gray-500">{t('profile.subtitle')}</p>
       </CardHeader>
       <CardContent className="flex flex-col items-center space-y-6 p-6">
-        <Avatar className="h-40 w-40 border-4 border-gray-200 shadow-sm">
-          <AvatarImage src={userProfile?.avatarUrl ?? undefined} alt="User avatar" />
-          <AvatarFallback className="bg-gray-100 text-2xl font-semibold text-gray-600">
-            {getInitials(userProfile?.firstName, userProfile?.lastName)}
-          </AvatarFallback>
-        </Avatar>
+        <UserAvatar
+          src={userProfile?.avatarUrl ?? undefined}
+          name={`${userProfile?.firstName ?? ''} ${userProfile?.lastName ?? ''}`.trim()}
+          size="xl"
+          className="h-40 w-40 border-4 border-gray-200 shadow-sm"
+        />
         <input
           type="file"
           ref={fileInputRef}

@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { ResourceCard } from './ResourceCard';
+import { Skeleton } from '@/shared/components/ui/skeleton';
 import type { LinkedResource, LinkedResourceType } from '../../types/resource';
-import { Loader2 } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 interface ResourceSelectorGridProps {
   resources: LinkedResource[];
@@ -27,22 +28,37 @@ export const ResourceSelectorGrid = ({
 
   if (isLoading) {
     return (
-      <div className="flex h-48 items-center justify-center">
-        <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="flex flex-col space-y-3 rounded-lg border p-3">
+            <Skeleton className="aspect-video w-full rounded-md" />
+            <Skeleton className="h-4 w-3/4" />
+          </div>
+        ))}
       </div>
     );
   }
 
   if (filteredResources.length === 0) {
     return (
-      <div className="text-muted-foreground flex h-48 items-center justify-center text-sm">
-        {searchQuery ? t('feed.resourceSelector.noSearchResults') : t('feed.resourceSelector.noResources')}
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="bg-muted/50 mb-4 rounded-full p-4">
+          <Search className="text-muted-foreground/60 h-8 w-8" />
+        </div>
+        <p className="text-foreground mb-1 text-sm font-medium">
+          {searchQuery ? t('feed.resourceSelector.noSearchResults') : t('feed.resourceSelector.noResources')}
+        </p>
+        {searchQuery && (
+          <p className="text-muted-foreground text-xs">
+            {t('feed.resourceSelector.tryDifferentSearch', 'Try a different search term')}
+          </p>
+        )}
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 px-1 sm:grid-cols-3 md:grid-cols-4">
       {filteredResources.map((resource) => (
         <ResourceCard
           key={`${resource.type}:${resource.id}`}

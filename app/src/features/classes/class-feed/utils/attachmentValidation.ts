@@ -6,13 +6,14 @@ export const ALLOWED_EXTENSIONS = {
 } as const;
 
 export const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+export const MAX_ATTACHMENTS = 10;
 
 export type MediaCategory = keyof typeof ALLOWED_EXTENSIONS;
 
 export interface ValidationResult {
   valid: boolean;
-  error?: string | 'invalid_extension' | 'file_too_large';
-  errorType?: 'invalid_extension' | 'file_too_large';
+  error?: string | 'invalid_extension' | 'file_too_large' | 'max_attachments';
+  errorType?: 'invalid_extension' | 'file_too_large' | 'max_attachments';
   errorData?: Record<string, any>;
 }
 
@@ -49,6 +50,45 @@ export function isValidFileSize(file: File): boolean {
 }
 
 /**
+ * Validate a single file and return a ValidationResult with structured data
+ */
+export function validateAttachment(file: File, currentCount = 0): ValidationResult {
+  const extension = getFileExtension(file.name);
+
+  if (!isValidFileExtension(file.name)) {
+    return {
+      valid: false,
+      error: 'invalid_extension',
+      errorType: 'invalid_extension',
+      errorData: { extension },
+    };
+  }
+
+  if (!isValidFileSize(file)) {
+    return {
+      valid: false,
+      error: 'file_too_large',
+      errorType: 'file_too_large',
+      errorData: {
+        maxSizeMB: Math.round(MAX_FILE_SIZE / (1024 * 1024)),
+        actualSizeMB: Math.round(file.size / (1024 * 1024)),
+      },
+    };
+  }
+
+  if (currentCount >= MAX_ATTACHMENTS) {
+    return {
+      valid: false,
+      error: 'max_attachments',
+      errorType: 'max_attachments',
+      errorData: { max: MAX_ATTACHMENTS },
+    };
+  }
+
+  return { valid: true };
+}
+
+/**
  * Get the media category for a file
  */
 export function getMediaCategory(filename: string): MediaCategory | null {
@@ -61,42 +101,6 @@ export function getMediaCategory(filename: string): MediaCategory | null {
     }
   }
   return null;
-}
-
-export interface ValidationError {
-  type: 'invalid_extension' | 'file_too_large';
-  extension?: string;
-  sizeMB?: string;
-}
-
-/**
- * Validate a file for upload
- * Returns validation result with error type instead of localized message
- */
-export function validateAttachment(
-  file: File
-): ValidationResult & { errorType?: ValidationError['type']; errorData?: any } {
-  if (!isValidFileExtension(file.name)) {
-    const extension = getFileExtension(file.name) || 'unknown';
-    return {
-      valid: false,
-      error: 'invalid_extension',
-      errorType: 'invalid_extension',
-      errorData: { extension },
-    };
-  }
-
-  if (!isValidFileSize(file)) {
-    const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-    return {
-      valid: false,
-      error: 'file_too_large',
-      errorType: 'file_too_large',
-      errorData: { sizeMB },
-    };
-  }
-
-  return { valid: true };
 }
 
 /**

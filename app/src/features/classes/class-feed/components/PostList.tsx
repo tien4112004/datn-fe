@@ -1,13 +1,13 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PostCard } from './PostCard';
-import { CommentThread } from './CommentThread';
-import { usePinPost, useDeletePost } from '../hooks/useApi';
-import { type Post, PostType } from '../types';
 import { useConfirmDialog } from '@/shared/hooks/useConfirmDialog';
 import { DeleteConfirmation } from '@/shared/components/common/DeleteConfirmation';
 import { SpinnerIcon } from '@/shared/components/common/GlobalSpinner';
 import { AnimatePresence, motion } from 'motion/react';
+import { useState } from 'react';
+import { useDeletePost, usePinPost, useUpdatePost } from '../hooks/useApi';
+import { PostType, type Post } from '../types';
+import { CommentThread } from './CommentThread';
+import { PostCard } from './PostCard';
 
 interface PostListProps {
   posts: Post[];
@@ -29,6 +29,15 @@ export const PostList = ({
   const { t } = useTranslation('classes');
   const pinPost = usePinPost();
   const deletePost = useDeletePost();
+  const updatePost = useUpdatePost();
+
+  const handleEditPost = async (postId: string, content: string) => {
+    try {
+      await updatePost.mutateAsync({ id: postId, content });
+    } catch (err) {
+      // Error handled by hook
+    }
+  };
   const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
   const { isOpen, openDialog, confirm, cancel } = useConfirmDialog<string>();
 
@@ -103,6 +112,7 @@ export const PostList = ({
         <div key={post.id}>
           <PostCard
             post={post}
+            onUpdate={(newContent) => handleEditPost(post.id, newContent)}
             onPin={(pinned) => handlePinPost(post.id, pinned)}
             onDelete={() => handleDeletePost(post.id)}
             onComment={() => toggleComments(post.id)}

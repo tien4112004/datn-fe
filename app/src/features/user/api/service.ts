@@ -38,9 +38,9 @@ export default class UserProfileService implements UserProfileApiService {
 
   async updateCurrentUserAvatar(avatar: File): Promise<{ avatarUrl: string }> {
     const formData = new FormData();
-    formData.append('avatar', avatar);
+    formData.append('file', avatar);
 
-    const response = await this.apiClient.patch<ApiResponse<{ avatarUrl: string }>>(
+    const response = await this.apiClient.post<ApiResponse<{ avatarUrl: string }>>(
       `${this.baseUrl}/api/user/me/avatar`,
       formData,
       {

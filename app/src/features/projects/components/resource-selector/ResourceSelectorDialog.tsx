@@ -7,12 +7,18 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/shared/components/ui/dialog';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/shared/components/ui/accordion';
+import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { ScrollArea } from '@/shared/components/ui/scroll-area';
 import { BrainCircuit, Presentation, ClipboardList, Search, X, Eye, MessageSquare } from 'lucide-react';
 import { useMindmaps } from '@/features/mindmap/hooks/useApi';
 import { usePresentations } from '@/features/presentation/hooks/useApi';
@@ -142,163 +148,178 @@ export const ResourceSelectorDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="flex max-h-[85vh] !max-w-3xl flex-col overflow-hidden">
-        <DialogHeader>
-          <DialogTitle>{t('feed.resourceSelector.title')}</DialogTitle>
-        </DialogHeader>
-
-        {/* Search Input */}
-        <div className="relative">
-          <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-          <Input
-            placeholder={t('feed.resourceSelector.searchPlaceholder')}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 pr-9"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={() => setSearchQuery('')}
-              className="text-muted-foreground hover:text-foreground absolute right-3 top-1/2 -translate-y-1/2"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-
-        {/* Tabs */}
-        <Tabs
-          value={activeTab}
-          onValueChange={(v) => setActiveTab(v as TabValue)}
-          className="flex flex-1 flex-col overflow-hidden"
-        >
-          <TabsList className="w-full justify-start">
-            <TabsTrigger value="mindmap" className="gap-1.5">
-              <BrainCircuit className="h-4 w-4" />
-              {t('feed.resourceSelector.tabs.mindmaps')}
-              {selectedCounts.mindmap > 0 && (
-                <span className="bg-primary text-primary-foreground ml-1 rounded-full px-1.5 py-0.5 text-xs">
-                  {selectedCounts.mindmap}
-                </span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="presentation" className="gap-1.5">
-              <Presentation className="h-4 w-4" />
-              {t('feed.resourceSelector.tabs.presentations')}
-              {selectedCounts.presentation > 0 && (
-                <span className="bg-primary text-primary-foreground ml-1 rounded-full px-1.5 py-0.5 text-xs">
-                  {selectedCounts.presentation}
-                </span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="assignment" className="gap-1.5">
-              <ClipboardList className="h-4 w-4" />
-              {t('feed.resourceSelector.tabs.assignments')}
-              {selectedCounts.assignment > 0 && (
-                <span className="bg-primary text-primary-foreground ml-1 rounded-full px-1.5 py-0.5 text-xs">
-                  {selectedCounts.assignment}
-                </span>
-              )}
-            </TabsTrigger>
-          </TabsList>
-
-          <div className="flex-1 overflow-y-auto py-4">
-            <TabsContent value="mindmap" className="mt-0">
-              <ResourceSelectorGrid
-                resources={mindmapResources}
-                isLoading={mindmapsLoading}
-                isSelected={isSelected}
-                onToggle={toggleResource}
-                searchQuery={searchQuery}
-              />
-            </TabsContent>
-
-            <TabsContent value="presentation" className="mt-0">
-              <ResourceSelectorGrid
-                resources={presentationResources}
-                isLoading={presentationsLoading}
-                isSelected={isSelected}
-                onToggle={toggleResource}
-                searchQuery={searchQuery}
-              />
-            </TabsContent>
-
-            <TabsContent value="assignment" className="mt-0">
-              <ResourceSelectorGrid
-                resources={assignmentResources}
-                isLoading={assignmentsLoading}
-                isSelected={isSelected}
-                onToggle={toggleResource}
-                searchQuery={searchQuery}
-              />
-            </TabsContent>
+      <DialogContent className="animate-in fade-in-0 zoom-in-95 flex max-h-[85vh] !max-w-3xl flex-col overflow-hidden duration-200">
+        <div className="flex flex-1 flex-col gap-4 overflow-hidden px-2">
+          <DialogHeader>
+            <DialogTitle>{t('feed.resourceSelector.title')}</DialogTitle>
+          </DialogHeader>
+          {/* Search Input */}
+          <div className="relative">
+            <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+            <Input
+              placeholder={t('feed.resourceSelector.searchPlaceholder')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-9"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="text-muted-foreground hover:text-foreground absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
-        </Tabs>
+
+          {/* Tabs */}
+          <Tabs
+            value={activeTab}
+            onValueChange={(v) => setActiveTab(v as TabValue)}
+            className="flex flex-1 flex-col overflow-hidden"
+          >
+            <TabsList className="w-full justify-start">
+              <TabsTrigger value="mindmap" className="gap-1.5">
+                <BrainCircuit className="h-4 w-4" />
+                {t('feed.resourceSelector.tabs.mindmaps')}
+                {selectedCounts.mindmap > 0 && (
+                  <Badge variant="default" className="ml-1 px-1.5 py-0">
+                    {selectedCounts.mindmap}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="presentation" className="gap-1.5">
+                <Presentation className="h-4 w-4" />
+                {t('feed.resourceSelector.tabs.presentations')}
+                {selectedCounts.presentation > 0 && (
+                  <Badge variant="default" className="ml-1 px-1.5 py-0">
+                    {selectedCounts.presentation}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="assignment" className="gap-1.5">
+                <ClipboardList className="h-4 w-4" />
+                {t('feed.resourceSelector.tabs.assignments')}
+                {selectedCounts.assignment > 0 && (
+                  <Badge variant="default" className="ml-1 px-1.5 py-0">
+                    {selectedCounts.assignment}
+                  </Badge>
+                )}
+              </TabsTrigger>
+            </TabsList>
+
+            <div className="min-h-0 flex-1 overflow-y-auto py-4">
+              <TabsContent value="mindmap" className="mt-0">
+                <ResourceSelectorGrid
+                  resources={mindmapResources}
+                  isLoading={mindmapsLoading}
+                  isSelected={isSelected}
+                  onToggle={toggleResource}
+                  searchQuery={searchQuery}
+                />
+              </TabsContent>
+
+              <TabsContent value="presentation" className="mt-0">
+                <ResourceSelectorGrid
+                  resources={presentationResources}
+                  isLoading={presentationsLoading}
+                  isSelected={isSelected}
+                  onToggle={toggleResource}
+                  searchQuery={searchQuery}
+                />
+              </TabsContent>
+
+              <TabsContent value="assignment" className="mt-0">
+                <ResourceSelectorGrid
+                  resources={assignmentResources}
+                  isLoading={assignmentsLoading}
+                  isSelected={isSelected}
+                  onToggle={toggleResource}
+                  searchQuery={searchQuery}
+                />
+              </TabsContent>
+            </div>
+          </Tabs>
+        </div>
 
         {/* Selected Resources Panel */}
         {selectedResources.length > 0 && (
-          <div className="flex-shrink-0 border-t pt-3">
-            <div className="mb-2 flex items-center justify-between">
-              <Label className="text-sm font-medium">
-                {t('feed.resourceSelector.selectedResources', 'Selected Resources')} (
-                {selectedResources.length})
-              </Label>
-              <button
-                type="button"
-                onClick={clearSelection}
-                className="text-muted-foreground hover:text-foreground text-xs hover:underline"
-              >
-                {t('feed.resourceSelector.clearSelection')}
-              </button>
-            </div>
-            <ScrollArea className="max-h-[120px]">
-              <div className="space-y-1.5 pr-3">
-                {selectedResources.map((resource) => {
-                  const Icon = getResourceIcon(resource.type);
-                  return (
-                    <div
-                      key={`${resource.type}:${resource.id}`}
-                      className="bg-muted/30 flex items-center gap-2 rounded-md border px-2 py-1.5"
+          <div className="bg-muted/30 flex-shrink-0 border-t py-3">
+            <Accordion type="single" collapsible defaultValue="selected-resources">
+              <AccordionItem value="selected-resources" className="border-none">
+                <AccordionTrigger className="px-1 py-0 hover:no-underline">
+                  <div className="flex w-full items-center justify-between">
+                    <Label className="text-sm font-medium">
+                      {t('feed.resourceSelector.selectedResources')} ({selectedResources.length})
+                    </Label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        clearSelection();
+                      }}
+                      className="mr-2 h-auto px-2 py-1 text-xs"
                     >
-                      <Icon className="text-muted-foreground h-4 w-4 flex-shrink-0" />
-                      <span className="min-w-0 flex-1 truncate text-sm">{resource.title}</span>
-                      <Select
-                        value={resource.permissionLevel || 'view'}
-                        onValueChange={(value: PermissionLevel) =>
-                          updateResourcePermission(resource.type, resource.id, value)
-                        }
-                      >
-                        <SelectTrigger className="h-7 w-[110px] flex-shrink-0 text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="view">
-                            <div className="flex items-center gap-1.5">
-                              <Eye className="h-3 w-3" />
-                              <span>{t('feed.resourceSelector.viewOnly', 'View only')}</span>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="comment">
-                            <div className="flex items-center gap-1.5">
-                              <MessageSquare className="h-3 w-3" />
-                              <span>{t('feed.resourceSelector.viewAndComment', 'View & Comment')}</span>
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <button
-                        type="button"
-                        onClick={() => toggleResource(resource)}
-                        className="text-muted-foreground hover:text-destructive flex-shrink-0"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            </ScrollArea>
+                      {t('feed.resourceSelector.clearSelection')}
+                    </Button>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pb-0 pt-3">
+                  <div className="space-y-2 pr-3">
+                    {selectedResources.map((resource) => {
+                      const Icon = getResourceIcon(resource.type);
+                      return (
+                        <div
+                          key={`${resource.type}:${resource.id}`}
+                          className="bg-background flex items-center gap-2 rounded-md border px-3 py-2 transition-colors"
+                        >
+                          <Icon className="text-muted-foreground h-4 w-4 flex-shrink-0" />
+                          <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                            {resource.title}
+                          </span>
+                          <Select
+                            value={resource.permissionLevel || 'view'}
+                            onValueChange={(value: PermissionLevel) =>
+                              updateResourcePermission(resource.type, resource.id, value)
+                            }
+                          >
+                            <SelectTrigger className="h-8 w-fit flex-shrink-0 text-xs">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="view">
+                                <div className="flex items-center gap-1.5">
+                                  <Eye className="h-3 w-3" />
+                                  <span>{t('feed.resourceSelector.viewOnly')}</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="comment">
+                                <div className="flex items-center gap-1.5">
+                                  <MessageSquare className="h-3 w-3" />
+                                  <span>{t('feed.resourceSelector.viewAndComment')}</span>
+                                </div>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => toggleResource(resource)}
+                            className="hover:bg-destructive/10 hover:text-destructive h-8 w-8 flex-shrink-0"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
         )}
 
@@ -308,7 +329,7 @@ export const ResourceSelectorDialog = ({
             {/* Set All Permissions */}
             <div className="flex items-center gap-3">
               <Label className="text-muted-foreground whitespace-nowrap text-sm">
-                {t('feed.resourceSelector.setAllPermissions', 'Set all permissions:')}
+                {t('feed.resourceSelector.setAllPermissions')}
               </Label>
               <Select
                 value={defaultPermissionLevel}
@@ -321,13 +342,13 @@ export const ResourceSelectorDialog = ({
                   <SelectItem value="view">
                     <div className="flex items-center gap-2">
                       <Eye className="h-4 w-4" />
-                      <span>{t('feed.resourceSelector.viewOnly', 'View only')}</span>
+                      <span>{t('feed.resourceSelector.viewOnly')}</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="comment">
                     <div className="flex items-center gap-2">
                       <MessageSquare className="h-4 w-4" />
-                      <span>{t('feed.resourceSelector.viewAndComment', 'View & Comment')}</span>
+                      <span>{t('feed.resourceSelector.viewAndComment')}</span>
                     </div>
                   </SelectItem>
                 </SelectContent>

@@ -1,14 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useCreatePost } from '../hooks/useApi';
-import { useAttachmentUpload } from '../hooks/useAttachmentUpload';
-import { type PostCreateRequest, PostType } from '../types';
+import { ResourceSelectorDialog } from '@/features/projects/components/resource-selector';
 import type { LinkedResource } from '@/features/projects/types/resource';
-import { useTranslation } from 'react-i18next';
-import { Button } from '@/shared/components/ui/button';
 import RichTextEditor from '@/shared/components/rte/RichTextEditor';
 import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
-import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
-import { Label } from '@/shared/components/ui/label';
+import { Badge } from '@/shared/components/ui/badge';
+import { Button } from '@/shared/components/ui/button';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Switch } from '@/shared/components/ui/switch';
 import { Input } from '@/shared/components/ui/input';
@@ -19,30 +14,39 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/components/ui/dialog';
+import { Label } from '@/shared/components/ui/label';
+import { Progress } from '@/shared/components/ui/progress';
+import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
+import { Separator } from '@/shared/components/ui/separator';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  Paperclip,
-  Plus,
-  X,
-  Link2,
   BrainCircuit,
-  Presentation,
   ClipboardList,
-  Loader2,
   Eye,
+  Link2,
+  Loader2,
   MessageSquare,
   CalendarIcon,
+  Paperclip,
+  Plus,
+  Presentation,
+  X,
 } from 'lucide-react';
-import { Separator } from '@/shared/components/ui/separator';
-import { ResourceSelectorDialog } from '@/features/projects/components/resource-selector';
-import { getAcceptString, formatFileSize } from '../utils/attachmentValidation';
-import { Progress } from '@/shared/components/ui/progress';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { useCreatePost } from '../hooks/useApi';
+import { useAttachmentUpload } from '../hooks/useAttachmentUpload';
+import { PostType, type PostCreateRequest } from '../types';
+import { formatFileSize, getAcceptString } from '../utils/attachmentValidation';
+import { postEditorSchema } from '../validation/postSchema';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { cn } from '@/shared/lib/utils';
 import { AssignmentListCommand } from './AssignmentListCommand';
 import { format } from 'date-fns/format';
 import type { Assignment } from '@/features/assignment';
-import { Calendar } from 'antd';
+import { Calendar } from '@/components/ui/calendar';
 
 interface PostCreatorProps {
   classId: string;
@@ -87,17 +91,46 @@ export const PostCreator = ({
   const [passingScore, setPassingScore] = useState<number | undefined>(undefined);
   const [availableFrom, setAvailableFrom] = useState<string>('');
   const [availableUntil, setAvailableUntil] = useState<string>('');
+  const [attachmentErrors, setAttachmentErrors] = useState<string[]>([]);
 
   // Sync type with initialType when it changes (e.g., when filter switches to Exercise)
   useEffect(() => {
     setType(initialType);
   }, [initialType]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Form for content validation
+  const form = useForm<{ content: string }>({
+    resolver: zodResolver(postEditorSchema),
+    defaultValues: { content: '' },
+    mode: 'onSubmit',
+  });
 
-    if (!editor || editor.document.length === 0) return;
+  const {
+    handleSubmit: handleFormSubmit,
+    setValue,
+    formState: { errors },
+  } = form;
 
+  // Keep editor content in sync with the form
+  const handleEditorChange = useCallback(async () => {
+    if (!editor) return;
+    try {
+      const md = await editor.blocksToMarkdownLossy(editor.document);
+      setValue('content', md, { shouldValidate: false, shouldDirty: true });
+      setAttachmentErrors([]);
+    } catch (err) {
+      console.error('Failed to convert blocks to markdown:', err);
+    }
+  }, [editor, setValue]);
+
+  // Initial sync when editor is ready
+  useEffect(() => {
+    if (!editor) return;
+    // ensure form content is in sync when editor is focused/used
+    handleEditorChange();
+  }, [editor, handleEditorChange]);
+
+  const onSubmit = handleFormSubmit(async (data) => {
     try {
       // Upload pending attachments first
       let attachmentUrls: string[] = [];
@@ -105,12 +138,10 @@ export const PostCreator = ({
         attachmentUrls = await uploadAll();
       }
 
-      const contentMd = await editor.blocksToMarkdownLossy(editor.document);
-
       const request: PostCreateRequest = {
         classId,
         type,
-        content: contentMd,
+        content: data.content,
         attachments: attachmentUrls.length > 0 ? attachmentUrls : undefined,
         linkedResources:
           type === PostType.Post && linkedResources.length > 0
@@ -138,8 +169,9 @@ export const PostCreator = ({
 
       await createPost.mutateAsync(request);
 
-      // Reset form
+      // Reset form and UI
       editor.replaceBlocks(editor.document, []);
+      form.reset({ content: '' });
       clearAttachments();
       setLinkedResources([]);
       setSelectedAssignment(null);
@@ -161,17 +193,44 @@ export const PostCreator = ({
     } catch (err) {
       // Error is handled by the hook
     }
-  };
+  });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    addFiles(files);
+    const results = addFiles(files);
+
+    const newErrors: string[] = [];
+    for (let i = 0; i < results.length; i++) {
+      const r = results[i];
+      if (!r.valid) {
+        if (r.errorType === 'invalid_extension') {
+          newErrors.push(
+            // @ts-ignore - errorData.extension exists
+            t('feed.creator.attachments.validation.invalidFileType', { extension: r.errorData?.extension })
+          );
+        } else if (r.errorType === 'file_too_large') {
+          newErrors.push(
+            t('feed.creator.attachments.validation.fileTooLarge', {
+              fileName: files[i].name,
+              maxSize: r.errorData?.maxSizeMB,
+              actualSize: r.errorData?.actualSizeMB,
+            })
+          );
+        } else if (r.errorType === 'max_attachments') {
+          newErrors.push(t('feed.creator.validation.maxAttachmentsExceeded', { max: r.errorData?.max }));
+        } else {
+          newErrors.push(t('feed.creator.attachments.validation.cannotAdd', { fileName: files[i].name }));
+        }
+      }
+    }
+
+    setAttachmentErrors(newErrors);
+
     // Reset the input so the same file can be selected again
     e.target.value = '';
   };
 
-  const canSubmit = editor && editor.document.length > 0 && !createPost.isPending && !isUploading;
-
+  const canSubmit = !createPost.isPending && !isUploading;
   const buttonText =
     initialType === PostType.Exercise
       ? t('feed.creator.actions.createHomework')
@@ -190,7 +249,7 @@ export const PostCreator = ({
           <DialogTitle>{t('feed.creator.dialog.title')}</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={onSubmit} className="space-y-6">
           {/* Post Type */}
           <div className="space-y-3">
             <Label className="text-sm font-medium">{t('feed.creator.labels.postType')}</Label>
@@ -217,14 +276,22 @@ export const PostCreator = ({
           {/* Content Editor */}
           <div className="space-y-2">
             <Label className="text-sm font-medium">{t('feed.creator.labels.content')}</Label>
-            <div className="rounded-lg border">
+            <div
+              className={`rounded-lg border ${errors.content ? 'border-red-500 ring-2 ring-red-200' : ''}`}
+            >
               <RichTextEditor
                 editor={editor}
                 minimalToolbar={true}
                 sideMenu={false}
                 className="min-h-[150px] p-2 md:min-h-[200px] md:p-3"
+                onChange={handleEditorChange}
               />
             </div>
+            {errors.content && (
+              <p className="text-sm text-red-600">
+                {t(((errors.content.message as string) ?? 'feed.creator.validation.contentRequired') as any)}
+              </p>
+            )}
           </div>
           <Separator />
           {/* Conditional Fields based on Post Type */}
@@ -262,6 +329,7 @@ export const PostCreator = ({
                         selected={dueDate}
                         onSelect={setDueDate}
                         disabled={(date: Date) => date < new Date()}
+                        locale={getLocaleDateFns()}
                       />
                     </PopoverContent>
                   </Popover>
@@ -489,6 +557,15 @@ export const PostCreator = ({
                       ))}
                     </div>
                   )}
+
+                  {/* Attachment validation errors */}
+                  {attachmentErrors.length > 0 && (
+                    <div className="mt-2 space-y-1 text-sm text-red-600">
+                      {attachmentErrors.map((err, idx) => (
+                        <p key={idx}>{err}</p>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -499,17 +576,27 @@ export const PostCreator = ({
                   type="button"
                   variant="outline"
                   onClick={() => setResourceSelectorOpen(true)}
-                  className="w-full justify-start"
+                  className={cn(
+                    'w-full justify-start gap-2',
+                    linkedResources.length > 0 && 'border-primary/50'
+                  )}
                 >
-                  <Link2 className="mr-2 h-4 w-4" />
-                  {linkedResources.length > 0
-                    ? t('feed.creator.resourcesSelected', { count: linkedResources.length })
-                    : t('feed.creator.selectResources')}
+                  <Link2 className="h-4 w-4" />
+                  <span className="flex-1 text-left">
+                    {linkedResources.length > 0
+                      ? t('feed.creator.resourcesSelected', { count: linkedResources.length })
+                      : t('feed.creator.selectResources')}
+                  </span>
+                  {linkedResources.length > 0 && (
+                    <Badge variant="secondary" className="ml-auto">
+                      {linkedResources.length}
+                    </Badge>
+                  )}
                 </Button>
 
                 {/* Selected resources chips */}
                 {linkedResources.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-2">
+                  <div className="mt-3 flex flex-wrap gap-2">
                     {linkedResources.map((resource) => {
                       const Icon =
                         resource.type === 'mindmap'
@@ -519,27 +606,30 @@ export const PostCreator = ({
                             : ClipboardList;
                       const PermissionIcon = resource.permissionLevel === 'comment' ? MessageSquare : Eye;
                       return (
-                        <div
+                        <Badge
                           key={`${resource.type}:${resource.id}`}
-                          className="bg-secondary flex items-center gap-1.5 rounded-full px-3 py-1 text-sm"
+                          variant="secondary"
+                          className="group flex items-center gap-2 py-1.5 pl-2.5 pr-2"
                         >
-                          <Icon className="h-3.5 w-3.5" />
-                          <span className="max-w-[120px] truncate">{resource.title}</span>
-                          <span className="text-muted-foreground flex items-center gap-0.5 text-xs">
-                            <PermissionIcon className="h-3 w-3" />
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setLinkedResources((prev) =>
-                                prev.filter((r) => !(r.type === resource.type && r.id === resource.id))
-                              )
-                            }
-                            className="hover:text-destructive ml-1"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </div>
+                          <Icon className="h-4 w-4 flex-shrink-0" />
+                          <span className="max-w-[120px] truncate font-medium">{resource.title}</span>
+                          <div className="flex items-center gap-1.5 border-l border-current border-opacity-20 pl-1.5">
+                            <PermissionIcon className="h-3.5 w-3.5 flex-shrink-0 opacity-60" />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="hover:bg-destructive/10 hover:text-destructive -mr-0.5 h-5 w-5 opacity-60 hover:opacity-100"
+                              onClick={() =>
+                                setLinkedResources((prev) =>
+                                  prev.filter((r) => !(r.type === resource.type && r.id === resource.id))
+                                )
+                              }
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </Badge>
                       );
                     })}
                   </div>

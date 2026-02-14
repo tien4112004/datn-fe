@@ -1,12 +1,8 @@
 import { api, getBackendUrl } from '@aiprimary/api';
 import type { ApiResponse } from '@aiprimary/api';
 import type { AIModificationRequest, AIModificationResponse } from '@/types/aiModification';
-import { mockAIModificationService } from './mockModifications';
 
 const BASE_URL = getBackendUrl();
-
-// Set to false to use real backend API instead of mocks
-const USE_MOCK = false;
 
 /**
  * AI Modification Service
@@ -26,7 +22,6 @@ export const aiModificationService = {
     provider: string = 'google'
   ): Promise<AIModificationResponse> {
     console.log(`[AI] processModification → ${request.action}`, { payload: request, model, provider });
-    if (USE_MOCK) return mockAIModificationService.processModification(request);
     try {
       let endpoint = '';
       let payload = {};
@@ -106,7 +101,6 @@ export const aiModificationService = {
     provider: string = 'google'
   ): Promise<AIModificationResponse> {
     console.log('[AI] refineElementText', { payload: request, model, provider });
-    if (USE_MOCK) return mockAIModificationService.refineElementText(request);
     try {
       const response = await api.post<ApiResponse<any>>(`${BASE_URL}/api/ai/refine-element-text`, {
         ...request,
@@ -157,7 +151,6 @@ export const aiModificationService = {
     provider: string = 'google'
   ): Promise<AIModificationResponse> {
     console.log('[AI] replaceElementImage', { payload: request, model, provider });
-    if (USE_MOCK) return mockAIModificationService.replaceElementImage(request);
     try {
       const response = await api.post<ApiResponse<any>>(`${BASE_URL}/api/ai/replace-element-image`, {
         ...request,
@@ -206,7 +199,6 @@ export const aiModificationService = {
     provider: string = 'google'
   ): Promise<AIModificationResponse> {
     console.log('[AI] refineCombinedText', { payload: request, model, provider });
-    if (USE_MOCK) return mockAIModificationService.refineCombinedText(request);
     try {
       const response = await api.post<ApiResponse<any>>(`${BASE_URL}/api/ai/refine-combined-text`, {
         ...request,

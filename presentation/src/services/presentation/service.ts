@@ -118,15 +118,6 @@ export class PresentationApiService implements ApiService {
   }
 
   /**
-   * Mark presentation as parsed (generation complete)
-   */
-  async setParsed(id: string): Promise<any> {
-    return await this.apiClient.patch<ApiResponse<Presentation>>(
-      `${this.baseUrl}/api/presentations/${id}/parse`
-    );
-  }
-
-  /**
    * Stream presentation generation
    * Returns a stream of stringified JSON slide objects
    */
@@ -253,7 +244,7 @@ export class PresentationApiService implements ApiService {
       theme: data.theme,
       viewport: data.viewport,
       slides: data.slides,
-      isParsed: data.parsed || data.isParsed || false,
+      isParsed: data.isParsed || false,
     };
   }
 

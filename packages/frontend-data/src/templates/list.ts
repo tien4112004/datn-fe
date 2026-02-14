@@ -299,7 +299,7 @@ export const listTemplates: SlideTemplate[] = [
           fontWeight: 'normal',
           textAlign: 'left',
           lineHeight: 1.5,
-          fontSizeRange: { minSize: 15, maxSize: 24 },
+          fontSizeRange: { minSize: 15, maxSize: 28 },
         },
         children: [
           {
@@ -310,6 +310,7 @@ export const listTemplates: SlideTemplate[] = [
               color: '{{theme.fontColor}}',
               fontFamily: '{{theme.fontName}}',
               fontWeight: 'normal',
+              fontSizeRange: { minSize: 15, maxSize: 28 },
             },
           },
         ],

@@ -1,7 +1,6 @@
-import { Button } from '@/shared/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Controller } from 'react-hook-form';
-import { CircleAlert, RotateCcw, Square, Trash2 } from 'lucide-react';
+import { CircleAlert, RotateCcw } from 'lucide-react';
 import OutlineWorkspace from './OutlineWorkspace';
 import { AutosizeTextarea } from '@/shared/components/ui/autosize-textarea';
 import {
@@ -13,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select';
+import { getAllGrades, getAllSubjects } from '@aiprimary/core';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { LANGUAGE_OPTIONS, SLIDE_COUNT_OPTIONS } from '@/features/presentation/types';
 import { MODEL_TYPES, useModels } from '@/features/model';
@@ -100,127 +100,159 @@ interface OutlineFormSectionProps {
   onRegenerateOutline: () => void;
 }
 
-const OutlineFormSection = memo(
-  ({ isFetching, stopStream, clearContent, onRegenerateOutline }: OutlineFormSectionProps) => {
-    const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
-    const { models } = useModels(MODEL_TYPES.TEXT);
-    const { control } = usePresentationForm();
-    const disabled = useOutlineStore((state) => state.isStreaming);
+const OutlineFormSection = memo(({ isFetching, onRegenerateOutline }: OutlineFormSectionProps) => {
+  const { t, i18n } = useTranslation('presentation', { keyPrefix: 'createOutline' });
+  const { models } = useModels(MODEL_TYPES.TEXT);
+  const { control } = usePresentationForm();
+  const disabled = useOutlineStore((state) => state.isStreaming);
+  const grades = getAllGrades();
+  const subjects = getAllSubjects();
 
-    return (
-      <div className="flex flex-col gap-4">
-        <div className="flex w-full flex-row items-center gap-4">
-          <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('promptSection')}</div>
-          <div className="my-2 flex flex-1 flex-row gap-2">
-            <Controller
-              name="slideCount"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  value={field.value?.toString()}
-                  onValueChange={(value) => field.onChange(Number(value))}
-                  disabled={disabled}
-                >
-                  <SelectTrigger className="bg-card w-fit">
-                    <SelectValue placeholder={t('slideCountPlaceholder')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>{t('slideCountLabel')}</SelectLabel>
-                      {SLIDE_COUNT_OPTIONS.map((num) => (
-                        <SelectItem key={num} value={num.toString()}>
-                          {num} {t('slideCountUnit')}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            <Controller
-              name="language"
-              control={control}
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange} disabled={disabled}>
-                  <SelectTrigger className="w-fit">
-                    <SelectValue placeholder={t('language.placeholder')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>{t('language.label')}</SelectLabel>
-                      {LANGUAGE_OPTIONS.map((languageOption) => (
-                        <SelectItem key={languageOption.value} value={languageOption.value}>
-                          {t(languageOption.labelKey as never)}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            <Controller
-              name="model"
-              control={control}
-              render={({ field }) => (
-                <ModelSelect
-                  models={models}
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  placeholder={t('model.placeholder')}
-                  label={t('model.label')}
-                  disabled={disabled}
-                />
-              )}
-            />
-          </div>
-        </div>
-        <Controller
-          name="topic"
-          control={control}
-          render={({ field }) => (
-            <div className="relative">
-              <AutosizeTextarea className="pr-12 text-lg" {...field} disabled={disabled} />
-              <LoadingButton
-                type="button"
-                size="sm"
-                variant={'ghost'}
-                onClick={onRegenerateOutline}
-                disabled={disabled || isFetching}
-                loading={isFetching}
-                className="absolute right-3 top-1/2 h-8 w-8 -translate-y-1/2 p-0"
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex w-full flex-row items-center gap-4">
+        <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('promptSection')}</div>
+        <div className="my-2 flex flex-1 flex-row gap-2">
+          <Controller
+            name="slideCount"
+            control={control}
+            render={({ field }) => (
+              <Select
+                value={field.value?.toString()}
+                onValueChange={(value) => field.onChange(Number(value))}
+                disabled={disabled}
               >
-                <RotateCcw className="h-4 w-4" />
-              </LoadingButton>
-            </div>
-          )}
-        />
-        <div className="flex w-full justify-between">
-          <div className="flex flex-row gap-2">
-            {isFetching && (
-              <Button size="sm" type="button" onClick={() => stopStream()} variant="destructive">
-                <Square className="mr-2 h-4 w-4" />
-                <span>{t('stop')} (Dev)</span>
-              </Button>
+                <SelectTrigger className="bg-card w-fit">
+                  <SelectValue placeholder={t('slideCountPlaceholder')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>{t('slideCountLabel')}</SelectLabel>
+                    {SLIDE_COUNT_OPTIONS.map((num) => (
+                      <SelectItem key={num} value={num.toString()}>
+                        {num} {t('slideCountUnit')}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             )}
-
-            <Button type="button" size="sm" onClick={clearContent} disabled={isFetching}>
-              <Trash2 className="mr-2 h-4 w-4" />
-              <span>Clear (Dev)</span>
-            </Button>
-          </div>
-
-          {/* // Warning user to not navigate while generating */}
-          {isFetching && (
-            <div className="flex items-center">
-              <CircleAlert className="mr-1 h-4 w-4 text-orange-600" />
-              <span className="text-xs text-orange-600">{t('generatingOutlineWarning')}</span>
-            </div>
-          )}
+          />
+          <Controller
+            name="language"
+            control={control}
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange} disabled={disabled}>
+                <SelectTrigger className="w-fit">
+                  <SelectValue placeholder={t('language.placeholder')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>{t('language.label')}</SelectLabel>
+                    {LANGUAGE_OPTIONS.map((languageOption) => (
+                      <SelectItem key={languageOption.value} value={languageOption.value}>
+                        {t(languageOption.labelKey as never)}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          <Controller
+            name="model"
+            control={control}
+            render={({ field }) => (
+              <ModelSelect
+                models={models}
+                value={field.value}
+                onValueChange={field.onChange}
+                placeholder={t('model.placeholder')}
+                label={t('model.label')}
+                disabled={disabled}
+              />
+            )}
+          />
+          <Controller
+            name="grade"
+            control={control}
+            render={({ field }) => (
+              <Select
+                value={field.value || 'none'}
+                onValueChange={(val) => field.onChange(val === 'none' ? '' : val)}
+                disabled={disabled}
+              >
+                <SelectTrigger className="w-fit">
+                  <SelectValue placeholder={t('grade.placeholder')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">{t('grade.none')}</SelectItem>
+                  {grades.map((g) => (
+                    <SelectItem key={g.code} value={g.code}>
+                      {i18n.language === 'vi' ? g.name : g.nameEn}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+          <Controller
+            name="subject"
+            control={control}
+            render={({ field }) => (
+              <Select
+                value={field.value || 'none'}
+                onValueChange={(val) => field.onChange(val === 'none' ? '' : val)}
+                disabled={disabled}
+              >
+                <SelectTrigger className="w-fit">
+                  <SelectValue placeholder={t('subject.placeholder')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">{t('subject.none')}</SelectItem>
+                  {subjects.map((s) => (
+                    <SelectItem key={s.code} value={s.code}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
         </div>
       </div>
-    );
-  }
-);
+      <Controller
+        name="topic"
+        control={control}
+        render={({ field }) => (
+          <div className="relative">
+            <AutosizeTextarea className="pr-12 text-lg" {...field} disabled={disabled} />
+            <LoadingButton
+              type="button"
+              size="sm"
+              variant={'ghost'}
+              onClick={onRegenerateOutline}
+              disabled={disabled || isFetching}
+              loading={isFetching}
+              className="absolute right-3 top-1/2 h-8 w-8 -translate-y-1/2 p-0"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </LoadingButton>
+          </div>
+        )}
+      />
+      <div className="flex w-full justify-between">
+        {/* // Warning user to not navigate while generating */}
+        {isFetching && (
+          <div className="flex items-center">
+            <CircleAlert className="mr-1 h-4 w-4 text-orange-600" />
+            <span className="text-xs text-orange-600">{t('generatingOutlineWarning')}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+});
 
 OutlineFormSection.displayName = 'OutlineFormSection';
 

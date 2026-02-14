@@ -541,8 +541,18 @@ export default () => {
       for (const el of slide.elements) {
         // Apply global outline/shadow if requested (but not for cards)
         if (applyAll) {
-          if ('outline' in el && el.outline && el.shapeType !== 'card') el.outline = outline;
-          if ('shadow' in el && el.shadow && el.shapeType !== 'card') el.shadow = shadow;
+          if (
+            'outline' in el &&
+            el.outline &&
+            (el.type !== 'shape' || (el.type === 'shape' && (el as any).shapeType !== 'card'))
+          )
+            el.outline = outline;
+          if (
+            'shadow' in el &&
+            el.shadow &&
+            (el.type !== 'shape' || (el.type === 'shape' && (el as any).shapeType !== 'card'))
+          )
+            el.shadow = shadow;
         }
 
         // Skip cards (already processed in pass 1)

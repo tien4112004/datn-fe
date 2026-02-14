@@ -7,7 +7,7 @@ import type { PPTImageElement, SlideTheme } from '@/types/slides';
 import { useSlidesStore } from '@/store';
 import { useGenerationStore, type AiResultSlide } from '@/store/generation';
 import { useSaveStore } from '@/store/save';
-import { useAiResult, useSetParsed } from '@/services/presentation/queries';
+import { useAiResult } from '@/services/presentation/queries';
 import { useGenerateImage } from '@/services/image/queries';
 import { queryKeys } from '@/services/query-keys';
 import type { PresentationGenerationRequest } from '@/types/generation';
@@ -37,7 +37,7 @@ export function usePresentationProcessor(
   isGenerating: boolean,
   pinia: Pinia,
   generationRequest?: PresentationGenerationRequest
-): { isProcessing: Ref<boolean> } {
+): { isProcessing: Ref<boolean>; processFullAiResult: () => Promise<void> } {
   const isProcessing = ref(false);
   const processedStreamDataRef = ref<AiResultSlide[]>([]);
   const pendingImageGenerations = ref<Set<Promise<any>>>(new Set());
@@ -46,7 +46,6 @@ export function usePresentationProcessor(
   // API Hooks
   const queryClient = useQueryClient();
   const { refetch: fetchAiResult } = useAiResult(presentationId, { enabled: false });
-  const { mutateAsync: setParsedMutation } = useSetParsed();
   const { mutateAsync: generateImageMutation } = useGenerateImage();
 
   // Wrapper to preserve existing interface and add cache invalidation
@@ -155,6 +154,7 @@ export function usePresentationProcessor(
       }
 
       const theme = presentation?.theme || slidesStore.theme;
+      slidesStore.setTheme(theme);
 
       const slides = await Promise.all(
         aiResultSlides.map(async (slideData: any, i: number) => {
@@ -208,8 +208,6 @@ export function usePresentationProcessor(
             thumbnail: presentation.thumbnail,
           });
         }
-
-        await setParsedMutation(presentationId);
       } finally {
         dispatchGeneratingEvent(false);
       }
@@ -329,23 +327,6 @@ export function usePresentationProcessor(
       console.error('Image generation failed for slide:', slideId, error);
       await updateSlideImageInStoreWithError(slideId, imageElement.id);
       return { success: false, error: error as Error };
-    }
-  }
-
-  // Helper to convert URL to base64
-  async function urlToBase64(url: string): Promise<string> {
-    try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    } catch (error) {
-      console.error('Failed to convert URL to base64:', error);
-      throw error;
     }
   }
 
@@ -488,8 +469,6 @@ export function usePresentationProcessor(
               viewport,
               thumbnail: presentation?.thumbnail,
             });
-
-            await setParsedMutation(presentationId);
           } finally {
             // Always clear generating state
             dispatchGeneratingEvent(false);
@@ -540,5 +519,5 @@ export function usePresentationProcessor(
     );
   }
 
-  return { isProcessing, processFullAiResult: processFullAiResult as any };
+  return { isProcessing, processFullAiResult };
 }

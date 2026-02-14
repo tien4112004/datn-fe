@@ -1,16 +1,15 @@
 <template>
-  <div class="canvas-container">
+  <div
+    class="canvas"
+    ref="canvasRef"
+    @wheel="($event) => handleMousewheelCanvas($event)"
+    @mousedown="($event) => handleClickBlankArea($event)"
+    @dblclick="($event) => handleDblClick($event)"
+    v-contextmenu="contextmenus"
+    v-click-outside="removeEditorAreaFocus"
+  >
     <EmptyCanvas v-if="!hasSlides" />
-    <div
-      v-else
-      class="canvas"
-      ref="canvasRef"
-      @wheel="($event) => handleMousewheelCanvas($event)"
-      @mousedown="($event) => handleClickBlankArea($event)"
-      @dblclick="($event) => handleDblClick($event)"
-      v-contextmenu="contextmenus"
-      v-click-outside="removeEditorAreaFocus"
-    >
+    <template v-else>
       <!-- Preview Mode Overlay -->
       <div v-if="isCurrentSlideLocked || mode === 'view'" class="preview-overlay"></div>
       <ElementCreateSelection
@@ -88,7 +87,7 @@
       <Modal v-model:visible="linkDialogVisible" :width="540">
         <LinkDialog @close="linkDialogVisible = false" />
       </Modal>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -405,12 +404,5 @@ provide(injectKeySlideScale, canvasScale);
   justify-content: center;
   z-index: 5000;
   pointer-events: none;
-}
-
-.canvas-container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
 }
 </style>

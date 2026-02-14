@@ -295,30 +295,6 @@ export function useUpsertSlides(
   });
 }
 
-/**
- * Hook to mark presentation as parsed
- *
- * @example
- * ```ts
- * const mutation = useSetParsed();
- * mutation.mutate('presentation-123');
- * ```
- */
-export function useSetParsed(
-  options?: UseMutationOptions<Presentation, Error, string>
-): UseMutationReturnType<Presentation, Error, string, unknown> {
-  const queryClient = useQueryClient();
-  const presentationApi = getPresentationApi();
-
-  return useMutation({
-    mutationFn: (presentationId: string) => presentationApi.setParsed(presentationId),
-    onSuccess: (data, presentationId) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.presentations.detail(presentationId) });
-    },
-    ...options,
-  });
-}
-
 interface UpdatePresentationVariables {
   presentationId: string;
   data: Partial<Presentation> | FormData;

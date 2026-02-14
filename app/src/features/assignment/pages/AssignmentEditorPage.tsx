@@ -11,12 +11,16 @@ import { useSaveAssignment } from '../hooks/useSaveAssignment';
 import { createEmptyFormData, transformAssignmentToFormData } from '../api/service';
 import { ERROR_TYPE } from '@/shared/constants';
 import { CriticalError } from '@aiprimary/api';
+import { useFloatingImageGeneratorFAB } from '@/features/image/hooks';
 import type { Assignment } from '@aiprimary/core';
 
 export const AssignmentEditorPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor' });
+
+  // Enable floating image generator FAB on this page
+  useFloatingImageGeneratorFAB();
 
   // Get assignment from loader (edit mode) or null (create mode)
   const { assignment: assignmentData } = useLoaderData() as { assignment: Assignment | null };

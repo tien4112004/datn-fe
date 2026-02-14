@@ -6,6 +6,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AuthProvider } from '@/shared/context/auth';
 import { Toaster } from '@/shared/components/ui/sonner';
 import { NotificationInitializer } from '@/features/notifications';
+import { FloatingImageGeneratorProvider } from '@/features/image/context/FloatingImageGeneratorContext';
 
 const queryClient = new QueryClient();
 
@@ -13,10 +14,12 @@ export default function App() {
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <NotificationInitializer />
-          <RouterProvider router={router} />
-        </AuthProvider>
+        <FloatingImageGeneratorProvider>
+          <AuthProvider>
+            <NotificationInitializer />
+            <RouterProvider router={router} />
+          </AuthProvider>
+        </FloatingImageGeneratorProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
       <Toaster />

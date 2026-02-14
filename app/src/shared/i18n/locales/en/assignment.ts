@@ -662,6 +662,18 @@ export default {
       selectQuestionHint: 'Select a question from the navigator to edit',
     },
 
+    // Floating image generator
+    floating: {
+      addToQuestionTitle: 'Add to Question Title',
+      addToOption: 'Add to Option {{number}}',
+      addToMatchingLeft: 'Add to Left Item {{number}}',
+      addToMatchingRight: 'Add to Right Item {{number}}',
+      imageAddedToTitle: 'Image added to question title',
+      imageAddedToOption: 'Image added to option {{number}}',
+      imageAddedToMatchingLeft: 'Image added to matching left item',
+      imageAddedToMatchingRight: 'Image added to matching right item',
+    },
+
     // Questions list
     questionsList: {
       emptyTitle: 'No questions yet',

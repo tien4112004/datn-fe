@@ -29,6 +29,7 @@ import { cn } from '@/shared/lib/utils';
 import { TreePanelContent } from '../tree-panel';
 import { CommentDrawer } from '@/features/comments';
 import { PermissionBadge } from '@/shared/components/common/PermissionBadge';
+import AIMindmapPanel from '../ai-panel/AIMindmapPanel';
 import type { Permission } from '@/shared/utils/permission';
 import { useSaveMindmap } from '../../hooks';
 
@@ -161,7 +162,7 @@ const Toolbar = memo(
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-1 flex-col">
-          <TabsList className={cn('grid w-full grid-cols-3', isMobileSheet ? 'h-12' : 'h-10')}>
+          <TabsList className={cn('grid w-full grid-cols-4', isMobileSheet ? 'h-12' : 'h-10')}>
             <TabsTrigger value="general" className={cn(isMobileSheet ? 'text-base' : 'text-sm')}>
               {t('toolbar.tabs.general')}
             </TabsTrigger>
@@ -180,6 +181,9 @@ const Toolbar = memo(
                   {selectedCount}
                 </span>
               )}
+            </TabsTrigger>
+            <TabsTrigger value="ai" className={cn(isMobileSheet ? 'text-base' : 'text-sm')}>
+              {t('toolbar.tabs.ai', 'AI')}
             </TabsTrigger>
             <TabsTrigger value="tree" className={cn(isMobileSheet ? 'text-base' : 'text-sm')}>
               {t('toolbar.tabs.tree')}
@@ -308,9 +312,7 @@ const Toolbar = memo(
                       title={t('toolbar.actions.duplicate')}
                     >
                       <Copy size={isMobileSheet ? 20 : 16} />
-                      {duplicateMutation.isPending
-                        ? t('toolbar.save.saving')
-                        : t('toolbar.actions.duplicate')}
+                      {duplicateMutation.isPending ? t('toolbar.save.saving') : t('toolbar.actions.duplicate')}
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -348,6 +350,11 @@ const Toolbar = memo(
           {/* Selection Tab Content */}
           <TabsContent value="selection" className="mt-4 flex-1">
             <NodeSelectionTab />
+          </TabsContent>
+
+          {/* AI Tab Content */}
+          <TabsContent value="ai" className="mt-4 flex-1 overflow-hidden">
+            <AIMindmapPanel />
           </TabsContent>
 
           {/* Tree Tab Content */}

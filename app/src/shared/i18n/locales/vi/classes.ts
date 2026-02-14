@@ -1352,6 +1352,71 @@ export default {
     },
   },
 
+  studentDetail: {
+    loading: 'Đang tải...',
+    studentNotFound: 'Không tìm thấy học sinh',
+    unableToLoad: 'Không thể tải thông tin học sinh',
+    errorReasons: {
+      description: 'Chúng tôi không thể tìm thấy thông tin của học sinh này. Điều này có thể do:',
+      incorrectId: 'ID học sinh không chính xác hoặc học sinh không tồn tại',
+      noPermission: 'Bạn không có quyền xem học sinh này',
+      connectionIssue: 'Có sự cố kết nối tạm thời',
+    },
+    actions: {
+      retry: 'Thử lại',
+      goBack: 'Quay lại',
+      tryAgain: 'Thử lại',
+    },
+    pageDescription: 'Xem hiệu suất học tập, tiến độ và thông tin chi tiết của {{fullName}}',
+    sections: {
+      studentInformation: 'Thông tin học sinh',
+      performanceAnalytics: 'Phân tích hiệu suất',
+    },
+    performance: {
+      unavailable: 'Dữ liệu hiệu suất không khả dụng',
+      unavailableDescription:
+        'Không thể tải phân tích hiệu suất. Điều này có thể do {{fullName}} chưa hoàn thành bài tập nào hoặc có sự cố kết nối tạm thời.',
+    },
+    info: {
+      title: 'Thông tin học sinh',
+      contactInformation: 'Thông tin liên hệ',
+      born: 'Ngày sinh',
+      notProvided: 'Chưa cung cấp',
+      fields: {
+        phone: 'Điện thoại',
+        parentEmail: 'Email phụ huynh',
+        address: 'Địa chỉ',
+        enrollmentDate: 'Ngày nhập học',
+      },
+      status: {
+        active: 'Đang học',
+        inactive: 'Không hoạt động',
+        transferred: 'Chuyển trường',
+        graduated: 'Tốt nghiệp',
+      },
+    },
+    analytics: {
+      title: 'Phân tích hiệu suất',
+      subtitle: 'Thống kê tổng quan và theo dõi tiến độ',
+      metrics: {
+        overallAverage: 'Điểm trung bình',
+        completionRate: 'Tỷ lệ hoàn thành',
+        completed: 'Đã hoàn thành',
+        pending: 'Đang chờ',
+        overdue: 'Quá hạn',
+      },
+      trends: {
+        title: 'xu hướng hiệu suất',
+        subtitle: 'Hiệu suất lịch sử theo thời gian',
+      },
+      byClass: {
+        title: 'Hiệu suất theo lớp',
+        subtitle: 'Phân tích chi tiết cho {{count}} lớp',
+        subtitle_other: 'Phân tích chi tiết cho {{count}} lớp',
+      },
+    },
+  },
+
   resources: {
     tab: {
       title: 'Tài liệu lớp học',

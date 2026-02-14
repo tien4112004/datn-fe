@@ -1326,6 +1326,70 @@ export default {
     },
   },
 
+  studentDetail: {
+    loading: 'Loading...',
+    studentNotFound: 'Student Not Found',
+    unableToLoad: 'Unable to Load Student',
+    errorReasons: {
+      description: "We couldn't find this student's information. This could be because:",
+      incorrectId: "The student ID is incorrect or the student doesn't exist",
+      noPermission: "You don't have permission to view this student",
+      connectionIssue: "There's a temporary connection issue",
+    },
+    actions: {
+      retry: 'Retry',
+      goBack: 'Go Back',
+      tryAgain: 'Try Again',
+    },
+    pageDescription: "View {{fullName}}'s academic performance, progress, and detailed information",
+    sections: {
+      studentInformation: 'Student Information',
+      performanceAnalytics: 'Performance Analytics',
+    },
+    performance: {
+      unavailable: 'Performance Data Unavailable',
+      unavailableDescription:
+        "Unable to load performance analytics. This may be because {{fullName}} hasn't completed any assignments yet, or there's a temporary connection issue.",
+    },
+    info: {
+      title: 'Student Information',
+      contactInformation: 'Contact Information',
+      born: 'Born',
+      notProvided: 'Not provided',
+      fields: {
+        phone: 'Phone',
+        parentEmail: 'Parent Email',
+        address: 'Address',
+        enrollmentDate: 'Enrollment Date',
+      },
+      status: {
+        active: 'Active',
+        inactive: 'Inactive',
+        transferred: 'Transferred',
+        graduated: 'Graduated',
+      },
+    },
+    analytics: {
+      title: 'Performance Analytics',
+      subtitle: 'Overall statistics and progress tracking',
+      metrics: {
+        overallAverage: 'Overall Average',
+        completionRate: 'Completion Rate',
+        completed: 'Completed',
+        pending: 'Pending',
+        overdue: 'Overdue',
+      },
+      trends: {
+        title: 'Performance Trends',
+        subtitle: 'Historical performance over time',
+      },
+      byClass: {
+        title: 'Performance by Class',
+        subtitle: 'Detailed breakdown across {{count}} class',
+        subtitle_other: 'Detailed breakdown across {{count}} classes',
+      },
+    },
+  },
   resources: {
     tab: {
       title: 'Class Resources',

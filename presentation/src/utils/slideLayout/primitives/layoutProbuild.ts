@@ -50,44 +50,66 @@ export async function buildImageElement(
 }
 
 export function buildCards(instance: LayoutBlockInstance): PPTElement[] {
-  const list = getAllDescendantInstances(instance)
-    .map((inst) => {
+  const descendants = getAllDescendantInstances(instance);
+  const list = descendants
+    .map((inst, index) => {
       if (!inst.border) return null;
-      return createCard(inst);
+      // Use auto-generated ID for decorative cards: auto-card-{index}
+      return createCard(inst, `auto-card-${index}`);
     })
     .filter((el) => el !== null) as PPTElement[];
 
   return list;
 }
 
-export function buildTitle(title: string, config: TemplateContainerConfig, theme: SlideTheme): PPTElement[] {
+export function buildTitle(
+  title: string | any,
+  config: TemplateContainerConfig,
+  theme: SlideTheme
+): PPTElement[] {
   const titleInstance = {
     ...config,
     bounds: config.bounds,
   } as TextLayoutBlockInstance;
 
+  // Extract dataId from enriched value if present
+  const dataId = typeof title === 'object' && title !== null && 'id' in title ? title.id : undefined;
+
+  // Unwrap enriched value if needed
+  const unwrappedTitle =
+    typeof title === 'object' && title !== null && 'value' in title ? title.value : title;
+
   const titleElement = createTextElement(
-    title,
+    unwrappedTitle,
     titleInstance,
     titleInstance.text?.fontSizeRange || FONT_SIZE_RANGE_TITLE,
-    'title'
+    'title',
+    dataId // Pass data ID for deterministic element ID
   );
 
   return [titleElement];
 }
 
-export function buildText(content: string, config: TemplateContainerConfig): PPTElement[] {
+export function buildText(content: string | any, config: TemplateContainerConfig): PPTElement[] {
   const textInstance = {
     ...config,
     bounds: config.bounds,
   } as TextLayoutBlockInstance;
 
+  // Extract dataId from enriched value if present
+  const dataId = typeof content === 'object' && content !== null && 'id' in content ? content.id : undefined;
+
+  // Unwrap enriched value if needed
+  const unwrappedContent =
+    typeof content === 'object' && content !== null && 'value' in content ? content.value : content;
+
   // Explicitly pass 'content' as textType for clarity
   const textElement = createTextElement(
-    content,
+    unwrappedContent,
     textInstance,
     textInstance.text?.fontSizeRange || FONT_SIZE_RANGE_CONTENT,
-    'content'
+    'content',
+    dataId // Pass data ID for deterministic element ID
   );
 
   return [textElement];
@@ -98,12 +120,16 @@ export function buildText(content: string, config: TemplateContainerConfig): PPT
  * Creates ProseMirror-compatible <ul><li><p> or <ol><li><p> structure.
  * Returns 1 or 2 elements depending on whether content needs column wrapping.
  *
- * @param contents - Array of HTML content strings for each list item
+ * @param contents - Array of HTML content strings or enriched values for each list item
  * @param config - Container configuration
  * @param listType - Type of list: 'ul' for unordered or 'ol' for ordered (default: 'ul')
  * @returns Array containing one or two list elements (split into columns if needed)
  */
-export function buildCombinedList(contents: string[], config: TemplateContainerConfig): PPTElement[] {
+export function buildCombinedList(
+  contents: (string | any)[],
+  config: TemplateContainerConfig,
+  dataIds?: string[]
+): PPTElement[] {
   const textInstance = {
     ...config,
     bounds: config.bounds,
@@ -116,7 +142,8 @@ export function buildCombinedList(contents: string[], config: TemplateContainerC
     contents,
     textInstance,
     textInstance.text?.fontSizeRange || FONT_SIZE_RANGE_CONTENT,
-    textType
+    textType,
+    dataIds // Pass data IDs for deterministic element IDs
   );
 
   return listElements;
@@ -333,7 +360,7 @@ export function buildLayoutWithUnifiedFontSizing(
   _measureAndPositionElements(instance, labelGroups, htmlElements, dataMap);
 
   // Step 7: Convert HTML elements to PPT elements
-  const elements = _convertToPPTElements(htmlElements, labelGroups);
+  const elements = _convertToPPTElements(htmlElements, labelGroups, dataMap);
 
   return { instance, elements, fontSizes };
 }
@@ -396,17 +423,20 @@ function _calculateUnifiedFontSizes(
  */
 function _createElementsWithFontSizes(
   labelGroups: Map<string, TextLayoutBlockInstance[]>,
-  dataMap: Map<string, string[]>,
+  dataMap: Map<string, any[]>,
   fontSizes: Record<string, number>
 ): Record<string, HTMLElement[]> {
   const allElements: Record<string, HTMLElement[]> = {};
 
   for (const [label, instances] of labelGroups.entries()) {
     const labelData = dataMap.get(label) || [];
+
     if (labelData.length === 0) continue;
 
     allElements[label] = labelData.map((item) => {
-      return createHtmlElement(item, fontSizes[label], instances[0].text || {});
+      // Unwrap enriched value if needed (only for HTML creation)
+      const unwrappedItem = typeof item === 'object' && item !== null && 'value' in item ? item.value : item;
+      return createHtmlElement(unwrappedItem, fontSizes[label], instances[0].text || {});
     });
   }
 
@@ -497,7 +527,10 @@ function _calculateFontSizeForLabel(
 ): { fontSize: number } {
   // Create HTML elements for font size calculation
   const elements = labelData.map((item) => {
-    return createHtmlElement(item, 16, instances[0].text || {});
+    // Unwrap enriched value if needed (only for font size calculation)
+    const unwrappedItem =
+      typeof item === 'object' && item !== null && 'value' in item ? (item as any).value : item;
+    return createHtmlElement(unwrappedItem, 16, instances[0].text || {});
   });
 
   // Determine font size range from text config or use default based on label type
@@ -549,12 +582,14 @@ function _collectLabelGroupsRecursive(
  */
 function _convertToPPTElements(
   htmlElements: Record<string, HTMLElement[]>,
-  labelGroups: Map<string, TextLayoutBlockInstance[]>
+  labelGroups: Map<string, TextLayoutBlockInstance[]>,
+  dataMap?: Map<string, any[]>
 ): Record<string, PPTElement[]> {
   const pptElements: Record<string, PPTElement[]> = {};
 
   for (const [label, elements] of Object.entries(htmlElements)) {
     const instances = labelGroups.get(label) || [];
+    const labelData = dataMap?.get(label) || [];
 
     // Map label to textType for consistent theme application
     const textType = mapLabelToTextType(label);
@@ -570,8 +605,13 @@ function _convertToPPTElements(
           return null;
         }
 
-        // Pass textType to ensure correct theme styling
-        return createTextPPTElement(htmlEl, instance, textType);
+        // Extract dataId from enriched value if available
+        const dataItem = labelData[index];
+        const dataId =
+          typeof dataItem === 'object' && dataItem !== null && 'id' in dataItem ? dataItem.id : undefined;
+
+        // Pass textType to ensure correct theme styling, and dataId for deterministic element ID
+        return createTextPPTElement(htmlEl, instance, textType, dataId);
       })
       .filter((el) => el !== null) as PPTElement[];
   }

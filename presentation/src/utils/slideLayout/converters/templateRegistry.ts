@@ -149,9 +149,6 @@ class TemplateRegistry {
       }
 
       this.initialized = true;
-      console.log(
-        `✓ Loaded ${allTemplates.length} templates from API, grouped into ${grouped.size} layout types`
-      );
     } catch (error) {
       console.error('Failed to prefetch templates from API:', error);
       // Mark as initialized even on error to prevent retry loops

@@ -75,13 +75,16 @@ export function mapLabelToTextType(label: string | undefined): TextType {
  * @param content - Text content (can include HTML)
  * @param container - Container with bounds and styling
  * @param fontSizeRange - Optional font size constraints
+ * @param textType - Optional text type for styling
+ * @param dataId - Optional data ID for deterministic element ID (elem-{dataId})
  * @returns PPT text element ready for slide insertion
  */
 export function createTextElement(
   content: string,
   container: TextLayoutBlockInstance,
   fontSizeRange?: FontSizeRange,
-  textType?: TextType
+  textType?: TextType,
+  dataId?: string
 ): PPTTextElement {
   // Create initial text element with default styling
   const initialElement = createHtmlElement(
@@ -104,7 +107,7 @@ export function createTextElement(
 
   // Create and return the PPT text element
   return {
-    id: crypto.randomUUID(),
+    id: dataId ? `elem-${dataId}` : crypto.randomUUID(),
     type: 'text',
     content: initialElement.outerHTML,
     defaultFontName: container.text.fontFamily || 'Arial',
@@ -183,13 +186,15 @@ function createListHtmlElement(
  * @param container - Container with bounds and styling
  * @param fontSizeRange - Optional font size constraints
  * @param textType - Optional explicit textType (if not provided, maps from container.label)
+ * @param dataIds - Optional array of data IDs matching contents array length (for deterministic element IDs)
  * @returns Array of PPT text elements (1 if fits, 2 if column wrap needed)
  */
 export function createListElements(
   contents: string[],
   container: TextLayoutBlockInstance,
   fontSizeRange?: FontSizeRange,
-  textType?: TextType
+  textType?: TextType,
+  dataIds?: string[]
 ): PPTTextElement[] {
   const paragraphSpace = 25; // Spacing between list items
   const listType = container.combined?.ordered ? 'ol' : 'ul';
@@ -300,7 +305,7 @@ export function createListElements(
 
     return [
       {
-        id: crypto.randomUUID(),
+        id: dataIds && dataIds[0] ? `elem-${dataIds[0]}+${dataIds[midpoint - 1]}` : crypto.randomUUID(),
         type: 'text',
         content: leftList.outerHTML,
         defaultFontName: container.text.fontFamily || 'Arial',
@@ -320,7 +325,10 @@ export function createListElements(
         },
       } as any,
       {
-        id: crypto.randomUUID(),
+        id:
+          dataIds && dataIds[midpoint]
+            ? `elem-${dataIds[midpoint]}+${dataIds[dataIds.length - 1]}`
+            : crypto.randomUUID(),
         type: 'text',
         content: rightList.outerHTML,
         defaultFontName: container.text.fontFamily || 'Arial',
@@ -376,7 +384,7 @@ export function createListElements(
 
   return [
     {
-      id: crypto.randomUUID(),
+      id: dataIds && dataIds[0] ? `elem-${dataIds[0]}+${dataIds[dataIds.length - 1]}` : crypto.randomUUID(),
       type: 'text',
       content: finalListElement.outerHTML,
       defaultFontName: container.text.fontFamily || 'Arial',
@@ -408,11 +416,13 @@ export function createListElements(
  *
  * @param src - Image source URL
  * @param container - Container with bounds
+ * @param dataId - Optional data ID for deterministic element ID (elem-{dataId})
  * @returns PPT image element with calculated clip region
  */
 export async function createImageElement(
   src: string,
-  container: ImageLayoutBlockInstance
+  container: ImageLayoutBlockInstance,
+  dataId?: string
 ): Promise<PPTImageElement> {
   const imageOriginalSize = await getImageSize(src);
   const imageRatio = imageOriginalSize.width / imageOriginalSize.height;
@@ -442,7 +452,7 @@ export async function createImageElement(
   }
 
   return {
-    id: crypto.randomUUID(),
+    id: dataId ? `elem-${dataId}` : crypto.randomUUID(),
     type: 'image',
     src,
     fixedRatio: false,
@@ -462,8 +472,10 @@ export async function createImageElement(
 
 /**
  * Create a card (shape) element
+ * @param container - Layout block instance with bounds and styling
+ * @param dataId - Optional data ID for deterministic element ID (elem-deco-{dataId})
  */
-export function createCard(container: LayoutBlockInstance): PPTShapeElement {
+export function createCard(container: LayoutBlockInstance, dataId?: string): PPTShapeElement {
   const formula = SHAPE_PATH_FORMULAS[SHAPE_PATH_FORMULAS_KEYS.ROUND_RECT_CUSTOM];
   const radiusValue = container.border?.radius || 0;
 
@@ -487,7 +499,7 @@ export function createCard(container: LayoutBlockInstance): PPTShapeElement {
   const path = formula.formula(container.bounds.width, container.bounds.height, keypoints);
 
   return {
-    id: crypto.randomUUID(),
+    id: dataId ? `elem-deco-${dataId}` : crypto.randomUUID(),
     type: 'shape',
     pathFormula: SHAPE_PATH_FORMULAS_KEYS.ROUND_RECT_CUSTOM,
     left: container.bounds.left,
@@ -517,11 +529,13 @@ export function createCard(container: LayoutBlockInstance): PPTShapeElement {
  * @param content - HTML element containing the text
  * @param block - Text layout block instance
  * @param textType - Optional explicit textType (if not provided, maps from block.label)
+ * @param dataId - Optional data ID for deterministic element ID (elem-{dataId})
  */
 export function createTextPPTElement(
   content: HTMLElement,
   block: TextLayoutBlockInstance,
-  textType?: TextType
+  textType?: TextType,
+  dataId?: string
 ): PPTTextElement {
   const dimensions = measureElement(content, block);
 
@@ -533,7 +547,7 @@ export function createTextPPTElement(
   const finalTextType = textType || mapLabelToTextType(block.label);
 
   return {
-    id: crypto.randomUUID(),
+    id: dataId ? `elem-${dataId}` : crypto.randomUUID(),
     type: 'text',
     content: content.outerHTML,
     defaultFontName: textConfig.fontFamily,

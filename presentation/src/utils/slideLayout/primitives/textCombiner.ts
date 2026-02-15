@@ -13,7 +13,7 @@ import { extractLabelStyles, collectDescendantTextsByLabel } from './layoutUtils
  */
 export function processCombinedTextContainer(
   container: any,
-  labelData: Record<string, string[]>,
+  labelData: Record<string, string[] | any[]>,
   zIndex: number
 ): {
   elements: Array<{ element: any; zIndex: number }>;
@@ -21,19 +21,56 @@ export function processCombinedTextContainer(
 } {
   const pattern = container.combined.pattern;
 
+  // Debug: Log incoming labelData structure
+  console.log('[processCombinedTextContainer] Processing combined container');
+  for (const [label, dataArray] of Object.entries(labelData)) {
+    console.log(`  [processCombinedTextContainer] Label "${label}":`, {
+      arrayLength: dataArray.length,
+      firstItemType: dataArray[0] ? typeof dataArray[0] : 'none',
+      firstItemIsObject: dataArray[0] && typeof dataArray[0] === 'object',
+      firstItemKeys: dataArray[0] && typeof dataArray[0] === 'object' ? Object.keys(dataArray[0]) : [],
+      firstItemHasId: dataArray[0] && typeof dataArray[0] === 'object' && 'id' in dataArray[0],
+      firstItemId:
+        dataArray[0] && typeof dataArray[0] === 'object' && 'id' in dataArray[0] ? dataArray[0].id : 'none',
+      firstItemHasValue: dataArray[0] && typeof dataArray[0] === 'object' && 'value' in dataArray[0],
+      firstItemValue:
+        dataArray[0] && typeof dataArray[0] === 'object' && 'value' in dataArray[0]
+          ? dataArray[0].value
+          : dataArray[0],
+    });
+  }
+
   // Extract styles for each label from children config
   const labelStyles = extractLabelStyles(container);
 
+  // Extract all data IDs before unwrapping for display
+  const dataIds: string[] = [];
+  const maxLength = Math.max(...Object.values(labelData).map((arr) => arr.length));
+
+  for (let i = 0; i < maxLength; i++) {
+    // Check each label group for this item index
+    for (const [_, values] of Object.entries(labelData)) {
+      const item = values[i];
+      if (item && typeof item === 'object' && 'id' in item) {
+        dataIds.push(item.id);
+        break; // Only need one ID per item (use first label's ID)
+      }
+    }
+  }
+
   // Collect all descendant texts by label
-  const textsByLabel = collectDescendantTextsByLabel(labelData);
+  const textsByLabel = collectDescendantTextsByLabel(labelData as Record<string, string[]>);
+
+  console.log('[processCombinedTextContainer] After collectDescendantTextsByLabel:');
+  console.log('  First item:', textsByLabel[0] ? { ...textsByLabel[0] } : 'none');
 
   // Apply pattern and styles to each item
   const listContents = textsByLabel.map((item) => {
     return applyPatternWithStyles(pattern, item, labelStyles);
   });
 
-  // Build combined list with unified font sizing
-  const textElements = buildCombinedList(listContents, container);
+  // Build combined list with unified font sizing - pass dataIds
+  const textElements = buildCombinedList(listContents, container, dataIds);
   const elements = textElements.map((element) => ({ element, zIndex }));
 
   // Extract border/shadow if present
@@ -81,8 +118,12 @@ function applyPatternWithStyles(
     // Get styles for this label from children config
     const styles = labelStyles.get(key);
 
+    // Unwrap enriched value for display
+    const unwrappedValue =
+      typeof value === 'object' && value !== null && 'value' in value ? (value as any).value : value;
+
     // Wrap value with span containing label-specific styles
-    let styledValue = value;
+    let styledValue = unwrappedValue;
     if (styles) {
       const styleAttrs: string[] = [];
       if (styles.fontFamily) styleAttrs.push(`font-family: ${styles.fontFamily}`);
@@ -91,7 +132,7 @@ function applyPatternWithStyles(
       if (styles.fontStyle) styleAttrs.push(`font-style: ${styles.fontStyle}`);
 
       if (styleAttrs.length > 0) {
-        styledValue = `<span style="${styleAttrs.join('; ')}">${value}</span>`;
+        styledValue = `<span style="${styleAttrs.join('; ')}">${unwrappedValue}</span>`;
       }
     }
 

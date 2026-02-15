@@ -1,5 +1,5 @@
 import { ReactFlow } from '@xyflow/react';
-import { memo, useState, useEffect, type ReactNode } from 'react';
+import { memo, useState, useEffect, type ReactNode, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { Loader2 } from 'lucide-react';
 import { useReactFlowIntegration } from '@/features/mindmap/hooks';
@@ -9,7 +9,7 @@ import RootNodeBlock from '../node/RootNode';
 import ShapeNodeBlock from '../node/ShapeNode';
 import TextNodeBlock from '../node/TextNode';
 import ImageNodeBlock from '../node/ImageNode';
-import { useCoreStore } from '../../stores';
+import { useCoreStore, useLayoutStore } from '../../stores';
 
 /**
  * @deprecated ShapeNodeBlock and ImageNodeBlock are deprecated and will be removed in a future version.
@@ -78,8 +78,22 @@ const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag
     return () => clearTimeout(timer);
   }, []);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    return useLayoutStore.subscribe((state) => {
+      if (containerRef.current) {
+        if (state.isLayouting) {
+          containerRef.current.classList.add('layouting-mode');
+        } else {
+          containerRef.current.classList.remove('layouting-mode');
+        }
+      }
+    });
+  }, []);
+
   return (
-    <>
+    <div ref={containerRef} className="h-full w-full">
       {isInitializing && (
         <div className="bg-background/80 absolute inset-0 z-50 flex items-center justify-center">
           <Loader2 className="text-primary h-8 w-8 animate-spin" />
@@ -114,7 +128,7 @@ const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag
       >
         {children}
       </ReactFlow>
-    </>
+    </div>
   );
 });
 

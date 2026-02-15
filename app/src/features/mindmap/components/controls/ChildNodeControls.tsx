@@ -34,11 +34,6 @@ const nodeManipulationSelector = (state: NodeManipulationState) => ({
   expand: state.expand,
 });
 
-const coreStoreSelector = (state: CoreState) => ({
-  hasLeftChildren: state.hasLeftChildren,
-  hasRightChildren: state.hasRightChildren,
-});
-
 const nodeOperationsSelector = (state: NodeOperationsState) => state.addChildNode;
 
 const layoutStoreSelector = (state: LayoutState) => ({
@@ -49,7 +44,8 @@ export const ChildNodeControls = memo(
   ({ node, selected }: ChildNodeControlsProps) => {
     const { canEdit } = useMindmapPermissionContext();
     const { collapse, expand } = useNodeManipulationStore(useShallow(nodeManipulationSelector));
-    const { hasLeftChildren, hasRightChildren } = useCoreStore(useShallow(coreStoreSelector));
+    const hasLeftChildren = useCoreStore((state) => state.hasLeftChildren);
+    const hasRightChildren = useCoreStore((state) => state.hasRightChildren);
     const addChildNodeStore = useNodeOperationsStore(nodeOperationsSelector);
     useLayoutStore(useShallow(layoutStoreSelector));
 
@@ -195,8 +191,9 @@ export const ChildNodeControls = memo(
                   else collapse(node.id, SIDE.LEFT);
                 }}
                 variant="secondary"
+                className={cn('cursor-pointer rounded-full transition-all duration-200')}
               >
-                {isLeftChildrenCollapsed ? <Plus /> : <Minus />}
+                <Minus />
               </Button>
             </motion.div>
           </div>
@@ -231,8 +228,9 @@ export const ChildNodeControls = memo(
                   else collapse(node.id, SIDE.RIGHT);
                 }}
                 variant="secondary"
+                className={cn('cursor-pointer rounded-full transition-all duration-200')}
               >
-                {isRightChildrenCollapsed ? <Plus /> : <Minus />}
+                <Minus />
               </Button>
             </motion.div>
             {canEdit && (
@@ -289,8 +287,9 @@ export const ChildNodeControls = memo(
                   else collapse(node.id, SIDE.LEFT);
                 }}
                 variant="secondary"
+                className={cn('cursor-pointer rounded-full transition-all duration-200')}
               >
-                {isLeftChildrenCollapsed ? <Plus /> : <Minus />}
+                <Minus />
               </Button>
             </motion.div>
           </div>
@@ -325,8 +324,9 @@ export const ChildNodeControls = memo(
                   else collapse(node.id, SIDE.RIGHT);
                 }}
                 variant="secondary"
+                className={cn('cursor-pointer rounded-full transition-all duration-200')}
               >
-                {isRightChildrenCollapsed ? <Plus /> : <Minus />}
+                <Minus />
               </Button>
             </motion.div>
             {canEdit && (
@@ -351,7 +351,8 @@ export const ChildNodeControls = memo(
       prevProps.node.id === nextProps.node.id &&
       prevProps.selected === nextProps.selected &&
       prevProps.node.data.side === nextProps.node.data.side &&
-      prevProps.node.type === nextProps.node.type
+      prevProps.node.type === nextProps.node.type &&
+      prevProps.node.data.collapsedChildren === nextProps.node.data.collapsedChildren
     );
   }
 );

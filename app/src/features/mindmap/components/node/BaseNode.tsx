@@ -7,12 +7,7 @@ import { isEqual } from 'lodash';
 import { AnimatePresence, motion } from 'motion/react';
 import { memo, useCallback, useMemo, type HTMLAttributes, type ReactNode } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import {
-  useClipboardStore,
-  useCoreStore,
-  useLayoutStore,
-  useNodeOperationsStore,
-} from '@/features/mindmap/stores';
+import { useClipboardStore, useCoreStore, useNodeOperationsStore } from '@/features/mindmap/stores';
 import { ChildNodeControls, NodeHandlers } from '../controls/ChildNodeControls';
 
 export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
@@ -30,7 +25,6 @@ export const BaseNodeBlock = memo(
     const dragTargetNodeId = useClipboardStore(useShallow(clipboardSelector));
     const isDragTarget = dragTargetNodeId === id;
 
-    const isLayouting = useLayoutStore((state) => state.isLayouting);
     const onNodeDelete = useNodeOperationsStore((state) => state.finalizeNodeDeletion);
     const layoutType = useCoreStore((state) => {
       const rootId = state.nodeToRootMap.get(id);
@@ -45,19 +39,9 @@ export const BaseNodeBlock = memo(
 
     const baseStyles = cn(isDragTarget && 'drag-target', DRAGHANDLE.CLASS);
 
-    const cardStyles = cn(
-      'base-node-card',
-      isLayouting && 'layouting',
-      isDragTarget && 'drag-target',
-      className
-    );
+    const cardStyles = cn('base-node-card', isDragTarget && 'drag-target', className);
 
-    const rootStyles = cn(
-      'root-node-card',
-      isLayouting && 'layouting',
-      isDragTarget && 'drag-target',
-      className
-    );
+    const rootStyles = cn('root-node-card', isDragTarget && 'drag-target', className);
 
     // Memoized animation configurations
     const animationConfig = useMemo(

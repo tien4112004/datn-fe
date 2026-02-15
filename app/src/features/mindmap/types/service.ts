@@ -1,13 +1,19 @@
 import type { ApiResponse } from '@aiprimary/api';
-import type { Mindmap, AiGeneratedNode, MindMapNode, MindMapEdge, MindmapMetadata } from './mindmap';
 import type {
-  User,
+  AIModificationResponse,
+  ExpandNodeRequest,
+  RefineBranchRequest,
+  RefineNodeContentRequest,
+} from './aiModification';
+import type { AiGeneratedNode, Mindmap, MindMapEdge, MindmapMetadata, MindMapNode } from './mindmap';
+import type {
+  PublicAccessRequest,
+  PublicAccessResponse,
   SharedUserApiResponse,
   ShareRequest,
   ShareResponse,
-  PublicAccessRequest,
-  PublicAccessResponse,
   ShareStateResponse,
+  User,
 } from './share';
 
 export interface MindmapCollectionRequest {
@@ -27,6 +33,9 @@ export interface MindmapApiService {
   updateMindmapTitle(id: string, name: string): Promise<MindmapTitleUpdateResponse>;
   generateMindmap(request: MindmapGenerateRequest): Promise<AiGeneratedNode>;
 
+  // Metadata for AI context enrichment
+  getMindmapMetadata(id: string): Promise<MindmapMetadataResponse>;
+
   // Share functionality
   searchUsers(query: string): Promise<User[]>;
   shareMindmap(id: string, shareData: ShareRequest): Promise<ShareResponse>;
@@ -39,6 +48,24 @@ export interface MindmapApiService {
 
   // Optimized single-call initialization
   getShareState(mindmapId: string): Promise<ShareStateResponse>;
+
+  // AI modification methods
+  refineNode(request: RefineNodeContentRequest): Promise<AIModificationResponse>;
+  expandNode(request: ExpandNodeRequest): Promise<AIModificationResponse>;
+  refineBranch(request: RefineBranchRequest): Promise<AIModificationResponse>;
+}
+
+/**
+ * Lightweight metadata for AI context enrichment
+ * Returned from /api/mindmaps/{id}/metadata
+ */
+export interface MindmapMetadataResponse {
+  mindmapId: string;
+  title: string;
+  description?: string;
+  rootNodeId?: string;
+  grade?: string;
+  subject?: string;
 }
 
 /**

@@ -6,6 +6,7 @@ import type { AiGeneratedNode, MindMapNode, MindMapEdge, Side } from '../types';
 import { MINDMAP_TYPES, PATH_TYPES, DRAGHANDLE, SIDE } from '../types';
 import { generateId } from '@/shared/lib/utils';
 import { getOppositeSide } from './utils';
+import { markdownToHtml } from './utils/contentUtils';
 
 interface ConvertChildrenResult {
   nodes: MindMapNode[];
@@ -28,9 +29,29 @@ export const convertChildrenToNodes = async (
   const parentSide = parentNode.data.side || SIDE.RIGHT;
   const parentLevel = parentNode.data.level || 0;
 
-  const processChild = (child: AiGeneratedNode, parentId: string, level: number, side: Side): void => {
+  const processChild = async (
+    child: AiGeneratedNode,
+    parentId: string,
+    level: number,
+    side: Side
+  ): Promise<void> => {
     const nodeId = generateId();
-    const content = getNodeContent(child);
+    const markdown = getNodeContent(child);
+
+    // Log for debugging empty content
+    if (!markdown || markdown.trim() === '') {
+      console.warn('Node expansion: Received empty content for child node', { child, nodeId, parentId });
+    }
+
+    // Convert Markdown content to HTML
+    let htmlContent: string;
+    try {
+      htmlContent = markdown ? await markdownToHtml(markdown) : '<p>[Empty content from AI response]</p>';
+    } catch (error) {
+      console.error('Node expansion: Failed to convert markdown to HTML', { error, markdown, nodeId });
+      // Fallback: wrap markdown in paragraph or use a placeholder
+      htmlContent = markdown ? `<p>${markdown}</p>` : '<p>[Content conversion failed]</p>';
+    }
 
     // Create TEXT_NODE child
     const childNode: MindMapNode = {
@@ -39,7 +60,7 @@ export const convertChildrenToNodes = async (
       position: { x: 0, y: 0 }, // Layout will position
       data: {
         level,
-        content: `<p>${content}</p>`,
+        content: htmlContent,
         side,
         parentId,
         pathType: PATH_TYPES.SMOOTHSTEP,
@@ -68,16 +89,14 @@ export const convertChildrenToNodes = async (
 
     // Process grandchildren recursively
     if (child.children && child.children.length > 0) {
-      child.children.forEach((grandchild) => {
-        processChild(grandchild, nodeId, level + 1, side);
-      });
+      await Promise.all(
+        child.children.map((grandchild) => processChild(grandchild, nodeId, level + 1, side))
+      );
     }
   };
 
   // Process all top-level children
-  children.forEach((child) => {
-    processChild(child, parentNode.id, parentLevel + 1, parentSide);
-  });
+  await Promise.all(children.map((child) => processChild(child, parentNode.id, parentLevel + 1, parentSide)));
 
   // Return nodes and edges without layout
   // Layout will be applied separately via the store
@@ -85,7 +104,7 @@ export const convertChildrenToNodes = async (
 };
 
 /**
- * Get content from AI node (supports both 'data' and 'content' properties)
+ * Get content from AI node (supports 'content' and 'data' properties)
  */
 const getNodeContent = (aiNode: AiGeneratedNode): string => {
   return aiNode.content ?? aiNode.data ?? '';

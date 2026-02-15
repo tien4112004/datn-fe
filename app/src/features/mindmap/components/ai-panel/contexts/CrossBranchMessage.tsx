@@ -19,18 +19,10 @@ export function CrossBranchMessage({ context }: Props): React.ReactElement {
         <AlertCircle className="h-6 w-6 text-amber-600" />
       </div>
       <div>
-        <h3 className="text-sm font-semibold text-gray-700">
-          {t('aiPanel.crossBranch.title', 'Multiple Branches Selected')}
-        </h3>
-        <p className="mt-1 text-xs text-gray-500">
-          {t('aiPanel.crossBranch.message', 'AI works best on nodes from the same branch')}
-        </p>
+        <h3 className="text-sm font-semibold text-gray-700">{t('aiPanel.crossBranch.title')}</h3>
+        <p className="mt-1 text-xs text-gray-500">{t('aiPanel.crossBranch.message')}</p>
       </div>
-      <p className="text-xs text-gray-400">
-        {t('aiPanel.crossBranch.hint', 'Selected {{count}} nodes from different branches', {
-          count: context.nodeCount,
-        })}
-      </p>
+      <p className="text-xs text-gray-400">{t('aiPanel.crossBranch.hint', { count: context.nodeCount })}</p>
     </div>
   );
 }

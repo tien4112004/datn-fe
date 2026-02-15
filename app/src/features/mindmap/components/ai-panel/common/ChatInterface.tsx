@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Send, Loader } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -12,10 +13,12 @@ interface ChatInterfaceProps {
  * Chat input interface for custom AI instructions
  */
 export function ChatInterface({
-  placeholder = 'Ask AI to modify this content...',
+  placeholder,
   onSubmit,
   isLoading = false,
 }: ChatInterfaceProps): React.ReactElement {
+  const { t } = useTranslation('mindmap');
+  const defaultPlaceholder = placeholder || t('aiPanel.chat.placeholder');
   const [input, setInput] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,7 +35,7 @@ export function ChatInterface({
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        placeholder={placeholder}
+        placeholder={defaultPlaceholder}
         disabled={isLoading}
         className="flex-1 rounded border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-400 disabled:bg-gray-100 disabled:text-gray-500"
       />

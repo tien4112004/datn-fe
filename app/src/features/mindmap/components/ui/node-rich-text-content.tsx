@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
 import RichTextEditor from '@/components/rte/RichTextEditor';
 import { cn } from '@/shared/lib/utils';
@@ -103,7 +104,7 @@ export const NodeRichTextContent = ({
             paddingInline: '1px',
           }}
           className={cn('break-word m-0 min-h-[24px] w-full', !isPresenterMode && 'cursor-text')}
-          dangerouslySetInnerHTML={{ __html: content }}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }}
           onClick={() => !isPresenterMode && setIsEditing(true)}
         />
       )}

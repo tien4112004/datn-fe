@@ -282,4 +282,83 @@ export default {
       failedToLoadShareState: 'Không thể tải trạng thái chia sẻ',
     },
   },
+  aiPanel: {
+    noSelection: {
+      title: 'Chưa chọn nút nào',
+      message: 'Chọn một hoặc nhiều nút để nhận trợ giúp từ AI',
+      hint: 'Nhấp vào một nút để chọn hoặc sử dụng Ctrl+Click để chọn nhiều nút',
+    },
+    current: 'Nội dung hiện tại',
+    quickActions: 'Thao tác nhanh',
+    quickActionItems: {
+      expand: {
+        label: 'Mở rộng',
+        instruction: 'Thêm chi tiết cho khái niệm này',
+        tooltip: 'Thêm 2-3 câu giải thích',
+      },
+      shorten: {
+        label: 'Rút gọn',
+        instruction: 'Làm cho khái niệm này ngắn gọn hơn',
+        tooltip: 'Giảm xuống tối đa 1-2 câu',
+      },
+      grammar: {
+        label: 'Sửa ngữ pháp',
+        instruction: 'Sửa lỗi ngữ pháp và chính tả',
+        tooltip: 'Sửa các lỗi ngữ pháp',
+      },
+      formal: {
+        label: 'Trang trọng hóa',
+        instruction: 'Làm cho nội dung trang trọng và chuyên nghiệp hơn',
+        tooltip: 'Sử dụng ngôn ngữ học thuật hơn',
+      },
+    },
+    expandTree: {
+      title: 'Mở rộng cây',
+      description: 'Tạo nút con cho nút đã chọn bằng AI',
+      button: 'Mở rộng nút',
+    },
+    chat: {
+      placeholder: 'Yêu cầu AI chỉnh sửa nội dung này...',
+    },
+    feedback: {
+      success: 'Cập nhật nút thành công',
+      branchSuccess: 'Cập nhật nhánh thành công',
+    },
+    sameBranch: {
+      title: 'Đã chọn nhánh tương tự',
+      parent: 'Nút cha',
+      description: 'Bạn đã chọn nhiều nút từ cùng một nhánh',
+      selected: 'Nút được chọn',
+      concepts: 'khái niệm',
+      chatPlaceholder: 'Yêu cầu AI chỉnh sửa các nút này...',
+    },
+    crossBranch: {
+      title: 'Đã chọn nhiều nhánh',
+      message: 'Bạn đã chọn nút từ các nhánh khác nhau',
+      hint: 'Vui lòng chọn nút từ một nhánh duy nhất ({{count}} được chọn)',
+    },
+  },
+  expandNode: {
+    dialog: {
+      title: 'Mở rộng nút',
+      description: 'Cấu hình các thông số để tạo nút con',
+    },
+    currentNode: 'Nút hiện tại',
+    maxChildren: 'Số nút con tối đa',
+    'maxChildren.hint': 'Số lượng nút con tối đa để tạo',
+    maxDepth: 'Độ sâu tối đa',
+    'maxDepth.hint': 'Độ sâu tối đa của cây con được tạo',
+    language: 'Ngôn ngữ',
+    grade: 'Cấp độ lớp',
+    'grade.placeholder': 'ví dụ: grade-3, grade-6',
+    'grade.hint': 'Tùy chọn: Chỉ định cấp độ lớp (ví dụ: grade-3, grade-6)',
+    subject: 'Môn học',
+    'subject.placeholder': 'ví dụ: science, history',
+    'subject.hint': 'Tùy chọn: Chỉ định môn học (ví dụ: science, history)',
+    model: 'Mô hình',
+    'model.hint': 'Chọn mô hình AI để sử dụng để tạo',
+    cancel: 'Hủy',
+    generate: 'Tạo',
+    generating: 'Đang tạo...',
+  },
 };

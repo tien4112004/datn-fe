@@ -1,7 +1,7 @@
-import { GitBranchPlus, Undo, Redo, Save, Sparkles, Download, Share2, Copy } from 'lucide-react';
+import LoadingButton from '@/components/common/LoadingButton';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/ui/tabs';
-import { memo } from 'react';
+import { CommentDrawer } from '@/features/comments';
+import { PermissionBadge } from '@/shared/components/common/PermissionBadge';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,25 +13,24 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/shared/components/ui/alert-dialog';
-import { useUndoRedoStore, useNodeOperationsStore, useCoreStore } from '../../stores';
-import { useSavingStore } from '../../stores/saving';
-import { useTranslation } from 'react-i18next';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
-import { useDuplicateMindmap } from '../../hooks/useApi';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { cn } from '@/shared/lib/utils';
+import type { Permission } from '@/shared/utils/permission';
+import { Copy, Download, GitBranchPlus, Redo, Save, Share2, Sparkles, Undo } from 'lucide-react';
+import { memo, useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useSaveMindmap } from '../../hooks';
+import { useDuplicateMindmap } from '../../hooks/useApi';
+import { useCoreStore, useNodeOperationsStore, useUndoRedoStore } from '../../stores';
+import { useSavingStore } from '../../stores/saving';
+import AIMindmapPanel from '../ai-panel/AIMindmapPanel';
 import ExportMindmapDialog from '../export';
 import { GenerateTreeDialog } from '../generate';
 import ShareMindmapDialog from '../share/ShareMindmapDialog';
-import NodeSelectionTab from './NodeSelectionTab';
-import LoadingButton from '@/components/common/LoadingButton';
-import { cn } from '@/shared/lib/utils';
 import { TreePanelContent } from '../tree-panel';
-import { CommentDrawer } from '@/features/comments';
-import { PermissionBadge } from '@/shared/components/common/PermissionBadge';
-import AIMindmapPanel from '../ai-panel/AIMindmapPanel';
-import type { Permission } from '@/shared/utils/permission';
-import { useSaveMindmap } from '../../hooks';
+import NodeSelectionTab from './NodeSelectionTab';
 
 // Memoized dialogs component to prevent re-renders when Toolbar state changes
 const ToolbarDialogs = memo(
@@ -129,19 +128,6 @@ const Toolbar = memo(
     const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
     const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<string>('general');
-    const hasShownSelectionTabRef = useRef(false);
-
-    // Auto-switch to selection tab only once when selection first exists
-    // Use ref to prevent multiple re-renders from repeated tab switches
-    useEffect(() => {
-      if (hasSelection && !hasShownSelectionTabRef.current) {
-        hasShownSelectionTabRef.current = true;
-        setActiveTab('selection');
-      } else if (!hasSelection && hasShownSelectionTabRef.current) {
-        hasShownSelectionTabRef.current = false;
-        setActiveTab('general');
-      }
-    }, [hasSelection]);
 
     return (
       <div
@@ -312,7 +298,9 @@ const Toolbar = memo(
                       title={t('toolbar.actions.duplicate')}
                     >
                       <Copy size={isMobileSheet ? 20 : 16} />
-                      {duplicateMutation.isPending ? t('toolbar.save.saving') : t('toolbar.actions.duplicate')}
+                      {duplicateMutation.isPending
+                        ? t('toolbar.save.saving')
+                        : t('toolbar.actions.duplicate')}
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -354,7 +342,7 @@ const Toolbar = memo(
 
           {/* AI Tab Content */}
           <TabsContent value="ai" className="mt-4 flex-1 overflow-hidden">
-            <AIMindmapPanel />
+            <AIMindmapPanel mindmapId={mindmapId} />
           </TabsContent>
 
           {/* Tree Tab Content */}

@@ -1,7 +1,10 @@
 import { useState, useCallback } from 'react';
-import { aiMindmapModificationApi } from '../../services/api/aiMindmapModification';
+import { useMindmapApiService } from '../../api';
 import type { RefineBranchRequest } from '../../types/aiModification';
+import type { MindmapMetadataResponse } from '../../types/service';
 import { useCoreStore, useUndoRedoStore } from '../../stores';
+import { htmlToMarkdown, markdownToHtml } from '../../services/utils/contentUtils';
+import { buildTreeContext } from '../../services/utils/contextBuilder';
 import { toast } from 'sonner';
 
 interface UseBranchRefinementReturn {
@@ -11,18 +14,15 @@ interface UseBranchRefinementReturn {
   clearError: () => void;
 }
 
-export function useBranchRefinement(): UseBranchRefinementReturn {
+export function useBranchRefinement(metadata?: MindmapMetadataResponse): UseBranchRefinementReturn {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { setNodes } = useCoreStore((state) => ({
-    setNodes: state.setNodes,
-  }));
+  const setNodes = useCoreStore((state) => state.setNodes);
+  const mindmapService = useMindmapApiService();
 
-  const { prepareToPushUndo, pushToUndoStack } = useUndoRedoStore((state) => ({
-    prepareToPushUndo: state.prepareToPushUndo,
-    pushToUndoStack: state.pushToUndoStack,
-  }));
+  const prepareToPushUndo = useUndoRedoStore((state) => state.prepareToPushUndo);
+  const pushToUndoStack = useUndoRedoStore((state) => state.pushToUndoStack);
 
   const refineBranch = useCallback(
     async (request: RefineBranchRequest) => {
@@ -30,8 +30,29 @@ export function useBranchRefinement(): UseBranchRefinementReturn {
       setError(null);
 
       try {
-        // 1. Call API
-        const response = await aiMindmapModificationApi.refineBranch(request);
+        // 1. Convert HTML content to Markdown for API request
+        const markdownNodes = await Promise.all(
+          request.nodes.map(async (node) => ({
+            ...node,
+            content: await htmlToMarkdown(node.content),
+          }))
+        );
+
+        // 2. Build tree context for the first node (representative)
+        // For branch operations, use the first node as context reference
+        const nodes = useCoreStore.getState().nodes;
+        const firstNodeId = request.nodes[0]?.nodeId;
+        const treeContext = firstNodeId ? buildTreeContext(firstNodeId, nodes, metadata) : undefined;
+
+        // 3. Create API request with context
+        const apiRequest: RefineBranchRequest = {
+          ...request,
+          nodes: markdownNodes,
+          context: treeContext,
+        };
+
+        // 4. Call API
+        const response = await mindmapService.refineBranch(apiRequest);
 
         if (!response.success) {
           throw new Error(response.message || 'Failed to refine branch');
@@ -42,13 +63,21 @@ export function useBranchRefinement(): UseBranchRefinementReturn {
           throw new Error('No refined nodes returned');
         }
 
-        // 2. Prepare undo/redo
+        // 5. Convert Markdown responses back to HTML
+        const refinedNodesWithHtml = await Promise.all(
+          refinedNodes.map(async (refined: { nodeId: string; content: string }) => ({
+            ...refined,
+            content: await markdownToHtml(refined.content),
+          }))
+        );
+
+        // 6. Prepare undo/redo
         prepareToPushUndo();
 
-        // 3. Update nodes with refined content
+        // 7. Update nodes with refined content
         setNodes((prevNodes) =>
           prevNodes.map((node) => {
-            const refined = refinedNodes.find(
+            const refined = refinedNodesWithHtml.find(
               (r: { nodeId: string; content: string }) => r.nodeId === node.id
             );
             if (refined) {
@@ -56,7 +85,7 @@ export function useBranchRefinement(): UseBranchRefinementReturn {
                 ...node,
                 data: {
                   ...node.data,
-                  content: `<p>${refined.content}</p>`,
+                  content: refined.content,
                 },
               };
             }
@@ -64,11 +93,11 @@ export function useBranchRefinement(): UseBranchRefinementReturn {
           })
         );
 
-        // 4. Push to undo stack
+        // 8. Push to undo stack
         pushToUndoStack();
 
-        // 5. Show appropriate toast message
-        const successCount = refinedNodes.length;
+        // 9. Show appropriate toast message
+        const successCount = refinedNodesWithHtml.length;
         const totalCount = request.nodes.length;
         if (successCount < totalCount) {
           toast.warning(`${successCount} of ${totalCount} nodes refined`);
@@ -83,7 +112,7 @@ export function useBranchRefinement(): UseBranchRefinementReturn {
         setIsProcessing(false);
       }
     },
-    [setNodes, prepareToPushUndo, pushToUndoStack]
+    [setNodes, mindmapService, prepareToPushUndo, pushToUndoStack, metadata]
   );
 
   const clearError = useCallback(() => {

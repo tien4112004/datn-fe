@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 import { useNodeOperationsStore } from '../../stores';
 import type { MindMapNode } from '../../types';
 
@@ -76,7 +77,7 @@ export const TreeNodeContent = ({ node, onSelect }: TreeNodeContentProps) => {
         onSelect?.(); // Select node first
         setIsEditing(true); // Then enter edit mode
       }}
-      dangerouslySetInnerHTML={{ __html: node.data.content as string }}
+      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(node.data.content as string) }}
       className="min-w-0 flex-1 cursor-text break-words px-1.5 text-sm leading-tight"
       title={`${node.data.content as string} (Click to edit)`}
     />

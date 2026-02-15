@@ -9,6 +9,10 @@ export interface TreeContext {
   currentLevel?: number;
   parentContent?: string;
   siblingContents?: string[];
+  // Enhanced context for better AI responses
+  mindmapTitle?: string;
+  rootNodeContent?: string;
+  fullAncestryPath?: string[]; // Ordered from root to immediate parent
 }
 
 // API Request types
@@ -61,6 +65,7 @@ export interface SingleNodeContext {
   node: MindMapNode;
   parentContent?: string;
   siblingContents: string[];
+  ancestryPath: string[]; // Full path from root to immediate parent
   level: number;
 }
 
@@ -68,6 +73,7 @@ export interface SameBranchContext {
   type: 'same-branch';
   nodes: MindMapNode[];
   parentContent?: string;
+  ancestryPath: string[]; // Full path from root to parent
   level: number;
   nodeCount: number;
 }

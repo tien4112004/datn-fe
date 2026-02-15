@@ -1,25 +1,32 @@
+import type { User } from '@/features/user/types';
 import type { ApiClient, ApiResponse } from '@aiprimary/api';
+import { mapPagination, type Pagination } from '@aiprimary/api';
+import { parsePermissionHeader } from '../../../shared/utils/permission';
 import {
-  type MindmapApiService,
-  type MindmapResponse,
-  type MindmapCreateInput,
-  type MindmapUpdateInput,
-  type MindmapCollectionRequest,
-  type MindmapTitleUpdateResponse,
   type AiGeneratedNode,
+  type MindmapApiService,
+  type MindmapCollectionRequest,
+  type MindmapCreateInput,
   type MindmapGenerateRequest,
+  type MindmapMetadataResponse,
+  type MindmapResponse,
+  type MindmapTitleUpdateResponse,
+  type MindmapUpdateInput,
 } from '../types';
 import type {
+  AIModificationResponse,
+  ExpandNodeRequest,
+  RefineBranchRequest,
+  RefineNodeContentRequest,
+} from '../types/aiModification';
+import type {
+  PublicAccessRequest,
+  PublicAccessResponse,
   SharedUserApiResponse,
   ShareRequest,
   ShareResponse,
-  PublicAccessRequest,
-  PublicAccessResponse,
   ShareStateResponse,
 } from '../types/share';
-import { mapPagination, type Pagination } from '@aiprimary/api';
-import { parsePermissionHeader } from '../../../shared/utils/permission';
-import type { User } from '@/features/user/types';
 
 export default class MindmapService implements MindmapApiService {
   private readonly apiClient: ApiClient;
@@ -67,6 +74,14 @@ export default class MindmapService implements MindmapApiService {
 
     return mindmap;
   }
+
+  async getMindmapMetadata(id: string): Promise<MindmapMetadataResponse> {
+    const response = await this.apiClient.get<ApiResponse<MindmapMetadataResponse>>(
+      `${this.baseUrl}/api/mindmaps/${id}/metadata`
+    );
+    return response.data.data;
+  }
+
   async createMindmap(data: MindmapCreateInput): Promise<MindmapResponse> {
     const response = await this.apiClient.post<ApiResponse<MindmapResponse>>(
       `${this.baseUrl}/api/mindmaps`,
@@ -151,5 +166,38 @@ export default class MindmapService implements MindmapApiService {
       `${this.baseUrl}/api/resources/${mindmapId}/share-state`
     );
     return response.data.data;
+  }
+
+  async refineNode(request: RefineNodeContentRequest): Promise<AIModificationResponse> {
+    const response = await this.apiClient.post<AIModificationResponse>(
+      `${this.baseUrl}/api/ai/mindmap/refine-node`,
+      {
+        ...request,
+        provider: request.provider?.toLowerCase(),
+      }
+    );
+    return response.data;
+  }
+
+  async expandNode(request: ExpandNodeRequest): Promise<AIModificationResponse> {
+    const response = await this.apiClient.post<AIModificationResponse>(
+      `${this.baseUrl}/api/ai/mindmap/expand-node`,
+      {
+        ...request,
+        provider: request.provider?.toLowerCase(),
+      }
+    );
+    return response.data;
+  }
+
+  async refineBranch(request: RefineBranchRequest): Promise<AIModificationResponse> {
+    const response = await this.apiClient.post<AIModificationResponse>(
+      `${this.baseUrl}/api/ai/mindmap/refine-branch`,
+      {
+        ...request,
+        provider: request.provider?.toLowerCase(),
+      }
+    );
+    return response.data;
   }
 }

@@ -1,7 +1,10 @@
 import { useState, useCallback } from 'react';
-import { aiMindmapModificationApi } from '../../services/api/aiMindmapModification';
+import { useMindmapApiService } from '../../api';
 import type { RefineNodeContentRequest } from '../../types/aiModification';
+import type { MindmapMetadataResponse } from '../../types/service';
 import { useCoreStore } from '../../stores';
+import { htmlToMarkdown, markdownToHtml } from '../../services/utils/contentUtils';
+import { buildTreeContext } from '../../services/utils/contextBuilder';
 import { toast } from 'sonner';
 
 interface UseNodeRefinementReturn {
@@ -11,13 +14,11 @@ interface UseNodeRefinementReturn {
   clearError: () => void;
 }
 
-export function useNodeRefinement(): UseNodeRefinementReturn {
+export function useNodeRefinement(metadata?: MindmapMetadataResponse): UseNodeRefinementReturn {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { nodes, setNodes } = useCoreStore((state) => ({
-    nodes: state.nodes,
-    setNodes: state.setNodes,
-  }));
+  const setNodes = useCoreStore((state) => state.setNodes);
+  const mindmapService = useMindmapApiService();
 
   const refineNode = useCallback(
     async (request: RefineNodeContentRequest) => {
@@ -25,16 +26,33 @@ export function useNodeRefinement(): UseNodeRefinementReturn {
       setError(null);
 
       try {
-        const response = await aiMindmapModificationApi.refineNode(request);
+        // Convert HTML content to Markdown for API request
+        const markdownContent = await htmlToMarkdown(request.currentContent);
+
+        // Build tree context from current state
+        const nodes = useCoreStore.getState().nodes;
+        const treeContext = buildTreeContext(request.nodeId, nodes, metadata);
+
+        // Create API request with context
+        const apiRequest: RefineNodeContentRequest = {
+          ...request,
+          currentContent: markdownContent,
+          context: treeContext,
+        };
+
+        const response = await mindmapService.refineNode(apiRequest);
 
         if (!response.success) {
           throw new Error(response.message || 'Failed to refine node');
         }
 
-        const refinedContent = response.data?.refinedContent;
-        if (!refinedContent) {
+        const refinedMarkdown = response.data?.refinedContent;
+        if (!refinedMarkdown) {
           throw new Error('No refined content in response');
         }
+
+        // Convert Markdown response back to HTML for storage
+        const refinedContent = await markdownToHtml(refinedMarkdown);
 
         // Update the node with refined content
         setNodes((prevNodes) =>
@@ -52,7 +70,7 @@ export function useNodeRefinement(): UseNodeRefinementReturn {
         setIsProcessing(false);
       }
     },
-    [nodes, setNodes]
+    [setNodes, mindmapService, metadata]
   );
 
   const clearError = useCallback(() => {

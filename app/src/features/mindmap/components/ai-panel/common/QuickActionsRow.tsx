@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Maximize2, Minimize2, CheckCircle, FileText, Loader } from 'lucide-react';
 import type { QuickAction } from '../../../types/aiModification';
 
@@ -24,13 +25,16 @@ export function QuickActionsRow({
   onActionClick,
   isLoading = false,
 }: QuickActionsRowProps): React.ReactElement {
+  const { t } = useTranslation('mindmap');
   const handleClick = async (action: QuickAction) => {
     await onActionClick(action.operation, action.instruction);
   };
 
   return (
     <div>
-      <label className="text-xs font-semibold uppercase tracking-wide text-gray-600">Quick Actions</label>
+      <label className="text-xs font-semibold uppercase tracking-wide text-gray-600">
+        {t('aiPanel.quickActions')}
+      </label>
       <div className="mt-2 grid grid-cols-2 gap-2">
         {actions.map((action) => (
           <button

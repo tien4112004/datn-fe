@@ -282,4 +282,83 @@ export default {
       failedToLoadShareState: 'Failed to load share state',
     },
   },
+  aiPanel: {
+    noSelection: {
+      title: 'No nodes selected',
+      message: 'Select one or more nodes to get AI assistance',
+      hint: 'Click on a node to select it, or use Ctrl+Click to select multiple nodes',
+    },
+    current: 'Current Content',
+    quickActions: 'Quick Actions',
+    quickActionItems: {
+      expand: {
+        label: 'Expand',
+        instruction: 'Add more detail to this concept',
+        tooltip: 'Add 2-3 sentences of explanation',
+      },
+      shorten: {
+        label: 'Shorten',
+        instruction: 'Make this concept more concise',
+        tooltip: 'Reduce to 1-2 sentences maximum',
+      },
+      grammar: {
+        label: 'Fix Grammar',
+        instruction: 'Fix grammar and spelling',
+        tooltip: 'Correct grammatical errors',
+      },
+      formal: {
+        label: 'Formalize',
+        instruction: 'Make this more formal and professional',
+        tooltip: 'Use more academic language',
+      },
+    },
+    expandTree: {
+      title: 'Expand Tree',
+      description: 'Generate child nodes for the selected node using AI',
+      button: 'Expand Node',
+    },
+    chat: {
+      placeholder: 'Ask AI to modify this content...',
+    },
+    feedback: {
+      success: 'Node updated successfully',
+      branchSuccess: 'Branch updated successfully',
+    },
+    sameBranch: {
+      title: 'Same Branch Selected',
+      parent: 'Parent',
+      description: 'You have selected multiple nodes from the same branch',
+      selected: 'Selected Nodes',
+      concepts: 'concepts',
+      chatPlaceholder: 'Ask AI to modify these nodes...',
+    },
+    crossBranch: {
+      title: 'Multiple Branches Selected',
+      message: 'You have selected nodes from different branches',
+      hint: 'Please select nodes from a single branch ({{count}} selected)',
+    },
+  },
+  expandNode: {
+    dialog: {
+      title: 'Expand Node',
+      description: 'Configure parameters to generate child nodes',
+    },
+    currentNode: 'Current Node',
+    maxChildren: 'Max Children per Node',
+    'maxChildren.hint': 'Maximum number of child nodes to generate',
+    maxDepth: 'Max Depth',
+    'maxDepth.hint': 'Maximum depth of the generated subtree',
+    language: 'Language',
+    grade: 'Grade Level',
+    'grade.placeholder': 'e.g., grade-3, grade-6',
+    'grade.hint': 'Optional: Specify the grade level (e.g., grade-3, grade-6)',
+    subject: 'Subject',
+    'subject.placeholder': 'e.g., science, history',
+    'subject.hint': 'Optional: Specify the subject (e.g., science, history)',
+    model: 'Model',
+    'model.hint': 'Select the AI model to use for generation',
+    cancel: 'Cancel',
+    generate: 'Generate',
+    generating: 'Generating...',
+  },
 };

@@ -1,38 +1,41 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { QuickAction } from '../../types/aiModification';
 
 export function useMindmapQuickActions(): QuickAction[] {
+  const { t } = useTranslation('mindmap');
+
   return useMemo(
     () => [
       {
         icon: 'Maximize2',
-        label: 'Expand',
+        label: t('aiPanel.quickActionItems.expand.label'),
         operation: 'expand',
-        instruction: 'Add more detail to this concept',
-        tooltip: 'Add 2-3 sentences of explanation',
+        instruction: t('aiPanel.quickActionItems.expand.instruction'),
+        tooltip: t('aiPanel.quickActionItems.expand.tooltip'),
       },
       {
         icon: 'Minimize2',
-        label: 'Shorten',
+        label: t('aiPanel.quickActionItems.shorten.label'),
         operation: 'shorten',
-        instruction: 'Make this concept more concise',
-        tooltip: 'Reduce to 1-2 sentences maximum',
+        instruction: t('aiPanel.quickActionItems.shorten.instruction'),
+        tooltip: t('aiPanel.quickActionItems.shorten.tooltip'),
       },
       {
         icon: 'CheckCircle',
-        label: 'Fix Grammar',
+        label: t('aiPanel.quickActionItems.grammar.label'),
         operation: 'grammar',
-        instruction: 'Fix grammar and spelling',
-        tooltip: 'Correct grammatical errors',
+        instruction: t('aiPanel.quickActionItems.grammar.instruction'),
+        tooltip: t('aiPanel.quickActionItems.grammar.tooltip'),
       },
       {
         icon: 'FileText',
-        label: 'Formalize',
+        label: t('aiPanel.quickActionItems.formal.label'),
         operation: 'formal',
-        instruction: 'Make this more formal and professional',
-        tooltip: 'Use more academic language',
+        instruction: t('aiPanel.quickActionItems.formal.instruction'),
+        tooltip: t('aiPanel.quickActionItems.formal.tooltip'),
       },
     ],
-    []
+    [t]
   );
 }

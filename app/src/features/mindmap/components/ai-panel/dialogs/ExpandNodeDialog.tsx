@@ -1,22 +1,19 @@
-import React from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
+import DOMPurify from 'dompurify';
 import { TreeDeciduous } from 'lucide-react';
+import React from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
+import LoadingButton from '@/components/common/LoadingButton';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import LoadingButton from '@/components/common/LoadingButton';
+import { MODEL_TYPES, useModels } from '@/features/model';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
-import { useModels, MODEL_TYPES } from '@/features/model';
 
 import type { SingleNodeContext } from '../../../types/aiModification';
 import type { ExpandNodeFormData, ExpandNodeParams } from '../../../types/expandNode';
-import {
-  EXPAND_MAX_CHILDREN_OPTIONS,
-  EXPAND_MAX_DEPTH_OPTIONS,
-  EXPAND_LANGUAGES,
-} from '../../../types/expandNode';
+import { EXPAND_MAX_CHILDREN_OPTIONS, EXPAND_MAX_DEPTH_OPTIONS } from '../../../types/expandNode';
 
 interface ExpandNodeDialogProps {
   isOpen: boolean;
@@ -44,9 +41,6 @@ export function ExpandNodeDialog({
     defaultValues: {
       maxChildren: 5,
       maxDepth: 2,
-      language: 'en',
-      grade: '',
-      subject: '',
       model: models.find((m) => m.default) || models[0] || { name: '', provider: '' },
     },
   });
@@ -60,9 +54,6 @@ export function ExpandNodeDialog({
         nodeContent,
         maxChildren: data.maxChildren,
         maxDepth: data.maxDepth,
-        language: data.language,
-        grade: data.grade || undefined,
-        subject: data.subject || undefined,
         model: data.model.name,
         provider: data.model.provider,
       });
@@ -78,16 +69,17 @@ export function ExpandNodeDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-md overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{t('expandNode.dialog.title', 'Generate Child Nodes')}</DialogTitle>
-          <DialogDescription>
-            {t('expandNode.dialog.description', 'Configure AI generation for child nodes')}
-          </DialogDescription>
+          <DialogTitle>{t('expandNode.dialog.title')}</DialogTitle>
+          <DialogDescription>{t('expandNode.dialog.description')}</DialogDescription>
         </DialogHeader>
 
         {/* Current Node Content */}
         <div className="space-y-2">
-          <Label className="text-sm font-semibold">{t('expandNode.currentNode', 'Current Node')}</Label>
-          <div className="rounded bg-gray-50 p-3 text-sm text-gray-700">{nodeContent}</div>
+          <Label className="text-sm font-semibold">{t('expandNode.currentNode')}</Label>
+          <div
+            className="prose prose-sm max-w-none rounded bg-gray-50 p-3 text-sm text-gray-700"
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(nodeContent) }}
+          />
         </div>
 
         {/* Form */}
@@ -95,7 +87,7 @@ export function ExpandNodeDialog({
           {/* Max Children */}
           <div className="space-y-2">
             <Label htmlFor="maxChildren" className="text-sm font-semibold">
-              {t('expandNode.maxChildren', 'Maximum Children')}
+              {t('expandNode.maxChildren')}
             </Label>
             <select
               id="maxChildren"
@@ -109,15 +101,13 @@ export function ExpandNodeDialog({
                 </option>
               ))}
             </select>
-            <p className="text-xs text-gray-500">
-              {t('expandNode.maxChildren.hint', 'Number of child nodes to generate')}
-            </p>
+            <p className="text-xs text-gray-500">{t('expandNode.maxChildren.hint')}</p>
           </div>
 
           {/* Max Depth */}
           <div className="space-y-2">
             <Label htmlFor="maxDepth" className="text-sm font-semibold">
-              {t('expandNode.maxDepth', 'Maximum Depth')}
+              {t('expandNode.maxDepth')}
             </Label>
             <select
               id="maxDepth"
@@ -131,69 +121,12 @@ export function ExpandNodeDialog({
                 </option>
               ))}
             </select>
-            <p className="text-xs text-gray-500">
-              {t('expandNode.maxDepth.hint', 'How many levels deep to generate')}
-            </p>
-          </div>
-
-          {/* Language */}
-          <div className="space-y-2">
-            <Label htmlFor="language" className="text-sm font-semibold">
-              {t('expandNode.language', 'Language')}
-            </Label>
-            <select
-              id="language"
-              {...form.register('language')}
-              className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm"
-              disabled={isExpanding}
-            >
-              {EXPAND_LANGUAGES.map(({ value, label }) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Grade (Optional) */}
-          <div className="space-y-2">
-            <Label htmlFor="grade" className="text-sm font-semibold">
-              {t('expandNode.grade', 'Grade Level (Optional)')}
-            </Label>
-            <input
-              id="grade"
-              type="text"
-              placeholder="e.g., grade-3, grade-6"
-              {...form.register('grade')}
-              className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-400"
-              disabled={isExpanding}
-            />
-            <p className="text-xs text-gray-500">
-              {t('expandNode.grade.hint', 'Optional: for educational context')}
-            </p>
-          </div>
-
-          {/* Subject (Optional) */}
-          <div className="space-y-2">
-            <Label htmlFor="subject" className="text-sm font-semibold">
-              {t('expandNode.subject', 'Subject (Optional)')}
-            </Label>
-            <input
-              id="subject"
-              type="text"
-              placeholder="e.g., science, history"
-              {...form.register('subject')}
-              className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-400"
-              disabled={isExpanding}
-            />
-            <p className="text-xs text-gray-500">
-              {t('expandNode.subject.hint', 'Optional: for educational context')}
-            </p>
+            <p className="text-xs text-gray-500">{t('expandNode.maxDepth.hint')}</p>
           </div>
 
           {/* Model Selection */}
           <div className="space-y-2">
-            <Label className="text-sm font-semibold">{t('expandNode.model', 'AI Model')}</Label>
+            <Label className="text-sm font-semibold">{t('expandNode.model')}</Label>
             <Controller
               control={form.control}
               name="model"
@@ -208,9 +141,7 @@ export function ExpandNodeDialog({
                 />
               )}
             />
-            <p className="text-xs text-gray-500">
-              {t('expandNode.model.hint', 'Select the AI model to use')}
-            </p>
+            <p className="text-xs text-gray-500">{t('expandNode.model.hint')}</p>
           </div>
 
           {/* Buttons */}
@@ -222,16 +153,16 @@ export function ExpandNodeDialog({
               disabled={isExpanding}
               className="flex-1"
             >
-              {t('expandNode.cancel', 'Cancel')}
+              {t('expandNode.cancel')}
             </Button>
             <LoadingButton
               type="submit"
               loading={isExpanding}
-              loadingText={t('expandNode.generating', 'Generating...')}
+              loadingText={t('expandNode.generating')}
               className="flex-1 gap-2"
             >
               <TreeDeciduous className="h-4 w-4" />
-              {t('expandNode.generate', 'Generate')}
+              {t('expandNode.generate')}
             </LoadingButton>
           </div>
         </form>

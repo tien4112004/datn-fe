@@ -14,17 +14,11 @@ export function NoSelectionState(): React.ReactElement {
         <Sparkles className="h-6 w-6 text-purple-600" />
       </div>
       <div>
-        <h3 className="text-sm font-semibold text-gray-700">
-          {t('aiPanel.noSelection.title', 'Select a Node')}
-        </h3>
-        <p className="mt-1 text-xs text-gray-500">
-          {t('aiPanel.noSelection.message', 'Select a node to access AI assistance')}
-        </p>
+        <h3 className="text-sm font-semibold text-gray-700">{t('aiPanel.noSelection.title')}</h3>
+        <p className="mt-1 text-xs text-gray-500">{t('aiPanel.noSelection.message')}</p>
       </div>
       <div className="mt-2 max-w-xs text-xs text-gray-400">
-        <p>
-          {t('aiPanel.noSelection.hint', 'AI can help you expand, shorten, or improve your mindmap content.')}
-        </p>
+        <p>{t('aiPanel.noSelection.hint')}</p>
       </div>
     </div>
   );

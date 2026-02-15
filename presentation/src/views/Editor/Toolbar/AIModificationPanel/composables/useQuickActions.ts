@@ -103,13 +103,13 @@ export function useQuickActions() {
   function getQuickActions(contextType: 'slide' | 'text' | 'combined-text'): QuickAction[] {
     switch (contextType) {
       case 'slide':
-        return slideQuickActions;
+        return slideQuickActions.value;
       case 'text':
-        return textQuickActions;
+        return textQuickActions.value;
       case 'combined-text':
-        return combinedTextQuickActions;
+        return combinedTextQuickActions.value;
       default:
-        return slideQuickActions;
+        return slideQuickActions.value;
     }
   }
 

@@ -37,11 +37,26 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
 
         if (storedNodes.length === 0 && storedEdges.length === 0) return;
 
-        const restoredNodes = [...nodes, ...storedNodes];
+        // Restore nodes with isCollapsed reset to false
+        const restoredNodes = [...nodes];
+        storedNodes.forEach((node) => {
+          // Create a clean copy of the node with isCollapsed reset
+          // We must also reset collapsedBy to ensure it's not hidden by mistake
+          const restoredNode = {
+            ...node,
+            data: {
+              ...node.data,
+              isCollapsed: false,
+              collapsedBy: undefined,
+            },
+          };
+          restoredNodes.push(restoredNode);
+        });
 
         const restoredEdges = [...edges, ...storedEdges];
 
-        // Update parent node to clear stored children and update collapse flags
+        // Update parent node to clear ONLY the expanded side's stored children
+        // while PRESERVING the other side's data
         const updatedNodes = restoredNodes.map((n) => {
           if (n.id === nodeId) {
             return {
@@ -49,10 +64,11 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
               data: {
                 ...n.data,
                 collapsedChildren: {
-                  leftNodes: [],
-                  leftEdges: [],
-                  rightNodes: [],
-                  rightEdges: [],
+                  ...n.data.collapsedChildren, // Preserve existing data (e.g. other side)
+                  // Overwrite only the side we are expanding
+                  ...(side === SIDE.LEFT
+                    ? { leftNodes: [], leftEdges: [] }
+                    : { rightNodes: [], rightEdges: [] }),
                 },
               },
             };
@@ -78,29 +94,41 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
         const updatedNodes = nodes
           .map((n) => {
             if (n.id === nodeId) {
+              // Preserve existing collapsed data (e.g. from other side)
+              const existingCollapsedData = n.data.collapsedChildren || {
+                leftNodes: [],
+                leftEdges: [],
+                rightNodes: [],
+                rightEdges: [],
+              };
+
               return {
                 ...n,
                 data: {
                   ...n.data,
                   collapsedChildren: {
-                    leftNodes: side === SIDE.LEFT ? affectedDescendants : [],
-                    rightNodes: side === SIDE.RIGHT ? affectedDescendants : [],
-                    leftEdges:
-                      side === SIDE.LEFT
-                        ? edges.filter((edge) =>
+                    ...existingCollapsedData, // Keep other side's data
+                    // Update only the current side
+                    ...(side === SIDE.LEFT
+                      ? {
+                          leftNodes: affectedDescendants,
+                          leftEdges: edges.filter((edge) =>
                             affectedDescendants.some((d) => d.id === edge.target || d.id === edge.source)
-                          )
-                        : [],
-                    rightEdges:
-                      side === SIDE.RIGHT
-                        ? edges.filter((edge) =>
+                          ),
+                        }
+                      : {
+                          rightNodes: affectedDescendants,
+                          rightEdges: edges.filter((edge) =>
                             affectedDescendants.some((d) => d.id === edge.target || d.id === edge.source)
-                          )
-                        : [],
+                          ),
+                        }),
                   },
                 },
               };
             }
+
+            // SAFETY CHECK: Never collapse the node that initiated the collapse
+            if (n.id === nodeId) return n;
 
             // Don't collapse nodes that are already collapsed by another ancestor
             const isAffectedDescendant = affectedDescendants.some((d) => d.id === n.id);

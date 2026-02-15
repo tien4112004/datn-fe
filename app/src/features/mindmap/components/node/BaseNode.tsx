@@ -22,7 +22,6 @@ export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>,
 }
 
 const clipboardSelector = (state: any) => state.dragTargetNodeId;
-const selectedCountSelector = (state: any) => state.selectedNodeIds.size;
 
 export const BaseNodeBlock = memo(
   ({ className, children, variant = 'card', node, ...props }: BaseNodeBlockProps) => {
@@ -116,6 +115,7 @@ export const BaseNodeBlock = memo(
         >
           {children}
           <NodeHandlers layoutType={layoutType} id={id} side={data.side} />
+          <NodeResizer isVisible={selected} minWidth={100} minHeight={60} />
           <Helper node={node} dragging={dragging} selected={selected} />
         </motion.div>
       </AnimatePresence>
@@ -144,28 +144,31 @@ export const BaseNodeBlock = memo(
 
 const Helper = memo(
   ({ node, dragging, selected }: { node: NodeProps<MindMapNode>; dragging: boolean; selected: boolean }) => {
-    const selectedNodeCount = useCoreStore(useShallow(selectedCountSelector));
-    if (selectedNodeCount > 1 || dragging) {
+    // Use getState() to avoid reactive subscription to selectedNodeIds
+    // Only hide controls if: dragging OR (selected AND multiple nodes selected)
+    const shouldHideControls = dragging || (selected && useCoreStore.getState().selectedNodeIds.size > 1);
+
+    if (shouldHideControls) {
       return null;
     }
 
     return (
       <>
-        <NodeResizer isVisible={selected} minWidth={100} minHeight={60} />
         <ChildNodeControls node={node} selected={selected} />
       </>
     );
   },
   (prevProps, nextProps) => {
+    // Only re-render if this node's selection, dragging, or data actually changed
     const prevData = prevProps.node.data;
     const nextData = nextProps.node.data;
 
-    // Be more conservative with memoization for Helper component
-    // to ensure selection changes are properly handled
     return (
       prevProps.node.id === nextProps.node.id &&
       prevProps.selected === nextProps.selected &&
       prevProps.dragging === nextProps.dragging &&
+      prevProps.node.width === nextProps.node.width &&
+      prevProps.node.height === nextProps.node.height &&
       isEqual(prevData.collapsedChildren, nextData.collapsedChildren)
     );
   }

@@ -61,8 +61,6 @@ const EdgeBlock = memo(
     sourceY,
     targetX,
     targetY,
-    source,
-    target,
     sourcePosition,
     targetPosition,
     data,
@@ -77,13 +75,6 @@ const EdgeBlock = memo(
       targetPosition,
     });
 
-    const getNode = useCoreStore((state) => state.getNode);
-
-    const sourceNode = getNode(source);
-    const targetNode = getNode(target);
-
-    const selected = sourceNode?.selected || targetNode?.selected;
-
     return (
       <motion.path
         id={id}
@@ -91,7 +82,7 @@ const EdgeBlock = memo(
         d={edgePath}
         fill="none"
         stroke={data?.strokeColor || '#3b82f6'}
-        strokeWidth={selected ? (data?.strokeWidth || 2) + 1 : data?.strokeWidth || 2}
+        strokeWidth={data?.strokeWidth || 2}
         animate={
           data && data.isDeleting
             ? { opacity: 0, scale: 0 }

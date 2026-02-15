@@ -8,7 +8,7 @@ import { getSideFromPosition, getTreeForceLayout, getRootNodeOfSubtree } from '.
 
 export const useReactFlowIntegration = () => {
   const hasInitializedRef = useRef(false);
-  const updateSelectedNodeIds = useCoreStore((state) => state.updateSelectedNodeIds);
+
   const moveToChild = useNodeManipulationStore((state) => state.moveToChild);
   const getNode = useCoreStore((state) => state.getNode);
   const addChildNode = useNodeOperationsStore((state) => state.addChildNode);
@@ -125,7 +125,9 @@ export const useReactFlowIntegration = () => {
 
       // If auto layout is enabled, apply layout after dropping node
       if (isAutoLayoutEnabled) {
-        const rootNode = getRootNodeOfSubtree(node.id, nodes);
+        // Use getState to avoid dependency on nodes array
+        const currentNodes = useCoreStore.getState().nodes;
+        const rootNode = getRootNodeOfSubtree(node.id, currentNodes);
         if (rootNode) {
           applyAutoLayout(rootNode.id);
         }
@@ -139,7 +141,7 @@ export const useReactFlowIntegration = () => {
       setDragTarget,
       isAutoLayoutEnabled,
       applyAutoLayout,
-      nodes,
+      // nodes is not a dependency if we use getState()
     ]
   );
 
@@ -176,10 +178,6 @@ export const useReactFlowIntegration = () => {
     setMouseOverNodeId(null);
   }, [setMouseOverNodeId]);
 
-  const onSelectionChange = useCallback(() => {
-    updateSelectedNodeIds();
-  }, [updateSelectedNodeIds]);
-
   return {
     onNodeDragStart,
     onNodeDrag,
@@ -190,6 +188,5 @@ export const useReactFlowIntegration = () => {
     onConnectEnd,
     onNodeMouseEnter,
     onNodeMouseLeave,
-    onSelectionChange,
   };
 };

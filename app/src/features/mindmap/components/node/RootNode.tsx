@@ -68,11 +68,6 @@ const RootNodeBlock = memo(
           {/* <div className={cn('flex-shrink-0 p-2 pr-0', DRAGHANDLE.CLASS)}>
             <GripVertical className={cn('h-6 w-5', isSelected ? 'opacity-100' : 'opacity-50')} />
           </div> */}
-          <style>{`
-			.bn-container[data-color-scheme] {
-			--bn-colors-editor-background: ${data.backgroundColor} !important;
-			}
-		`}</style>
 
           <NodeRichTextContent
             content={data.content}
@@ -82,10 +77,10 @@ const RootNodeBlock = memo(
             minimalToolbar={true}
             isPresenterMode={isReadOnly}
             style={{
-              width: width ? `${width - 40}px` : undefined,
-              height: height ? `${height - 16}px` : undefined,
               minWidth: 'fit-content',
               minHeight: 'fit-content',
+              // @ts-ignore - Custom CSS variable for editor background
+              '--bn-colors-editor-background': data.backgroundColor,
             }}
           />
         </BaseNodeContent>

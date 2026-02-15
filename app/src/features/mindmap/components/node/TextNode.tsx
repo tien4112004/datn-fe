@@ -11,7 +11,7 @@ import { BaseNodeControl } from '../controls/BaseNodeControl';
 import { BaseNodeContent } from '../ui/base-node';
 import { NodeRichTextContent } from '../ui/node-rich-text-content';
 import { BaseNodeBlock } from './BaseNode';
-import { getTreeLayoutType } from '../../services/utils';
+import { DEFAULT_LAYOUT_TYPE } from '../../services/utils';
 
 const TextNodeBlock = memo(
   ({ ...node }: NodeProps<TextNode>) => {
@@ -19,9 +19,15 @@ const TextNodeBlock = memo(
 
     const { isReadOnly, canEdit } = useMindmapPermissionContext();
 
-    const nodes = useCoreStore((state) => state.nodes);
     const isLayouting = useLayoutStore((state) => state.isLayouting);
-    const layoutType = useMemo(() => getTreeLayoutType(nodes), [nodes]);
+
+    // Use cached layout type map instead of searching through all nodes
+    // This avoids subscribing to the full nodes array on every component instance
+    const layoutType = useMemo(() => {
+      const rootId = useCoreStore.getState().nodeToRootMap.get(node.id);
+      if (!rootId) return DEFAULT_LAYOUT_TYPE;
+      return useCoreStore.getState().rootLayoutTypeMap.get(rootId) || DEFAULT_LAYOUT_TYPE;
+    }, [node.id]);
 
     const updateNodeData = useNodeOperationsStore((state) => state.updateNodeDataWithUndo);
     const updateSubtreeLayout = useLayoutStore((state) => state.updateSubtreeLayout);
@@ -48,11 +54,6 @@ const TextNodeBlock = memo(
           {/* <div className={cn('flex-shrink-0 p-2 pr-0', DRAGHANDLE.CLASS)}>
             <GripVertical className={cn('h-6 w-5', isSelected ? 'opacity-100' : 'opacity-50')} />
           </div> */}
-          <style>{`
-            .bn-container[data-color-scheme] {
-              --bn-colors-editor-background: ${data.backgroundColor} !important;
-            }
-          `}</style>
 
           <NodeRichTextContent
             content={data.content}
@@ -62,10 +63,10 @@ const TextNodeBlock = memo(
             minimalToolbar={true}
             isPresenterMode={isReadOnly}
             style={{
-              width: width ? `${width - 40}px` : undefined,
-              height: height ? `${height - 16}px` : undefined,
               minWidth: 'fit-content',
               minHeight: 'fit-content',
+              // @ts-ignore - Custom CSS variable for editor background
+              '--bn-colors-editor-background': data.backgroundColor,
             }}
           />
         </BaseNodeContent>

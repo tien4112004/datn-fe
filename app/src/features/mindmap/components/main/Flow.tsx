@@ -15,18 +15,7 @@ import { useCoreStore } from '../../stores';
  * @deprecated ShapeNodeBlock and ImageNodeBlock are deprecated and will be removed in a future version.
  * Consider using TextNode or other alternative node types instead.
  */
-const nodeTypes = {
-  mindmapTextNode: TextNodeBlock,
-  mindmapRootNode: RootNodeBlock,
-  /** @deprecated - Use TextNode or other alternatives instead */
-  mindmapShapeNode: ShapeNodeBlock,
-  /** @deprecated - Use TextNode or other alternatives instead */
-  mindmapImageNode: ImageNodeBlock,
-};
-
-const edgeTypes = {
-  mindmapEdge: EdgeBlock,
-};
+import { useMemo } from 'react';
 
 const handlersSelector = (state: any) => ({
   nodes: state.nodes,
@@ -56,8 +45,29 @@ const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag
     onConnectEnd,
     onNodeMouseEnter,
     onNodeMouseLeave,
-    onSelectionChange,
   } = useReactFlowIntegration();
+
+  // Memoize nodeTypes and edgeTypes to prevent unnecessary re-renders in ReactFlow
+  const nodeTypes = useMemo(
+    () => ({
+      mindmapTextNode: TextNodeBlock,
+      mindmapRootNode: RootNodeBlock,
+      /** @deprecated - Use TextNode or other alternatives instead */
+      mindmapShapeNode: ShapeNodeBlock,
+      /** @deprecated - Use TextNode or other alternatives instead */
+      mindmapImageNode: ImageNodeBlock,
+    }),
+    []
+  );
+
+  const edgeTypes = useMemo(
+    () => ({
+      mindmapEdge: EdgeBlock,
+    }),
+    []
+  );
+
+  const proOptions = useMemo(() => ({ hideAttribution: true }), []);
 
   // Simple fixed-duration loading state
   useEffect(() => {
@@ -83,7 +93,7 @@ const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag
         onConnect={onConnect}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        proOptions={{ hideAttribution: true }}
+        proOptions={proOptions}
         onPaneMouseMove={onPaneMouseMove}
         onPaneClick={onPaneClick}
         onNodeDragStart={onNodeDragStart}
@@ -93,7 +103,6 @@ const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag
         onConnectEnd={onConnectEnd}
         onNodeMouseEnter={onNodeMouseEnter}
         onNodeMouseLeave={onNodeMouseLeave}
-        onSelectionChange={onSelectionChange}
         connectionLineComponent={ConnectionLine}
         panOnDrag={isPanOnDrag}
         panActivationKeyCode={!isPanOnDrag ? 'Shift' : null}
@@ -102,7 +111,6 @@ const Flow = memo(({ children, isPanOnDrag }: { children: ReactNode; isPanOnDrag
         selectionKeyCode={isPanOnDrag ? 'Shift' : null}
         nodesDraggable={!isReadOnly}
         nodesConnectable={!isReadOnly}
-        fitViewOnInit={false}
       >
         {children}
       </ReactFlow>

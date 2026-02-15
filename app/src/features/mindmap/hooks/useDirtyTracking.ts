@@ -1,10 +1,16 @@
 import { useEffect, useRef } from 'react';
 import { isEqual } from 'lodash';
+import { useShallow } from 'zustand/react/shallow';
 import { useCoreStore } from '../stores/core';
 import { useDirtyStore } from '../stores/dirty';
 
 export const useMindmapDirtyTracking = (enabled: boolean = true) => {
-  const { nodes, edges } = useCoreStore();
+  const { nodes, edges } = useCoreStore(
+    useShallow((state) => ({
+      nodes: state.nodes,
+      edges: state.edges,
+    }))
+  );
   const markDirty = useDirtyStore((state) => state.markDirty);
   const isDirty = useDirtyStore((state) => state.isDirty);
 

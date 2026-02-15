@@ -12,7 +12,7 @@
   }
 
   .react-flow__node.selected .base-node-card {
-    @apply shadow-lg ring-2 ring-blue-500;
+    @apply shadow-lg ring-blue-500;
   }
 
   .root-node-card {
@@ -28,6 +28,6 @@
   }
 
   .react-flow__node.selected .root-node-card {
-    @apply ring-primary shadow-xl ring-2;
+    @apply ring-primary shadow-xl;
   }
 }

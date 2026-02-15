@@ -8,13 +8,13 @@ import {
   Toolbar,
   MindmapBreadcrumbHeader,
   MindmapControls,
+  DirtyTracker,
 } from '@/features/mindmap/components';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLoaderData } from 'react-router-dom';
 import { useCoreStore, usePresenterModeStore } from '../stores';
 import { useDirtyStore } from '../stores/dirty';
-import { useMindmapDirtyTracking } from '../hooks/useDirtyTracking';
 import { useFullscreen } from '../hooks/useFullscreen';
 import { usePresenterMode } from '../hooks/usePresenterMode';
 import { useCommentDrawerTrigger } from '../hooks/useCommentDrawer';
@@ -79,9 +79,6 @@ const MindmapPage = () => {
   const [isToolbarVisible, setIsToolbarVisible] = useState(isDesktop);
   const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
   const userPermission = mindmap?.permission;
-
-  // Track dirty state changes - only if user can edit
-  useMindmapDirtyTracking(userPermission === 'edit');
 
   // Track saving and duplicating state
   const isSaving = useSavingStore((state) => state.isSaving);
@@ -253,6 +250,7 @@ const MindmapPage = () => {
       <SmallScreenDialog />
       {isSaving && <GlobalSpinner text={t('toolbar.save.saving')} />}
       {isDuplicating && <GlobalSpinner text={t('toolbar.actions.duplicateLoading')} />}
+      <DirtyTracker enabled={userPermission === 'edit'} />
     </>
   );
 };

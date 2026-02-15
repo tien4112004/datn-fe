@@ -1380,10 +1380,13 @@ export default {
     info: {
       title: 'Thông tin học sinh',
       contactInformation: 'Thông tin liên hệ',
+      parentInformation: 'Thông tin phụ huynh',
       born: 'Ngày sinh',
       notProvided: 'Chưa cung cấp',
       fields: {
         phone: 'Điện thoại',
+        parentName: 'Tên phụ huynh',
+        parentPhone: 'SĐT phụ huynh',
         parentEmail: 'Email phụ huynh',
         address: 'Địa chỉ',
         enrollmentDate: 'Ngày nhập học',

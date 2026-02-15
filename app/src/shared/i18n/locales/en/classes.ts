@@ -1354,10 +1354,13 @@ export default {
     info: {
       title: 'Student Information',
       contactInformation: 'Contact Information',
+      parentInformation: 'Parent Information',
       born: 'Born',
       notProvided: 'Not provided',
       fields: {
         phone: 'Phone',
+        parentName: 'Parent Name',
+        parentPhone: 'Parent Phone',
         parentEmail: 'Parent Email',
         address: 'Address',
         enrollmentDate: 'Enrollment Date',

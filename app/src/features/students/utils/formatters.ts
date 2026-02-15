@@ -16,12 +16,12 @@ export function getInitials(firstName?: string | null, lastName?: string | null)
 /**
  * Format ISO date string to locale date
  */
-export function formatDate(dateString?: string | null): string {
+export function formatDate(dateString?: string | null, locale: string = 'en-US'): string {
   if (!dateString) return 'N/A';
 
   try {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat(locale, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',

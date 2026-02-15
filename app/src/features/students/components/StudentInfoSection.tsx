@@ -1,12 +1,12 @@
-import { Phone, MapPin, Calendar, Mail, User } from 'lucide-react';
+import { Phone, MapPin, Calendar, Mail, User, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
-import { Avatar, AvatarImage, AvatarFallback } from '@/shared/components/ui/avatar';
 import { Separator } from '@/shared/components/ui/separator';
 import { Badge } from '@/shared/components/ui/badge';
+import { UserAvatar } from '@/shared/components/common/UserAvatar';
 import type { Student } from '../types';
 import { InfoRow } from './InfoRow';
-import { getInitials, formatDate } from '../utils/formatters';
+import { formatDate } from '../utils/formatters';
 
 interface StudentInfoSectionProps {
   student: Student;
@@ -22,10 +22,9 @@ interface StudentInfoSectionProps {
  * - Accessible information presentation
  */
 export function StudentInfoSection({ student }: StudentInfoSectionProps) {
-  const { t } = useTranslation('classes');
-  const initials = getInitials(student.firstName, student.lastName);
+  const { t, i18n } = useTranslation('classes');
   const fullName = student.fullName || `${student.firstName || ''} ${student.lastName || ''}`.trim();
-  const enrollmentDate = formatDate(student.enrollmentDate);
+  const enrollmentDate = formatDate(student.enrollmentDate, i18n.language);
 
   // Determine status variant
   const statusVariant =
@@ -61,24 +60,21 @@ export function StudentInfoSection({ student }: StudentInfoSectionProps) {
           )}
         </div>
       </CardHeader>
-      <CardContent className="space-y-6 pt-6">
+      <CardContent className="space-y-4 pt-3">
         {/* Avatar and Name Section */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-          <Avatar className="h-24 w-24 ring-2 ring-muted ring-offset-2 transition-transform duration-200 hover:scale-105">
-            <AvatarImage
-              src={student.avatarUrl || undefined}
-              alt={`${fullName}'s profile picture`}
-            />
-            <AvatarFallback className="text-2xl font-semibold bg-gradient-to-br from-blue-500 to-purple-500 text-white">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            src={student.avatarUrl || undefined}
+            name={fullName}
+            size="xl"
+            className="h-24 w-24 ring-2 ring-muted ring-offset-2 transition-transform duration-200 hover:scale-105"
+          />
           <div className="flex-1 text-center sm:text-left space-y-1">
             <h2 className="text-3xl font-bold tracking-tight">{fullName}</h2>
             <p className="text-base text-muted-foreground">@{student.username}</p>
             {student.dateOfBirth && (
               <p className="text-sm text-muted-foreground">
-                {t('studentDetail.info.born')}: {formatDate(student.dateOfBirth)}
+                {t('studentDetail.info.born')}: {formatDate(student.dateOfBirth, i18n.language)}
               </p>
             )}
           </div>
@@ -88,20 +84,10 @@ export function StudentInfoSection({ student }: StudentInfoSectionProps) {
 
         {/* Contact Information Grid */}
         <div>
-          <h3 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wide">
+          <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
             {t('studentDetail.info.contactInformation')}
           </h3>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
-            <InfoRow
-              icon={Phone}
-              label={t('studentDetail.info.fields.phone')}
-              value={student.phoneNumber || t('studentDetail.info.notProvided')}
-            />
-            <InfoRow
-              icon={Mail}
-              label={t('studentDetail.info.fields.parentEmail')}
-              value={student.parentContactEmail || t('studentDetail.info.notProvided')}
-            />
+          <div className="grid gap-2.5 sm:grid-cols-2">
             <InfoRow
               icon={MapPin}
               label={t('studentDetail.info.fields.address')}
@@ -111,6 +97,33 @@ export function StudentInfoSection({ student }: StudentInfoSectionProps) {
               icon={Calendar}
               label={t('studentDetail.info.fields.enrollmentDate')}
               value={enrollmentDate}
+            />
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Parent Information Grid */}
+        <div>
+          <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            {t('studentDetail.info.parentInformation')}
+          </h3>
+          <div className="grid gap-2.5 sm:grid-cols-2">
+            <InfoRow
+              icon={User}
+              label={t('studentDetail.info.fields.parentName')}
+              value={student.parentName || t('studentDetail.info.notProvided')}
+            />
+            <InfoRow
+              icon={Phone}
+              label={t('studentDetail.info.fields.parentPhone')}
+              value={student.parentPhone || t('studentDetail.info.notProvided')}
+            />
+            <InfoRow
+              icon={Mail}
+              label={t('studentDetail.info.fields.parentEmail')}
+              value={student.parentContactEmail || t('studentDetail.info.notProvided')}
             />
           </div>
         </div>

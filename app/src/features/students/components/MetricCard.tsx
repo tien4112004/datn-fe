@@ -78,12 +78,13 @@ export function MetricCard({
         'hover:shadow-md'
       )}
     >
-      <CardContent className="flex items-center gap-4 p-6">
+      <CardContent className="flex items-center gap-4 py-1.5 px-4">
         {/* Icon Container */}
         <div
           className={cn(
-            'rounded-lg p-3 transition-transform duration-200',
-            colors.iconBg
+            'rounded-lg transition-transform duration-200',
+            colors.iconBg,
+            'p-2 flex items-center'
           )}
           aria-hidden="true"
         >

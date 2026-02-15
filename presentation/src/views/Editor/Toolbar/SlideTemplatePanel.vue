@@ -110,6 +110,19 @@ import TemplateParameterEditor from './TemplateParameterEditor.vue';
 import message from '@/utils/message';
 import Button from '@/components/Button.vue';
 
+// Debounce utility for preventing rapid re-generation
+let regenerateTimeout: NodeJS.Timeout | null = null;
+const debouncedGeneratePreviews = async (delayMs = 300) => {
+  if (regenerateTimeout) {
+    clearTimeout(regenerateTimeout);
+  }
+
+  regenerateTimeout = setTimeout(() => {
+    console.log('[TemplatePanel] Debounced regeneration triggered');
+    generatePreviews();
+  }, delayMs);
+};
+
 interface TemplatePreview {
   template: Template;
   slide: Slide | null;
@@ -196,9 +209,14 @@ const confirmAndStartEditing = () => {
  */
 const generatePreviews = async () => {
   if (!currentSlide.value?.layout?.schema || isLoading.value) {
+    console.log('[TemplatePanel] Skipping preview generation:', {
+      hasSchema: !!currentSlide.value?.layout?.schema,
+      isLoading: isLoading.value,
+    });
     return;
   }
 
+  console.log('[TemplatePanel] Starting preview generation for slide:', currentSlide.value.id);
   isLoading.value = true;
   templatePreviews.value = [];
 
@@ -252,6 +270,9 @@ const generatePreviews = async () => {
     );
 
     templatePreviews.value = previews;
+    console.log('[TemplatePanel] ✓ Preview generation complete, rendered', previews.length, 'templates');
+  } catch (error) {
+    console.error('[TemplatePanel] Error during preview generation:', error);
   } finally {
     isLoading.value = false;
   }
@@ -292,15 +313,24 @@ watch(
 );
 
 // Regenerate previews when schema changes (from content edits)
+// Use a computed property that serializes the schema to catch all changes
+const schemaChecksum = computed(() => {
+  const schema = currentSlide.value?.layout?.schema;
+  if (!schema) return null;
+  // Create a checksum of schema to detect any changes
+  return JSON.stringify(schema);
+});
+
 watch(
-  () => currentSlide.value?.layout?.schema,
-  async (newSchema) => {
-    // Only regenerate if schema exists and we can switch
-    if (newSchema && canSwitch.value) {
-      await generatePreviews();
+  schemaChecksum,
+  (newChecksum, oldChecksum) => {
+    // Only regenerate if schema actually changed and we can switch
+    if (newChecksum && oldChecksum && newChecksum !== oldChecksum && canSwitch.value) {
+      console.log('[TemplatePanel] Schema changed, queuing preview regeneration');
+      debouncedGeneratePreviews(200); // Use shorter debounce for schema changes
     }
   },
-  { deep: true }
+  { deep: false } // Not needed since we serialize
 );
 </script>
 

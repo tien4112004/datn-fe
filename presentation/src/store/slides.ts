@@ -8,7 +8,7 @@ import type {
   SlideTemplate,
   PPTTextElement,
 } from '@/types/slides';
-import { editSlideContent } from '@/utils/slideLayout/editing/contentEditor';
+import { editSlideContent, editCombinedListContent } from '@/utils/slideLayout/editing/contentEditor';
 
 /**
  * Cleans ProsemirrorEditor HTML output, keeping only <strong> and <em> tags.
@@ -103,6 +103,7 @@ export interface SlidesState {
 function syncElementToSchema(slide: Slide, elementId: string, props: Partial<PPTElement>): void {
   // Skip if slide doesn't have schema (manual slides)
   if (!slide.layout?.schema || !slide.layout?.elementMappings) {
+    console.log('[Schema Sync] ⊘ Skipped - no schema or mappings for element', elementId);
     return;
   }
 
@@ -118,6 +119,7 @@ function syncElementToSchema(slide: Slide, elementId: string, props: Partial<PPT
   }
 
   if (!newContent) {
+    console.log('[Schema Sync] ⊘ Skipped - no text content to sync for element', elementId);
     return; // No content to sync
   }
 
@@ -132,13 +134,35 @@ function syncElementToSchema(slide: Slide, elementId: string, props: Partial<PPT
   console.log('[Schema Sync] Cleaned content length:', cleanedContent.length);
   console.log('[Schema Sync] Cleaned content:', cleanedContent.substring(0, 100));
 
-  // Update schema using existing utility
+  // 🔥 NEW: Detect and handle combined list elements
+  if (elementId.includes('+')) {
+    console.log('[Schema Sync] → Detected combined list element (compound ID)');
+
+    editCombinedListContent(slide, elementId, cleanedContent)
+      .then((updatedSchema) => {
+        if (updatedSchema && slide.layout) {
+          slide.layout.schema = updatedSchema;
+          console.log('[Schema Sync] ✓ Combined list schema updated successfully');
+        } else {
+          console.error('[Schema Sync] ✗ Failed to update combined list');
+        }
+      })
+      .catch((error) => {
+        console.error('[Schema Sync] ✗ Error updating combined list:', error);
+      });
+
+    return;
+  }
+
+  // Original single-item update logic
   const updatedSchema = editSlideContent(slide, elementId, cleanedContent);
 
   if (updatedSchema) {
     // Update schema (Vue reactivity handles re-rendering)
     slide.layout.schema = updatedSchema;
     console.log('[Schema Sync] ✓ Schema updated successfully');
+  } else {
+    console.error('[Schema Sync] ✗ Failed - editSlideContent returned null');
   }
 }
 

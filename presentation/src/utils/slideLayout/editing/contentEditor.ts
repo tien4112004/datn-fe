@@ -15,6 +15,8 @@
 import type { Slide } from '@/types/slides';
 import type { EnrichedSlideLayoutSchema } from '@aiprimary/core/templates';
 import { isEnriched } from '@aiprimary/core/templates';
+import { selectTemplateById } from '@/utils/slideLayout';
+import { parseListContentByPattern, extractFieldsFromItem } from './listContentParser';
 
 /**
  * Extracts data ID directly from deterministic element ID
@@ -40,6 +42,50 @@ export function parseElementId(elementId: string): string | null {
   }
 
   return dataId;
+}
+
+/**
+ * Parses compound element ID to extract constituent data IDs
+ *
+ * Compound IDs are used for combined list elements that merge multiple schema items.
+ * They follow the pattern: elem-{firstId}+{lastId} and represent a range of IDs.
+ *
+ * Example: "elem-items-0-label+items-3-label" extracts the range from items-0-label to items-3-label,
+ * returning all IDs in that range: ["items-0-label", "items-1-label", "items-2-label", "items-3-label"]
+ *
+ * @param elementId - Compound element ID like "elem-items-0+items-3"
+ * @returns Array of data IDs in the range, or null if not a valid compound ID
+ */
+export function parseCompoundElementId(elementId: string): string[] | null {
+  if (!elementId.startsWith('elem-')) return null;
+
+  const dataId = elementId.slice(5); // Remove "elem-" prefix
+
+  if (!dataId.includes('+')) return null; // Not compound
+
+  const [firstId, lastId] = dataId.split('+');
+
+  // Extract index range from formats like:
+  // - "items-0" → prefix="items", index=0, suffix=""
+  // - "items-0-label" → prefix="items", index=0, suffix="-label"
+  const firstMatch = firstId.match(/^(.+?)-(\d+)(.*)$/);
+  const lastMatch = lastId.match(/^(.+?)-(\d+)(.*)$/);
+
+  if (!firstMatch || !lastMatch) return null;
+
+  const [, prefix, firstIndexStr, suffix] = firstMatch;
+  const [, , lastIndexStr] = lastMatch;
+
+  const startIndex = parseInt(firstIndexStr);
+  const endIndex = parseInt(lastIndexStr);
+
+  // Generate all IDs in range
+  const ids: string[] = [];
+  for (let i = startIndex; i <= endIndex; i++) {
+    ids.push(`${prefix}-${i}${suffix}`);
+  }
+
+  return ids;
 }
 
 /**
@@ -250,6 +296,129 @@ export function editSlideContent(
 
   console.log(`[ContentEditor] ✓ Schema update complete`);
   console.log(`========== [ContentEditor] Edit complete ==========\n`);
+
+  return updatedSchema;
+}
+
+/**
+ * Retrieves the combined list pattern for an element
+ *
+ * The pattern is stored in the template configuration at:
+ * template.containers[containerLabel].combined.pattern
+ *
+ * @param slide - Slide containing the element
+ * @param elementId - Combined list element ID
+ * @returns Pattern string like "{label}: {content}", or null if not found
+ */
+async function getPatternForElement(slide: Slide, elementId: string): Promise<string | null> {
+  // Get container label from mappings
+  const mapping = slide.layout?.elementMappings?.find((m) => m.elementId === elementId);
+  if (!mapping?.containerLabel) {
+    console.warn('[ContentEditor] No mapping found for element:', elementId);
+    return null;
+  }
+
+  // Get template
+  if (!slide.layout?.layoutType || !slide.layout?.templateId) {
+    console.warn('[ContentEditor] Missing layout metadata');
+    return null;
+  }
+
+  try {
+    const template = await selectTemplateById(slide.layout.layoutType, slide.layout.templateId);
+
+    // Access pattern from template
+    const container = template.containers[mapping.containerLabel];
+    const pattern = container && 'combined' in container && (container as any).combined?.pattern;
+
+    if (!pattern) {
+      console.warn('[ContentEditor] No pattern found in container:', mapping.containerLabel);
+    }
+
+    return pattern || null;
+  } catch (error) {
+    console.error('[ContentEditor] Error retrieving template:', error);
+    return null;
+  }
+}
+
+/**
+ * Edits combined list content by parsing and updating multiple schema items
+ *
+ * For combined list elements with compound IDs like "elem-items-0+items-3",
+ * this function:
+ * 1. Parses the compound ID to get all constituent data IDs
+ * 2. Retrieves the pattern from the template
+ * 3. Parses the edited HTML into individual items
+ * 4. Updates each schema item with its corresponding content
+ *
+ * @param slide - Slide containing the combined list
+ * @param elementId - Compound element ID (e.g., "elem-items-0+items-3")
+ * @param newContent - Edited HTML content from user
+ * @returns Updated schema, or null on error
+ */
+export async function editCombinedListContent(
+  slide: Slide,
+  elementId: string,
+  newContent: string
+): Promise<EnrichedSlideLayoutSchema | null> {
+  console.log('\n========== [ContentEditor] EDIT COMBINED LIST ==========');
+  console.log(`Element ID: ${elementId}`);
+  console.log(`New content preview: ${newContent.substring(0, 100)}`);
+
+  // Step 1: Parse compound ID
+  const dataIds = parseCompoundElementId(elementId);
+  if (!dataIds || dataIds.length === 0) {
+    console.error('[ContentEditor] ✗ Failed to parse compound ID');
+    return null;
+  }
+
+  console.log(`[ContentEditor] Parsed ${dataIds.length} data IDs:`, dataIds);
+
+  // Step 2: Get pattern
+  const pattern = await getPatternForElement(slide, elementId);
+  if (!pattern) {
+    console.warn('[ContentEditor] ⚠ No pattern found, falling back to primary item update');
+    // Fallback: update only the first item
+    return updateSchemaContent(slide.layout!.schema, dataIds[0], newContent);
+  }
+
+  console.log(`[ContentEditor] Pattern: "${pattern}"`);
+
+  // Step 3: Parse content into items
+  const parsedItems = parseListContentByPattern(newContent, pattern, dataIds.length);
+  console.log(`[ContentEditor] Parsed ${parsedItems.length} items from content`);
+
+  if (parsedItems.length < dataIds.length) {
+    console.warn(`[ContentEditor] ⚠ Fewer items than expected (${parsedItems.length} < ${dataIds.length})`);
+    console.warn('[ContentEditor] Remaining schema items will be unchanged');
+  }
+
+  if (parsedItems.length > dataIds.length) {
+    console.warn(
+      `[ContentEditor] ⚠ Extra items detected (${parsedItems.length} > ${dataIds.length}), ignoring overflow`
+    );
+  }
+
+  // Step 4: Update schema for each item
+  let updatedSchema = slide.layout!.schema;
+  const itemsToUpdate = Math.min(parsedItems.length, dataIds.length);
+
+  for (let i = 0; i < itemsToUpdate; i++) {
+    const itemContent = parsedItems[i];
+    const dataId = dataIds[i];
+
+    // MVP: Update full content
+    // Future: Extract fields from pattern and update individually
+    const processedContent = extractFieldsFromItem(itemContent, pattern);
+
+    console.log(`[ContentEditor] Updating item ${i}: ${dataId} → ${processedContent.substring(0, 50)}...`);
+
+    updatedSchema = updateSchemaContent(updatedSchema, dataId, processedContent);
+  }
+
+  console.log(`[ContentEditor] ✓ Combined list update complete`);
+  console.log('========== [ContentEditor] Edit complete ==========\n');
 
   return updatedSchema;
 }

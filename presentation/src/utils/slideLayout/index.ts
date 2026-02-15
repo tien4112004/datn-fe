@@ -117,10 +117,6 @@ export const convertToSlide = async (
   // Step 1: Enrich schema with deterministic IDs (idempotent)
   // This wraps text content with ID objects to enable content editing
   const isAlreadyEnriched = isSchemaEnriched(data);
-  console.log(`\n========== [convertToSlide] Starting conversion ==========`);
-  console.log(`Layout type: ${data.type}`);
-  console.log(`Already enriched: ${isAlreadyEnriched}`);
-  console.log(`Original schema:`, JSON.stringify(data, null, 2));
 
   const enrichedSchema = isAlreadyEnriched ? data : enrichSchema(data);
 

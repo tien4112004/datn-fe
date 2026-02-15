@@ -1,4 +1,5 @@
 import { ref, computed, type Ref, type ComputedRef } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { api, getBackendUrl } from '@aiprimary/api';
 
 export interface ArtStyleWithModifiers {
@@ -6,23 +7,26 @@ export interface ArtStyleWithModifiers {
   name?: string;
   value?: string;
   label?: string;
+  labelKey?: string;
   modifiers?: string;
 }
 
 const fallbackArtStyles: ArtStyleWithModifiers[] = [
-  { value: 'photorealistic', label: 'Photorealistic', modifiers: '' },
-  { value: 'digital-art', label: 'Digital Art', modifiers: '' },
-  { value: 'minimalist', label: 'Minimalist', modifiers: '' },
-  { value: 'watercolor', label: 'Watercolor', modifiers: '' },
-  { value: 'oil-painting', label: 'Oil Painting', modifiers: '' },
-  { value: 'anime', label: 'Anime', modifiers: '' },
-  { value: 'cartoon', label: 'Cartoon', modifiers: '' },
-  { value: 'sketch', label: 'Sketch', modifiers: '' },
-  { value: 'abstract', label: 'Abstract', modifiers: '' },
-  { value: 'surreal', label: 'Surreal', modifiers: '' },
+  { value: 'photorealistic', labelKey: 'panels.aiModification.artStyles.photorealistic', modifiers: '' },
+  { value: 'digital-art', labelKey: 'panels.aiModification.artStyles.digitalArt', modifiers: '' },
+  { value: 'minimalist', labelKey: 'panels.aiModification.artStyles.minimalist', modifiers: '' },
+  { value: 'watercolor', labelKey: 'panels.aiModification.artStyles.watercolor', modifiers: '' },
+  { value: 'oil-painting', labelKey: 'panels.aiModification.artStyles.oilPainting', modifiers: '' },
+  { value: 'anime', labelKey: 'panels.aiModification.artStyles.anime', modifiers: '' },
+  { value: 'cartoon', labelKey: 'panels.aiModification.artStyles.cartoon', modifiers: '' },
+  { value: 'sketch', labelKey: 'panels.aiModification.artStyles.sketch', modifiers: '' },
+  { value: 'abstract', labelKey: 'panels.aiModification.artStyles.abstract', modifiers: '' },
+  { value: 'surreal', labelKey: 'panels.aiModification.artStyles.surreal', modifiers: '' },
 ];
 
 export function useArtStyles() {
+  const { t } = useI18n();
+
   // State
   const availableArtStyles = ref<ArtStyleWithModifiers[]>([]);
   const isLoading = ref(false);
@@ -78,7 +82,7 @@ export function useArtStyles() {
         }))
       : fallbackArtStyles.map((style) => ({
           value: style.value || '',
-          label: style.label || '',
+          label: style.labelKey ? t(style.labelKey) : style.label || '',
         }))
   );
 

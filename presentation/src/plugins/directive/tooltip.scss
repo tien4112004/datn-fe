@@ -1,6 +1,6 @@
 .tippy-box[data-theme~='tooltip'] {
-  background-color: #262626;
-  color: #fff;
+  background-color: var(--presentation-primary);
+  color: var(--presentation-primary-foreground);
   border-radius: var(--presentation-radius);
   padding: 8px;
   font-size: 0.75rem;

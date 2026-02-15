@@ -1,5 +1,5 @@
 <template>
-  <div class="editor-header">
+  <div class="tw-select-none tw-flex tw-justify-between tw-px-1.5">
     <!-- Breadcrumb Section -->
     <div class="tw-flex tw-items-center tw-gap-2 tw-max-w-md tw-flex-shrink">
       <Breadcrumb>
@@ -79,7 +79,7 @@
               <span>{{ $t('header.share.export') }}</span>
             </div>
           </PopoverMenuItem>
-          <div v-if="!hideStudentOptions" class="menu-divider"></div>
+          <div v-if="!hideStudentOptions" class="tw-h-px tw-bg-gray-200"></div>
 
           <!-- Slide Creation -->
           <PopoverMenuItem
@@ -128,7 +128,7 @@
             </PopoverMenuItem>
           </FileInput>
 
-          <div class="menu-divider"></div>
+          <div class="tw-h-px tw-bg-gray-200"></div>
 
           <!-- Tools -->
           <PopoverMenuItem
@@ -154,15 +154,20 @@
             </div>
           </PopoverMenuItem>
         </template>
-        <div class="menu-item">
-          <IconHamburgerButton class="icon" />
+        <div
+          class="tw-px-2.5 tw-h-8 tw-flex tw-items-center tw-rounded tw-cursor-pointer hover:tw-bg-gray-100"
+        >
+          <IconHamburgerButton class="tw-text-gray-600" />
         </div>
       </Popover>
       <Popover trigger="click" center contentClass="!tw-p-0 tw-min-w-[340px]">
         <template #content>
           <PresenterMenu @select="handlePresentationMode" />
         </template>
-        <Button class="menu-item" v-tooltip="$t('header.presentation.slideShow')">
+        <Button
+          class="tw-px-2.5 tw-rounded tw-cursor-pointer hover:tw-bg-gray-100"
+          v-tooltip="$t('header.presentation.slideShow')"
+        >
           <IconPpt />
           <span class="tw-hidden sm:tw-inline">{{ $t('header.buttons.present') }}</span>
         </Button>
@@ -172,21 +177,24 @@
         <template #content>
           <ShareMenu :presentationId="presentationId" @cancel="handleShareCancel" @share="handleShare" />
         </template>
-        <Button class="menu-item" v-tooltip="$t('header.share.sharePresentation')">
-          <IconShare class="icon" />
+        <Button
+          class="tw-px-2.5 tw-rounded tw-cursor-pointer hover:tw-bg-gray-100"
+          v-tooltip="$t('header.share.sharePresentation')"
+        >
+          <IconShare class="tw-text-gray-600" />
           <span class="tw-hidden sm:tw-inline">{{ $t('header.buttons.share') }}</span>
         </Button>
       </Popover>
       <Button
         v-if="permission === 'comment' || permission === 'edit'"
-        class="menu-item"
+        class="tw-px-2.5 tw-rounded tw-cursor-pointer hover:tw-bg-gray-100"
         v-tooltip="$t('header.comments.tooltip')"
         @click="handleOpenComments"
       >
-        <IconComments class="icon" />
+        <IconComments class="tw-text-gray-600" />
         <span class="tw-hidden sm:tw-inline">{{ $t('header.buttons.comments') }}</span>
       </Button>
-      <div class="menu-item" id="language-switcher">
+      <div class="tw-px-2.5 tw-rounded tw-cursor-pointer hover:tw-bg-gray-100" id="language-switcher">
         <LanguageSwitcher />
       </div>
     </div>
@@ -434,97 +442,3 @@ const handleRequestDuplicate = () => {
   );
 };
 </script>
-
-<style lang="scss" scoped>
-.editor-header {
-  user-select: none;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 5px;
-}
-
-.menu-item {
-  height: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 0.875rem;
-  padding: 0 10px;
-  border-radius: var(--presentation-radius);
-  cursor: pointer;
-
-  .icon {
-    color: #666666;
-  }
-  .text {
-    width: 18px;
-    text-align: center;
-    font-size: 17px;
-  }
-  .ai {
-    background: linear-gradient(270deg, #d897fd, #33bcfc);
-    background-clip: text;
-    color: transparent;
-    font-weight: 700;
-  }
-
-  &:hover {
-    background-color: #f1f1f1;
-  }
-}
-.group-menu-item {
-  height: 30px;
-  display: flex;
-  margin: 0 8px;
-  padding: 0 2px;
-  border-radius: var(--presentation-radius);
-
-  &:hover {
-    background-color: #f1f1f1;
-  }
-
-  .menu-item {
-    padding: 0 3px;
-  }
-  .arrow-btn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-  }
-}
-.title {
-  height: 30px;
-  margin-left: 2px;
-  font-size: 0.875rem;
-
-  .title-input {
-    width: 200px;
-    height: 100%;
-    padding-left: 0;
-    padding-right: 0;
-
-    ::v-deep(input) {
-      height: 28px;
-      line-height: 28px;
-    }
-  }
-  .title-text {
-    min-width: 20px;
-    max-width: 400px;
-    line-height: 30px;
-    padding: 0 6px;
-    border-radius: var(--presentation-radius);
-    cursor: pointer;
-    @include ellipsis-oneline();
-
-    &:hover {
-      background-color: var(--presentation-sidebar);
-    }
-  }
-}
-.github-link {
-  display: inline-block;
-  height: 30px;
-}
-</style>

@@ -1,4 +1,5 @@
 import { ref, computed, type Ref, type ComputedRef } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
 import { useModelStore } from '@/stores/modelStore';
@@ -8,6 +9,7 @@ import type { SlideLayoutSchema } from '@/utils/slideLayout/types/schemas';
 import { Columns, Grid, List as IconList } from 'lucide-vue-next';
 
 export function useLayoutTransformation() {
+  const { t } = useI18n();
   const slidesStore = useSlidesStore();
   const { currentSlide } = storeToRefs(slidesStore);
   const modelStore = useModelStore();
@@ -18,12 +20,12 @@ export function useLayoutTransformation() {
   // Computed
   const currentLayout = computed(() => currentSlide.value?.layout?.layoutType || 'LIST');
 
-  const layoutTypes = [
-    { label: 'List', value: 'LIST', icon: IconList },
-    { label: 'Columns', value: 'TWO_COLUMN', icon: Columns },
-    { label: 'Timeline', value: 'TIMELINE', icon: Grid },
-    { label: 'Pyramid', value: 'PYRAMID', icon: Grid },
-  ];
+  const layoutTypes = computed(() => [
+    { label: t('panels.aiModification.layoutTypes.list'), value: 'LIST', icon: IconList },
+    { label: t('panels.aiModification.layoutTypes.columns'), value: 'TWO_COLUMN', icon: Columns },
+    { label: t('panels.aiModification.layoutTypes.timeline'), value: 'TIMELINE', icon: Grid },
+    { label: t('panels.aiModification.layoutTypes.pyramid'), value: 'PYRAMID', icon: Grid },
+  ]);
 
   const getViewport = () => ({
     width: slidesStore.viewportSize,
@@ -34,13 +36,23 @@ export function useLayoutTransformation() {
    * Get tooltip message for layout type
    */
   function getLayoutTooltip(layoutType: string): string {
-    const tooltips: Record<string, string> = {
-      LIST: 'Transform to a list. Your content may be expanded to fit!',
-      TWO_COLUMN: 'Split into two columns. Content may be reorganized!',
-      TIMELINE: 'Show as a timeline. Steps or dates may be added!',
-      PYRAMID: 'Arrange as a pyramid. Content may be reordered!',
+    const tooltipMap: Record<string, string> = {
+      LIST: t('panels.aiModification.layout.changeTooltip', {
+        layoutType: t('panels.aiModification.layoutTypes.list'),
+      }),
+      TWO_COLUMN: t('panels.aiModification.layout.changeTooltip', {
+        layoutType: t('panels.aiModification.layoutTypes.columns'),
+      }),
+      TIMELINE: t('panels.aiModification.layout.changeTooltip', {
+        layoutType: t('panels.aiModification.layoutTypes.timeline'),
+      }),
+      PYRAMID: t('panels.aiModification.layout.changeTooltip', {
+        layoutType: t('panels.aiModification.layoutTypes.pyramid'),
+      }),
     };
-    return tooltips[layoutType] || 'Change slide layout';
+    return (
+      tooltipMap[layoutType] || t('panels.aiModification.layout.changeTooltip', { layoutType: 'Layout' })
+    );
   }
 
   /**
@@ -115,7 +127,7 @@ export function useLayoutTransformation() {
 
     // Computed
     currentLayout,
-    layoutTypes: computed(() => layoutTypes),
+    layoutTypes,
 
     // Methods
     transformLayout,

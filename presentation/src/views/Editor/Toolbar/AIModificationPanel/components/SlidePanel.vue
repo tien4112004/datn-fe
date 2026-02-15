@@ -14,13 +14,13 @@
       @submit="handleChatSubmit"
     />
 
-    <LayoutSelector
+    <!-- <LayoutSelector
       :layout-types="layoutTypes"
       :current-layout="currentLayout"
       :is-transforming="isTransforming"
       :get-layout-tooltip="getLayoutTooltip"
       @layout-select="transformLayout"
-    />
+    /> -->
   </div>
 </template>
 

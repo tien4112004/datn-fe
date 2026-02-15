@@ -23,8 +23,6 @@ export function parseListContentByPattern(
   pattern: string,
   expectedItemCount: number
 ): string[] {
-  console.log('[ListParser] Parsing list content, expected items:', expectedItemCount);
-
   // Parse HTML to AST
   const ast = toAST(htmlContent);
 
@@ -42,8 +40,6 @@ export function parseListContentByPattern(
 
   // Extract li elements
   const items = extractListItems(listNode);
-
-  console.log('[ListParser] Extracted', items.length, 'items');
 
   // Limit to expected count (handle extra items edge case)
   const limitedItems = items.slice(0, expectedItemCount);

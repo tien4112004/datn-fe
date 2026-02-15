@@ -21,25 +21,6 @@ export function processCombinedTextContainer(
 } {
   const pattern = container.combined.pattern;
 
-  // Debug: Log incoming labelData structure
-  console.log('[processCombinedTextContainer] Processing combined container');
-  for (const [label, dataArray] of Object.entries(labelData)) {
-    console.log(`  [processCombinedTextContainer] Label "${label}":`, {
-      arrayLength: dataArray.length,
-      firstItemType: dataArray[0] ? typeof dataArray[0] : 'none',
-      firstItemIsObject: dataArray[0] && typeof dataArray[0] === 'object',
-      firstItemKeys: dataArray[0] && typeof dataArray[0] === 'object' ? Object.keys(dataArray[0]) : [],
-      firstItemHasId: dataArray[0] && typeof dataArray[0] === 'object' && 'id' in dataArray[0],
-      firstItemId:
-        dataArray[0] && typeof dataArray[0] === 'object' && 'id' in dataArray[0] ? dataArray[0].id : 'none',
-      firstItemHasValue: dataArray[0] && typeof dataArray[0] === 'object' && 'value' in dataArray[0],
-      firstItemValue:
-        dataArray[0] && typeof dataArray[0] === 'object' && 'value' in dataArray[0]
-          ? dataArray[0].value
-          : dataArray[0],
-    });
-  }
-
   // Extract styles for each label from children config
   const labelStyles = extractLabelStyles(container);
 
@@ -60,9 +41,6 @@ export function processCombinedTextContainer(
 
   // Collect all descendant texts by label
   const textsByLabel = collectDescendantTextsByLabel(labelData as Record<string, string[]>);
-
-  console.log('[processCombinedTextContainer] After collectDescendantTextsByLabel:');
-  console.log('  First item:', textsByLabel[0] ? { ...textsByLabel[0] } : 'none');
 
   // Apply pattern and styles to each item
   const listContents = textsByLabel.map((item) => {

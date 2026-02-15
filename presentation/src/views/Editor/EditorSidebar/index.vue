@@ -68,7 +68,11 @@ const { isCurrentSlideLocked } = useSlideEditLock();
 const filterTabsByLockState = (tabs: TabConfig[], isLocked: boolean): TabConfig[] => {
   if (!isLocked) return tabs;
 
-  const hiddenTabsWhenLocked = [ToolbarStates.EL_ANIMATION, ToolbarStates.IMAGE_LIBRARY];
+  const hiddenTabsWhenLocked = [
+    ToolbarStates.EL_STYLE,
+    ToolbarStates.EL_POSITION,
+    ToolbarStates.IMAGE_LIBRARY,
+  ];
 
   return tabs.filter((tab) => !hiddenTabsWhenLocked.includes(tab.key));
 };
@@ -112,7 +116,14 @@ const elementTabs = computed<TabConfig[]>(() => {
     });
   }
 
-  return filterTabsByLockState(tabs, isCurrentSlideLocked.value);
+  let filteredTabs = filterTabsByLockState(tabs, isCurrentSlideLocked.value);
+
+  // Hide AI_MODIFICATION when there's no selected element AND NOT in Template Preview Mode
+  if (!activeElementIdList.value.length && !isCurrentSlideLocked.value) {
+    filteredTabs = filteredTabs.filter((tab) => tab.key !== ToolbarStates.AI_MODIFICATION);
+  }
+
+  return filteredTabs;
 });
 
 // Tab configuration for slide editing
@@ -160,7 +171,14 @@ const slideTabs = computed<TabConfig[]>(() => {
     });
   }
 
-  return filterTabsByLockState(tabs, isCurrentSlideLocked.value);
+  let filteredTabs = filterTabsByLockState(tabs, isCurrentSlideLocked.value);
+
+  // Hide AI_MODIFICATION when there's no selected element AND NOT in Template Preview Mode
+  if (!activeElementIdList.value.length && !isCurrentSlideLocked.value) {
+    filteredTabs = filteredTabs.filter((tab) => tab.key !== ToolbarStates.AI_MODIFICATION);
+  }
+
+  return filteredTabs;
 });
 
 // Tab configuration for multi-select

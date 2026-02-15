@@ -113,17 +113,13 @@ export function parseCompoundElementId(elementId: string): string[] | null {
  * // Returns: "items-2" (via mapping lookup)
  */
 export function resolveElementToDataId(slide: Slide, elementId: string): string | null {
-  console.log(`[ContentEditor] Resolving element ID: ${elementId}`);
-
   // Try direct parsing first (deterministic IDs, fast - O(1))
   const directDataId = parseElementId(elementId);
   if (directDataId) {
-    console.log(`[ContentEditor] Found direct mapping: ${elementId} → ${directDataId}`);
     return directDataId;
   }
 
   // Fallback to mapping lookup (legacy UUIDs)
-  console.log(`[ContentEditor] Element ID is not deterministic, using mapping lookup...`);
 
   const mappings = slide.layout?.elementMappings;
   if (!mappings) {
@@ -131,18 +127,12 @@ export function resolveElementToDataId(slide: Slide, elementId: string): string 
     return null;
   }
 
-  console.log(`[ContentEditor] Searching through ${mappings.length} mappings...`);
-
   const mapping = mappings.find((m) => m.elementId === elementId);
   if (!mapping) {
     console.warn(`[ContentEditor] No mapping found for element ${elementId}`);
-    console.log('[ContentEditor] Available element IDs:', mappings.map((m) => m.elementId).join(', '));
     return null;
   }
 
-  console.log(
-    `[ContentEditor] Found mapping: ${elementId} → ${mapping.dataId} (container: ${mapping.containerLabel})`
-  );
   return mapping.dataId;
 }
 
@@ -176,9 +166,6 @@ export function updateSchemaContent(
   dataId: string,
   newContent: string
 ): EnrichedSlideLayoutSchema {
-  console.log(`[ContentEditor] Updating schema content for dataId: "${dataId}"`);
-  console.log(`[ContentEditor] New content: "${newContent}"`);
-
   // Deep clone to avoid mutating original
   const updated = JSON.parse(JSON.stringify(schema));
 
@@ -190,9 +177,7 @@ export function updateSchemaContent(
 
     // Check if this is an enriched value with matching ID
     if (isEnriched(obj) && obj.id === dataId) {
-      const oldValue = obj.value;
       obj.value = newContent;
-      console.log(`[ContentEditor] Successfully updated "${dataId}": "${oldValue}" → "${newContent}"`);
       return true;
     }
 
@@ -271,10 +256,6 @@ export function editSlideContent(
   elementId: string,
   newContent: string
 ): EnrichedSlideLayoutSchema | null {
-  console.log(`\n========== [ContentEditor] EDIT SLIDE CONTENT ==========`);
-  console.log(`Element ID: ${elementId}`);
-  console.log(`New content: "${newContent}"`);
-
   // Step 1: Resolve element ID to data ID
   const dataId = resolveElementToDataId(slide, elementId);
   if (!dataId) {
@@ -289,13 +270,8 @@ export function editSlideContent(
     return null;
   }
 
-  console.log(`[ContentEditor] Current schema layout type: ${currentSchema.type}`);
-
   // Step 3: Update schema
   const updatedSchema = updateSchemaContent(currentSchema, dataId, newContent);
-
-  console.log(`[ContentEditor] ✓ Schema update complete`);
-  console.log(`========== [ContentEditor] Edit complete ==========\n`);
 
   return updatedSchema;
 }
@@ -362,18 +338,12 @@ export async function editCombinedListContent(
   elementId: string,
   newContent: string
 ): Promise<EnrichedSlideLayoutSchema | null> {
-  console.log('\n========== [ContentEditor] EDIT COMBINED LIST ==========');
-  console.log(`Element ID: ${elementId}`);
-  console.log(`New content preview: ${newContent.substring(0, 100)}`);
-
   // Step 1: Parse compound ID
   const dataIds = parseCompoundElementId(elementId);
   if (!dataIds || dataIds.length === 0) {
     console.error('[ContentEditor] ✗ Failed to parse compound ID');
     return null;
   }
-
-  console.log(`[ContentEditor] Parsed ${dataIds.length} data IDs:`, dataIds);
 
   // Step 2: Get pattern
   const pattern = await getPatternForElement(slide, elementId);
@@ -383,11 +353,8 @@ export async function editCombinedListContent(
     return updateSchemaContent(slide.layout!.schema, dataIds[0], newContent);
   }
 
-  console.log(`[ContentEditor] Pattern: "${pattern}"`);
-
   // Step 3: Parse content into items
   const parsedItems = parseListContentByPattern(newContent, pattern, dataIds.length);
-  console.log(`[ContentEditor] Parsed ${parsedItems.length} items from content`);
 
   if (parsedItems.length < dataIds.length) {
     console.warn(`[ContentEditor] ⚠ Fewer items than expected (${parsedItems.length} < ${dataIds.length})`);
@@ -412,13 +379,8 @@ export async function editCombinedListContent(
     // Future: Extract fields from pattern and update individually
     const processedContent = extractFieldsFromItem(itemContent, pattern);
 
-    console.log(`[ContentEditor] Updating item ${i}: ${dataId} → ${processedContent.substring(0, 50)}...`);
-
     updatedSchema = updateSchemaContent(updatedSchema, dataId, processedContent);
   }
-
-  console.log(`[ContentEditor] ✓ Combined list update complete`);
-  console.log('========== [ContentEditor] Edit complete ==========\n');
 
   return updatedSchema;
 }

@@ -118,7 +118,6 @@ const debouncedGeneratePreviews = async (delayMs = 300) => {
   }
 
   regenerateTimeout = setTimeout(() => {
-    console.log('[TemplatePanel] Debounced regeneration triggered');
     generatePreviews();
   }, delayMs);
 };
@@ -209,14 +208,9 @@ const confirmAndStartEditing = () => {
  */
 const generatePreviews = async () => {
   if (!currentSlide.value?.layout?.schema || isLoading.value) {
-    console.log('[TemplatePanel] Skipping preview generation:', {
-      hasSchema: !!currentSlide.value?.layout?.schema,
-      isLoading: isLoading.value,
-    });
     return;
   }
 
-  console.log('[TemplatePanel] Starting preview generation for slide:', currentSlide.value.id);
   isLoading.value = true;
   templatePreviews.value = [];
 
@@ -270,7 +264,6 @@ const generatePreviews = async () => {
     );
 
     templatePreviews.value = previews;
-    console.log('[TemplatePanel] ✓ Preview generation complete, rendered', previews.length, 'templates');
   } catch (error) {
     console.error('[TemplatePanel] Error during preview generation:', error);
   } finally {
@@ -326,7 +319,6 @@ watch(
   (newChecksum, oldChecksum) => {
     // Only regenerate if schema actually changed and we can switch
     if (newChecksum && oldChecksum && newChecksum !== oldChecksum && canSwitch.value) {
-      console.log('[TemplatePanel] Schema changed, queuing preview regeneration');
       debouncedGeneratePreviews(200); // Use shorter debounce for schema changes
     }
   },

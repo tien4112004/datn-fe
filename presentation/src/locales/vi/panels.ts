@@ -278,6 +278,74 @@ export default {
       preview: {
         label: 'Xem trước:',
       },
+      // Hành động nhanh
+      quickActions: {
+        // Hành động cấp trang chiếu
+        slide: {
+          shorten: 'Rút gọn',
+          shortenDesc: 'Rút gọn nội dung văn bản, giữ lại các điểm chính.',
+          expand: 'Mở rộng',
+          expandDesc: 'Mở rộng các điểm này với nhiều chi tiết hơn.',
+          fixGrammar: 'Sửa ngữ pháp',
+          fixGrammarDesc: 'Sửa ngữ pháp và lỗi chính tả.',
+          formal: 'Trang trọng',
+          formalDesc: 'Làm cho giọng điệu chuyên nghiệp và hấp dẫn hơn.',
+        },
+        // Hành động phần tử văn bản
+        textElement: {
+          fixGrammar: 'Sửa ngữ pháp',
+          fixGrammarDesc: 'Sửa ngữ pháp và lỗi chính tả trong văn bản này.',
+          shorten: 'Rút gọn',
+          shortenDesc: 'Làm cho văn bản này ngắn gọn hơn.',
+          expand: 'Mở rộng',
+          expandDesc: 'Mở rộng văn bản này với nhiều chi tiết hơn.',
+          formal: 'Trang trọng',
+          formalDesc: 'Viết lại văn bản này một cách chính thức hơn.',
+        },
+        // Hành động văn bản kết hợp
+        combinedText: {
+          expand: 'Mở rộng',
+          expandDesc: 'Mở rộng các điểm này với chi tiết và bài biên soạn nhiều hơn.',
+          shorten: 'Rút gọn',
+          shortenDesc: 'Làm cho các điểm này ngắn gọn hơn mà vẫn giữ lại thông tin chính.',
+          fixGrammar: 'Sửa ngữ pháp',
+          fixGrammarDesc: 'Sửa ngữ pháp và lỗi chính tả trong tất cả các mục.',
+          formal: 'Trang trọng',
+          formalDesc: 'Viết lại một cách chính thức và chuyên nghiệp hơn.',
+        },
+      },
+      // Phong cách nghệ thuật
+      artStyles: {
+        photorealistic: 'Chân thực ảnh',
+        digitalArt: 'Nghệ thuật kỹ thuật số',
+        minimalist: 'Tối giản',
+        watercolor: 'Màu nước',
+        oilPainting: 'Sơn dầu',
+        anime: 'Anime',
+        cartoon: 'Hoạt hình',
+        sketch: 'Phác thảo',
+        abstract: 'Trừu tượng',
+        surreal: 'Siêu thực',
+      },
+      // Loại bố cục
+      layoutTypes: {
+        list: 'Danh sách',
+        columns: 'Cột',
+        timeline: 'Dòng thời gian',
+        pyramid: 'Kim tự tháp',
+      },
+      // Thông báo phản hồi
+      messages: {
+        textRefinedSuccess: 'Văn bản đã được tinh chỉnh thành công!',
+        textRefinedError: 'Không thể tinh chỉnh văn bản',
+        combinedTextRefinedSuccess: 'Văn bản kết hợp đã được tinh chỉnh thành công!',
+        combinedTextRefinedError: 'Không thể tinh chỉnh văn bản kết hợp',
+        contentRefinedSuccess: 'Nội dung đã được tinh chỉnh thành công!',
+        contentRefinedError: 'Không thể tinh chỉnh nội dung',
+        imageReplacedSuccess: 'Hình ảnh đã được thay thế thành công!',
+        imageGenerationError: 'Không thể tạo hình ảnh',
+        imageReplaceError: 'Không thể thay thế hình ảnh',
+      },
     },
   },
 };

@@ -90,7 +90,7 @@
             </ul>
           </div>
 
-          <div class="tw-p-3 tw-bg-blue-500/8 tw-border-l-2 tw-border-blue-600 tw-rounded tw-mt-4">
+          <div class="tw-px-4 tw-py-2 tw-bg-blue-500/8 tw-border-l-2 tw-border-blue-600 tw-rounded tw-mt-4">
             <p class="tw-m-0 tw-mb-3 tw-text-xs tw-text-foreground tw-leading-relaxed">
               {{ $t('editor.templatePreview.dialog.howToUnlock') }}
             </p>
@@ -136,6 +136,7 @@ const previewModeFeatures = computed(() => ({
   navigateSlides: t('editor.templatePreview.dialog.previewMode.features.navigateSlides'),
   previewContent: t('editor.templatePreview.dialog.previewMode.features.previewContent'),
   editText: t('editor.templatePreview.dialog.previewMode.limitations.editText'),
+  slideModification: t('editor.templatePreview.dialog.previewMode.limitations.slideModification'),
 }));
 
 const previewModeLimitations = computed(() => ({
@@ -143,7 +144,6 @@ const previewModeLimitations = computed(() => ({
   addContent: t('editor.templatePreview.dialog.previewMode.limitations.addContent'),
   customizeStyles: t('editor.templatePreview.dialog.previewMode.limitations.customizeStyles'),
   deleteContent: t('editor.templatePreview.dialog.previewMode.limitations.deleteContent'),
-  slideModification: t('editor.templatePreview.dialog.previewMode.limitations.slideModification'),
 }));
 
 const editingModeFeatures = computed(() => ({
@@ -153,7 +153,6 @@ const editingModeFeatures = computed(() => ({
   customizeDesign: t('editor.templatePreview.dialog.editingMode.features.customizeDesign'),
   slideEditing: t('editor.templatePreview.dialog.editingMode.features.slideEditing'),
   elementEditing: t('editor.templatePreview.dialog.editingMode.features.elementEditing'),
-  aiEditing: t('editor.templatePreview.dialog.editingMode.features.aiEditing'),
   fullToolbar: t('editor.templatePreview.dialog.editingMode.features.fullToolbar'),
   deleteModify: t('editor.templatePreview.dialog.editingMode.features.deleteModify'),
 }));

@@ -151,11 +151,6 @@ export function calculateLargestOptimalFontSize(
 ): number {
   const clonedElement = element.cloneNode(true) as HTMLElement;
 
-  // Guard: Ensure container has valid bounds
-  if (!container.bounds?.height || container.bounds.height <= 0) {
-    return fontSizeRange.minSize;
-  }
-
   // Start from max size and work down
   let fontSize = fontSizeRange.maxSize;
   let optimalSize = fontSizeRange.minSize;

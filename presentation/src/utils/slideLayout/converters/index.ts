@@ -146,20 +146,6 @@ export async function convertLayoutGeneric<T = any>(
 
       // Check if this is a text container with combined enabled
       if (container.type === 'text' && container.combined?.enabled) {
-        console.log(`[convertLayoutGeneric] Processing combined container "${containerId}"`);
-        console.log(`  Container type: ${container.type}, combined: ${container.combined?.enabled}`);
-
-        // Debug: Log labelData structure before passing to processCombinedTextContainer
-        for (const [label, dataArray] of Object.entries(labelData)) {
-          console.log(`  [Before processCombinedTextContainer] Label "${label}":`, {
-            arrayLength: dataArray.length,
-            firstItemType: dataArray[0] ? typeof dataArray[0] : 'none',
-            firstItemIsObject: dataArray[0] && typeof dataArray[0] === 'object',
-            firstItemHasId: dataArray[0] && typeof dataArray[0] === 'object' && 'id' in dataArray[0],
-            firstItemHasValue: dataArray[0] && typeof dataArray[0] === 'object' && 'value' in dataArray[0],
-          });
-        }
-
         const { elements, cards } = processCombinedTextContainer(container, labelData, zIndex);
         allElements.push(...elements);
         allCards.push(...cards);
@@ -205,9 +191,6 @@ export async function convertLayoutGeneric<T = any>(
       // Build element mappings from enriched data
       const containerMappings = buildElementMappings(elements, labelData, containerId);
       allMappings.push(...containerMappings);
-      console.log(
-        `[ConvertLayout] Added ${containerMappings.length} mappings for container "${containerId}"`
-      );
 
       // Add all PPT elements from each label
       for (const [label, _] of Object.entries(labelData)) {
@@ -245,9 +228,6 @@ export async function convertLayoutGeneric<T = any>(
       if (textElements.length > 0 && isEnriched(textContent)) {
         const textMapping = buildTextElementMapping(textElements[0], textContent.id, containerId);
         allMappings.push(textMapping);
-        console.log(
-          `[ConvertLayout] Added text mapping for "${containerId}": ${textContent.id} → ${textElements[0].id}`
-        );
       }
 
       // Track actual bounds for title container (used by graphics)
@@ -300,10 +280,6 @@ export async function convertLayoutGeneric<T = any>(
   // Combine all elements and sort by zIndex (lower values render first/behind)
   const combinedElements = [...allCards, ...allElements, ...imageElements, ...graphicElements];
   combinedElements.sort((a, b) => a.zIndex - b.zIndex);
-
-  console.log(
-    `[ConvertLayout] Slide conversion complete. Total elements: ${combinedElements.length}, Total mappings: ${allMappings.length}`
-  );
 
   const slide: Slide = {
     id: slideId ?? crypto.randomUUID(),

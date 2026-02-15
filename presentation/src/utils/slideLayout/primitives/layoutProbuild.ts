@@ -527,7 +527,10 @@ function _calculateFontSizeForLabel(
 ): { fontSize: number } {
   // Create HTML elements for font size calculation
   const elements = labelData.map((item) => {
-    return createHtmlElement(item, 16, instances[0].text || {});
+    // Unwrap enriched value if needed (only for font size calculation)
+    const unwrappedItem =
+      typeof item === 'object' && item !== null && 'value' in item ? (item as any).value : item;
+    return createHtmlElement(unwrappedItem, 16, instances[0].text || {});
   });
 
   // Determine font size range from text config or use default based on label type

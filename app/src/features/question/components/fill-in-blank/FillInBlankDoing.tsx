@@ -2,24 +2,16 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion, FillInBlankAnswer } from '@/features/assignment/types';
 import { QUESTION_TYPE } from '@/features/assignment/types';
+import { QuestionTitle } from '../shared';
 import { Input } from '@/shared/components/ui/input';
-import { QuestionNumber } from '../shared';
 
 interface FillInBlankDoingProps {
   question: FillInBlankQuestion;
   answer?: FillInBlankAnswer;
-  points?: number; // Optional points for display
   onAnswerChange: (answer: FillInBlankAnswer) => void;
-  number?: number;
 }
 
-export const FillInBlankDoing = ({
-  question,
-  answer,
-  points,
-  onAnswerChange,
-  number,
-}: FillInBlankDoingProps) => {
+export const FillInBlankDoing = ({ question, answer, onAnswerChange }: FillInBlankDoingProps) => {
   const { t } = useTranslation('questions');
   const blankSegments = question.data.segments.filter((s) => s.type === 'blank');
   const [blanks, setBlanks] = useState<Record<string, string>>(() => {
@@ -54,15 +46,10 @@ export const FillInBlankDoing = ({
 
   return (
     <div className="space-y-4">
-      {number !== undefined && (
-        <div className="flex items-center gap-3">
-          <QuestionNumber number={number} />
-        </div>
-      )}
       {/* Title */}
       {question.title && (
         <div className="space-y-2">
-          <p className="font-medium">{question.title}</p>
+          <QuestionTitle content={question.title} variant="plain" />
           {question.titleImageUrl && (
             <img src={question.titleImageUrl} alt="Question" className="mt-2 max-h-64 rounded-md border" />
           )}
@@ -96,11 +83,6 @@ export const FillInBlankDoing = ({
           <div className="rounded-md border border-amber-200 bg-amber-50 p-2 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
             {t('fillInBlank.doing.caseSensitiveWarning')}
           </div>
-        )}
-        {points && (
-          <p>
-            {t('common.points')}: {points}
-          </p>
         )}
       </div>
     </div>

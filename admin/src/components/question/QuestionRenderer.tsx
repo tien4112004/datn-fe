@@ -1,5 +1,7 @@
 import type { Question } from '@aiprimary/core';
 import { QUESTION_TYPE } from '@/types/questionBank';
+import { cn } from '@/lib/utils';
+import { QuestionNumber } from './shared/QuestionNumber';
 import { MultipleChoiceEditing, MultipleChoiceViewing } from './multiple-choice';
 import { MatchingEditing, MatchingViewing } from './matching';
 import { OpenEndedEditing, OpenEndedViewing } from './open-ended';
@@ -36,8 +38,19 @@ export const QuestionRenderer = ({
       return <MultipleChoiceEditing question={question as any} onChange={onChange!} />;
     }
     if (viewMode === 'viewing') {
+      const componentContent = <MultipleChoiceViewing question={question as any} compact={compact} />;
       return (
-        <MultipleChoiceViewing question={question as any} points={points} number={number} compact={compact} />
+        <div className={cn(compact ? 'space-y-2' : 'space-y-4')}>
+          {number !== undefined && (
+            <div className={cn('flex items-center', compact ? 'gap-2' : 'gap-3')}>
+              <QuestionNumber number={number} className={compact ? 'h-6 w-6 text-xs' : undefined} />
+            </div>
+          )}
+          {componentContent}
+          {points !== undefined && (
+            <p className={cn('text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>Points: {points}</p>
+          )}
+        </div>
       );
     }
   }
@@ -48,7 +61,20 @@ export const QuestionRenderer = ({
       return <MatchingEditing question={question as any} onChange={onChange!} />;
     }
     if (viewMode === 'viewing') {
-      return <MatchingViewing question={question as any} points={points} number={number} compact={compact} />;
+      const componentContent = <MatchingViewing question={question as any} compact={compact} />;
+      return (
+        <div className={cn(compact ? 'space-y-2' : 'space-y-4')}>
+          {number !== undefined && (
+            <div className={cn('flex items-center', compact ? 'gap-2' : 'gap-3')}>
+              <QuestionNumber number={number} className={compact ? 'h-6 w-6 text-xs' : undefined} />
+            </div>
+          )}
+          {componentContent}
+          {points !== undefined && (
+            <p className={cn('text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>Points: {points}</p>
+          )}
+        </div>
+      );
     }
   }
 
@@ -58,8 +84,19 @@ export const QuestionRenderer = ({
       return <OpenEndedEditing question={question as any} onChange={onChange!} />;
     }
     if (viewMode === 'viewing') {
+      const componentContent = <OpenEndedViewing question={question as any} compact={compact} />;
       return (
-        <OpenEndedViewing question={question as any} points={points} number={number} compact={compact} />
+        <div className={cn(compact ? 'space-y-2' : 'space-y-4')}>
+          {number !== undefined && (
+            <div className={cn('flex items-center', compact ? 'gap-2' : 'gap-3')}>
+              <QuestionNumber number={number} className={compact ? 'h-6 w-6 text-xs' : undefined} />
+            </div>
+          )}
+          {componentContent}
+          {points !== undefined && (
+            <p className={cn('text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>Points: {points}</p>
+          )}
+        </div>
       );
     }
   }
@@ -70,8 +107,19 @@ export const QuestionRenderer = ({
       return <FillInBlankEditing question={question as any} onChange={onChange!} />;
     }
     if (viewMode === 'viewing') {
+      const componentContent = <FillInBlankViewing question={question as any} compact={compact} />;
       return (
-        <FillInBlankViewing question={question as any} points={points} number={number} compact={compact} />
+        <div className={cn(compact ? 'space-y-2' : 'space-y-4')}>
+          {number !== undefined && (
+            <div className={cn('flex items-center', compact ? 'gap-2' : 'gap-3')}>
+              <QuestionNumber number={number} className={compact ? 'h-6 w-6 text-xs' : undefined} />
+            </div>
+          )}
+          {componentContent}
+          {points !== undefined && (
+            <p className={cn('text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>Points: {points}</p>
+          )}
+        </div>
       );
     }
   }

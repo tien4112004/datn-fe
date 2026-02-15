@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { useSubmissionApiService } from '../api/submission.index';
 import { submissionKeys } from '../api/submissionApi';
 import type { SubmissionCreateRequest, SubmissionGradeRequest } from '../api/submission.service';
@@ -52,16 +53,17 @@ export const useSubmission = (submissionId: string | undefined) => {
 export const useCreateSubmission = () => {
   const service = useSubmissionApiService();
   const queryClient = useQueryClient();
+  const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor' });
 
   return useMutation({
     mutationFn: (request: SubmissionCreateRequest) => service.createSubmission(request),
     onSuccess: (_data, variables) => {
       // Invalidate submissions list for this post
       queryClient.invalidateQueries({ queryKey: submissionKeys.list(variables.postId) });
-      toast.success('Assignment submitted successfully!');
+      toast.success(t('toasts.submitSuccess'));
     },
     onError: (error: Error) => {
-      toast.error(`Failed to submit assignment: ${error.message}`);
+      toast.error(t('toasts.submitError', { message: (error as Error).message }));
     },
   });
 };
@@ -72,6 +74,7 @@ export const useCreateSubmission = () => {
 export const useGradeSubmission = () => {
   const service = useSubmissionApiService();
   const queryClient = useQueryClient();
+  const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor' });
 
   return useMutation({
     mutationFn: ({ submissionId, request }: { submissionId: string; request: SubmissionGradeRequest }) =>
@@ -83,10 +86,10 @@ export const useGradeSubmission = () => {
       if (data.assignmentId) {
         queryClient.invalidateQueries({ queryKey: submissionKeys.lists() });
       }
-      toast.success('Grading saved successfully!');
+      toast.success(t('toasts.gradingSaved'));
     },
     onError: (error: Error) => {
-      toast.error(`Failed to save grading: ${error.message}`);
+      toast.error(t('toasts.gradingError', { message: (error as Error).message }));
     },
   });
 };
@@ -97,16 +100,17 @@ export const useGradeSubmission = () => {
 export const useDeleteSubmission = () => {
   const service = useSubmissionApiService();
   const queryClient = useQueryClient();
+  const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor' });
 
   return useMutation({
     mutationFn: (submissionId: string) => service.deleteSubmission(submissionId),
     onSuccess: () => {
       // Invalidate all submission lists
       queryClient.invalidateQueries({ queryKey: submissionKeys.lists() });
-      toast.success('Submission deleted successfully!');
+      toast.success(t('toasts.submissionDeleted'));
     },
     onError: (error: Error) => {
-      toast.error(`Failed to delete submission: ${error.message}`);
+      toast.error(t('toasts.submissionDeleteError', { message: (error as Error).message }));
     },
   });
 };

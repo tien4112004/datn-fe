@@ -1,25 +1,17 @@
 import type { FillInBlankQuestion } from '@/types/questionBank';
-import { MarkdownPreview, QuestionNumber } from '../shared';
+import { MarkdownPreview } from '../shared';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 interface FillInBlankViewingProps {
   question: FillInBlankQuestion;
-  points?: number;
-  number?: number;
   compact?: boolean;
 }
 
-export const FillInBlankViewing = ({ question, points, number, compact }: FillInBlankViewingProps) => {
+export const FillInBlankViewing = ({ question, compact }: FillInBlankViewingProps) => {
   return (
     <div className={cn(compact ? 'space-y-2' : 'space-y-4')}>
-      {number !== undefined && (
-        <div className={cn('flex items-center', compact ? 'gap-2' : 'gap-3')}>
-          <QuestionNumber number={number} className={compact ? 'h-6 w-6 text-xs' : undefined} />
-        </div>
-      )}
-
       {/* Title */}
       {question.title && (
         <div className="space-y-1">
@@ -106,11 +98,6 @@ export const FillInBlankViewing = ({ question, points, number, compact }: FillIn
           <Label className={cn('font-medium', compact ? 'text-xs' : 'text-sm')}>Explanation</Label>
           <MarkdownPreview content={question.explanation} />
         </div>
-      )}
-
-      {/* Points */}
-      {points && (
-        <p className={cn('text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>Points: {points}</p>
       )}
     </div>
   );

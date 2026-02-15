@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import type { MatchingQuestion, MatchingAnswer } from '@/features/assignment/types';
-import { MarkdownPreview, AnswerFeedback, QuestionNumber } from '../shared';
+import type { Grade } from '@aiprimary/core';
+import { MarkdownPreview, QuestionTitle, GradeFeedback } from '../shared';
 
 import { CheckCircle2, XCircle, ArrowRight } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
@@ -9,16 +10,16 @@ interface MatchingAfterAssessmentProps {
   question: MatchingQuestion;
   answer?: MatchingAnswer;
   points?: number; // Points allocated for this question in the assignment
+  grade?: Grade; // Grade for this question
   hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
-  number?: number;
 }
 
 export const MatchingAfterAssessment = ({
   question,
   answer,
   points = 0,
+  grade,
   hideHeader = false,
-  number,
 }: MatchingAfterAssessmentProps) => {
   const { t } = useTranslation('questions');
   const answerMap = new Map(answer?.matches.map((m) => [m.rightId, m.leftId]) || []);
@@ -45,21 +46,18 @@ export const MatchingAfterAssessment = ({
 
   return (
     <div className="space-y-4">
-      {number !== undefined && (
-        <div className="flex items-center gap-3">
-          <QuestionNumber number={number} />
-        </div>
-      )}
       {/* Question Title */}
       <div className="space-y-2">
-        <MarkdownPreview content={question.title} />
+        <QuestionTitle content={question.title} />
         {question.titleImageUrl && (
           <img src={question.titleImageUrl} alt="Question" className="mt-2 max-h-64 rounded-md border" />
         )}
       </div>
 
-      {/* Answer Feedback */}
-      {!hideHeader && <AnswerFeedback isCorrect={isFullyCorrect} score={score} totalPoints={points} />}
+      {/* Grade Feedback */}
+      {!hideHeader && (
+        <GradeFeedback grade={grade} maxPoints={points} autoScore={score} isAutoCorrect={isFullyCorrect} />
+      )}
 
       {/* Results */}
       <div className="space-y-3">
@@ -68,7 +66,7 @@ export const MatchingAfterAssessment = ({
           <div
             key={result.correctPair.id}
             className={cn(
-              'rounded-md border p-4',
+              'rounded-md border px-4 py-2',
               result.isCorrect
                 ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
                 : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
@@ -136,21 +134,11 @@ export const MatchingAfterAssessment = ({
 
       {/* Explanation */}
       {question.explanation && (
-        <div className="bg-muted/50 rounded-md p-4">
+        <div className="bg-muted/50 rounded-md px-4 py-2">
           <h4 className="mb-2 font-semibold">{t('common.explanation')}:</h4>
           <MarkdownPreview content={question.explanation} />
         </div>
       )}
-
-      {/* Score Summary */}
-      <p className="text-muted-foreground text-sm">
-        {t('matching.afterAssessment.scoreSummary', {
-          correct: correctCount,
-          total: totalCount,
-          score,
-          maxScore: points || 0,
-        })}
-      </p>
     </div>
   );
 };

@@ -1,11 +1,12 @@
 export { MarkdownEditor } from './MarkdownEditor';
 export { MarkdownPreview } from './MarkdownPreview';
+export { QuestionTitle } from './QuestionTitle';
 export { ImageUploader } from './ImageUploader';
 export { DifficultyBadge } from './DifficultyBadge';
 export { QuestionTypeIcon } from './QuestionTypeIcon';
-export { AnswerFeedback } from './AnswerFeedback';
 export { QuestionNumber } from './QuestionNumber';
 export { ContextSelector } from './ContextSelector';
 export { ExplanationSection } from './ExplanationSection';
+export { GradeFeedback } from './GradeFeedback';
 export type { ExplanationMode } from './ExplanationSection';
 export { indexToLetter } from './numberingUtils';

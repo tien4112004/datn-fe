@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { OpenEndedQuestion, OpenEndedAnswer } from '@/features/assignment/types';
-import { MarkdownPreview, QuestionNumber } from '../shared';
+import { QuestionTitle } from '../shared';
 
 import { AutosizeTextarea } from '@/shared/components/ui/autosize-textarea';
 import { QUESTION_TYPE } from '@/features/assignment/types';
@@ -9,12 +9,10 @@ import { QUESTION_TYPE } from '@/features/assignment/types';
 interface OpenEndedDoingProps {
   question: OpenEndedQuestion;
   answer?: OpenEndedAnswer;
-  points?: number; // Optional points for display
   onAnswerChange: (answer: OpenEndedAnswer) => void;
-  number?: number;
 }
 
-export const OpenEndedDoing = ({ question, answer, points, onAnswerChange, number }: OpenEndedDoingProps) => {
+export const OpenEndedDoing = ({ question, answer, onAnswerChange }: OpenEndedDoingProps) => {
   const { t } = useTranslation('questions');
   const [text, setText] = useState(answer?.text || '');
 
@@ -42,14 +40,9 @@ export const OpenEndedDoing = ({ question, answer, points, onAnswerChange, numbe
 
   return (
     <div className="space-y-4">
-      {number !== undefined && (
-        <div className="flex items-center gap-3">
-          <QuestionNumber number={number} />
-        </div>
-      )}
       {/* Question */}
       <div className="space-y-2">
-        <MarkdownPreview content={question.title} />
+        <QuestionTitle content={question.title} />
         {question.titleImageUrl && (
           <img src={question.titleImageUrl} alt="Question" className="mt-2 max-h-64 rounded-md border" />
         )}
@@ -71,13 +64,6 @@ export const OpenEndedDoing = ({ question, answer, points, onAnswerChange, numbe
           </p>
         )}
       </div>
-
-      {/* Points */}
-      {points && (
-        <p className="text-muted-foreground text-sm">
-          {t('common.points')}: {points}
-        </p>
-      )}
     </div>
   );
 };

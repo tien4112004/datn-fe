@@ -106,6 +106,7 @@ export default {
     characterRemaining_plural: '{{count}} characters remaining',
     correct: 'Correct!',
     incorrect: 'Incorrect',
+    partialCredit: 'Partial Credit',
     scoreDisplay: 'Score: {{score}}/{{total}} points',
     pointsAbbreviation: 'pt',
     pointsAbbreviation_plural: 'pts',

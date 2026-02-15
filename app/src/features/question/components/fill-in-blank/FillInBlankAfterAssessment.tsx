@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion, FillInBlankAnswer } from '@/features/assignment/types';
-import { AnswerFeedback, QuestionNumber, ExplanationSection } from '../shared';
+import type { Grade } from '@aiprimary/core';
+import { ExplanationSection, QuestionTitle, GradeFeedback } from '../shared';
 
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
@@ -9,16 +10,16 @@ interface FillInBlankAfterAssessmentProps {
   question: FillInBlankQuestion;
   answer?: FillInBlankAnswer;
   points?: number; // Points allocated for this question in the assignment
+  grade?: Grade; // Grade for this question
   hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
-  number?: number;
 }
 
 export const FillInBlankAfterAssessment = ({
   question,
   answer,
   points = 0,
+  grade,
   hideHeader = false,
-  number,
 }: FillInBlankAfterAssessmentProps) => {
   const { t } = useTranslation('questions');
   const blankSegments = question.data.segments.filter((s) => s.type === 'blank');
@@ -50,23 +51,20 @@ export const FillInBlankAfterAssessment = ({
 
   return (
     <div className="space-y-4">
-      {number !== undefined && (
-        <div className="flex items-center gap-3">
-          <QuestionNumber number={number} />
-        </div>
-      )}
       {/* Title */}
       {question.title && (
         <div className="space-y-2">
-          <p className="font-medium">{question.title}</p>
+          <QuestionTitle content={question.title} variant="plain" />
           {question.titleImageUrl && (
             <img src={question.titleImageUrl} alt="Question" className="mt-2 max-h-64 rounded-md border" />
           )}
         </div>
       )}
 
-      {/* Answer Feedback */}
-      {!hideHeader && <AnswerFeedback isCorrect={isFullyCorrect} score={score} totalPoints={points} />}
+      {/* Grade Feedback */}
+      {!hideHeader && (
+        <GradeFeedback grade={grade} maxPoints={points} autoScore={score} isAutoCorrect={isFullyCorrect} />
+      )}
 
       {/* Question with results */}
       <div className="bg-muted/50 rounded-md p-4 text-sm leading-relaxed">
@@ -122,16 +120,6 @@ export const FillInBlankAfterAssessment = ({
 
       {/* Explanation */}
       <ExplanationSection mode="afterAssessment" explanation={question.explanation} />
-
-      {/* Score Summary */}
-      <p className="text-muted-foreground text-sm">
-        {t('fillInBlank.afterAssessment.scoreSummary', {
-          correct: correctCount,
-          total: totalCount,
-          score,
-          maxScore: points || 0,
-        })}
-      </p>
     </div>
   );
 };

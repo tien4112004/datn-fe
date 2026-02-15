@@ -8,3 +8,5 @@ export { PostCard } from './PostCard';
 export { CommentThread } from './CommentThread';
 export { SubmissionStatistics } from './SubmissionStatistics';
 export { StudentAssignmentActions } from './StudentAssignmentActions';
+export { ClassResourcesTab } from './ClassResourcesTab';
+export { ResourceCard } from './ResourceCard';

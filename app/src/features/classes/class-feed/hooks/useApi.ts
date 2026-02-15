@@ -21,6 +21,7 @@ export const feedQueryKeys = {
   post: (postId: string) => [...feedQueryKeys.all, 'post', postId] as const,
   comments: (postId: string) => [...feedQueryKeys.all, 'comments', postId] as const,
   comment: (commentId: string) => [...feedQueryKeys.all, 'comment', commentId] as const,
+  resources: (classId: string) => [...feedQueryKeys.all, 'resources', classId] as const,
 };
 
 // Helper to update comment count on a post
@@ -532,5 +533,28 @@ export function usePostMutations() {
 
     // Combined loading state
     isLoading: createPost.isPending || updatePost.isPending || deletePost.isPending || pinPost.isPending,
+  };
+}
+
+/**
+ * Hook for fetching all resources in a class
+ * Returns all linked resources across all posts in the class
+ */
+export function useClassResources(classId: string) {
+  const classFeedApi = useClassFeedApiService();
+
+  const resourcesQuery = useQuery({
+    queryKey: feedQueryKeys.resources(classId),
+    queryFn: () => classFeedApi.getAllResourcesInClass(classId),
+    enabled: !!classId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
+
+  return {
+    resources: resourcesQuery.data || [],
+    loading: resourcesQuery.isLoading,
+    error: resourcesQuery.error,
+    refetch: resourcesQuery.refetch,
   };
 }

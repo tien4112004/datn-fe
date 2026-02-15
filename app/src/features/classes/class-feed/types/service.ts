@@ -1,6 +1,7 @@
 import type { Comment, Post } from './index';
 import type { CommentCreateRequest, FeedFilter, PostCreateRequest, PostUpdateRequest } from './requests';
 import type { ApiResponse } from '@aiprimary/api';
+import type { LinkedResourceResponse } from '@/features/projects/types/resource';
 
 export interface ClassFeedApiService {
   // Posts
@@ -24,4 +25,7 @@ export interface ClassFeedApiService {
   // Attachments
   uploadAttachment(file: File): Promise<string>;
   uploadAttachments(files: File[]): Promise<string[]>;
+
+  // Resources
+  getAllResourcesInClass(classId: string): Promise<LinkedResourceResponse[]>;
 }

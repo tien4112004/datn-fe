@@ -8,6 +8,7 @@ import type {
   PostCreateRequest,
   PostUpdateRequest,
 } from '../types';
+import type { LinkedResourceResponse } from '@/features/projects/types/resource';
 
 export default class ClassFeedService implements ClassFeedApiService {
   private readonly apiClient: ApiClient;
@@ -140,5 +141,13 @@ export default class ClassFeedService implements ClassFeedApiService {
   async uploadAttachments(files: File[]): Promise<string[]> {
     const uploadPromises = files.map((file) => this.uploadAttachment(file));
     return Promise.all(uploadPromises);
+  }
+
+  async getAllResourcesInClass(classId: string): Promise<LinkedResourceResponse[]> {
+    const response = await this.apiClient.get<ApiResponse<LinkedResourceResponse[]>>(
+      `${this.baseUrl}/api/classes/${classId}/resources`
+    );
+
+    return response.data.data;
   }
 }

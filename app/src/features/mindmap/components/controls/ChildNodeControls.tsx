@@ -6,8 +6,6 @@ import {
   useNodeManipulationStore,
   useNodeOperationsStore,
 } from '@/features/mindmap/stores';
-import type { ClipboardState } from '@/features/mindmap/stores/clipboard';
-import type { CoreState } from '@/features/mindmap/stores/core';
 import type { LayoutState } from '@/features/mindmap/stores/layout';
 import type { NodeManipulationState } from '@/features/mindmap/stores/nodeManipulation';
 import type { NodeOperationsState } from '@/features/mindmap/stores/nodeOperation';

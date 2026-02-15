@@ -64,11 +64,10 @@ export const useNodeManipulationStore = create<NodeManipulationState>()(
               data: {
                 ...n.data,
                 collapsedChildren: {
-                  ...n.data.collapsedChildren, // Preserve existing data (e.g. other side)
-                  // Overwrite only the side we are expanding
-                  ...(side === SIDE.LEFT
-                    ? { leftNodes: [], leftEdges: [] }
-                    : { rightNodes: [], rightEdges: [] }),
+                  leftNodes: side === SIDE.LEFT ? [] : n.data.collapsedChildren?.leftNodes || [],
+                  leftEdges: side === SIDE.LEFT ? [] : n.data.collapsedChildren?.leftEdges || [],
+                  rightNodes: side === SIDE.RIGHT ? [] : n.data.collapsedChildren?.rightNodes || [],
+                  rightEdges: side === SIDE.RIGHT ? [] : n.data.collapsedChildren?.rightEdges || [],
                 },
               },
             };

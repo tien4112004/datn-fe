@@ -15,7 +15,7 @@ import { DEFAULT_LAYOUT_TYPE } from '../../services/utils';
 
 const TextNodeBlock = memo(
   ({ ...node }: NodeProps<TextNode>) => {
-    const { data, selected: isSelected, dragging, width, height } = node;
+    const { data, selected: isSelected, dragging } = node;
 
     const { isReadOnly, canEdit } = useMindmapPermissionContext();
 

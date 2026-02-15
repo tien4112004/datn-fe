@@ -18,7 +18,7 @@ import { NodeRichTextContent } from '../ui/node-rich-text-content';
 
 const RootNodeBlock = memo(
   ({ ...node }: NodeProps<RootNode>) => {
-    const { data, selected: isSelected, dragging, width, height } = node;
+    const { data, selected: isSelected, dragging } = node;
     const { isReadOnly, canEdit } = useMindmapPermissionContext();
 
     // Root node IS the tree root, can directly look up its own layoutType

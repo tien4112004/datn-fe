@@ -8,6 +8,63 @@ import type {
   SlideTemplate,
   PPTTextElement,
 } from '@/types/slides';
+import { editSlideContent } from '@/utils/slideLayout/editing/contentEditor';
+
+/**
+ * Cleans ProsemirrorEditor HTML output, keeping only <strong> and <em> tags.
+ * Removes all wrapper elements, styling, and other formatting.
+ *
+ * Similar to htmlToText but preserves semantic formatting.
+ *
+ * Examples:
+ * - `<p><span style="...">text</span></p>` → `text`
+ * - `<p><strong>bold</strong> text</p>` → `<strong>bold</strong> text`
+ * - `<p><span style="color: red;"><strong>bold</strong></span></p>` → `<strong>bold</strong>`
+ * - `<p><u>underline</u></p>` → `underline` (u tag removed)
+ */
+function cleanProsemirrorHTML(html: string): string {
+  if (!html || typeof html !== 'string') {
+    return html;
+  }
+
+  // Create a temporary DOM element to parse HTML
+  const temp = document.createElement('div');
+  temp.innerHTML = html;
+
+  // Extract text content while preserving only <strong> and <em>
+  const cleanContent = (node: Node): string => {
+    let result = '';
+
+    for (let child of node.childNodes) {
+      if (child.nodeType === Node.TEXT_NODE) {
+        // Text nodes - preserve as-is
+        result += (child as Text).textContent || '';
+      } else if (child.nodeType === Node.ELEMENT_NODE) {
+        const element = child as Element;
+        const tag = element.tagName.toLowerCase();
+
+        // Keep ONLY strong and em, reconstruct them without attributes
+        if (tag === 'strong' || tag === 'b') {
+          result += '<strong>' + cleanContent(element) + '</strong>';
+        } else if (tag === 'em' || tag === 'i') {
+          result += '<em>' + cleanContent(element) + '</em>';
+        } else if (tag === 'br') {
+          result += '<br>';
+        } else {
+          // For all other tags (p, span, u, mark, etc.), just process contents
+          result += cleanContent(child);
+        }
+      }
+    }
+
+    return result;
+  };
+
+  const cleaned = cleanContent(temp).trim();
+
+  // Remove trailing breaks
+  return cleaned.replace(/<br>\s*$/, '');
+}
 
 interface RemovePropData {
   id: string;
@@ -33,6 +90,56 @@ export interface SlidesState {
   viewportSize: number;
   viewportRatio: number;
   templates: SlideTemplate[];
+}
+
+/**
+ * Synchronizes element content changes back to the enriched schema.
+ * Maintains schema as source of truth while allowing UI edits.
+ *
+ * @param slide The slide being edited
+ * @param elementId The element that was modified
+ * @param props The properties that changed
+ */
+function syncElementToSchema(slide: Slide, elementId: string, props: Partial<PPTElement>): void {
+  // Skip if slide doesn't have schema (manual slides)
+  if (!slide.layout?.schema || !slide.layout?.elementMappings) {
+    return;
+  }
+
+  // Extract text content from props
+  let newContent: string | undefined;
+
+  if ('content' in props && typeof props.content === 'string') {
+    // TextElement update
+    newContent = props.content;
+  } else if ('text' in props && props.text && typeof props.text === 'object' && 'content' in props.text) {
+    // ShapeElement update
+    newContent = props.text.content;
+  }
+
+  if (!newContent) {
+    return; // No content to sync
+  }
+
+  console.log('[Schema Sync] Syncing content for element:', elementId);
+  console.log('[Schema Sync] Content length:', newContent.length);
+  console.log('[Schema Sync] Content preview (before cleaning):', newContent.substring(0, 100));
+
+  // Clean ProsemirrorEditor HTML to remove wrapper elements
+  // This preserves semantic formatting (bold, italic) while removing bloat
+  const cleanedContent = cleanProsemirrorHTML(newContent);
+
+  console.log('[Schema Sync] Cleaned content length:', cleanedContent.length);
+  console.log('[Schema Sync] Cleaned content:', cleanedContent.substring(0, 100));
+
+  // Update schema using existing utility
+  const updatedSchema = editSlideContent(slide, elementId, cleanedContent);
+
+  if (updatedSchema) {
+    // Update schema (Vue reactivity handles re-rendering)
+    slide.layout.schema = updatedSchema;
+    console.log('[Schema Sync] ✓ Schema updated successfully');
+  }
 }
 
 export const useSlidesStore = defineStore('slides', {
@@ -246,10 +353,20 @@ export const useSlidesStore = defineStore('slides', {
 
       const slideIndex = slideId ? this.slides.findIndex((item) => item.id === slideId) : this.slideIndex;
       const slide = this.slides[slideIndex];
+
+      // Update elements array (existing behavior)
       const elements = slide.elements.map((el) => {
         return elIdList.includes(el.id) ? { ...el, ...props } : el;
       });
       this.slides[slideIndex].elements = elements as PPTElement[];
+
+      // 🔥 NEW: Sync content changes to schema (for layout-based slides)
+      if (slide.layout?.schema && ('content' in props || 'text' in props)) {
+        const elementIds = typeof id === 'string' ? [id] : id;
+        for (const elementId of elementIds) {
+          syncElementToSchema(slide, elementId, props);
+        }
+      }
     },
 
     removeElementProps(data: RemovePropData) {

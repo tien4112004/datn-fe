@@ -59,6 +59,8 @@ import type {
 import { SLIDE_LAYOUT_TYPE } from './types';
 import { convertLayoutGeneric, resolveTemplate } from './converters';
 import { getImageSize } from '../image';
+import { enrichSchema, isSchemaEnriched } from './primitives/schemaEnricher';
+import { unwrap } from '@aiprimary/core/templates';
 
 /**
  * Main entry point: Converts layout schema to a complete slide.
@@ -112,7 +114,17 @@ export const convertToSlide = async (
   slideId?: string,
   parameterOverrides?: Record<string, number | boolean>
 ): Promise<Slide> => {
-  const layoutType = data.type;
+  // Step 1: Enrich schema with deterministic IDs (idempotent)
+  // This wraps text content with ID objects to enable content editing
+  const isAlreadyEnriched = isSchemaEnriched(data);
+  console.log(`\n========== [convertToSlide] Starting conversion ==========`);
+  console.log(`Layout type: ${data.type}`);
+  console.log(`Already enriched: ${isAlreadyEnriched}`);
+  console.log(`Original schema:`, JSON.stringify(data, null, 2));
+
+  const enrichedSchema = isAlreadyEnriched ? data : enrichSchema(data);
+
+  const layoutType = enrichedSchema.type;
 
   if (layoutType === SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE) {
     const resolvedTemplate = resolveTemplate(
@@ -123,7 +135,7 @@ export const convertToSlide = async (
       template.parameters
     );
     return convertLayoutGeneric(
-      data as TwoColumnWithImageLayoutSchema,
+      enrichedSchema as TwoColumnWithImageLayoutSchema,
       resolvedTemplate,
       (d) => ({
         texts: { title: d.title },
@@ -132,7 +144,7 @@ export const convertToSlide = async (
       }),
       slideId,
       {
-        layoutSchema: data,
+        layoutSchema: enrichedSchema,
         templateId: template.id,
         layoutType: layoutType,
       },
@@ -147,7 +159,7 @@ export const convertToSlide = async (
       template.parameters
     );
     return convertLayoutGeneric(
-      data as MainImageLayoutSchema,
+      enrichedSchema as MainImageLayoutSchema,
       resolvedTemplate,
       (d) => ({
         texts: { content: d.data.content },
@@ -156,7 +168,7 @@ export const convertToSlide = async (
       }),
       slideId,
       {
-        layoutSchema: data,
+        layoutSchema: enrichedSchema,
         templateId: template.id,
         layoutType: layoutType,
       },
@@ -171,7 +183,7 @@ export const convertToSlide = async (
       template.parameters
     );
     return convertLayoutGeneric(
-      data as TitleLayoutSchema,
+      enrichedSchema as TitleLayoutSchema,
       resolvedTemplate,
       (d) => ({
         texts: {
@@ -185,7 +197,7 @@ export const convertToSlide = async (
       }),
       slideId,
       {
-        layoutSchema: data,
+        layoutSchema: enrichedSchema,
         templateId: template.id,
         layoutType: layoutType,
       },
@@ -205,11 +217,11 @@ export const convertToSlide = async (
       resolvedTemplate.containers.leftColumn && resolvedTemplate.containers.rightColumn;
 
     return convertLayoutGeneric(
-      data as TwoColumnLayoutSchema,
+      enrichedSchema as TwoColumnLayoutSchema,
       resolvedTemplate,
       (d) => {
         const texts = { title: d.title };
-        let blocks: Record<string, Record<string, string[]>>;
+        let blocks: Record<string, Record<string, any[]>>;
 
         if (hasLeftRightColumns) {
           // Map to separate columns
@@ -228,7 +240,7 @@ export const convertToSlide = async (
       },
       slideId,
       {
-        layoutSchema: data,
+        layoutSchema: enrichedSchema,
         templateId: template.id,
         layoutType: layoutType,
       },
@@ -252,12 +264,12 @@ export const convertToSlide = async (
       );
 
     return convertLayoutGeneric(
-      data as ListLayoutSchema,
+      enrichedSchema as ListLayoutSchema,
       resolvedTemplate,
       (d) => {
         // For numbered templates: split into label (numbers) and content (text)
         // For non-numbered templates: single 'item' field
-        const contentData: Record<string, string[]> = hasNumbering
+        const contentData: Record<string, any[]> = hasNumbering
           ? {
               label: d.data.items.map((_, index) => String(index + 1).padStart(2, '0')),
               content: d.data.items,
@@ -273,7 +285,7 @@ export const convertToSlide = async (
       },
       slideId,
       {
-        layoutSchema: data,
+        layoutSchema: enrichedSchema,
         templateId: template.id,
         layoutType: layoutType,
       },
@@ -297,22 +309,24 @@ export const convertToSlide = async (
       );
 
     return convertLayoutGeneric(
-      data as LabeledListLayoutSchema,
+      enrichedSchema as LabeledListLayoutSchema,
       resolvedTemplate,
-      (d) => ({
-        texts: { title: d.title },
-        blocks: {
-          content: {
-            label: hasNumbering
-              ? d.data.items.map((_, index) => String(index + 1).padStart(2, '0'))
-              : d.data.items.map((item: { label: string; content: string }) => item.label),
-            content: d.data.items.map((item: { label: string; content: string }) => item.content),
+      (d) => {
+        return {
+          texts: { title: d.title },
+          blocks: {
+            content: {
+              label: hasNumbering
+                ? d.data.items.map((_, index) => String(index + 1).padStart(2, '0'))
+                : d.data.items.map((item: any) => item.label),
+              content: d.data.items.map((item: any) => item.content),
+            },
           },
-        },
-      }),
+        };
+      },
       slideId,
       {
-        layoutSchema: data,
+        layoutSchema: enrichedSchema,
         templateId: template.id,
         layoutType: layoutType,
       },
@@ -336,7 +350,7 @@ export const convertToSlide = async (
       );
 
     return convertLayoutGeneric(
-      data as TableOfContentsLayoutSchema,
+      enrichedSchema as TableOfContentsLayoutSchema,
       resolvedTemplate,
       (d) => ({
         texts: { title: 'Contents' },
@@ -349,7 +363,7 @@ export const convertToSlide = async (
       }),
       slideId,
       {
-        layoutSchema: data,
+        layoutSchema: enrichedSchema,
         templateId: template.id,
         layoutType: layoutType,
       },
@@ -365,20 +379,22 @@ export const convertToSlide = async (
     );
 
     return convertLayoutGeneric(
-      data as TimelineLayoutSchema,
+      enrichedSchema as TimelineLayoutSchema,
       resolvedTemplate,
-      (d) => ({
-        texts: { title: d.title },
-        blocks: {
-          content: {
-            label: d.data.items.map((item) => item.label),
-            content: d.data.items.map((item) => item.content),
+      (d) => {
+        return {
+          texts: { title: d.title },
+          blocks: {
+            content: {
+              label: d.data.items.map((item) => item.label),
+              content: d.data.items.map((item) => item.content),
+            },
           },
-        },
-      }),
+        };
+      },
       slideId,
       {
-        layoutSchema: data,
+        layoutSchema: enrichedSchema,
         templateId: template.id,
         layoutType: layoutType,
       },
@@ -394,7 +410,7 @@ export const convertToSlide = async (
     );
 
     return convertLayoutGeneric(
-      data as PyramidLayoutSchema,
+      enrichedSchema as PyramidLayoutSchema,
       resolvedTemplate,
       (d) => ({
         texts: { title: d.title },
@@ -406,7 +422,7 @@ export const convertToSlide = async (
       }),
       slideId,
       {
-        layoutSchema: data,
+        layoutSchema: enrichedSchema,
         templateId: template.id,
         layoutType: layoutType,
       },

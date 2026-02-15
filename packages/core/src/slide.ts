@@ -796,6 +796,12 @@ export interface SlideLayoutMetadata {
   isTemplatePreview?: boolean;
   /** User-customized template parameters (e.g., { IMAGE_RATIO: 0.5, SIDE_PADDING: 40, ENABLE_WRAP: true }) */
   parameterOverrides?: Record<string, number | boolean>;
+  /** Element-to-data mappings for content editing (tracks which element comes from which schema data) */
+  elementMappings?: Array<{
+    elementId: string;
+    dataId: string;
+    containerLabel?: string;
+  }>;
 }
 
 /**

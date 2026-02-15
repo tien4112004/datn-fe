@@ -3,6 +3,8 @@ export * from './graphics';
 export * from './layout';
 export * from './styling';
 export * from './template';
+export * from './enrichedSchemas';
+export * from './elementMapping';
 
 // Re-export SlideViewport and SlideTheme from parent module (slide.ts)
 export type { SlideViewport, SlideTheme } from '../slide';

@@ -290,6 +290,18 @@ watch(
   },
   { deep: true }
 );
+
+// Regenerate previews when schema changes (from content edits)
+watch(
+  () => currentSlide.value?.layout?.schema,
+  async (newSchema) => {
+    // Only regenerate if schema exists and we can switch
+    if (newSchema && canSwitch.value) {
+      await generatePreviews();
+    }
+  },
+  { deep: true }
+);
 </script>
 
 <style lang="scss" scoped>

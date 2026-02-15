@@ -545,7 +545,7 @@ const handleThemeListScroll = (event: Event) => {
 };
 
 const background = computed(() => {
-  if (!currentSlide.value.background) {
+  if (!currentSlide.value || !currentSlide.value.background) {
     return {
       type: 'solid' as SlideBackgroundType,
       color: 'var(--presentation-background)',

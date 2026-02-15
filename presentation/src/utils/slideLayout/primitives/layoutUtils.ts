@@ -64,7 +64,10 @@ export function collectDescendantTextsByLabel(data: Record<string, string[]>): A
 
     for (const [labelKey, values] of Object.entries(data)) {
       if (values[i] !== undefined) {
-        result[labelKey] = values[i];
+        const item = values[i];
+        // Unwrap enriched value for display
+        result[labelKey] =
+          typeof item === 'object' && item !== null && 'value' in item ? (item as any).value : item;
       }
     }
 

@@ -22,6 +22,8 @@ import { cloneDeepWith, template } from 'lodash';
 import { calculateElementBounds } from '../primitives/layoutUtils';
 import { renderGraphics } from '../primitives/graphicRenderer';
 import type { Bounds } from '../types';
+import { buildElementMappings, buildTextElementMapping } from '../primitives/mappingBuilder';
+import { isEnriched } from '@aiprimary/core/templates';
 
 /**
  * Resolved template configuration with theme and viewport
@@ -38,13 +40,16 @@ export interface ResolvedTemplateConfig {
 /**
  * Normalized data structure for all layout types.
  * All layout schemas are mapped to this format before processing.
+ *
+ * Note: After enrichment, texts and blocks may contain EnrichedValue objects
+ * rather than plain strings. The conversion pipeline unwraps these when needed.
  */
 export interface MappedLayoutData {
   /** Simple text containers (e.g., title, subtitle) - container ID -> text content */
-  texts?: Record<string, string>;
+  texts?: Record<string, string | any>;
 
   /** Block containers with labeled children - container ID -> label -> array of content */
-  blocks?: Record<string, Record<string, string[]>>;
+  blocks?: Record<string, Record<string, any[]>>;
 
   /** Image containers - container ID -> image source */
   images?: Record<string, string>;
@@ -121,6 +126,7 @@ export async function convertLayoutGeneric<T = any>(
 
   const allElements: Array<{ element: any; zIndex: number }> = [];
   const allCards: Array<{ element: any; zIndex: number }> = [];
+  const allMappings: Array<{ elementId: string; dataId: string; containerLabel?: string }> = [];
 
   // Track actual bounds of rendered elements (for graphics rendering)
   const containerActualBounds: Record<string, Bounds> = {};
@@ -140,9 +146,40 @@ export async function convertLayoutGeneric<T = any>(
 
       // Check if this is a text container with combined enabled
       if (container.type === 'text' && container.combined?.enabled) {
+        console.log(`[convertLayoutGeneric] Processing combined container "${containerId}"`);
+        console.log(`  Container type: ${container.type}, combined: ${container.combined?.enabled}`);
+
+        // Debug: Log labelData structure before passing to processCombinedTextContainer
+        for (const [label, dataArray] of Object.entries(labelData)) {
+          console.log(`  [Before processCombinedTextContainer] Label "${label}":`, {
+            arrayLength: dataArray.length,
+            firstItemType: dataArray[0] ? typeof dataArray[0] : 'none',
+            firstItemIsObject: dataArray[0] && typeof dataArray[0] === 'object',
+            firstItemHasId: dataArray[0] && typeof dataArray[0] === 'object' && 'id' in dataArray[0],
+            firstItemHasValue: dataArray[0] && typeof dataArray[0] === 'object' && 'value' in dataArray[0],
+          });
+        }
+
         const { elements, cards } = processCombinedTextContainer(container, labelData, zIndex);
         allElements.push(...elements);
         allCards.push(...cards);
+
+        // Create mappings for combined elements
+        for (const { element } of elements) {
+          if (element.id && element.id.startsWith('elem-')) {
+            const dataId = element.id.slice(5); // Remove 'elem-' prefix
+
+            // For compound IDs like "items-0+items-3", use first ID for mapping
+            const primaryDataId = dataId.includes('+') ? dataId.split('+')[0] : dataId;
+
+            allMappings.push({
+              elementId: element.id,
+              dataId: primaryDataId,
+              containerLabel: containerId,
+            });
+          }
+        }
+
         continue; // Skip normal block processing
       }
 
@@ -164,6 +201,13 @@ export async function convertLayoutGeneric<T = any>(
       // Extract cards (border decorations)
       const cards = buildCards(instance);
       allCards.push(...cards.map((element) => ({ element, zIndex })));
+
+      // Build element mappings from enriched data
+      const containerMappings = buildElementMappings(elements, labelData, containerId);
+      allMappings.push(...containerMappings);
+      console.log(
+        `[ConvertLayout] Added ${containerMappings.length} mappings for container "${containerId}"`
+      );
 
       // Add all PPT elements from each label
       for (const [label, _] of Object.entries(labelData)) {
@@ -196,6 +240,15 @@ export async function convertLayoutGeneric<T = any>(
           : buildText(textContent, instance);
 
       allElements.push(...textElements.map((element) => ({ element, zIndex })));
+
+      // Build mappings for text elements (if enriched)
+      if (textElements.length > 0 && isEnriched(textContent)) {
+        const textMapping = buildTextElementMapping(textElements[0], textContent.id, containerId);
+        allMappings.push(textMapping);
+        console.log(
+          `[ConvertLayout] Added text mapping for "${containerId}": ${textContent.id} → ${textElements[0].id}`
+        );
+      }
 
       // Track actual bounds for title container (used by graphics)
       if (containerId === 'title') {
@@ -248,6 +301,10 @@ export async function convertLayoutGeneric<T = any>(
   const combinedElements = [...allCards, ...allElements, ...imageElements, ...graphicElements];
   combinedElements.sort((a, b) => a.zIndex - b.zIndex);
 
+  console.log(
+    `[ConvertLayout] Slide conversion complete. Total elements: ${combinedElements.length}, Total mappings: ${allMappings.length}`
+  );
+
   const slide: Slide = {
     id: slideId ?? crypto.randomUUID(),
     elements: combinedElements.map((item) => item.element),
@@ -262,6 +319,8 @@ export async function convertLayoutGeneric<T = any>(
         isTemplatePreview: true,
         // Store parameter overrides if provided
         parameterOverrides: parameterOverrides,
+        // Store element-to-data mappings for content editing
+        elementMappings: allMappings,
       },
     }),
   };

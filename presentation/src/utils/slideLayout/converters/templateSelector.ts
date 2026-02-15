@@ -24,7 +24,7 @@ const cycleIndexes: Record<string, number> = {};
 export const TEMPLATE_VARIATIONS: Record<string, Template[]> = {
   [SLIDE_LAYOUT_TYPE.LIST]: listTemplates,
   [SLIDE_LAYOUT_TYPE.TWO_COLUMN_WITH_IMAGE]: twoColumnWithImageTemplates,
-  [SLIDE_LAYOUT_TYPE.TWO_COLUMN]: twoColumnTemplates,
+  [SLIDE_LAYOUT_TYPE.TWO_COLUMN]: [twoColumnTemplates[0]],
   [SLIDE_LAYOUT_TYPE.LABELED_LIST]: labeledListTemplates,
   [SLIDE_LAYOUT_TYPE.TITLE]: titleTemplates,
   [SLIDE_LAYOUT_TYPE.MAIN_IMAGE]: mainImageTemplates,

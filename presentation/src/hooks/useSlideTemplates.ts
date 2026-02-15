@@ -23,6 +23,7 @@ export default function useSlideTemplates() {
     for (const data of slideData) {
       const template = await selectNextTemplate(data.type);
       const slide = await convertToSlide(data, viewport, theme, template, undefined);
+      console.log('==========================', slide);
       slidesStore.appendNewSlide(slide);
       slidesStore.setTheme(theme);
     }

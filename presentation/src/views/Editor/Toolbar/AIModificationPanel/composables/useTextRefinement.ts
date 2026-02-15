@@ -1,4 +1,5 @@
 import { ref, type Ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
 import { useModelStore } from '@/stores/modelStore';
@@ -9,6 +10,7 @@ import emitter, { EmitterEvents } from '@/utils/emitter';
 import { htmlToText } from '@/utils/common';
 
 export function useTextRefinement() {
+  const { t } = useI18n();
   const slidesStore = useSlidesStore();
   const { currentSlide } = storeToRefs(slidesStore);
   const modelStore = useModelStore();
@@ -73,14 +75,14 @@ export function useTextRefinement() {
           action: { command: 'replace', value: result.data.refinedText },
         });
 
-        refineMessage.value = 'Text refined successfully!';
+        refineMessage.value = t('panels.aiModification.messages.textRefinedSuccess');
         refineType.value = 'success';
         chatInput.value = '';
       } else {
-        throw new Error(result.error || 'Failed to refine text');
+        throw new Error(result.error || t('panels.aiModification.messages.textRefinedError'));
       }
     } catch (error: any) {
-      refineMessage.value = error.message || 'Failed to refine text';
+      refineMessage.value = error.message || t('panels.aiModification.messages.textRefinedError');
       refineType.value = 'error';
     } finally {
       isProcessing.value = false;
@@ -119,14 +121,14 @@ export function useTextRefinement() {
         const updatedSlide = await schemaToSlide(updatedSchema);
         slidesStore.updateSlide(updatedSlide, currentSlide.value!.id);
 
-        refineMessage.value = 'Combined text refined successfully!';
+        refineMessage.value = t('panels.aiModification.messages.combinedTextRefinedSuccess');
         refineType.value = 'success';
         chatInput.value = '';
       } else {
-        throw new Error(result.error || 'Failed to refine combined text');
+        throw new Error(result.error || t('panels.aiModification.messages.combinedTextRefinedError'));
       }
     } catch (error: any) {
-      refineMessage.value = error.message || 'Failed to refine combined text';
+      refineMessage.value = error.message || t('panels.aiModification.messages.combinedTextRefinedError');
       refineType.value = 'error';
     } finally {
       isProcessing.value = false;
@@ -168,14 +170,14 @@ export function useTextRefinement() {
         const newSlide = await schemaToSlide(result.data.schema as SlideLayoutSchema);
         slidesStore.updateSlide(newSlide, currentSlide.value!.id);
 
-        refineMessage.value = 'Content refined successfully!';
+        refineMessage.value = t('panels.aiModification.messages.contentRefinedSuccess');
         refineType.value = 'success';
         chatInput.value = '';
       } else {
-        throw new Error(result.error || 'Failed to refine content');
+        throw new Error(result.error || t('panels.aiModification.messages.contentRefinedError'));
       }
     } catch (e: any) {
-      refineMessage.value = e.message;
+      refineMessage.value = e.message || t('panels.aiModification.messages.contentRefinedError');
       refineType.value = 'error';
     } finally {
       isProcessing.value = false;

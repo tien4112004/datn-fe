@@ -1,5 +1,7 @@
 import { FileText, Maximize2, Minimize2, CheckCircle } from 'lucide-vue-next';
 import type { Component } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { computed } from 'vue';
 
 export interface QuickAction {
   label: string;
@@ -9,89 +11,91 @@ export interface QuickAction {
 }
 
 export function useQuickActions() {
+  const { t } = useI18n();
+
   // Slide-level quick actions
-  const slideQuickActions: QuickAction[] = [
+  const slideQuickActions = computed(() => [
     {
-      label: 'Shorten',
+      label: t('panels.aiModification.quickActions.slide.shorten'),
       icon: Minimize2,
-      instruction: 'Shorten the text content, keeping key points.',
+      instruction: t('panels.aiModification.quickActions.slide.shortenDesc'),
       operation: 'shorten',
     },
     {
-      label: 'Expand',
+      label: t('panels.aiModification.quickActions.slide.expand'),
       icon: Maximize2,
-      instruction: 'Expand on these points with more detail.',
+      instruction: t('panels.aiModification.quickActions.slide.expandDesc'),
       operation: 'expand',
     },
     {
-      label: 'Fix Grammar',
+      label: t('panels.aiModification.quickActions.slide.fixGrammar'),
       icon: CheckCircle,
-      instruction: 'Fix grammar and spelling errors.',
+      instruction: t('panels.aiModification.quickActions.slide.fixGrammarDesc'),
       operation: 'grammar',
     },
     {
-      label: 'Formal',
+      label: t('panels.aiModification.quickActions.slide.formal'),
       icon: FileText,
-      instruction: 'Make the tone more professional and engaging.',
+      instruction: t('panels.aiModification.quickActions.slide.formalDesc'),
       operation: 'formal',
     },
-  ];
+  ]);
 
   // Text element quick actions
-  const textQuickActions: QuickAction[] = [
+  const textQuickActions = computed(() => [
     {
-      label: 'Fix Grammar',
+      label: t('panels.aiModification.quickActions.textElement.fixGrammar'),
       icon: CheckCircle,
-      instruction: 'Fix grammar and spelling errors in this text.',
+      instruction: t('panels.aiModification.quickActions.textElement.fixGrammarDesc'),
       operation: 'grammar',
     },
     {
-      label: 'Shorten',
+      label: t('panels.aiModification.quickActions.textElement.shorten'),
       icon: Minimize2,
-      instruction: 'Make this text more concise.',
+      instruction: t('panels.aiModification.quickActions.textElement.shortenDesc'),
       operation: 'shorten',
     },
     {
-      label: 'Expand',
+      label: t('panels.aiModification.quickActions.textElement.expand'),
       icon: Maximize2,
-      instruction: 'Expand this text with more detail.',
+      instruction: t('panels.aiModification.quickActions.textElement.expandDesc'),
       operation: 'expand',
     },
     {
-      label: 'Formal',
+      label: t('panels.aiModification.quickActions.textElement.formal'),
       icon: FileText,
-      instruction: 'Rewrite this text in a more formal tone.',
+      instruction: t('panels.aiModification.quickActions.textElement.formalDesc'),
       operation: 'formal',
     },
-  ];
+  ]);
 
   // Combined text quick actions
-  const combinedTextQuickActions: QuickAction[] = [
+  const combinedTextQuickActions = computed(() => [
     {
-      label: 'Expand',
+      label: t('panels.aiModification.quickActions.combinedText.expand'),
       icon: Maximize2,
-      instruction: 'Expand on these points with more detail and elaboration.',
+      instruction: t('panels.aiModification.quickActions.combinedText.expandDesc'),
       operation: 'expand',
     },
     {
-      label: 'Shorten',
+      label: t('panels.aiModification.quickActions.combinedText.shorten'),
       icon: Minimize2,
-      instruction: 'Make these points more concise while keeping key information.',
+      instruction: t('panels.aiModification.quickActions.combinedText.shortenDesc'),
       operation: 'shorten',
     },
     {
-      label: 'Fix Grammar',
+      label: t('panels.aiModification.quickActions.combinedText.fixGrammar'),
       icon: CheckCircle,
-      instruction: 'Fix grammar and spelling errors in all items.',
+      instruction: t('panels.aiModification.quickActions.combinedText.fixGrammarDesc'),
       operation: 'grammar',
     },
     {
-      label: 'Formal',
+      label: t('panels.aiModification.quickActions.combinedText.formal'),
       icon: FileText,
-      instruction: 'Rewrite in a more formal and professional tone.',
+      instruction: t('panels.aiModification.quickActions.combinedText.formalDesc'),
       operation: 'formal',
     },
-  ];
+  ]);
 
   /**
    * Get quick actions based on context type

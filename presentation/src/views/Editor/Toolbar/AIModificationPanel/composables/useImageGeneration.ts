@@ -1,4 +1,5 @@
 import { ref, computed, type Ref, type ComputedRef } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
 import { useModelStore } from '@/stores/modelStore';
@@ -9,6 +10,7 @@ import type { PPTImageElement } from '@/types/slides';
 import { getThemeApi } from '@/services/theme/api';
 
 export function useImageGeneration() {
+  const { t } = useI18n();
   const slidesStore = useSlidesStore();
   const { currentSlide } = storeToRefs(slidesStore);
   const modelStore = useModelStore();
@@ -103,11 +105,11 @@ export function useImageGeneration() {
         // Step 1: Store the generated image URL for preview
         generatedImageUrl.value = result.data.imageUrl;
       } else {
-        throw new Error(result.error || 'Failed to generate image');
+        throw new Error(result.error || t('panels.aiModification.messages.imageGenerationError'));
       }
     } catch (error: any) {
       console.error('Failed to generate image:', error);
-      refineMessage.value = error.message || 'Failed to generate image';
+      refineMessage.value = error.message || t('panels.aiModification.messages.imageGenerationError');
       refineType.value = 'error';
     } finally {
       isProcessing.value = false;
@@ -167,11 +169,11 @@ export function useImageGeneration() {
       // Clear state and show success message
       imagePrompt.value = '';
       generatedImageUrl.value = null;
-      refineMessage.value = 'Image replaced successfully!';
+      refineMessage.value = t('panels.aiModification.messages.imageReplacedSuccess');
       refineType.value = 'success';
     } catch (error: any) {
       console.error('Failed to replace image:', error);
-      refineMessage.value = error.message || 'Failed to replace image';
+      refineMessage.value = error.message || t('panels.aiModification.messages.imageReplaceError');
       refineType.value = 'error';
     } finally {
       isProcessing.value = false;

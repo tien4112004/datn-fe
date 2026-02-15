@@ -278,6 +278,74 @@ export default {
       preview: {
         label: 'Preview:',
       },
+      // Quick Actions
+      quickActions: {
+        // Slide-level actions
+        slide: {
+          shorten: 'Shorten',
+          shortenDesc: 'Shorten the text content, keeping key points.',
+          expand: 'Expand',
+          expandDesc: 'Expand on these points with more detail.',
+          fixGrammar: 'Fix Grammar',
+          fixGrammarDesc: 'Fix grammar and spelling errors.',
+          formal: 'Formal',
+          formalDesc: 'Make the tone more professional and engaging.',
+        },
+        // Text element actions
+        textElement: {
+          fixGrammar: 'Fix Grammar',
+          fixGrammarDesc: 'Fix grammar and spelling errors in this text.',
+          shorten: 'Shorten',
+          shortenDesc: 'Make this text more concise.',
+          expand: 'Expand',
+          expandDesc: 'Expand this text with more detail.',
+          formal: 'Formal',
+          formalDesc: 'Rewrite this text in a more formal tone.',
+        },
+        // Combined text actions
+        combinedText: {
+          expand: 'Expand',
+          expandDesc: 'Expand on these points with more detail and elaboration.',
+          shorten: 'Shorten',
+          shortenDesc: 'Make these points more concise while keeping key information.',
+          fixGrammar: 'Fix Grammar',
+          fixGrammarDesc: 'Fix grammar and spelling errors in all items.',
+          formal: 'Formal',
+          formalDesc: 'Rewrite in a more formal and professional tone.',
+        },
+      },
+      // Art Styles
+      artStyles: {
+        photorealistic: 'Photorealistic',
+        digitalArt: 'Digital Art',
+        minimalist: 'Minimalist',
+        watercolor: 'Watercolor',
+        oilPainting: 'Oil Painting',
+        anime: 'Anime',
+        cartoon: 'Cartoon',
+        sketch: 'Sketch',
+        abstract: 'Abstract',
+        surreal: 'Surreal',
+      },
+      // Layout Types
+      layoutTypes: {
+        list: 'List',
+        columns: 'Columns',
+        timeline: 'Timeline',
+        pyramid: 'Pyramid',
+      },
+      // Feedback Messages
+      messages: {
+        textRefinedSuccess: 'Text refined successfully!',
+        textRefinedError: 'Failed to refine text',
+        combinedTextRefinedSuccess: 'Combined text refined successfully!',
+        combinedTextRefinedError: 'Failed to refine combined text',
+        contentRefinedSuccess: 'Content refined successfully!',
+        contentRefinedError: 'Failed to refine content',
+        imageReplacedSuccess: 'Image replaced successfully!',
+        imageGenerationError: 'Failed to generate image',
+        imageReplaceError: 'Failed to replace image',
+      },
     },
   },
 };

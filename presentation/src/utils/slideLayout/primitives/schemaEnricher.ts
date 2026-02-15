@@ -87,8 +87,6 @@ function enrichArray<T>(arr: Array<T | EnrichedValue<T>>, prefix: string): Array
 export function enrichSchema(schema: SlideLayoutSchema): EnrichedSlideLayoutSchema {
   const type = schema.type;
 
-  console.log(`[SchemaEnricher] Enriching schema of type: ${type}`);
-
   // Handle each layout type
   // Each case enriches the specific fields that contain user-editable text content
 
@@ -102,7 +100,6 @@ export function enrichSchema(schema: SlideLayoutSchema): EnrichedSlideLayoutSche
         items: enrichArray(s.data.items, 'items'),
       },
     } as any;
-    console.log('[SchemaEnricher] Enriched TWO_COLUMN_WITH_IMAGE:', JSON.stringify(enriched, null, 2));
     return enriched;
   }
 
@@ -115,7 +112,6 @@ export function enrichSchema(schema: SlideLayoutSchema): EnrichedSlideLayoutSche
         content: enrichValue(s.data.content, 'content'),
       },
     } as any;
-    console.log('[SchemaEnricher] Enriched MAIN_IMAGE:', JSON.stringify(enriched, null, 2));
     return enriched;
   }
 
@@ -128,7 +124,6 @@ export function enrichSchema(schema: SlideLayoutSchema): EnrichedSlideLayoutSche
         subtitle: s.data.subtitle ? enrichValue(s.data.subtitle, 'subtitle') : undefined,
       },
     } as any;
-    console.log('[SchemaEnricher] Enriched TITLE:', JSON.stringify(enriched, null, 2));
     return enriched;
   }
 
@@ -142,7 +137,6 @@ export function enrichSchema(schema: SlideLayoutSchema): EnrichedSlideLayoutSche
         items2: enrichArray(s.data.items2, 'items2'),
       },
     } as any;
-    console.log('[SchemaEnricher] Enriched TWO_COLUMN:', JSON.stringify(enriched, null, 2));
     return enriched;
   }
 
@@ -155,7 +149,6 @@ export function enrichSchema(schema: SlideLayoutSchema): EnrichedSlideLayoutSche
         items: enrichArray(s.data.items, 'items'),
       },
     } as any;
-    console.log('[SchemaEnricher] Enriched LIST:', JSON.stringify(enriched, null, 2));
     return enriched;
   }
 
@@ -171,7 +164,6 @@ export function enrichSchema(schema: SlideLayoutSchema): EnrichedSlideLayoutSche
         })),
       },
     } as any;
-    console.log('[SchemaEnricher] Enriched LABELED_LIST:', JSON.stringify(enriched, null, 2));
     return enriched;
   }
 
@@ -183,7 +175,6 @@ export function enrichSchema(schema: SlideLayoutSchema): EnrichedSlideLayoutSche
         items: enrichArray(s.data.items, 'items'),
       },
     } as any;
-    console.log('[SchemaEnricher] Enriched TABLE_OF_CONTENTS:', JSON.stringify(enriched, null, 2));
     return enriched;
   }
 
@@ -199,7 +190,6 @@ export function enrichSchema(schema: SlideLayoutSchema): EnrichedSlideLayoutSche
         })),
       },
     } as any;
-    console.log('[SchemaEnricher] Enriched TIMELINE:', JSON.stringify(enriched, null, 2));
     return enriched;
   }
 
@@ -212,7 +202,6 @@ export function enrichSchema(schema: SlideLayoutSchema): EnrichedSlideLayoutSche
         items: enrichArray(s.data.items, 'items'),
       },
     } as any;
-    console.log('[SchemaEnricher] Enriched PYRAMID:', JSON.stringify(enriched, null, 2));
     return enriched;
   }
 

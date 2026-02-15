@@ -18,12 +18,53 @@ export default {
   editor: {
     templatePreview: {
       title: 'Chế độ xem trước mẫu',
-      subtitle: 'Chọn bố cục mà bạn thích. Bạn có thể chỉnh sửa sau khi xác nhận mẫu.',
       confirmCurrent: 'Xác nhận & Bắt đầu chỉnh sửa',
       confirmAll: 'Xác nhận tất cả slide',
       confirmAllWarning: 'Nhấn lại để xác nhận tất cả',
       successSingle: 'Đã xác nhận mẫu! Bạn có thể chỉnh sửa slide của mình.',
       successMultiple: 'Đã xác nhận {count} slide! Tất cả slide đã có thể chỉnh sửa.',
+      infoButton: 'Tìm hiểu thêm về chế độ này',
+      dialog: {
+        title: 'Hiểu về Chế độ Xem Trước Mẫu',
+        intro:
+          'Bạn đang ở Chế độ Xem Trước Mẫu. Chế độ này cho phép bạn khám phá và chọn bố cục trước khi chỉnh sửa.',
+        currentMode: 'Chế độ hiện tại',
+        canDo: 'Những gì bạn có thể làm',
+        cannotDo: 'Những gì bạn không thể làm',
+        available: 'Tính năng có sẵn',
+        howToUnlock: 'Để mở khóa khả năng chỉnh sửa đầy đủ, hãy xác nhận lựa chọn mẫu của bạn',
+        previewMode: {
+          title: 'Chế độ Xem Trước Mẫu',
+          features: {
+            browseTemplates: 'Duyệt và xem trước các bố cục slide khác nhau',
+            switchLayouts: 'Chuyển đổi giữa các biến thể mẫu',
+            navigateSlides: 'Di chuyển qua bài thuyết trình của bạn',
+            previewContent: 'Xem nội dung của bạn trông như thế nào trong các bố cục khác nhau',
+          },
+          limitations: {
+            editText: 'Chỉnh sửa hoặc thay đổi nội dung văn bản',
+            moveElements: 'Di chuyển, thay đổi kích thước hoặc sắp xếp lại các phần tử',
+            addContent: 'Thêm hộp văn bản, hình dạng hoặc hình ảnh mới',
+            customizeStyles: 'Thay đổi màu sắc, phông chữ hoặc kiểu dáng',
+            deleteContent: 'Xóa hoặc loại bỏ nội dung hiện có',
+            slideModification: 'Sửa đổi slide bằng AI',
+          },
+        },
+        editingMode: {
+          title: 'Chế độ Chỉnh Sửa Bình Thường',
+          features: {
+            fullEditing: 'Chỉnh sửa tất cả văn bản và nội dung một cách tự do',
+            moveResize: 'Di chuyển và thay đổi kích thước bất kỳ phần tử nào',
+            addElements: 'Thêm văn bản, hình dạng, hình ảnh và nhiều hơn nữa',
+            customizeDesign: 'Tùy chỉnh màu sắc, phông chữ và kiểu dáng',
+            slideEditing: 'Sửa đổi cấu trúc slide, thêm/xóa slide',
+            elementEditing: 'Chỉnh sửa các phần tử riêng lẻ với toàn bộ kiểm soát',
+            aiEditing: 'Sử dụng AI để tinh chỉnh nội dung, tạo hình ảnh và cải thiện bố cục',
+            fullToolbar: 'Truy cập tất cả các công cụ và tính năng chỉnh sửa',
+            deleteModify: 'Xóa, sao chép hoặc sửa đổi bất cứ thứ gì',
+          },
+        },
+      },
     },
     remarks: {
       title: 'Ghi chú slide',

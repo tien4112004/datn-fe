@@ -14,9 +14,15 @@
                   <IconSwatchBook />
                 </div>
                 <div class="banner-text">
-                  <div class="banner-title">{{ t('editor.templatePreview.title') }}</div>
-                  <div class="banner-subtitle">
-                    {{ t('editor.templatePreview.subtitle') }}
+                  <div class="banner-title-wrapper">
+                    <div class="banner-title">{{ t('editor.templatePreview.title') }}</div>
+                    <button
+                      class="info-button"
+                      @click="showTemplateInfo = true"
+                      :title="$t('editor.templatePreview.infoButton')"
+                    >
+                      <IconInfo class="tw-w-4 tw-h-4" />
+                    </button>
                   </div>
                 </div>
                 <div class="banner-buttons">
@@ -90,6 +96,9 @@
   <Modal :visible="!!dialogForExport" :width="1000" @closed="closeExportDialog()">
     <ExportDialog />
   </Modal>
+
+  <!-- Template Preview Info Dialog -->
+  <TemplatePreviewInfoDialog :visible="showTemplateInfo" @close="showTemplateInfo = false" />
 </template>
 
 <script lang="ts" setup>
@@ -115,8 +124,10 @@ import SearchPanel from './SearchPanel.vue';
 import NotesPanel from './NotesPanel.vue';
 import SymbolPanel from './Toolbar/SymbolPanel.vue';
 import MarkupPanel from './MarkupPanel.vue';
+import TemplatePreviewInfoDialog from './TemplatePreviewInfoDialog.vue';
 import Modal from '@/components/Modal.vue';
 import Drawer from '@/components/Drawer.vue';
+import { HelpCircle as IconInfo } from 'lucide-vue-next';
 
 const { t } = useI18n();
 
@@ -147,6 +158,7 @@ const closeExportDialog = () => mainStore.setDialogForExport('');
 const remarkHeight = ref(240);
 const showRemarkDrawer = ref(false);
 const showConfirmAllButton = ref(false);
+const showTemplateInfo = ref(false);
 
 // Function to open the drawer for editing
 const openRemarkDrawer = () => {
@@ -202,7 +214,7 @@ onMounted(() => {
   height: 100%;
 }
 .layout-header {
-  height: 40px;
+  height: 48px;
   flex-shrink: 0;
 }
 .layout-content {
@@ -343,16 +355,39 @@ onMounted(() => {
     min-width: 200px;
   }
 
+  .banner-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
   .banner-title {
     font-size: 14px;
     font-weight: 600;
-    margin-bottom: 2px;
   }
 
-  .banner-subtitle {
-    font-size: 12px;
-    opacity: 0.9;
-    line-height: 1.4;
+  .info-button {
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    color: white;
+    padding: 4px 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    line-height: 1;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
   }
 
   .banner-buttons {
@@ -436,6 +471,10 @@ onMounted(() => {
 
     .banner-title {
       font-size: 13px;
+    }
+
+    .info-button {
+      padding: 3px 5px;
     }
 
     .banner-subtitle {

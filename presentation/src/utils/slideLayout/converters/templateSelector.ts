@@ -51,7 +51,6 @@ export function selectTemplate(layoutType: string, seed?: string): Template {
 
   // If only one template exists, return it directly
   if (templates.length === 1) {
-    console.log(`Only one template available for layout type "${layoutType}": ${templates[0].id}`);
     return templates[0];
   }
 
@@ -62,7 +61,6 @@ export function selectTemplate(layoutType: string, seed?: string): Template {
     if (!template) {
       throw new Error(`Template with ID "${templateId}" not found for layout type: ${layoutType}`);
     }
-    console.log(`Directly selected template for layout type "${layoutType}": ${template.id}`);
     return template;
   }
 
@@ -85,11 +83,6 @@ export function selectTemplate(layoutType: string, seed?: string): Template {
   // Use seeded random if seed is provided, otherwise use Math.random
   const rng = seed ? seedrandom(seed) : Math.random;
   const randomIndex = Math.floor(rng() * templates.length);
-
-  // Log selected template for debugging
-  //   console.log(
-  //     `Selected template for layout type "${layoutType}" with seed "${seed}": ${templates[randomIndex].id}`
-  //   );
 
   return templates[randomIndex];
 }

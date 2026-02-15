@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Trash2, Plus, X } from 'lucide-react';
+import { Trash2, Plus, X, Info } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -13,6 +13,8 @@ import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Textarea } from '@/shared/components/ui/textarea';
 import { Label } from '@/shared/components/ui/label';
+import { Checkbox } from '@/shared/components/ui/checkbox';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 
 interface TopicEditModalProps {
@@ -33,6 +35,7 @@ export const TopicEditModal = ({ topicId, open, onOpenChange }: TopicEditModalPr
   const [name, setName] = useState(topic?.name || '');
   const [description, setDescription] = useState(topic?.description || '');
   const [subtopics, setSubtopics] = useState<string[]>(topic?.subtopics || []);
+  const [hasContext, setHasContext] = useState<boolean>(topic?.hasContext || false);
 
   // Update local state when topic changes
   useEffect(() => {
@@ -40,6 +43,7 @@ export const TopicEditModal = ({ topicId, open, onOpenChange }: TopicEditModalPr
       setName(topic.name);
       setDescription(topic.description || '');
       setSubtopics(topic.subtopics || []);
+      setHasContext(topic.hasContext || false);
     }
   }, [topic]);
 
@@ -49,6 +53,7 @@ export const TopicEditModal = ({ topicId, open, onOpenChange }: TopicEditModalPr
         name,
         description,
         subtopics: subtopics.length > 0 ? subtopics : undefined,
+        hasContext: hasContext || undefined,
       });
       onOpenChange(false);
     }
@@ -108,6 +113,42 @@ export const TopicEditModal = ({ topicId, open, onOpenChange }: TopicEditModalPr
               rows={3}
               className="resize-none"
             />
+          </div>
+
+          {/* Has Context Section */}
+          <div className="space-y-2 border-t pt-3">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="hasContext"
+                checked={hasContext}
+                onCheckedChange={(checked) => setHasContext(checked as boolean)}
+              />
+              <label
+                htmlFor="hasContext"
+                className="flex items-center gap-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {t('useContextLabel', 'Use reading passages')}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-xs">
+                      {t(
+                        'useContextHint',
+                        'When enabled, AI will use reading passages when generating questions for this topic through Fill Matrix Gaps'
+                      )}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </label>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {t(
+                'useContextDescription',
+                'This setting is used when generating questions with Fill Matrix Gaps'
+              )}
+            </p>
           </div>
 
           {/* Subtopics Section */}

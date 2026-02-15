@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { GenerateMatrixRequest } from '@/features/assignment/types/assignment';
+import type { GenerateMatrixRequest } from '@/features/assignment/types/assignment';
 
 export interface GenerationHistoryItem {
   id: string;

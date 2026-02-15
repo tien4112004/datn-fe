@@ -80,7 +80,7 @@ export const AssignmentMetadataPanel = () => {
                   </TooltipContent>
                 </Tooltip>
               </div>
-              <Select value={subject} onValueChange={setSubject}>
+              <Select value={subject as string} onValueChange={(val) => setSubject(val as any)}>
                 <SelectTrigger id="subject" className="h-9 text-sm" aria-invalid={!!subjectError}>
                   <SelectValue placeholder={t('fields.subjectPlaceholder')} />
                 </SelectTrigger>
@@ -109,7 +109,7 @@ export const AssignmentMetadataPanel = () => {
                   </TooltipContent>
                 </Tooltip>
               </div>
-              <Select value={grade} onValueChange={setGrade}>
+              <Select value={grade as string} onValueChange={(val) => setGrade(val as any)}>
                 <SelectTrigger id="grade" className="h-9 text-sm">
                   <SelectValue placeholder={t('fields.gradePlaceholder')} />
                 </SelectTrigger>

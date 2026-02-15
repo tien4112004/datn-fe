@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { Save, Wand2, Database, Plus, Library, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { Button } from '@/shared/components/ui/button';
 import LoadingButton from '@/shared/components/common/LoadingButton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
@@ -16,6 +18,9 @@ import { GenerateMatrixManager } from './GenerateMatrixManager';
 import { FillMatrixGapsManager } from './FillMatrixGapsManager';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
+import { useGenerateExamFromMatrix } from '../../hooks/useAssignmentApi';
+import { cellsToApiMatrix } from '../../utils/matrixConversion';
+import type { ExamDraftDto } from '../../types/assignment';
 
 interface AssignmentEditorLayoutProps {
   onCancel: () => void;
@@ -29,13 +34,60 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
   const setQuestionBankOpen = useAssignmentEditorStore((state) => state.setQuestionBankOpen);
   const setContextCreateFormOpen = useAssignmentEditorStore((state) => state.setContextCreateFormOpen);
   const setContextLibraryDialogOpen = useAssignmentEditorStore((state) => state.setContextLibraryDialogOpen);
+  const title = useAssignmentFormStore((state) => state.title);
+  const subject = useAssignmentFormStore((state) => state.subject);
+  const grade = useAssignmentFormStore((state) => state.grade);
+  const matrix = useAssignmentFormStore((state) => state.matrix);
   const questions = useAssignmentFormStore((state) => state.questions);
   const contexts = useAssignmentFormStore((state) => state.contexts);
   const topics = useAssignmentFormStore((state) => state.topics);
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor' });
+  const { t: tFillGaps } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.fillMatrixGaps' });
   const { t: tToolbar } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
   const { t: tContextsPanel } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.contextsPanel' });
   const { t: tActions } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.actions' });
+
+  // Fill Matrix Gaps state
+  const [fillMatrixDraft, setFillMatrixDraft] = useState<ExamDraftDto | null>(null);
+  const [isFillMatrixLoading, setIsFillMatrixLoading] = useState(false);
+  const detectGapsMutation = useGenerateExamFromMatrix();
+
+  const handleFillMatrixGaps = async () => {
+    // Validate matrix exists and has requirements
+    if (!matrix || matrix.length === 0) {
+      toast.error(String(tFillGaps('errors.noMatrix')));
+      return;
+    }
+
+    if (!matrix.some((cell) => cell.requiredCount > 0)) {
+      toast.error(String(tFillGaps('errors.noRequirements')));
+      return;
+    }
+
+    if (!grade || !subject) {
+      toast.error(String(tFillGaps('errors.missingMetadata')));
+      return;
+    }
+
+    setIsFillMatrixLoading(true);
+    try {
+      const apiMatrix = cellsToApiMatrix(matrix, { grade, subject }, topics);
+      const result = await detectGapsMutation.mutateAsync({
+        subject: subject || '',
+        title: title || 'Test Matrix',
+        matrix: apiMatrix,
+        missingStrategy: 'REPORT_GAPS',
+      });
+
+      setFillMatrixDraft(result);
+      setMainView('fillMatrixGaps');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(tFillGaps('errors.detectionFailed'));
+      toast.error(errorMessage);
+    } finally {
+      setIsFillMatrixLoading(false);
+    }
+  };
 
   return (
     <div className="grid grid-cols-1 gap-6 pb-4 lg:h-[calc(100vh-8rem)] lg:grid-cols-4">
@@ -55,11 +107,16 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
           <GenerateQuestionsManager />
         ) : mainView === 'generateMatrix' ? (
           <GenerateMatrixManager />
-        ) : mainView === 'fillMatrixGaps' ? (
+        ) : mainView === 'fillMatrixGaps' && fillMatrixDraft ? (
           <FillMatrixGapsManager
-            onClose={() => setMainView('matrix')}
+            draft={fillMatrixDraft}
+            onClose={() => {
+              setMainView('matrix');
+              setFillMatrixDraft(null);
+            }}
             onQuestionsAdded={() => {
               setMainView('matrix');
+              setFillMatrixDraft(null);
             }}
           />
         ) : null}
@@ -167,15 +224,16 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
                       type="button"
                       size="sm"
                       variant="outline"
-                      onClick={() => setMainView('fillMatrixGaps')}
+                      onClick={handleFillMatrixGaps}
+                      disabled={isFillMatrixLoading}
                       className="w-full"
                     >
                       <Sparkles className="mr-2 h-4 w-4" />
-                      {t('actions.fillMatrixGaps')}
+                      {String(t('actions.fillMatrixGaps'))}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{t('actions.tooltips.fillMatrixGaps')}</p>
+                    <p>{String(t('actions.tooltips.fillMatrixGaps'))}</p>
                   </TooltipContent>
                 </Tooltip>
               </div>

@@ -30,11 +30,9 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
   });
 
   // Get assignment data and actions
-  const { subject, topics, addQuestion } = useAssignmentFormStore((state) => ({
-    subject: state.subject,
-    topics: state.topics,
-    addQuestion: state.addQuestion,
-  }));
+  const subject = useAssignmentFormStore((state) => state.subject);
+  const topics = useAssignmentFormStore((state) => state.topics);
+  const addQuestion = useAssignmentFormStore((state) => state.addQuestion);
 
   // State
   const [isGenerating, setIsGenerating] = useState(false);
@@ -76,11 +74,13 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
 
         // Find topic ID from topic name
         const topicId = topics.find((t) => t.name === gap.topic)?.id || gap.topic;
+        const topic = topics.find((t) => t.id === topicId);
+        const shouldUseContext = topic?.hasContext || false;
 
         // Build request for this gap
         const request: GenerateQuestionsRequest = {
           gradeLevel: '5', // Default grade, could be parameterized
-          prompt: `Generate ${gap.gapCount} ${gap.difficulty} level ${gap.questionType} question${gap.gapCount > 1 ? 's' : ''} about ${gap.topic}.${additionalPrompt ? ' ' + additionalPrompt : ''}`,
+          prompt: `Generate ${gap.gapCount} ${gap.difficulty} level ${gap.questionType} question${gap.gapCount > 1 ? 's' : ''} about ${gap.topic}.${shouldUseContext ? ' Include a reading passage for context.' : ''}${additionalPrompt ? ' ' + additionalPrompt : ''}`,
           subject: subject || 'T',
           questionsPerDifficulty: {
             [gap.difficulty]: gap.gapCount,
@@ -105,7 +105,7 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
             data: bankItem.data,
             topicId,
             contextId: bankItem.contextId,
-          };
+          } as QuestionWithTopic;
 
           const assignmentQuestion: AssignmentQuestionWithTopic = {
             question: questionWithTopic,
@@ -135,17 +135,19 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('title')}</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{String(t('title'))}</h2>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          {t('gapsFound', { count: gaps.length, total: gaps.reduce((sum, g) => sum + g.gapCount, 0) })}
+          {String(
+            t('gapsFound', { count: gaps.length, total: gaps.reduce((sum, g) => sum + g.gapCount, 0) })
+          )}
         </p>
       </div>
 
       {/* Selected Gaps Summary */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">{t('gapDetails.title')}</CardTitle>
-          <CardDescription>{t('selectGaps')}</CardDescription>
+          <CardTitle className="text-base">{String(t('gapDetails.title'))}</CardTitle>
+          <CardDescription>{String(t('selectGaps'))}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
@@ -179,27 +181,27 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
         <div className="space-y-4">
           {/* AI Model Selection */}
           <div className="space-y-2">
-            <Label>{t('fields.model')}</Label>
+            <Label>{String(t('fields.model'))}</Label>
             <ModelSelect
               models={models}
               value={selectedModel}
               onValueChange={(value) => setSelectedModel(value as any)}
-              placeholder={t('fields.modelPlaceholder')}
+              placeholder={String(t('fields.modelPlaceholder'))}
               isLoading={isLoadingModels}
             />
           </div>
 
           {/* Additional Prompt */}
           <div className="space-y-2">
-            <Label htmlFor="additional-prompt">{t('fields.additionalPrompt')}</Label>
+            <Label htmlFor="additional-prompt">{String(t('fields.additionalPrompt'))}</Label>
             <Textarea
               id="additional-prompt"
-              placeholder={t('fields.additionalPromptPlaceholder')}
+              placeholder={String(t('fields.additionalPromptPlaceholder'))}
               value={additionalPrompt}
               onChange={(e) => setAdditionalPrompt(e.target.value)}
               className="min-h-20 resize-none"
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400">{t('fields.promptHint')}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{String(t('fields.promptHint'))}</p>
           </div>
         </div>
       )}
@@ -208,7 +210,9 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
       {isGenerating && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{t('generatingQuestions', { count: gaps.length })}</CardTitle>
+            <CardTitle className="text-base">
+              {String(t('generatingQuestions', { count: gaps.length }))}
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -251,12 +255,12 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
       <div className="flex gap-2">
         <Button onClick={onBack} variant="outline" disabled={isGenerating} className="flex-1">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          {t('actions.backToReview')}
+          {String(t('actions.backToReview'))}
         </Button>
         {!isGenerating && (
           <Button onClick={handleGenerate} className="flex-1" disabled={gaps.length === 0}>
             <Sparkles className="mr-2 h-4 w-4" />
-            {t('actions.generateQuestions')}
+            {String(t('actions.generateQuestions'))}
           </Button>
         )}
       </div>

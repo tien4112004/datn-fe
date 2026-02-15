@@ -8,6 +8,7 @@ import type {
   AssignmentValidationErrors,
 } from '../types';
 import { generateId, createCellId } from '@aiprimary/core';
+import type { Grade, SubjectCode } from '@aiprimary/core';
 
 /**
  * Sync matrix cell counts based on current questions
@@ -49,8 +50,8 @@ interface AssignmentFormStore {
   // === FORM DATA ===
   title: string;
   description: string;
-  subject: string;
-  grade: string;
+  subject: SubjectCode | '';
+  grade: Grade | '';
   topics: AssignmentTopic[];
   questions: AssignmentQuestionWithTopic[];
   matrix: MatrixCell[];
@@ -64,8 +65,8 @@ interface AssignmentFormStore {
   // === ACTIONS: Metadata ===
   setTitle: (title: string) => void;
   setDescription: (description: string) => void;
-  setSubject: (subject: string) => void;
-  setGrade: (grade: string) => void;
+  setSubject: (subject: SubjectCode) => void;
+  setGrade: (grade: Grade) => void;
   setShuffleQuestions: (shuffle: boolean) => void;
 
   // === ACTIONS: Topics ===
@@ -512,7 +513,12 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
       },
 
       reset: (data) => {
-        const newState = { ...initialState, ...data };
+        const newState = {
+          ...initialState,
+          ...data,
+          subject: (data?.subject || initialState.subject) as SubjectCode | '',
+          grade: (data?.grade || initialState.grade) as Grade | '',
+        };
         set(newState, false, 'assignment/reset');
         dispatchDirtyEvent(false);
       },
@@ -523,8 +529,8 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
         const newState = {
           title: data.title || '',
           description: data.description || '',
-          subject: data.subject || '',
-          grade: data.grade || '',
+          subject: (data.subject || '') as SubjectCode | '',
+          grade: (data.grade || '') as Grade | '',
           topics: data.topics || [],
           questions,
           matrix: syncMatrixCounts(questions, matrix),

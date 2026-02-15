@@ -1,10 +1,11 @@
 import { useTranslation } from 'react-i18next';
-import { Plus, Trash2, X } from 'lucide-react';
+import { Plus, Trash2, X, Info } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Textarea } from '@/shared/components/ui/textarea';
 import { Label } from '@/shared/components/ui/label';
-import { Badge } from '@/shared/components/ui/badge';
+import { Checkbox } from '@/shared/components/ui/checkbox';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 import { generateId } from '@/shared/lib/utils';
 
@@ -34,6 +35,10 @@ export const TopicManager = () => {
 
   const handleTopicDescriptionChange = (topicId: string, description: string) => {
     updateTopic(topicId, { description });
+  };
+
+  const handleHasContextChange = (topicId: string, hasContext: boolean) => {
+    updateTopic(topicId, { hasContext });
   };
 
   const handleAddSubtopic = (topicId: string) => {
@@ -96,6 +101,34 @@ export const TopicManager = () => {
               rows={2}
               className="resize-none text-sm"
             />
+
+            {/* Has Context Checkbox */}
+            <div className="flex items-center gap-2 pt-2">
+              <Checkbox
+                id={`hasContext-${topic.id}`}
+                checked={topic.hasContext || false}
+                onCheckedChange={(checked) => handleHasContextChange(topic.id, checked as boolean)}
+              />
+              <label
+                htmlFor={`hasContext-${topic.id}`}
+                className="flex items-center gap-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {t('useContextLabel', 'Use reading passages')}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-3.5 w-3.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-xs">
+                      {t(
+                        'useContextHint',
+                        'When enabled, AI will use reading passages when generating questions for this topic through Fill Matrix Gaps'
+                      )}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </label>
+            </div>
 
             {/* Subtopics Editor */}
             <div className="space-y-2 border-t pt-3">

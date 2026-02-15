@@ -10,6 +10,8 @@ import type {
   AssignmentTopic,
   GenerateMatrixRequest,
   GenerateMatrixResponse,
+  GenerateExamFromMatrixRequest,
+  ExamDraftDto,
 } from '../types';
 import { createMatrixCellsForTopic } from '../utils/matrixHelpers';
 import { mergeApiMatrixIntoCells } from '../utils/matrixConversion';
@@ -106,7 +108,15 @@ export default class AssignmentService implements AssignmentApiService {
   }
 
   async generateMatrix(request: GenerateMatrixRequest): Promise<GenerateMatrixResponse> {
-    const response = await this.apiClient.post(`${this.baseUrl}/api/exams/generate-matrix`, request);
+    const response = await this.apiClient.post(`${this.baseUrl}/api/assignments/generate-matrix`, request);
+    return response.data.data;
+  }
+
+  async generateExamFromMatrix(request: GenerateExamFromMatrixRequest): Promise<ExamDraftDto> {
+    const response = await this.apiClient.post(
+      `${this.baseUrl}/api/assignments/generate-from-matrix`,
+      request
+    );
     return response.data.data;
   }
 }
@@ -136,12 +146,18 @@ export function transformAssignmentToFormData(assignment: Assignment): Assignmen
   // Flatten topic > subtopic hierarchy into a flat topics list
   let topics: AssignmentTopic[] = (assignment.matrix?.dimensions?.topics ?? []).flatMap((topic) =>
     (topic.subtopics ?? [])
-      .filter((sub) => sub.name?.trim())
-      .map((sub) => ({
-        id: sub.id || createTopicId(),
-        name: sub.name,
-        parentTopic: topic.name,
-      }))
+      .filter((subtopic: any) => {
+        // subtopic is defined as string[], so filter out empty strings
+        return typeof subtopic === 'string' ? subtopic.trim() : true;
+      })
+      .map((subtopic: any) => {
+        // Since subtopics are strings, just use them as names
+        const name = typeof subtopic === 'string' ? subtopic : String(subtopic);
+        return {
+          id: createTopicId(),
+          name,
+        };
+      })
   );
 
   // Fall back to a default topic if empty

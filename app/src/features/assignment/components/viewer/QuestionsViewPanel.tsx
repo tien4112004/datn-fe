@@ -32,7 +32,9 @@ export const QuestionsViewPanel = ({ assignment }: QuestionsViewPanelProps) => {
     if (dims) {
       dims.forEach((topic) =>
         (topic.subtopics ?? []).forEach((sub) => {
-          if (sub.id) map.set(sub.id, sub.name);
+          // subtopics are strings, so use them directly as both key and value
+          const subtopicName = typeof sub === 'string' ? sub : (sub as any).name || String(sub);
+          if (subtopicName) map.set(subtopicName, subtopicName);
         })
       );
     }

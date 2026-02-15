@@ -283,6 +283,7 @@ export default {
       actions: 'Actions',
       cancel: 'Cancel',
       save: 'Save Assignment',
+      fillMatrixGaps: 'Generate Question from Matrix Gap',
       saving: 'Saving...',
       tooltips: {
         save: 'Save changes',
@@ -291,6 +292,7 @@ export default {
         fromBank: 'Add from question bank',
         addContext: 'Create a new reading passage',
         fromLibrary: 'Import from context library',
+        fillMatrixGaps: 'Detect gaps in the matrix and generate questions to fill them',
       },
     },
 
@@ -455,6 +457,11 @@ export default {
       tableHeaders: {
         topic: 'Topic',
       },
+      useContextLabel: 'Use reading passages',
+      useContextHint:
+        'When enabled, AI will use reading passages when generating questions for this topic through Fill Matrix Gaps',
+      useContextDescription: 'This setting is used when generating questions with Fill Matrix Gaps',
+      usesContext: 'Uses reading passages',
     },
 
     // Contexts panel
@@ -606,53 +613,55 @@ export default {
         },
         save: 'Save Preset',
       },
-      fillMatrixGaps: {
-        title: 'Fill Matrix Gaps',
-        detecting: 'Detecting gaps...',
-        noGaps: 'No gaps found! Matrix is complete.',
-        gapsFound: 'Found {{count}} gap(s) requiring {{total}} questions',
-        selectGaps: 'Select which gaps to fill',
-        generatingQuestions: 'Generating questions for {{count}} gap(s)...',
-        success: 'Successfully filled {{count}} gap(s)',
-        status: {
-          allRequirementsMet: 'All matrix requirements have been met',
-        },
-        gapDetails: {
-          title: 'Gap Details',
-          topic: 'Topic',
-          difficulty: 'Difficulty',
-          type: 'Question Type',
-          needed: 'Need {{count}} more questions',
-          available: '{{available}} / {{required}}',
-          selected: 'Selected',
-          select: 'Select',
-        },
-        errors: {
-          noMatrix: 'No matrix exists. Please create a matrix first.',
-          noRequirements: 'Matrix has no requirements. Please add requirements to the matrix.',
-          noGapsSelected: 'Please select at least one gap to fill',
-          modelRequired: 'Please select an AI model before generating questions',
-          detectionFailed: 'Failed to detect gaps',
-          generationFailed: 'Failed to generate questions',
-        },
-        actions: {
-          selectAll: 'Select All',
-          clearAll: 'Clear All',
-          backToMatrix: 'Back to Matrix',
-          backToReview: 'Back to Review',
-          generateQuestions: 'Generate Questions',
-          fillMatrixGaps: 'Fill Matrix Gaps',
-        },
-        fields: {
-          model: 'AI Model',
-          modelPlaceholder: 'Select AI model',
-          additionalPrompt: 'Additional Prompt',
-          additionalPromptPlaceholder: 'E.g., Focus on practical applications',
-          promptHint: 'Provide additional context to guide question generation',
-        },
-        tooltips: {
-          fillMatrixGaps: 'Detect and fill gaps in the matrix',
-        },
+    },
+
+    fillMatrixGaps: {
+      title: 'Generate Question from Matrix Gap',
+      detecting: 'Detecting gaps...',
+      noGaps: 'No gaps found! Matrix is complete.',
+      gapsFound: 'Found {{count}} gap(s) requiring {{total}} questions',
+      selectGaps: 'Select which gaps to fill',
+      generatingQuestions: 'Generating questions for {{count}} gap(s)...',
+      success: 'Successfully filled {{count}} gap(s)',
+      status: {
+        allRequirementsMet: 'All matrix requirements have been met',
+      },
+      gapDetails: {
+        title: 'Gap Details',
+        topic: 'Topic',
+        difficulty: 'Difficulty',
+        type: 'Question Type',
+        needed: 'Need {{count}} more questions',
+        available: '{{available}} / {{required}}',
+        selected: 'Selected',
+        select: 'Select',
+      },
+      errors: {
+        noMatrix: 'No matrix exists. Please create a matrix first.',
+        noRequirements: 'Matrix has no requirements. Please add requirements to the matrix.',
+        noGapsSelected: 'Please select at least one gap to fill',
+        modelRequired: 'Please select an AI model before generating questions',
+        detectionFailed: 'Failed to detect gaps',
+        generationFailed: 'Failed to generate questions',
+        missingMetadata: 'Please set the grade and subject before generating questions from matrix gaps.',
+      },
+      actions: {
+        selectAll: 'Select All',
+        clearAll: 'Clear All',
+        backToMatrix: 'Back to Matrix',
+        backToReview: 'Back to Review',
+        generateQuestions: 'Generate Questions',
+        fillMatrixGaps: 'Generate Question from Matrix Gap',
+      },
+      fields: {
+        model: 'AI Model',
+        modelPlaceholder: 'Select AI model',
+        additionalPrompt: 'Additional Prompt',
+        additionalPromptPlaceholder: 'E.g., Focus on practical applications',
+        promptHint: 'Provide additional context to guide question generation',
+      },
+      tooltips: {
+        fillMatrixGaps: 'Detect gaps in the matrix and generate questions to fill them',
       },
     },
 

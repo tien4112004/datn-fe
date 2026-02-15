@@ -28,6 +28,7 @@ export interface AssignmentTopic {
   name: string;
   description?: string;
   subtopics?: string[]; // Informational subtopic names (not used for filtering)
+  hasContext?: boolean; // Whether to use reading passages for this topic
 }
 
 // Matrix dimension topic (topics are the first dimension, subtopics are informational)
@@ -113,6 +114,7 @@ export interface TopicRequest {
   id: string;
   name: string;
   description?: string;
+  hasContext?: boolean;
 }
 
 // Matrix structure for API requests/responses

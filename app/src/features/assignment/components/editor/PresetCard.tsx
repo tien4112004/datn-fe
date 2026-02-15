@@ -1,7 +1,8 @@
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
 import { Trash2, Pencil } from 'lucide-react';
-import { MatrixPreset, getPresetIconComponent } from '@/features/assignment/utils/presetManager';
+import { getPresetIconComponent } from '@/features/assignment/utils/presetManager';
+import type { MatrixPreset } from '@/features/assignment/utils/presetManager';
 
 interface PresetCardProps {
   preset: MatrixPreset;

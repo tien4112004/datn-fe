@@ -6,7 +6,6 @@ import type {
   UpdateAssignmentRequest,
   GenerateMatrixRequest,
   GenerateExamFromMatrixRequest,
-  ExamDraftDto,
 } from '../types';
 
 /**
@@ -175,20 +174,9 @@ export const useGenerateMatrix = () => {
  * @returns Mutation function and state that returns ExamDraftDto with gaps
  */
 export const useGenerateExamFromMatrix = () => {
+  const service = getAssignmentApiService();
+
   return useMutation({
-    mutationFn: async (request: GenerateExamFromMatrixRequest): Promise<ExamDraftDto> => {
-      const response = await fetch('/api/exams/generate-from-matrix', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(request),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to generate exam from matrix');
-      }
-
-      return response.json();
-    },
+    mutationFn: (request: GenerateExamFromMatrixRequest) => service.generateExamFromMatrix(request),
   });
 };

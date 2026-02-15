@@ -24,6 +24,7 @@ export function MatrixGapsSummary({
   totalMissingQuestions,
 }: MatrixGapsSummaryProps) {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, {
+    // @ts-ignore - Translation keys are defined in locale files but not recognized by type system
     keyPrefix: 'assignmentEditor.fillMatrixGaps',
   });
 
@@ -55,9 +56,11 @@ export function MatrixGapsSummary({
     return (
       <Alert className="border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950">
         <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-        <AlertTitle className="text-green-900 dark:text-green-100">{t('noGaps')}</AlertTitle>
+        {/* @ts-ignore - Type instantiation depth issue with i18n typing */}
+        <AlertTitle className="text-green-900 dark:text-green-100">{String(t('noGaps'))}</AlertTitle>
         <AlertDescription className="text-green-800 dark:text-green-200">
-          {t('status.allRequirementsMet')}
+          {/* @ts-ignore - Type instantiation depth issue with i18n typing */}
+          {String(t('status.allRequirementsMet'))}
         </AlertDescription>
       </Alert>
     );
@@ -72,23 +75,23 @@ export function MatrixGapsSummary({
       <Alert className="border-yellow-200 bg-yellow-50 dark:border-yellow-900 dark:bg-yellow-950">
         <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
         <AlertTitle className="text-yellow-900 dark:text-yellow-100">
-          {t('gapsFound', { count: totalGaps, total: totalMissing })}
+          {String(t('gapsFound', { count: totalGaps, total: totalMissing }))}
         </AlertTitle>
         <AlertDescription className="text-yellow-800 dark:text-yellow-200">
-          {t('selectGaps')}
+          {String(t('selectGaps'))}
         </AlertDescription>
       </Alert>
 
       {/* Gaps List */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100">{t('gapDetails.title')}</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100">{String(t('gapDetails.title'))}</h3>
           <div className="flex gap-2">
             <Button type="button" size="sm" variant="ghost" onClick={handleSelectAll} className="text-xs">
-              {t('actions.selectAll')}
+              {String(t('actions.selectAll'))}
             </Button>
             <Button type="button" size="sm" variant="ghost" onClick={handleClearAll} className="text-xs">
-              {t('actions.clearAll')}
+              {String(t('actions.clearAll'))}
             </Button>
           </div>
         </div>
@@ -126,20 +129,22 @@ export function MatrixGapsSummary({
                       </Badge>
                     </div>
                     <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {t('gapDetails.needed', { count: gap.gapCount })}
+                      {String(t('gapDetails.needed', { count: gap.gapCount }))}
                     </div>
                     <div className="text-xs text-gray-600 dark:text-gray-400">
-                      {t('gapDetails.available', {
-                        available: gap.availableCount,
-                        required: gap.requiredCount,
-                      })}
+                      {String(
+                        t('gapDetails.available', {
+                          available: gap.availableCount,
+                          required: gap.requiredCount,
+                        })
+                      )}
                     </div>
                   </div>
                   <Label
                     htmlFor={`gap-${gapId}`}
                     className="cursor-pointer whitespace-nowrap text-xs font-medium text-gray-700 dark:text-gray-300"
                   >
-                    {isSelected ? t('gapDetails.selected') : t('gapDetails.select')}
+                    {isSelected ? String(t('gapDetails.selected')) : String(t('gapDetails.select'))}
                   </Label>
                 </div>
               </CardContent>

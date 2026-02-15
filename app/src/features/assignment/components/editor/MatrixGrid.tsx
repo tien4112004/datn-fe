@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pencil } from 'lucide-react';
+import { Pencil, BookOpen } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
 import { Button } from '@/shared/components/ui/button';
@@ -17,7 +17,7 @@ import {
 } from '@aiprimary/core';
 import { generateId } from '@aiprimary/core';
 import { QuestionTypeIcon } from '@/features/question/components/shared/QuestionTypeIcon';
-import type { AssignmentTopic, QuestionType } from '@/features/assignment/types';
+import type { QuestionType } from '@/features/assignment/types';
 
 export const MatrixGrid = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrixEditor' });
@@ -28,7 +28,6 @@ export const MatrixGrid = () => {
   const topics = useAssignmentFormStore((state) => state.topics);
   const matrixCells = useAssignmentFormStore((state) => state.matrix);
   const addTopic = useAssignmentFormStore((state) => state.addTopic);
-  const updateTopic = useAssignmentFormStore((state) => state.updateTopic);
 
   // Modal state
   const [editingTopicId, setEditingTopicId] = useState<string | null>(null);
@@ -115,6 +114,16 @@ export const MatrixGrid = () => {
                     <div className="min-w-0 flex-1 space-y-1">
                       <div className="whitespace-normal break-words">
                         {topic.name || t('tableHeaders.topic')}
+                        {topic.hasContext && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <BookOpen className="ml-1 inline-block h-3 w-3 text-blue-600 dark:text-blue-400" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="text-xs">{t('usesContext', 'Uses reading passages')}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
                       </div>
                       {topic.description && (
                         <div className="whitespace-normal break-words text-xs font-normal text-gray-500">

@@ -8,14 +8,6 @@ export interface SmartDefaults {
   suggestedPoints: number;
 }
 
-const GRADE_MAPPING: Record<string, { minGrade: number; maxGrade: number }> = {
-  '1': { minGrade: 1, maxGrade: 1 },
-  '2': { minGrade: 2, maxGrade: 2 },
-  '3': { minGrade: 3, maxGrade: 3 },
-  '4': { minGrade: 4, maxGrade: 4 },
-  '5': { minGrade: 5, maxGrade: 5 },
-};
-
 /**
  * Get recommended difficulty levels based on grade
  * - Grade 1-2: KNOWLEDGE only (basic recall)

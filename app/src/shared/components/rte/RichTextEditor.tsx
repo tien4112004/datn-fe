@@ -18,6 +18,7 @@ interface RichTextEditorProps extends BlockNoteViewProps<any, any, any> {
   className?: string;
   onBlur?: () => void;
   minimalToolbar?: boolean;
+  style?: React.CSSProperties;
 }
 
 const FONT_SIZES = ['10px', '12px', '14px', '16px', '18px', '20px', '24px', '28px', '32px'];
@@ -97,6 +98,7 @@ export default React.memo(function RichTextEditor({
       {children}
       <BlockNoteView
         {...props}
+        style={props.style}
         data-theming-ui-css-variables
         className={props.className}
         formattingToolbar={minimalToolbar ? false : undefined}

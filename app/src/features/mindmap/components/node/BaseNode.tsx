@@ -7,12 +7,7 @@ import { isEqual } from 'lodash';
 import { AnimatePresence, motion } from 'motion/react';
 import { memo, useCallback, useMemo, type HTMLAttributes, type ReactNode } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import {
-  useClipboardStore,
-  useCoreStore,
-  useLayoutStore,
-  useNodeOperationsStore,
-} from '@/features/mindmap/stores';
+import { useClipboardStore, useCoreStore, useNodeOperationsStore } from '@/features/mindmap/stores';
 import { ChildNodeControls, NodeHandlers } from '../controls/ChildNodeControls';
 
 export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
@@ -22,7 +17,6 @@ export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>,
 }
 
 const clipboardSelector = (state: any) => state.dragTargetNodeId;
-const selectedCountSelector = (state: any) => state.selectedNodeIds.size;
 
 export const BaseNodeBlock = memo(
   ({ className, children, variant = 'card', node, ...props }: BaseNodeBlockProps) => {
@@ -31,7 +25,6 @@ export const BaseNodeBlock = memo(
     const dragTargetNodeId = useClipboardStore(useShallow(clipboardSelector));
     const isDragTarget = dragTargetNodeId === id;
 
-    const isLayouting = useLayoutStore((state) => state.isLayouting);
     const onNodeDelete = useNodeOperationsStore((state) => state.finalizeNodeDeletion);
     const layoutType = useCoreStore((state) => {
       const rootId = state.nodeToRootMap.get(id);
@@ -46,19 +39,9 @@ export const BaseNodeBlock = memo(
 
     const baseStyles = cn(isDragTarget && 'drag-target', DRAGHANDLE.CLASS);
 
-    const cardStyles = cn(
-      'base-node-card',
-      isLayouting && 'layouting',
-      isDragTarget && 'drag-target',
-      className
-    );
+    const cardStyles = cn('base-node-card', isDragTarget && 'drag-target', className);
 
-    const rootStyles = cn(
-      'root-node-card',
-      isLayouting && 'layouting',
-      isDragTarget && 'drag-target',
-      className
-    );
+    const rootStyles = cn('root-node-card', isDragTarget && 'drag-target', className);
 
     // Memoized animation configurations
     const animationConfig = useMemo(
@@ -116,6 +99,7 @@ export const BaseNodeBlock = memo(
         >
           {children}
           <NodeHandlers layoutType={layoutType} id={id} side={data.side} />
+          <NodeResizer isVisible={selected} minWidth={100} minHeight={60} />
           <Helper node={node} dragging={dragging} selected={selected} />
         </motion.div>
       </AnimatePresence>
@@ -144,28 +128,31 @@ export const BaseNodeBlock = memo(
 
 const Helper = memo(
   ({ node, dragging, selected }: { node: NodeProps<MindMapNode>; dragging: boolean; selected: boolean }) => {
-    const selectedNodeCount = useCoreStore(useShallow(selectedCountSelector));
-    if (selectedNodeCount > 1 || dragging) {
+    // Use getState() to avoid reactive subscription to selectedNodeIds
+    // Only hide controls if: dragging OR (selected AND multiple nodes selected)
+    const shouldHideControls = dragging || (selected && useCoreStore.getState().selectedNodeIds.size > 1);
+
+    if (shouldHideControls) {
       return null;
     }
 
     return (
       <>
-        <NodeResizer isVisible={selected} minWidth={100} minHeight={60} />
         <ChildNodeControls node={node} selected={selected} />
       </>
     );
   },
   (prevProps, nextProps) => {
+    // Only re-render if this node's selection, dragging, or data actually changed
     const prevData = prevProps.node.data;
     const nextData = nextProps.node.data;
 
-    // Be more conservative with memoization for Helper component
-    // to ensure selection changes are properly handled
     return (
       prevProps.node.id === nextProps.node.id &&
       prevProps.selected === nextProps.selected &&
       prevProps.dragging === nextProps.dragging &&
+      prevProps.node.width === nextProps.node.width &&
+      prevProps.node.height === nextProps.node.height &&
       isEqual(prevData.collapsedChildren, nextData.collapsedChildren)
     );
   }

@@ -6,3 +6,4 @@ export { default as MindmapTitleInput } from './main/MindmapTitleInput';
 export { default as MindmapControls } from './main/MindmapControls';
 export { CustomControls, CustomControlButton } from './controls/CustomControls';
 export { default as MindmapBreadcrumbHeader } from './main/MindmapBreadcrumbHeader';
+export { DirtyTracker } from './main/DirtyTracker';

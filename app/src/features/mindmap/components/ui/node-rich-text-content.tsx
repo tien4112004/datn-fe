@@ -102,7 +102,7 @@ export const NodeRichTextContent = ({
             fontFamily: 'inherit',
             paddingInline: '1px',
           }}
-          className={cn('break-word m-0 mr-1 min-h-[24px] w-full', !isPresenterMode && 'cursor-text')}
+          className={cn('break-word m-0 min-h-[24px] w-full', !isPresenterMode && 'cursor-text')}
           dangerouslySetInnerHTML={{ __html: content }}
           onClick={() => !isPresenterMode && setIsEditing(true)}
         />

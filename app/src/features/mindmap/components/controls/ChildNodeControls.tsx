@@ -6,8 +6,6 @@ import {
   useNodeManipulationStore,
   useNodeOperationsStore,
 } from '@/features/mindmap/stores';
-import type { ClipboardState } from '@/features/mindmap/stores/clipboard';
-import type { CoreState } from '@/features/mindmap/stores/core';
 import type { LayoutState } from '@/features/mindmap/stores/layout';
 import type { NodeManipulationState } from '@/features/mindmap/stores/nodeManipulation';
 import type { NodeOperationsState } from '@/features/mindmap/stores/nodeOperation';
@@ -18,7 +16,7 @@ import { cn } from '@/shared/lib/utils';
 import { Position, useUpdateNodeInternals, type NodeProps } from '@xyflow/react';
 import { Minus, Plus } from 'lucide-react';
 import { motion } from 'motion/react';
-import { memo, useCallback, useEffect } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useMindmapPermissionContext } from '../../contexts/MindmapPermissionContext';
 import { BaseHandle } from '../ui/base-handle';
@@ -34,322 +32,328 @@ const nodeManipulationSelector = (state: NodeManipulationState) => ({
   expand: state.expand,
 });
 
-const coreStoreSelector = (state: CoreState) => ({
-  hasLeftChildren: state.hasLeftChildren,
-  hasRightChildren: state.hasRightChildren,
-});
-
 const nodeOperationsSelector = (state: NodeOperationsState) => state.addChildNode;
 
 const layoutStoreSelector = (state: LayoutState) => ({
   isLayouting: state.isLayouting,
 });
 
-const mouseOverSelector = (state: ClipboardState) => state.mouseOverNodeId;
+export const ChildNodeControls = memo(
+  ({ node, selected }: ChildNodeControlsProps) => {
+    const { canEdit } = useMindmapPermissionContext();
+    const { collapse, expand } = useNodeManipulationStore(useShallow(nodeManipulationSelector));
+    const hasLeftChildren = useCoreStore((state) => state.hasLeftChildren);
+    const hasRightChildren = useCoreStore((state) => state.hasRightChildren);
+    const addChildNodeStore = useNodeOperationsStore(nodeOperationsSelector);
+    useLayoutStore(useShallow(layoutStoreSelector));
 
-export const ChildNodeControls = ({ node, selected }: ChildNodeControlsProps) => {
-  const { canEdit } = useMindmapPermissionContext();
-  const { collapse, expand } = useNodeManipulationStore(useShallow(nodeManipulationSelector));
-  const { hasLeftChildren, hasRightChildren } = useCoreStore(useShallow(coreStoreSelector));
-  const addChildNodeStore = useNodeOperationsStore(nodeOperationsSelector);
-  useLayoutStore(useShallow(layoutStoreSelector));
+    // Get layoutType using cached maps - O(1) lookup
+    const layoutType = useCoreStore((state) => {
+      const rootId = state.nodeToRootMap.get(node.id);
+      return (rootId && state.rootLayoutTypeMap.get(rootId)) || DEFAULT_LAYOUT_TYPE;
+    });
 
-  // Get layoutType using cached maps - O(1) lookup
-  const layoutType = useCoreStore((state) => {
-    const rootId = state.nodeToRootMap.get(node.id);
-    return (rootId && state.rootLayoutTypeMap.get(rootId)) || DEFAULT_LAYOUT_TYPE;
-  });
+    const isRootNode = node.type === MINDMAP_TYPES.ROOT_NODE;
 
-  const isRootNode = node.type === MINDMAP_TYPES.ROOT_NODE;
+    // Memoize the canCreateSides calculation to avoid recalculating on every render
+    const { canCreateLeft, canCreateRight, canCreateTop, canCreateBottom } = useMemo(() => {
+      const side = node.data.side;
+      const isMid = side === SIDE.MID;
 
-  // Determine if we can create children on each side based on layout type and node side
-  const getCanCreateSides = () => {
-    const side = node.data.side;
-    const isMid = side === SIDE.MID;
+      switch (layoutType) {
+        case LAYOUT_TYPE.HORIZONTAL_BALANCED:
+          return {
+            canCreateLeft: side === SIDE.LEFT || isMid || isRootNode,
+            canCreateRight: side === SIDE.RIGHT || isMid || isRootNode,
+            canCreateTop: false,
+            canCreateBottom: false,
+          };
 
-    switch (layoutType) {
-      case LAYOUT_TYPE.HORIZONTAL_BALANCED:
-        return {
-          canCreateLeft: side === SIDE.LEFT || isMid || isRootNode,
-          canCreateRight: side === SIDE.RIGHT || isMid || isRootNode,
-          canCreateTop: false,
-          canCreateBottom: false,
-        };
+        case LAYOUT_TYPE.VERTICAL_BALANCED:
+          return {
+            canCreateLeft: false,
+            canCreateRight: false,
+            canCreateTop: side === SIDE.TOP || isMid || isRootNode,
+            canCreateBottom: side === SIDE.BOTTOM || isMid || isRootNode,
+          };
 
-      case LAYOUT_TYPE.VERTICAL_BALANCED:
-        return {
-          canCreateLeft: false,
-          canCreateRight: false,
-          canCreateTop: side === SIDE.TOP || isMid || isRootNode,
-          canCreateBottom: side === SIDE.BOTTOM || isMid || isRootNode,
-        };
+        case LAYOUT_TYPE.RIGHT_ONLY:
+          return {
+            canCreateLeft: false,
+            canCreateRight: true,
+            canCreateTop: false,
+            canCreateBottom: false,
+          };
 
-      case LAYOUT_TYPE.RIGHT_ONLY:
-        return {
-          canCreateLeft: false,
-          canCreateRight: true,
-          canCreateTop: false,
-          canCreateBottom: false,
-        };
+        case LAYOUT_TYPE.LEFT_ONLY:
+          return {
+            canCreateLeft: true,
+            canCreateRight: false,
+            canCreateTop: false,
+            canCreateBottom: false,
+          };
 
-      case LAYOUT_TYPE.LEFT_ONLY:
-        return {
-          canCreateLeft: true,
-          canCreateRight: false,
-          canCreateTop: false,
-          canCreateBottom: false,
-        };
+        case LAYOUT_TYPE.BOTTOM_ONLY:
+          return {
+            canCreateLeft: false,
+            canCreateRight: false,
+            canCreateTop: false,
+            canCreateBottom: true,
+          };
 
-      case LAYOUT_TYPE.BOTTOM_ONLY:
-        return {
-          canCreateLeft: false,
-          canCreateRight: false,
-          canCreateTop: false,
-          canCreateBottom: true,
-        };
+        case LAYOUT_TYPE.TOP_ONLY:
+          return {
+            canCreateLeft: false,
+            canCreateRight: false,
+            canCreateTop: true,
+            canCreateBottom: false,
+          };
 
-      case LAYOUT_TYPE.TOP_ONLY:
-        return {
-          canCreateLeft: false,
-          canCreateRight: false,
-          canCreateTop: true,
-          canCreateBottom: false,
-        };
+        default:
+          return {
+            canCreateLeft: side === SIDE.LEFT || isMid || isRootNode,
+            canCreateRight: side === SIDE.RIGHT || isMid || isRootNode,
+            canCreateTop: false,
+            canCreateBottom: false,
+          };
+      }
+    }, [layoutType, node.data.side, node.type]);
 
-      default:
-        return {
-          canCreateLeft: side === SIDE.LEFT || isMid || isRootNode,
-          canCreateRight: side === SIDE.RIGHT || isMid || isRootNode,
-          canCreateTop: false,
-          canCreateBottom: false,
-        };
-    }
-  };
+    const addChildNode = useCallback(
+      (side: Side, type: MindMapTypes) => {
+        expand(node.id, side);
+        addChildNodeStore(node, { x: node.positionAbsoluteX, y: node.positionAbsoluteY + 200 }, side, type);
+        // Auto-layout is now handled inside the addChildNode store function
+      },
+      [expand, addChildNodeStore, node.id, node.positionAbsoluteX, node.positionAbsoluteY]
+    );
 
-  const { canCreateLeft, canCreateRight, canCreateTop, canCreateBottom } = getCanCreateSides();
+    // Optimize selector to return boolean, preventing re-renders when mouseOverNodeId changes
+    // but matches neither the previous nor current node id for this component
+    const isMouseOver = useClipboardStore((state) => state.mouseOverNodeId === node.id);
 
-  const addChildNode = useCallback(
-    (side: Side, type: MindMapTypes) => {
-      expand(node.id, side);
-      addChildNodeStore(node, { x: node.positionAbsoluteX, y: node.positionAbsoluteY + 200 }, side, type);
-      // Auto-layout is now handled inside the addChildNode store function
-    },
-    [expand, addChildNodeStore, node.id, node.positionAbsoluteX, node.positionAbsoluteY]
-  );
+    const isLeftChildrenCollapsed = (node.data.collapsedChildren?.leftNodes || []).length > 0;
+    const isRightChildrenCollapsed = (node.data.collapsedChildren?.rightNodes || []).length > 0;
 
-  const mouseOverNodeId = useClipboardStore(useShallow(mouseOverSelector));
-  const isMouseOver = mouseOverNodeId === node.id;
+    // Determine if we're in a vertical-flow layout (TOP_ONLY, BOTTOM_ONLY, VERTICAL_BALANCED)
+    const isVerticalFlow =
+      layoutType === LAYOUT_TYPE.VERTICAL_BALANCED ||
+      layoutType === LAYOUT_TYPE.TOP_ONLY ||
+      layoutType === LAYOUT_TYPE.BOTTOM_ONLY;
 
-  const isLeftChildrenCollapsed = (node.data.collapsedChildren?.leftNodes || []).length > 0;
-  const isRightChildrenCollapsed = (node.data.collapsedChildren?.rightNodes || []).length > 0;
+    // Determine if we're in a horizontal-flow layout (LEFT_ONLY, RIGHT_ONLY, HORIZONTAL_BALANCED)
+    const isHorizontalFlow =
+      layoutType === LAYOUT_TYPE.HORIZONTAL_BALANCED ||
+      layoutType === LAYOUT_TYPE.LEFT_ONLY ||
+      layoutType === LAYOUT_TYPE.RIGHT_ONLY;
 
-  // Determine if we're in a vertical-flow layout (TOP_ONLY, BOTTOM_ONLY, VERTICAL_BALANCED)
-  const isVerticalFlow =
-    layoutType === LAYOUT_TYPE.VERTICAL_BALANCED ||
-    layoutType === LAYOUT_TYPE.TOP_ONLY ||
-    layoutType === LAYOUT_TYPE.BOTTOM_ONLY;
-
-  // Determine if we're in a horizontal-flow layout (LEFT_ONLY, RIGHT_ONLY, HORIZONTAL_BALANCED)
-  const isHorizontalFlow =
-    layoutType === LAYOUT_TYPE.HORIZONTAL_BALANCED ||
-    layoutType === LAYOUT_TYPE.LEFT_ONLY ||
-    layoutType === LAYOUT_TYPE.RIGHT_ONLY;
-
-  return (
-    <>
-      {/* Left side button (for horizontal layouts) */}
-      {isHorizontalFlow && (
-        <div
-          className={cn(
-            'absolute z-[10000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
-            'left-0 top-1/2 -translate-x-[calc(100%+24px)] -translate-y-1/2',
-            (isMouseOver || selected) &&
-              (canCreateLeft || hasLeftChildren(node.id) || isLeftChildrenCollapsed)
-              ? 'visible opacity-100'
-              : 'invisible opacity-0'
-          )}
-        >
-          {canEdit && (
-            <Button
-              variant="secondary"
-              className={cn('cursor-pointer rounded-full transition-all duration-200')}
-              onClick={() => {
-                addChildNode(SIDE.LEFT, MINDMAP_TYPES.TEXT_NODE);
-              }}
-            >
-              <Plus />
-            </Button>
-          )}
-          {/* Collapse/expand button - visible in View Mode */}
-          <motion.div
-            whileTap={{ scale: 0.95 }}
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+    return (
+      <>
+        {/* Left side button (for horizontal layouts) */}
+        {isHorizontalFlow && (
+          <div
             className={cn(
-              hasLeftChildren(node.id) || isLeftChildrenCollapsed
+              'absolute z-[10000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
+              'left-0 top-1/2 -translate-x-[calc(100%+24px)] -translate-y-1/2',
+              (isMouseOver || selected || isLeftChildrenCollapsed) &&
+                (canCreateLeft || hasLeftChildren(node.id) || isLeftChildrenCollapsed)
                 ? 'visible opacity-100'
                 : 'invisible opacity-0'
             )}
           >
-            <Button
-              onClick={() => {
-                if (isLeftChildrenCollapsed) expand(node.id, SIDE.LEFT);
-                else collapse(node.id, SIDE.LEFT);
-              }}
-              variant="secondary"
-              className={cn('cursor-pointer rounded-full transition-all duration-200')}
+            {canEdit && (
+              <Button
+                variant="secondary"
+                className={cn('cursor-pointer rounded-full transition-all duration-200')}
+                onClick={() => {
+                  addChildNode(SIDE.LEFT, MINDMAP_TYPES.TEXT_NODE);
+                }}
+              >
+                <Plus />
+              </Button>
+            )}
+            {/* Collapse/expand button - visible in View Mode */}
+            <motion.div
+              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+              className={cn(
+                hasLeftChildren(node.id) || isLeftChildrenCollapsed
+                  ? 'visible opacity-100'
+                  : 'invisible opacity-0'
+              )}
             >
-              <Minus />
-            </Button>
-          </motion.div>
-        </div>
-      )}
+              <Button
+                onClick={() => {
+                  if (isLeftChildrenCollapsed) expand(node.id, SIDE.LEFT);
+                  else collapse(node.id, SIDE.LEFT);
+                }}
+                variant="secondary"
+                className={cn('cursor-pointer rounded-full transition-all duration-200')}
+              >
+                <Minus />
+              </Button>
+            </motion.div>
+          </div>
+        )}
 
-      {/* Right side button (for horizontal layouts) */}
-      {isHorizontalFlow && (
-        <div
-          className={cn(
-            'absolute z-[10000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
-            'right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+24px)]',
-            (isMouseOver || selected) &&
-              (canCreateRight || hasRightChildren(node.id) || isRightChildrenCollapsed)
-              ? 'visible opacity-100'
-              : 'invisible opacity-0'
-          )}
-        >
-          {/* Collapse/expand button - visible in View Mode */}
-          <motion.div
-            whileTap={{ scale: 0.95 }}
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+        {/* Right side button (for horizontal layouts) */}
+        {isHorizontalFlow && (
+          <div
             className={cn(
-              hasRightChildren(node.id) || isRightChildrenCollapsed
+              'absolute z-[10000] flex items-center justify-center gap-1 rounded-sm transition-all duration-200',
+              'right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+24px)]',
+              (isMouseOver || selected || isRightChildrenCollapsed) &&
+                (canCreateRight || hasRightChildren(node.id) || isRightChildrenCollapsed)
                 ? 'visible opacity-100'
                 : 'invisible opacity-0'
             )}
           >
-            <Button
-              onClick={() => {
-                if (isRightChildrenCollapsed) expand(node.id, SIDE.RIGHT);
-                else collapse(node.id, SIDE.RIGHT);
-              }}
-              variant="secondary"
-              className={cn('cursor-pointer rounded-full transition-all duration-200')}
+            {/* Collapse/expand button - visible in View Mode */}
+            <motion.div
+              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+              className={cn(
+                hasRightChildren(node.id) || isRightChildrenCollapsed
+                  ? 'visible opacity-100'
+                  : 'invisible opacity-0'
+              )}
             >
-              <Minus />
-            </Button>
-          </motion.div>
-          {canEdit && (
-            <Button
-              variant="secondary"
-              className={cn('cursor-pointer rounded-full transition-all duration-200')}
-              onClick={() => {
-                addChildNode(SIDE.RIGHT, MINDMAP_TYPES.TEXT_NODE);
-              }}
-            >
-              <Plus />
-            </Button>
-          )}
-        </div>
-      )}
+              <Button
+                onClick={() => {
+                  if (isRightChildrenCollapsed) expand(node.id, SIDE.RIGHT);
+                  else collapse(node.id, SIDE.RIGHT);
+                }}
+                variant="secondary"
+                className={cn('cursor-pointer rounded-full transition-all duration-200')}
+              >
+                <Minus />
+              </Button>
+            </motion.div>
+            {canEdit && (
+              <Button
+                variant="secondary"
+                className={cn('cursor-pointer rounded-full transition-all duration-200')}
+                onClick={() => {
+                  addChildNode(SIDE.RIGHT, MINDMAP_TYPES.TEXT_NODE);
+                }}
+              >
+                <Plus />
+              </Button>
+            )}
+          </div>
+        )}
 
-      {/* Top side button (for vertical layouts) */}
-      {isVerticalFlow && (
-        <div
-          className={cn(
-            'absolute z-[10000] flex flex-col items-center justify-center gap-1 rounded-sm transition-all duration-200',
-            'left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+24px)]',
-            (isMouseOver || selected) && (canCreateTop || hasLeftChildren(node.id) || isLeftChildrenCollapsed)
-              ? 'visible opacity-100'
-              : 'invisible opacity-0'
-          )}
-        >
-          {canEdit && (
-            <Button
-              variant="secondary"
-              className={cn('cursor-pointer rounded-full transition-all duration-200')}
-              onClick={() => {
-                addChildNode(SIDE.TOP, MINDMAP_TYPES.TEXT_NODE);
-              }}
-            >
-              <Plus />
-            </Button>
-          )}
-          {/* Collapse/expand button - visible in View Mode */}
-          <motion.div
-            whileTap={{ scale: 0.95 }}
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+        {/* Top side button (for vertical layouts) */}
+        {isVerticalFlow && (
+          <div
             className={cn(
-              hasLeftChildren(node.id) || isLeftChildrenCollapsed
+              'absolute z-[10000] flex flex-col items-center justify-center gap-1 rounded-sm transition-all duration-200',
+              'left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+24px)]',
+              (isMouseOver || selected || isLeftChildrenCollapsed) &&
+                (canCreateTop || hasLeftChildren(node.id) || isLeftChildrenCollapsed)
                 ? 'visible opacity-100'
                 : 'invisible opacity-0'
             )}
           >
-            <Button
-              onClick={() => {
-                if (isLeftChildrenCollapsed) expand(node.id, SIDE.LEFT);
-                else collapse(node.id, SIDE.LEFT);
-              }}
-              variant="secondary"
-              className={cn('cursor-pointer rounded-full transition-all duration-200')}
+            {canEdit && (
+              <Button
+                variant="secondary"
+                className={cn('cursor-pointer rounded-full transition-all duration-200')}
+                onClick={() => {
+                  addChildNode(SIDE.TOP, MINDMAP_TYPES.TEXT_NODE);
+                }}
+              >
+                <Plus />
+              </Button>
+            )}
+            {/* Collapse/expand button - visible in View Mode */}
+            <motion.div
+              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+              className={cn(
+                hasLeftChildren(node.id) || isLeftChildrenCollapsed
+                  ? 'visible opacity-100'
+                  : 'invisible opacity-0'
+              )}
             >
-              <Minus />
-            </Button>
-          </motion.div>
-        </div>
-      )}
+              <Button
+                onClick={() => {
+                  if (isLeftChildrenCollapsed) expand(node.id, SIDE.LEFT);
+                  else collapse(node.id, SIDE.LEFT);
+                }}
+                variant="secondary"
+                className={cn('cursor-pointer rounded-full transition-all duration-200')}
+              >
+                <Minus />
+              </Button>
+            </motion.div>
+          </div>
+        )}
 
-      {/* Bottom side button (for vertical layouts) */}
-      {isVerticalFlow && (
-        <div
-          className={cn(
-            'absolute z-[10000] flex flex-col items-center justify-center gap-1 rounded-sm transition-all duration-200',
-            'bottom-0 left-1/2 -translate-x-1/2 translate-y-[calc(100%+24px)]',
-            (isMouseOver || selected) &&
-              (canCreateBottom || hasRightChildren(node.id) || isRightChildrenCollapsed)
-              ? 'visible opacity-100'
-              : 'invisible opacity-0'
-          )}
-        >
-          {/* Collapse/expand button - visible in View Mode */}
-          <motion.div
-            whileTap={{ scale: 0.95 }}
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+        {/* Bottom side button (for vertical layouts) */}
+        {isVerticalFlow && (
+          <div
             className={cn(
-              hasRightChildren(node.id) || isRightChildrenCollapsed
+              'absolute z-[10000] flex flex-col items-center justify-center gap-1 rounded-sm transition-all duration-200',
+              'bottom-0 left-1/2 -translate-x-1/2 translate-y-[calc(100%+24px)]',
+              (isMouseOver || selected || isRightChildrenCollapsed) &&
+                (canCreateBottom || hasRightChildren(node.id) || isRightChildrenCollapsed)
                 ? 'visible opacity-100'
                 : 'invisible opacity-0'
             )}
           >
-            <Button
-              onClick={() => {
-                if (isRightChildrenCollapsed) expand(node.id, SIDE.RIGHT);
-                else collapse(node.id, SIDE.RIGHT);
-              }}
-              variant="secondary"
-              className={cn('cursor-pointer rounded-full transition-all duration-200')}
+            {/* Collapse/expand button - visible in View Mode */}
+            <motion.div
+              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+              className={cn(
+                hasRightChildren(node.id) || isRightChildrenCollapsed
+                  ? 'visible opacity-100'
+                  : 'invisible opacity-0'
+              )}
             >
-              <Minus />
-            </Button>
-          </motion.div>
-          {canEdit && (
-            <Button
-              variant="secondary"
-              className={cn('cursor-pointer rounded-full transition-all duration-200')}
-              onClick={() => {
-                addChildNode(SIDE.BOTTOM, MINDMAP_TYPES.TEXT_NODE);
-              }}
-            >
-              <Plus />
-            </Button>
-          )}
-        </div>
-      )}
-    </>
-  );
-};
+              <Button
+                onClick={() => {
+                  if (isRightChildrenCollapsed) expand(node.id, SIDE.RIGHT);
+                  else collapse(node.id, SIDE.RIGHT);
+                }}
+                variant="secondary"
+                className={cn('cursor-pointer rounded-full transition-all duration-200')}
+              >
+                <Minus />
+              </Button>
+            </motion.div>
+            {canEdit && (
+              <Button
+                variant="secondary"
+                className={cn('cursor-pointer rounded-full transition-all duration-200')}
+                onClick={() => {
+                  addChildNode(SIDE.BOTTOM, MINDMAP_TYPES.TEXT_NODE);
+                }}
+              >
+                <Plus />
+              </Button>
+            )}
+          </div>
+        )}
+      </>
+    );
+  },
+  (prevProps, nextProps) => {
+    // Only re-render if node ID, selection state, side, or type changed
+    return (
+      prevProps.node.id === nextProps.node.id &&
+      prevProps.selected === nextProps.selected &&
+      prevProps.node.data.side === nextProps.node.data.side &&
+      prevProps.node.type === nextProps.node.type &&
+      prevProps.node.data.collapsedChildren === nextProps.node.data.collapsedChildren
+    );
+  }
+);
 
 export const NodeHandlers = memo(
   ({ layoutType, side, id }: { layoutType: LayoutType; side: Side; id: string }) => {
@@ -357,10 +361,6 @@ export const NodeHandlers = memo(
 
     useEffect(() => {
       updateNodeInternals(id);
-
-      const timerId = setTimeout(() => {
-        updateNodeInternals(id);
-      }, 0);
 
       const timerId2 = setTimeout(() => {
         updateNodeInternals(id);
@@ -371,7 +371,6 @@ export const NodeHandlers = memo(
       }, 2000);
 
       return () => {
-        clearTimeout(timerId);
         clearTimeout(timerId2);
         clearTimeout(timerId3);
       };
@@ -538,5 +537,15 @@ export const NodeHandlers = memo(
         />
       </>
     );
+  },
+  (prevProps, nextProps) => {
+    // Only re-render if layout type, side, or id changed
+    return (
+      prevProps.layoutType === nextProps.layoutType &&
+      prevProps.side === nextProps.side &&
+      prevProps.id === nextProps.id
+    );
   }
 );
+
+NodeHandlers.displayName = 'NodeHandlers';

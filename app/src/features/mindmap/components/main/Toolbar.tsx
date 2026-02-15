@@ -1,6 +1,7 @@
 import { GitBranchPlus, Undo, Redo, Save, Sparkles, Download, Share2, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/ui/tabs';
+import { memo } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,13 +13,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/shared/components/ui/alert-dialog';
-import { useUndoRedoStore, useNodeOperationsStore } from '../../stores';
+import { useUndoRedoStore, useNodeOperationsStore, useCoreStore } from '../../stores';
 import { useSavingStore } from '../../stores/saving';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
-import { useSaveMindmap, useNodeSelection } from '../../hooks';
 import { useDuplicateMindmap } from '../../hooks/useApi';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ExportMindmapDialog from '../export';
 import { GenerateTreeDialog } from '../generate';
@@ -30,299 +30,350 @@ import { TreePanelContent } from '../tree-panel';
 import { CommentDrawer } from '@/features/comments';
 import { PermissionBadge } from '@/shared/components/common/PermissionBadge';
 import type { Permission } from '@/shared/utils/permission';
+import { useSaveMindmap } from '../../hooks';
 
-const Toolbar = ({
-  mindmapId,
-  isMobileSheet = false,
-  permission,
-}: {
-  mindmapId: string;
-  isMobileSheet?: boolean;
-  permission?: Permission;
-}) => {
-  const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
-  const navigate = useNavigate();
-  const addNode = useNodeOperationsStore((state) => state.addNode);
-  const undo = useUndoRedoStore((state) => state.undo);
-  const redo = useUndoRedoStore((state) => state.redo);
-  const canUndo = useUndoRedoStore((state) => !state.undoStack.isEmpty());
-  const canRedo = useUndoRedoStore((state) => !state.redoStack.isEmpty());
+// Memoized dialogs component to prevent re-renders when Toolbar state changes
+const ToolbarDialogs = memo(
+  ({
+    mindmapId,
+    isExportDialogOpen,
+    onExportDialogOpenChange,
+    isGenerateDialogOpen,
+    onGenerateDialogOpenChange,
+    isShareDialogOpen,
+    onShareDialogOpenChange,
+    isCommentDrawerOpen,
+    onCommentDrawerOpenChange,
+    permission,
+  }: {
+    mindmapId: string;
+    isExportDialogOpen: boolean;
+    onExportDialogOpenChange: (open: boolean) => void;
+    isGenerateDialogOpen: boolean;
+    onGenerateDialogOpenChange: (open: boolean) => void;
+    isShareDialogOpen: boolean;
+    onShareDialogOpenChange: (open: boolean) => void;
+    isCommentDrawerOpen: boolean;
+    onCommentDrawerOpenChange: (open: boolean) => void;
+    permission?: Permission;
+  }) => (
+    <>
+      <ExportMindmapDialog isOpen={isExportDialogOpen} onOpenChange={onExportDialogOpenChange} />
+      <GenerateTreeDialog isOpen={isGenerateDialogOpen} onOpenChange={onGenerateDialogOpenChange} />
+      <ShareMindmapDialog
+        isOpen={isShareDialogOpen}
+        onOpenChange={onShareDialogOpenChange}
+        mindmapId={mindmapId}
+      />
+      <CommentDrawer
+        isOpen={isCommentDrawerOpen}
+        onOpenChange={onCommentDrawerOpenChange}
+        documentId={mindmapId}
+        documentType="mindmap"
+        userPermission={permission || 'read'}
+      />
+    </>
+  )
+);
 
-  // Selection state
-  const { selectedCount, hasSelection } = useNodeSelection();
+ToolbarDialogs.displayName = 'ToolbarDialogs';
 
-  // Permission state
-  const userPermission = permission;
+const Toolbar = memo(
+  ({
+    mindmapId,
+    isMobileSheet = false,
+    permission,
+  }: {
+    mindmapId: string;
+    isMobileSheet?: boolean;
+    permission?: Permission;
+  }) => {
+    const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
+    const navigate = useNavigate();
+    const addNode = useNodeOperationsStore((state) => state.addNode);
+    const undo = useUndoRedoStore((state) => state.undo);
+    const redo = useUndoRedoStore((state) => state.redo);
+    const canUndo = useUndoRedoStore((state) => !state.undoStack.isEmpty());
+    const canRedo = useUndoRedoStore((state) => !state.redoStack.isEmpty());
 
-  // Save and Export states
-  const { saveWithThumbnail, isLoading: isSaving } = useSaveMindmap();
-  const duplicateMutation = useDuplicateMindmap();
-  const setIsDuplicating = useSavingStore((state) => state.setIsDuplicating);
+    // Selection state
+    // Selection state - usage of useNodeSelection hook causes re-renders on every node change (e.g. drag)
+    // because it returns a new array of selected nodes.
+    // We only need the count and existence here.
+    const selectedCount = useCoreStore((state) => state.selectedNodeIds.size);
+    const hasSelection = selectedCount > 0;
 
-  // Handle duplicate with navigation
-  const handleDuplicate = useCallback(async () => {
-    setIsDuplicating(true);
-    try {
-      const duplicated = await duplicateMutation.mutateAsync(mindmapId);
-      navigate(`/mindmap/${duplicated.id}`);
-    } catch (error) {
-      console.error('Duplicate failed:', error);
-    } finally {
-      setIsDuplicating(false);
-    }
-  }, [mindmapId, duplicateMutation, navigate, setIsDuplicating]);
-  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
-  const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
-  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
-  const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>('general');
+    // Permission state
+    const userPermission = permission;
 
-  // Auto-switch to general tab when selection is cleared or to selection tab when selection exists
-  useEffect(() => {
-    if (!hasSelection && activeTab === 'selection') {
-      setActiveTab('general');
-    }
+    // Save and Export states
+    const { saveWithThumbnail, isLoading: isSaving } = useSaveMindmap();
+    const duplicateMutation = useDuplicateMindmap();
+    const setIsDuplicating = useSavingStore((state) => state.setIsDuplicating);
 
-    if (hasSelection && activeTab === 'general') {
-      setActiveTab('selection');
-    }
-  }, [hasSelection, activeTab]);
+    // Handle duplicate with navigation
+    const handleDuplicate = useCallback(async () => {
+      setIsDuplicating(true);
+      try {
+        const duplicated = await duplicateMutation.mutateAsync(mindmapId);
+        navigate(`/mindmap/${duplicated.id}`);
+      } catch (error) {
+        console.error('Duplicate failed:', error);
+      } finally {
+        setIsDuplicating(false);
+      }
+    }, [mindmapId, duplicateMutation, navigate, setIsDuplicating]);
+    const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+    const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
+    const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+    const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState<string>('general');
+    const hasShownSelectionTabRef = useRef(false);
 
-  return (
-    <div
-      className={cn(
-        'flex flex-col gap-2 p-4',
-        isMobileSheet
-          ? 'w-full bg-transparent'
-          : 'w-[400px] overflow-x-hidden border-l border-gray-200 bg-gradient-to-b from-white to-slate-50/95 shadow-lg backdrop-blur-md'
-      )}
-    >
-      {/* Header - Hide on mobile (shown in SheetHeader instead) */}
-      {!isMobileSheet && (
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-gray-800">{t('toolbar.title')}</h2>
-          {userPermission && <PermissionBadge permission={userPermission} />}
-        </div>
-      )}
+    // Auto-switch to selection tab only once when selection first exists
+    // Use ref to prevent multiple re-renders from repeated tab switches
+    useEffect(() => {
+      if (hasSelection && !hasShownSelectionTabRef.current) {
+        hasShownSelectionTabRef.current = true;
+        setActiveTab('selection');
+      } else if (!hasSelection && hasShownSelectionTabRef.current) {
+        hasShownSelectionTabRef.current = false;
+        setActiveTab('general');
+      }
+    }, [hasSelection]);
 
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-1 flex-col">
-        <TabsList className={cn('grid w-full grid-cols-3', isMobileSheet ? 'h-12' : 'h-10')}>
-          <TabsTrigger value="general" className={cn(isMobileSheet ? 'text-base' : 'text-sm')}>
-            {t('toolbar.tabs.general')}
-          </TabsTrigger>
-          <TabsTrigger
-            value="selection"
-            className={cn(hasSelection && 'relative', isMobileSheet ? 'text-base' : 'text-sm')}
-          >
-            {t('toolbar.tabs.selection')}
-            {hasSelection && (
-              <span
-                className={cn(
-                  'ml-1 inline-flex items-center justify-center rounded-full bg-blue-500 text-white',
-                  isMobileSheet ? 'h-6 w-6 text-sm' : 'h-5 w-5 text-xs'
-                )}
-              >
-                {selectedCount}
-              </span>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="tree" className={cn(isMobileSheet ? 'text-base' : 'text-sm')}>
-            {t('toolbar.tabs.tree')}
-          </TabsTrigger>
-        </TabsList>
-
-        {/* General Tab Content */}
-        <TabsContent value="general" className="mt-4 flex-1 space-y-4">
-          {/* Node Operations Section */}
-          <div className="space-y-2">
-            <h3 className="mb-2 border-b border-gray-200 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-700">
-              {t('toolbar.sections.nodeOperations')}
-            </h3>
-            <div className="space-y-2">
-              <Button
-                onClick={() => {
-                  addNode();
-                }}
-                title={t('toolbar.tooltips.addTree')}
-                variant="default"
-                size="sm"
-                className={cn(
-                  'w-full transition-colors hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500',
-                  isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
-                )}
-              >
-                <GitBranchPlus size={isMobileSheet ? 20 : 16} />
-                {t('toolbar.actions.addTree')}
-              </Button>
-              <Button
-                onClick={() => setIsGenerateDialogOpen(true)}
-                title={t('toolbar.tooltips.generateTree')}
-                variant="outline"
-                size="sm"
-                className={cn(
-                  'w-full gap-2 transition-colors hover:border-purple-400 hover:bg-purple-50 hover:text-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500',
-                  isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
-                )}
-              >
-                <Sparkles size={isMobileSheet ? 20 : 16} />
-                {t('toolbar.actions.generateTree')}
-              </Button>
-            </div>
+    return (
+      <div
+        className={cn(
+          'flex flex-col gap-2 p-4',
+          isMobileSheet
+            ? 'w-full bg-transparent'
+            : 'w-[400px] overflow-x-hidden border-l border-gray-200 bg-gradient-to-b from-white to-slate-50/95 shadow-lg backdrop-blur-md'
+        )}
+      >
+        {/* Header - Hide on mobile (shown in SheetHeader instead) */}
+        {!isMobileSheet && (
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-gray-800">{t('toolbar.title')}</h2>
+            {userPermission && <PermissionBadge permission={userPermission} />}
           </div>
+        )}
 
-          {/* History Section */}
-          <div className="space-y-2">
-            <h3 className="mb-2 border-b border-gray-200 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-700">
-              {t('toolbar.sections.history')}
-            </h3>
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-1 flex-col">
+          <TabsList className={cn('grid w-full grid-cols-3', isMobileSheet ? 'h-12' : 'h-10')}>
+            <TabsTrigger value="general" className={cn(isMobileSheet ? 'text-base' : 'text-sm')}>
+              {t('toolbar.tabs.general')}
+            </TabsTrigger>
+            <TabsTrigger
+              value="selection"
+              className={cn(hasSelection && 'relative', isMobileSheet ? 'text-base' : 'text-sm')}
+            >
+              {t('toolbar.tabs.selection')}
+              {hasSelection && (
+                <span
+                  className={cn(
+                    'ml-1 inline-flex items-center justify-center rounded-full bg-blue-500 text-white',
+                    isMobileSheet ? 'h-6 w-6 text-sm' : 'h-5 w-5 text-xs'
+                  )}
+                >
+                  {selectedCount}
+                </span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="tree" className={cn(isMobileSheet ? 'text-base' : 'text-sm')}>
+              {t('toolbar.tabs.tree')}
+            </TabsTrigger>
+          </TabsList>
+
+          {/* General Tab Content */}
+          <TabsContent value="general" className="mt-4 flex-1 space-y-4">
+            {/* Node Operations Section */}
             <div className="space-y-2">
-              <Button
-                variant="outline"
-                onClick={undo}
-                disabled={!canUndo}
-                title={t('toolbar.tooltips.undo')}
-                size="sm"
-                className={cn(
-                  'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50',
-                  isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
-                )}
-              >
-                <Undo size={isMobileSheet ? 20 : 16} />
-                {t('toolbar.actions.undo')}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={redo}
-                disabled={!canRedo}
-                title={t('toolbar.tooltips.redo')}
-                size="sm"
-                className={cn(
-                  'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50',
-                  isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
-                )}
-              >
-                <Redo size={isMobileSheet ? 20 : 16} />
-                {t('toolbar.actions.redo')}
-              </Button>
+              <h3 className="mb-2 border-b border-gray-200 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-700">
+                {t('toolbar.sections.nodeOperations')}
+              </h3>
+              <div className="space-y-2">
+                <Button
+                  onClick={() => {
+                    addNode();
+                  }}
+                  title={t('toolbar.tooltips.addTree')}
+                  variant="default"
+                  size="sm"
+                  className={cn(
+                    'w-full transition-colors hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500',
+                    isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
+                  )}
+                >
+                  <GitBranchPlus size={isMobileSheet ? 20 : 16} />
+                  {t('toolbar.actions.addTree')}
+                </Button>
+                <Button
+                  onClick={() => setIsGenerateDialogOpen(true)}
+                  title={t('toolbar.tooltips.generateTree')}
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    'w-full gap-2 transition-colors hover:border-purple-400 hover:bg-purple-50 hover:text-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500',
+                    isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
+                  )}
+                >
+                  <Sparkles size={isMobileSheet ? 20 : 16} />
+                  {t('toolbar.actions.generateTree')}
+                </Button>
+              </div>
             </div>
-          </div>
 
-          {/* Utilities Section */}
-          <div className="space-y-2">
-            <h3 className="mb-2 border-b border-gray-200 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-700">
-              {t('toolbar.sections.utilities')}
-            </h3>
+            {/* History Section */}
             <div className="space-y-2">
-              <LoadingButton
-                variant="outline"
-                onClick={async () => await saveWithThumbnail(mindmapId)}
-                loading={isSaving}
-                loadingText={t('toolbar.save.saving')}
-                className={cn(
-                  'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500',
-                  isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
-                )}
-                title={t('toolbar.tooltips.saveMindmap')}
-                size="sm"
-              >
-                <Save size={isMobileSheet ? 20 : 16} />
-                {t('toolbar.save.save')}
-              </LoadingButton>
-              <Button
-                variant="outline"
-                onClick={() => setIsExportDialogOpen(true)}
-                className={cn(
-                  'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500',
-                  isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
-                )}
-                size="sm"
-              >
-                <Download size={isMobileSheet ? 20 : 16} />
-                {t('toolbar.export.export')}
-              </Button>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    disabled={duplicateMutation.isPending}
-                    className={cn(
-                      'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50',
-                      isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
-                    )}
-                    size="sm"
-                    title={t('toolbar.actions.duplicate')}
-                  >
-                    <Copy size={isMobileSheet ? 20 : 16} />
-                    {duplicateMutation.isPending ? t('toolbar.save.saving') : t('toolbar.actions.duplicate')}
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>{t('toolbar.actions.duplicate')}</AlertDialogTitle>
-                    <AlertDialogDescription>{t('toolbar.actions.duplicateConfirm')}</AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>{t('toolbar.actions.cancel')}</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDuplicate}>
-                      {t('toolbar.actions.confirm')}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-              {userPermission === 'edit' && (
+              <h3 className="mb-2 border-b border-gray-200 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-700">
+                {t('toolbar.sections.history')}
+              </h3>
+              <div className="space-y-2">
                 <Button
                   variant="outline"
-                  onClick={() => setIsShareDialogOpen(true)}
+                  onClick={undo}
+                  disabled={!canUndo}
+                  title={t('toolbar.tooltips.undo')}
+                  size="sm"
                   className={cn(
-                    'w-full transition-colors hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500',
+                    'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50',
+                    isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
+                  )}
+                >
+                  <Undo size={isMobileSheet ? 20 : 16} />
+                  {t('toolbar.actions.undo')}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={redo}
+                  disabled={!canRedo}
+                  title={t('toolbar.tooltips.redo')}
+                  size="sm"
+                  className={cn(
+                    'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50',
+                    isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
+                  )}
+                >
+                  <Redo size={isMobileSheet ? 20 : 16} />
+                  {t('toolbar.actions.redo')}
+                </Button>
+              </div>
+            </div>
+
+            {/* Utilities Section */}
+            <div className="space-y-2">
+              <h3 className="mb-2 border-b border-gray-200 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-700">
+                {t('toolbar.sections.utilities')}
+              </h3>
+              <div className="space-y-2">
+                <LoadingButton
+                  variant="outline"
+                  onClick={async () => await saveWithThumbnail(mindmapId)}
+                  loading={isSaving}
+                  loadingText={t('toolbar.save.saving')}
+                  className={cn(
+                    'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500',
+                    isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
+                  )}
+                  title={t('toolbar.tooltips.saveMindmap')}
+                  size="sm"
+                >
+                  <Save size={isMobileSheet ? 20 : 16} />
+                  {t('toolbar.save.save')}
+                </LoadingButton>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsExportDialogOpen(true)}
+                  className={cn(
+                    'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500',
                     isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
                   )}
                   size="sm"
-                  title={t('toolbar.tooltips.share')}
                 >
-                  <Share2 size={isMobileSheet ? 20 : 16} />
-                  {t('toolbar.actions.share')}
+                  <Download size={isMobileSheet ? 20 : 16} />
+                  {t('toolbar.export.export')}
                 </Button>
-              )}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      disabled={duplicateMutation.isPending}
+                      className={cn(
+                        'w-full transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50',
+                        isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
+                      )}
+                      size="sm"
+                      title={t('toolbar.actions.duplicate')}
+                    >
+                      <Copy size={isMobileSheet ? 20 : 16} />
+                      {duplicateMutation.isPending
+                        ? t('toolbar.save.saving')
+                        : t('toolbar.actions.duplicate')}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>{t('toolbar.actions.duplicate')}</AlertDialogTitle>
+                      <AlertDialogDescription>{t('toolbar.actions.duplicateConfirm')}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>{t('toolbar.actions.cancel')}</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDuplicate}>
+                        {t('toolbar.actions.confirm')}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+                {userPermission === 'edit' && (
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsShareDialogOpen(true)}
+                    className={cn(
+                      'w-full transition-colors hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500',
+                      isMobileSheet ? 'h-11 min-h-[44px] text-base' : 'h-9 text-sm'
+                    )}
+                    size="sm"
+                    title={t('toolbar.tooltips.share')}
+                  >
+                    <Share2 size={isMobileSheet ? 20 : 16} />
+                    {t('toolbar.actions.share')}
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
-        </TabsContent>
+          </TabsContent>
 
-        {/* Selection Tab Content */}
-        <TabsContent value="selection" className="mt-4 flex-1">
-          <NodeSelectionTab />
-        </TabsContent>
+          {/* Selection Tab Content */}
+          <TabsContent value="selection" className="mt-4 flex-1">
+            <NodeSelectionTab />
+          </TabsContent>
 
-        {/* Tree Tab Content */}
-        <TabsContent value="tree" className="mt-4 flex-1 overflow-hidden">
-          <TreePanelContent />
-        </TabsContent>
-      </Tabs>
+          {/* Tree Tab Content */}
+          <TabsContent value="tree" className="mt-4 flex-1 overflow-hidden">
+            <TreePanelContent />
+          </TabsContent>
+        </Tabs>
 
-      {/* Export Dialog */}
-      <ExportMindmapDialog isOpen={isExportDialogOpen} onOpenChange={setIsExportDialogOpen} />
+        {/* Dialogs and Drawers */}
+        <ToolbarDialogs
+          mindmapId={mindmapId}
+          isExportDialogOpen={isExportDialogOpen}
+          onExportDialogOpenChange={setIsExportDialogOpen}
+          isGenerateDialogOpen={isGenerateDialogOpen}
+          onGenerateDialogOpenChange={setIsGenerateDialogOpen}
+          isShareDialogOpen={isShareDialogOpen}
+          onShareDialogOpenChange={setIsShareDialogOpen}
+          isCommentDrawerOpen={isCommentDrawerOpen}
+          onCommentDrawerOpenChange={setIsCommentDrawerOpen}
+          permission={userPermission}
+        />
+      </div>
+    );
+  }
+);
 
-      {/* Generate Tree Dialog */}
-      <GenerateTreeDialog isOpen={isGenerateDialogOpen} onOpenChange={setIsGenerateDialogOpen} />
-
-      {/* Share Dialog */}
-      <ShareMindmapDialog
-        isOpen={isShareDialogOpen}
-        onOpenChange={setIsShareDialogOpen}
-        mindmapId={mindmapId}
-      />
-
-      {/* Comment Drawer */}
-      <CommentDrawer
-        isOpen={isCommentDrawerOpen}
-        onOpenChange={setIsCommentDrawerOpen}
-        documentId={mindmapId}
-        documentType="mindmap"
-        userPermission={userPermission || 'read'}
-      />
-    </div>
-  );
-};
+Toolbar.displayName = 'Toolbar';
 
 export default Toolbar;

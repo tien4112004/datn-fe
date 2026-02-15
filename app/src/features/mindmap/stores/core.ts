@@ -14,6 +14,7 @@ export interface CoreState {
   // Multi-tree layout type caching
   nodeToRootMap: Map<string, string>; // nodeId → rootId
   rootLayoutTypeMap: Map<string, LayoutType>; // rootId → layoutType
+  childrenSidesMap: Map<string, { hasLeft: boolean; hasRight: boolean }>; // nodeId → children sides
   onNodesChange: (changes: any) => void;
   onEdgesChange: (changes: any) => void;
   onConnect: (connection: Connection) => void;
@@ -84,6 +85,34 @@ const buildRootLayoutTypeMapping = (nodes: MindMapNode[]): Map<string, LayoutTyp
   return map;
 };
 
+/**
+ * Build mapping of which sides each node has children on
+ * Only runs when node structure changes (not selection)
+ */
+const buildChildrenSidesMapping = (
+  nodes: MindMapNode[]
+): Map<string, { hasLeft: boolean; hasRight: boolean }> => {
+  const map = new Map<string, { hasLeft: boolean; hasRight: boolean }>();
+
+  // Initialize all nodes with no children
+  nodes.forEach((node) => {
+    map.set(node.id, { hasLeft: false, hasRight: false });
+  });
+
+  // Mark which sides have children
+  nodes.forEach((node) => {
+    if (node.data.parentId) {
+      const parent = map.get(node.data.parentId);
+      if (parent) {
+        if (node.data.side === SIDE.LEFT) parent.hasLeft = true;
+        if (node.data.side === SIDE.RIGHT) parent.hasRight = true;
+      }
+    }
+  });
+
+  return map;
+};
+
 export const useCoreStore = create<CoreState>()(
   devtools(
     persist(
@@ -93,6 +122,7 @@ export const useCoreStore = create<CoreState>()(
         selectedNodeIds: new Set<string>(),
         nodeToRootMap: new Map(),
         rootLayoutTypeMap: new Map(),
+        childrenSidesMap: new Map(),
 
         onNodesChange: (changes) => {
           set(
@@ -124,11 +154,15 @@ export const useCoreStore = create<CoreState>()(
               const rootLayoutTypeMap = hasStructureChange
                 ? buildRootLayoutTypeMapping(newNodes)
                 : state.rootLayoutTypeMap;
+              const childrenSidesMap = hasStructureChange
+                ? buildChildrenSidesMapping(newNodes)
+                : state.childrenSidesMap;
 
               return {
                 nodes: newNodes,
                 nodeToRootMap,
                 rootLayoutTypeMap,
+                childrenSidesMap,
                 selectedNodeIds,
               };
             },
@@ -186,12 +220,14 @@ export const useCoreStore = create<CoreState>()(
               // Rebuild mappings when nodes change
               const nodeToRootMap = buildNodeToRootMapping(newNodes);
               const rootLayoutTypeMap = buildRootLayoutTypeMapping(newNodes);
+              const childrenSidesMap = buildChildrenSidesMapping(newNodes);
 
               return {
                 nodes: newNodes,
                 selectedNodeIds: newSelectedNodeIds,
                 nodeToRootMap,
                 rootLayoutTypeMap,
+                childrenSidesMap,
               };
             },
             false,
@@ -231,13 +267,11 @@ export const useCoreStore = create<CoreState>()(
         },
 
         hasLeftChildren: (nodeId: string) => {
-          const { nodes } = get();
-          return nodes.some((node) => node.data.parentId === nodeId && node.data.side === SIDE.LEFT);
+          return get().childrenSidesMap.get(nodeId)?.hasLeft ?? false;
         },
 
         hasRightChildren: (nodeId: string) => {
-          const { nodes } = get();
-          return nodes.some((node) => node.data.parentId === nodeId && node.data.side === SIDE.RIGHT);
+          return get().childrenSidesMap.get(nodeId)?.hasRight ?? false;
         },
 
         selectAllNodesAndEdges: () => {
@@ -295,6 +329,7 @@ export const useCoreStore = create<CoreState>()(
               const nodes = state.nodes || [];
               const nodeToRootMap = buildNodeToRootMapping(nodes);
               const rootLayoutTypeMap = buildRootLayoutTypeMapping(nodes);
+              const childrenSidesMap = buildChildrenSidesMapping(nodes);
 
               return {
                 ...value,
@@ -303,6 +338,7 @@ export const useCoreStore = create<CoreState>()(
                   selectedNodeIds: new Set(state.selectedNodeIds || []),
                   nodeToRootMap,
                   rootLayoutTypeMap,
+                  childrenSidesMap,
                 },
               };
             }

@@ -1,4 +1,5 @@
 import { Trash2, Copy, Plus, Palette, GitBranch, MousePointerClick, ChevronDown } from 'lucide-react';
+import { memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/shared/components/ui/label';
 import { Checkbox } from '@/shared/components/ui/checkbox';
@@ -43,7 +44,7 @@ const selectIsAutoLayoutEnabled = (state: any) => {
   return Boolean(rootNode?.data?.forceLayout ?? false);
 };
 
-const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
+const NodeSelectionTab = memo(({ className }: NodeSelectionTabProps) => {
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
   const {
     selectedNodes,
@@ -524,6 +525,8 @@ const NodeSelectionTab = ({ className }: NodeSelectionTabProps) => {
       </div>
     </div>
   );
-};
+});
+
+NodeSelectionTab.displayName = 'NodeSelectionTab';
 
 export default NodeSelectionTab;

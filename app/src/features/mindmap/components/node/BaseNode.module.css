@@ -3,7 +3,8 @@
     @apply bg-card text-card-foreground border-border hover:ring-ring relative rounded-md border-2 shadow-md transition-shadow hover:ring-1;
   }
 
-  .base-node-card.layouting {
+  /* Use :global to target the class added to the parent container in Flow.tsx */
+  :global(.layouting-mode) .base-node-card {
     @apply shadow-lg ring-2 ring-blue-300;
   }
 
@@ -12,14 +13,14 @@
   }
 
   .react-flow__node.selected .base-node-card {
-    @apply shadow-lg ring-2 ring-blue-500;
+    @apply shadow-lg ring-blue-500;
   }
 
   .root-node-card {
     @apply border-primary from-primary/5 to-primary/10 text-card-foreground hover:ring-primary/50 relative rounded-lg border-2 bg-gradient-to-br shadow-lg transition-all hover:ring-2;
   }
 
-  .root-node-card.layouting {
+  :global(.layouting-mode) .root-node-card {
     @apply shadow-xl ring-2 ring-blue-300;
   }
 
@@ -28,6 +29,6 @@
   }
 
   .react-flow__node.selected .root-node-card {
-    @apply ring-primary shadow-xl ring-2;
+    @apply ring-primary shadow-xl;
   }
 }

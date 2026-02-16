@@ -19,6 +19,7 @@ import type {
   UpdateQuestionPayload,
 } from '@/types/questionBank';
 import type { Context } from '@/types/context';
+import type { TokenUsageFilterRequest } from '@/types/tokenUsage';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -85,6 +86,14 @@ export const adminKeys = {
     all: ['matrix-templates'] as const,
     list: (params?: MatrixTemplateParams) => [...adminKeys.matrixTemplates.all, 'list', params] as const,
     detail: (id: string) => [...adminKeys.matrixTemplates.all, 'detail', id] as const,
+  },
+  // Token Usage
+  tokenUsage: {
+    all: ['token-usage'] as const,
+    stats: (userId: string, filters?: TokenUsageFilterRequest) =>
+      [...adminKeys.tokenUsage.all, 'stats', userId, filters] as const,
+    byModel: (userId: string) => [...adminKeys.tokenUsage.all, 'by-model', userId] as const,
+    byRequestType: (userId: string) => [...adminKeys.tokenUsage.all, 'by-request-type', userId] as const,
   },
 };
 
@@ -783,5 +792,37 @@ export function useDeleteMatrixTemplate() {
         description: error instanceof Error ? error.message : 'An error occurred',
       });
     },
+  });
+}
+
+// ============= TOKEN USAGE =============
+
+export function useTokenUsageStats(userId: string, filters?: TokenUsageFilterRequest) {
+  return useQuery({
+    queryKey: adminKeys.tokenUsage.stats(userId, filters),
+    queryFn: () => getAdminApiService().getTokenUsageStats(userId, filters),
+    enabled: !!userId,
+    staleTime: 30000,
+    gcTime: 300000,
+  });
+}
+
+export function useTokenUsageByModel(userId: string) {
+  return useQuery({
+    queryKey: adminKeys.tokenUsage.byModel(userId),
+    queryFn: () => getAdminApiService().getTokenUsageByModel(userId),
+    enabled: !!userId,
+    staleTime: 30000,
+    gcTime: 300000,
+  });
+}
+
+export function useTokenUsageByRequestType(userId: string) {
+  return useQuery({
+    queryKey: adminKeys.tokenUsage.byRequestType(userId),
+    queryFn: () => getAdminApiService().getTokenUsageByRequestType(userId),
+    enabled: !!userId,
+    staleTime: 30000,
+    gcTime: 300000,
   });
 }

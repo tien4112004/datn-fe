@@ -53,6 +53,28 @@ export function UsersPage() {
         header: 'Phone',
         cell: (info) => info.getValue() || '-',
       }),
+      columnHelper.accessor('totalCoin', {
+        header: 'Total Coins',
+        cell: (info) => {
+          const value = info.getValue();
+          return value ? (
+            <span className="font-medium text-amber-600">{parseInt(value).toLocaleString()}</span>
+          ) : (
+            '-'
+          );
+        },
+      }),
+      columnHelper.accessor('totalMoney', {
+        header: 'Total Spent ($)',
+        cell: (info) => {
+          const value = info.getValue();
+          return value ? (
+            <span className="font-medium text-green-600">${parseFloat(value).toFixed(2)}</span>
+          ) : (
+            '-'
+          );
+        },
+      }),
       columnHelper.accessor('createdAt', {
         header: 'Created',
         cell: (info) => {

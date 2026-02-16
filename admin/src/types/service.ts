@@ -27,6 +27,7 @@ import type {
   CoinPricingQueryParams,
   EnumOption,
 } from './coin';
+import type { TokenUsageStats, TokenUsageFilterRequest } from './tokenUsage';
 
 /**
  * Base service interface that all API services must extend
@@ -123,4 +124,9 @@ export interface AdminApiService extends Service {
   createMatrixTemplate(data: Partial<MatrixTemplate>): Promise<ApiResponse<MatrixTemplate>>;
   updateMatrixTemplate(id: string, data: Partial<MatrixTemplate>): Promise<ApiResponse<MatrixTemplate>>;
   deleteMatrixTemplate(id: string): Promise<ApiResponse<void>>;
+
+  // Token Usage
+  getTokenUsageStats(userId: string, filters?: TokenUsageFilterRequest): Promise<ApiResponse<TokenUsageStats>>;
+  getTokenUsageByModel(userId: string): Promise<ApiResponse<TokenUsageStats[]>>;
+  getTokenUsageByRequestType(userId: string): Promise<ApiResponse<TokenUsageStats[]>>;
 }

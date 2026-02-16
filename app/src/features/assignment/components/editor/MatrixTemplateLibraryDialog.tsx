@@ -4,6 +4,8 @@ import { Loader2, Calendar, Grid3x3, FileText } from 'lucide-react';
 import { debounce } from 'lodash';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
+import { Tabs, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
+import { Badge } from '@/shared/components/ui/badge';
 import {
   Dialog,
   DialogContent,
@@ -14,7 +16,7 @@ import {
 } from '@/shared/components/ui/dialog';
 import { cn } from '@/shared/lib/utils';
 import { useInfiniteMatrixTemplateList } from '../../hooks/useMatrixTemplateApi';
-import type { MatrixTemplate } from '../../types/matrixTemplate';
+import type { MatrixTemplate, BankType } from '../../types/matrixTemplate';
 import type { Grade } from '@aiprimary/core/assessment/grades.js';
 import type { SubjectCode } from '@aiprimary/core';
 
@@ -34,10 +36,12 @@ export const MatrixTemplateLibraryDialog = ({
   onImport,
 }: MatrixTemplateLibraryDialogProps) => {
   const { t } = useTranslation('assignment');
+  const { t: tCommon } = useTranslation('common');
 
   const [librarySearch, setLibrarySearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  const [bankType, setBankType] = useState<BankType>('personal'); // Default to personal
 
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -51,7 +55,7 @@ export const MatrixTemplateLibraryDialog = ({
     return () => debouncedSetSearch.cancel();
   }, [debouncedSetSearch]);
 
-  // Fetch templates filtered by current grade and subject
+  // Fetch templates filtered by current grade, subject, and bankType
   const { templates, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteMatrixTemplateList(
       open
@@ -59,6 +63,7 @@ export const MatrixTemplateLibraryDialog = ({
             search: debouncedSearch || undefined,
             subject: currentSubject || undefined,
             grade: currentGrade || undefined,
+            bankType, // Filter by personal or public
           }
         : {}
     );
@@ -69,6 +74,7 @@ export const MatrixTemplateLibraryDialog = ({
       setLibrarySearch('');
       setDebouncedSearch('');
       setSelectedTemplateId(null);
+      setBankType('personal'); // Reset to personal tab
     }
   }, [open]);
 
@@ -132,21 +138,24 @@ export const MatrixTemplateLibraryDialog = ({
     <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{t('matrixTemplateLibrary.title', 'Matrix Template Library')}</DialogTitle>
-          <DialogDescription>
-            {t(
-              'matrixTemplateLibrary.description',
-              'Browse and import matrix templates to quickly set up your assignment structure.'
-            )}
-          </DialogDescription>
+          <DialogTitle>{t('matrixTemplateLibrary.title')}</DialogTitle>
+          <DialogDescription>{t('matrixTemplateLibrary.description')}</DialogDescription>
         </DialogHeader>
+
+        {/* Personal/Public Tabs */}
+        <Tabs value={bankType} onValueChange={(value) => setBankType(value as BankType)}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="personal">{t('matrixTemplateLibrary.tabs.personal')}</TabsTrigger>
+            <TabsTrigger value="public">{t('matrixTemplateLibrary.tabs.public')}</TabsTrigger>
+          </TabsList>
+        </Tabs>
 
         {/* Search and filters */}
         <div className="space-y-3">
           <Input
             value={librarySearch}
             onChange={handleSearchChange}
-            placeholder={t('matrixTemplateLibrary.searchPlaceholder', 'Search templates...')}
+            placeholder={t('matrixTemplateLibrary.searchPlaceholder')}
           />
 
           {/* Filter chips */}
@@ -154,12 +163,12 @@ export const MatrixTemplateLibraryDialog = ({
             <div className="flex gap-2 text-xs">
               {currentGrade && (
                 <span className="rounded-full bg-blue-100 px-2 py-1 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
-                  {t('common.grade', 'Grade')}: {String(currentGrade)}
+                  {tCommon('grade')}: {String(currentGrade)}
                 </span>
               )}
               {currentSubject && (
                 <span className="rounded-full bg-green-100 px-2 py-1 text-green-700 dark:bg-green-900 dark:text-green-300">
-                  {t('common.subject', 'Subject')}: {currentSubject}
+                  {tCommon('subject')}: {currentSubject}
                 </span>
               )}
             </div>
@@ -169,15 +178,10 @@ export const MatrixTemplateLibraryDialog = ({
         {/* Template list */}
         <div className="!max-h-[400px] overflow-y-auto">
           {isLoading && templates.length === 0 ? (
-            <div className="py-8 text-center text-sm text-gray-500">
-              {t('matrixTemplateLibrary.loading', 'Loading templates...')}
-            </div>
+            <div className="py-8 text-center text-sm text-gray-500">{t('matrixTemplateLibrary.loading')}</div>
           ) : templates.length === 0 ? (
             <div className="py-8 text-center text-sm text-gray-500">
-              {t(
-                'matrixTemplateLibrary.noTemplates',
-                'No templates found. Create your first template to reuse it later!'
-              )}
+              {t('matrixTemplateLibrary.noTemplates')}
             </div>
           ) : (
             <div className="space-y-2">
@@ -218,20 +222,29 @@ export const MatrixTemplateLibraryDialog = ({
                         <h4 className="truncate font-medium text-gray-900 dark:text-gray-100">
                           {template.name}
                         </h4>
-                        {!isCompatible && (
-                          <span className="shrink-0 text-xs text-amber-600">Incompatible</span>
-                        )}
+                        <div className="flex gap-2">
+                          {template.ownerId === null && (
+                            <Badge variant="outline" className="shrink-0">
+                              {t('matrixTemplateLibrary.badges.public')}
+                            </Badge>
+                          )}
+                          {!isCompatible && (
+                            <span className="shrink-0 text-xs text-amber-600">
+                              {t('matrixTemplateLibrary.badges.incompatible')}
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       {/* Template metadata */}
                       <div className="mt-1 flex flex-wrap gap-3 text-xs text-gray-500">
                         <span className="flex items-center gap-1">
                           <Grid3x3 className="h-3 w-3" />
-                          {template.totalTopics} topics
+                          {template.totalTopics} {t('matrixTemplateLibrary.metadata.topics')}
                         </span>
                         <span className="flex items-center gap-1">
                           <FileText className="h-3 w-3" />
-                          {template.totalQuestions} questions
+                          {template.totalQuestions} {t('matrixTemplateLibrary.metadata.questions')}
                         </span>
                         <span className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
@@ -263,10 +276,10 @@ export const MatrixTemplateLibraryDialog = ({
 
         <DialogFooter>
           <Button type="button" variant="ghost" size="sm" onClick={handleClose}>
-            {t('common.cancel', 'Cancel')}
+            {tCommon('table.cancel')}
           </Button>
           <Button type="button" size="sm" onClick={handleImportSelected} disabled={!selectedTemplateId}>
-            {t('matrixTemplateLibrary.importTemplate', 'Import Template')}
+            {t('matrixTemplateLibrary.importTemplate')}
           </Button>
         </DialogFooter>
       </DialogContent>

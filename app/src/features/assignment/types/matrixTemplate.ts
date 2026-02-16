@@ -3,11 +3,19 @@ import type { SubjectCode } from '@aiprimary/core';
 import type { ApiMatrix } from './assignment';
 
 /**
+ * Bank type for matrix templates
+ * - personal: User's private templates (ownerId = userId)
+ * - public: System-managed templates (ownerId IS NULL)
+ */
+export type BankType = 'personal' | 'public';
+
+/**
  * Matrix template from API
+ * Note: ownerId is null for public templates, userId for private templates
  */
 export interface MatrixTemplate {
   id: string;
-  ownerId: string;
+  ownerId: string | null; // null for public templates
   name: string;
   subject: SubjectCode;
   grade: Grade;
@@ -25,6 +33,7 @@ export interface MatrixTemplateFilters {
   search?: string;
   subject?: SubjectCode;
   grade?: Grade;
+  bankType?: BankType; // Filter by personal/public
   page?: number;
   pageSize?: number;
 }

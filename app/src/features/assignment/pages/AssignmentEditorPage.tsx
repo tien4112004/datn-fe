@@ -29,7 +29,7 @@ export const AssignmentEditorPage = () => {
   const initialize = useAssignmentFormStore((state) => state.initialize);
 
   // Dirty state + unsaved changes blocking
-  const { isDirty, markClean, saveSuccessRef, showDialog, setShowDialog, handleStay, handleProceed } =
+  const { markClean, saveSuccessRef, showDialog, setShowDialog, handleStay, handleProceed } =
     useAssignmentDirtyState();
 
   // Save logic
@@ -49,7 +49,7 @@ export const AssignmentEditorPage = () => {
     if (id && assignmentData) {
       initialize(transformAssignmentToFormData(assignmentData));
       markClean();
-    } else if (!id) {
+    } else {
       initialize(createEmptyFormData());
     }
 
@@ -59,12 +59,8 @@ export const AssignmentEditorPage = () => {
   }, [id, assignmentData, initialize, markClean]);
 
   const handleCancel = () => {
-    if (isDirty && !saveSuccessRef.current) {
-      // Let the blocker handle this - trigger navigation which will show the dialog
-      navigate('/projects?resource=assignment');
-    } else {
-      navigate('/projects?resource=assignment');
-    }
+    // The blocker will automatically intercept navigation if there are unsaved changes
+    navigate('/projects?resource=assignment');
   };
 
   return (

@@ -61,6 +61,7 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
   const { t: tToolbar } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
   const { t: tContextsPanel } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.contextsPanel' });
   const { t: tActions } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.actions' });
+  const { t: tMatrixActions } = useTranslation('assignment', { keyPrefix: 'matrixActions' });
 
   // Fill Matrix Gaps state
   const [fillMatrixDraft, setFillMatrixDraft] = useState<ExamDraftDto | null>(null);
@@ -262,14 +263,14 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
                       className="w-full"
                     >
                       <Library className="mr-2 h-4 w-4" />
-                      Template Library
+                      {tMatrixActions('templateLibrary')}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>
                       {!subject || !grade
-                        ? 'Set subject and grade first to browse templates'
-                        : 'Browse and import matrix templates'}
+                        ? tMatrixActions('templateLibraryDisabled')
+                        : tMatrixActions('templateLibraryTooltip')}
                     </p>
                   </TooltipContent>
                 </Tooltip>
@@ -284,16 +285,16 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
                       className="w-full"
                     >
                       <Save className="mr-2 h-4 w-4" />
-                      Save as Template
+                      {tMatrixActions('saveAsTemplate')}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>
                       {!subject || !grade
-                        ? 'Set subject and grade first'
+                        ? tMatrixActions('saveAsTemplateDisabledMetadata')
                         : !matrix || matrix.length === 0
-                          ? 'Create a matrix first'
-                          : 'Save current matrix as a reusable template'}
+                          ? tMatrixActions('saveAsTemplateDisabledMatrix')
+                          : tMatrixActions('saveAsTemplateTooltip')}
                     </p>
                   </TooltipContent>
                 </Tooltip>

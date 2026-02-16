@@ -175,4 +175,8 @@ export default {
     vietnamese: 'Tiếng Việt',
     english: 'Tiếng Anh',
   },
+  grade: 'Lớp',
+  subject: 'Môn học',
+  topics: 'Chủ đề',
+  characters: 'ký tự',
 };

@@ -119,6 +119,12 @@ export default {
       minimal: 'Tối giản',
       modern: 'Hiện đại',
       classic: 'Cổ điển',
+      gallery: {
+        title: 'Tất cả chủ đề có sẵn',
+        description: 'Chọn từ bộ sưu tập đầy đủ các chủ đề của chúng tôi',
+        close: 'Đóng',
+        loadMore: 'Tải thêm',
+      },
     },
     content: {
       title: 'Nội dung',

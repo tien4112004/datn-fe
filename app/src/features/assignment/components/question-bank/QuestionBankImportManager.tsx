@@ -16,6 +16,7 @@ import { Checkbox } from '@/shared/components/ui/checkbox';
 import { QuestionBankDialog } from '../question-bank';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
+import useQuestionBankStore from '../../stores/questionBankStore';
 import { getContextApiService } from '@/features/context';
 import { getUserPreference, setUserPreference } from '@/shared/utils/userPreferences';
 import { generateId } from '@/shared/lib/utils';
@@ -33,6 +34,19 @@ export const QuestionBankImportManager: React.FC = () => {
 
   const isQuestionBankOpen = useAssignmentEditorStore((state) => state.isQuestionBankOpen);
   const setQuestionBankOpen = useAssignmentEditorStore((state) => state.setQuestionBankOpen);
+  const subject = useAssignmentFormStore((state) => state.subject);
+  const grade = useAssignmentFormStore((state) => state.grade);
+  const setFilters = useQuestionBankStore((state) => state.setFilters);
+
+  // Pre-populate question bank filters with assignment's grade/subject when dialog opens
+  React.useEffect(() => {
+    if (isQuestionBankOpen) {
+      setFilters({
+        ...(subject ? { subject: [subject] } : { subject: undefined }),
+        ...(grade ? { grade: [grade] } : { grade: undefined }),
+      });
+    }
+  }, [isQuestionBankOpen, subject, grade, setFilters]);
 
   const [pendingImport, setPendingImport] = React.useState<{
     questions: Question[];

@@ -360,6 +360,7 @@ export default {
 
     // Bảng điều khiển thông tin bài tập
     metadata: {
+      basicInformation: 'Thông tin cơ bản',
       panelTitle: 'Thông tin bài tập',
       edit: 'Chỉnh sửa',
       title: 'Thông tin bài tập',
@@ -716,6 +717,15 @@ export default {
         contexts: 'Quản lý đoạn văn đọc hiểu',
         questionNumber: 'Nhấp để sửa, kéo để sắp xếp',
       },
+    },
+
+    // Hộp thoại danh sách câu hỏi
+    questionList: {
+      title: 'Tất cả câu hỏi',
+      emptyMessage: 'Chưa có câu hỏi nào',
+      dragHint: 'Kéo câu hỏi để sắp xếp lại',
+      questionNumber: 'CH{{number}}',
+      close: 'Đóng',
     },
 
     // Ô ma trận
@@ -1363,5 +1373,49 @@ export default {
       feedbackForQuestion: 'Nhận xét cho câu này (Tùy chọn)',
       questionFeedbackPlaceholder: 'Thêm nhận xét cụ thể về câu trả lời này...',
     },
+  },
+  matrixTemplateLibrary: {
+    title: 'Thư viện Mẫu Ma trận',
+    description: 'Duyệt và nhập các mẫu ma trận để nhanh chóng thiết lập cấu trúc bài tập.',
+    searchPlaceholder: 'Tìm kiếm mẫu...',
+    loading: 'Đang tải mẫu...',
+    noTemplates: 'Không tìm thấy mẫu nào. Tạo mẫu đầu tiên để sử dụng lại sau!',
+    importTemplate: 'Nhập Mẫu',
+    tabs: {
+      personal: 'Cá nhân',
+      public: 'Công khai',
+    },
+    badges: {
+      public: 'Công khai',
+      incompatible: 'Không tương thích',
+    },
+    metadata: {
+      topics: 'chủ đề',
+      questions: 'câu hỏi',
+    },
+  },
+  matrixTemplateSave: {
+    title: 'Lưu Ma trận làm Mẫu',
+    description: 'Lưu cấu hình ma trận hiện tại làm mẫu có thể tái sử dụng cho các bài tập sau.',
+    nameLabel: 'Tên Mẫu',
+    namePlaceholder: 'ví dụ: Ma trận Toán Lớp 1 Chuẩn',
+    summary: 'Tóm tắt Ma trận',
+    totalQuestions: 'Tổng Câu hỏi',
+    save: 'Lưu Mẫu',
+    saving: 'Đang lưu...',
+    nameRequired: 'Tên mẫu là bắt buộc',
+    metadataRequired: 'Môn học và lớp là bắt buộc',
+    matrixEmpty: 'Ma trận phải có ít nhất một chủ đề và ô',
+    saveSuccess: 'Lưu mẫu thành công',
+    saveFailed: 'Lưu mẫu thất bại',
+  },
+  matrixActions: {
+    templateLibrary: 'Thư viện Mẫu',
+    templateLibraryTooltip: 'Duyệt và nhập các mẫu ma trận',
+    templateLibraryDisabled: 'Đặt môn học và lớp trước để duyệt mẫu',
+    saveAsTemplate: 'Lưu làm Mẫu',
+    saveAsTemplateTooltip: 'Lưu ma trận hiện tại làm mẫu có thể tái sử dụng',
+    saveAsTemplateDisabledMetadata: 'Đặt môn học và lớp trước',
+    saveAsTemplateDisabledMatrix: 'Tạo ma trận trước',
   },
 };

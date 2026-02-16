@@ -360,6 +360,7 @@ export default {
 
     // Assignment metadata panel
     metadata: {
+      basicInformation: 'Basic Information',
       panelTitle: 'Assignment Info',
       edit: 'Edit',
       title: 'Assignment Metadata',
@@ -1385,5 +1386,49 @@ export default {
       feedbackForQuestion: 'Feedback for this question (Optional)',
       questionFeedbackPlaceholder: 'Add specific feedback about this answer...',
     },
+  },
+  matrixTemplateLibrary: {
+    title: 'Matrix Template Library',
+    description: 'Browse and import matrix templates to quickly set up your assignment structure.',
+    searchPlaceholder: 'Search templates...',
+    loading: 'Loading templates...',
+    noTemplates: 'No templates found. Create your first template to reuse it later!',
+    importTemplate: 'Import Template',
+    tabs: {
+      personal: 'Personal',
+      public: 'Public',
+    },
+    badges: {
+      public: 'Public',
+      incompatible: 'Incompatible',
+    },
+    metadata: {
+      topics: 'topics',
+      questions: 'questions',
+    },
+  },
+  matrixTemplateSave: {
+    title: 'Save Matrix as Template',
+    description: 'Save the current matrix configuration as a reusable template for future assignments.',
+    nameLabel: 'Template Name',
+    namePlaceholder: 'e.g., Grade 1 Math Standard Matrix',
+    summary: 'Matrix Summary',
+    totalQuestions: 'Total Questions',
+    save: 'Save Template',
+    saving: 'Saving...',
+    nameRequired: 'Template name is required',
+    metadataRequired: 'Subject and grade are required',
+    matrixEmpty: 'Matrix must have at least one topic and cell',
+    saveSuccess: 'Template saved successfully',
+    saveFailed: 'Failed to save template',
+  },
+  matrixActions: {
+    templateLibrary: 'Template Library',
+    templateLibraryTooltip: 'Browse and import matrix templates',
+    templateLibraryDisabled: 'Set subject and grade first to browse templates',
+    saveAsTemplate: 'Save as Template',
+    saveAsTemplateTooltip: 'Save current matrix as a reusable template',
+    saveAsTemplateDisabledMetadata: 'Set subject and grade first',
+    saveAsTemplateDisabledMatrix: 'Create a matrix first',
   },
 };

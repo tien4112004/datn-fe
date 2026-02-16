@@ -84,10 +84,6 @@ export default {
     actions: {
       edit: 'Chỉnh sửa',
     },
-    stats: {
-      students: 'Học sinh',
-      available: 'còn lại',
-    },
     tabs: {
       feed: 'Bảng tin',
       teaching: 'Giảng dạy',
@@ -173,19 +169,6 @@ export default {
     },
     noClasses: 'Không có lớp học nào',
   },
-  grid: {
-    academicYear: 'Năm học',
-    enrollment: 'Danh sách',
-    class: 'Phòng học',
-    actions: {
-      manageStudents: 'Quản lý học sinh',
-    },
-    error: 'Lỗi khi tải lớp học',
-    noClasses: 'Không có lớp học nào',
-    pagination: {
-      showing: 'Hiển thị {{start}} đến {{end}} trong {{total}} lớp học',
-    },
-  },
   filters: {
     search: {
       placeholder: 'Tìm kiếm theo tên lớp...',
@@ -217,26 +200,19 @@ export default {
       urgentTasks: 'công việc khẩn cấp',
       stats: {
         periodsToday: 'Tiết học hôm nay',
-        lessonsCompleted: 'Bài học hoàn thành',
         objectivesAchieved: 'Mục tiêu đạt được',
         resourcesPrepared: 'Tài nguyên đã chuẩn bị',
       },
       tabs: {
         overview: 'Tổng quan',
         schedule: 'Lịch biểu',
-        lessons: 'Bài học',
         objectives: 'Mục tiêu',
         resources: 'Tài nguyên',
       },
       quickActions: 'Hành động nhanh',
       actions: {
-        startCurrentLesson: 'Bắt đầu bài học hiện tại',
-        prepareNextLesson: 'Chuẩn bị bài học tiếp theo',
         reviewObjectives: 'Xem lại mục tiêu',
       },
-      noCurrentLesson: 'Không có bài học hiện tại',
-      selectLessonToViewObjectives: 'Chọn bài học để xem mục tiêu',
-      selectLessonToViewResources: 'Chọn bài học để xem tài nguyên',
       todayObjectivesSummary: 'Tóm tắt mục tiêu hôm nay',
       todayResourcesSummary: 'Tóm tắt tài nguyên hôm nay',
       achieved: 'đạt được',
@@ -270,7 +246,7 @@ export default {
         withLesson: 'Có bài học',
       },
       dialog: {
-        eventDetails: 'Chi tiết sự kiện lịch biểu',
+        periodDetails: 'Chi tiết tiết học',
         time: 'Thời gian:',
         location: 'Địa điểm:',
         description: 'Mô tả:',
@@ -278,10 +254,10 @@ export default {
       },
     },
     currentNext: {
-      currentClass: 'Lớp học hiện tại',
-      nextClass: 'Lớp học tiếp theo',
-      noCurrentClass: 'Không có lớp học hiện tại',
-      noNextClass: 'Không có lớp học tiếp theo',
+      currentPeriod: 'Tiết học hiện tại',
+      nextPeriod: 'Tiết học tiếp theo',
+      noCurrentPeriod: 'Không có tiết học hiện tại',
+      noNextPeriod: 'Không có tiết học tiếp theo',
       room: 'Phòng',
       startsIn: 'Bắt đầu trong',
       status: {
@@ -336,7 +312,6 @@ export default {
       lesson: 'Bài học',
       mapped: 'Được gán cho tiết học này',
       error: 'Lỗi khi tải dữ liệu bộ môn',
-      loading: 'Đang tải các bộ môn...',
       loadingPeriods: 'Đang tải các tiết học...',
       period: 'Tiết học',
       date: 'Ngày',
@@ -945,12 +920,10 @@ export default {
       optionalColumns: 'Cột tùy chọn',
       columnDateOfBirth: 'Ngày sinh',
       columnDateOfBirthDescription: 'Định dạng ngày: YYYY-MM-DD (ví dụ: "2010-03-15")',
-      columnPhone: 'Điện thoại',
-      columnPhoneDescription: 'Số điện thoại liên hệ. Chấp nhận số, khoảng trắng và dấu gạch ngang.',
       columnParentName: 'Tên phụ huynh/Người giám hộ',
       columnParentNameDescription: 'Tên của phụ huynh hoặc người giám hộ.',
-      columnParentEmail: 'Email phụ huynh/Người giám hộ',
-      columnParentEmailDescription: 'Địa chỉ email của phụ huynh hoặc người giám hộ.',
+      columnParentPhone: 'Số điện thoại phụ huynh/Người giám hộ',
+      columnParentPhoneDescription: 'Số điện thoại của phụ huynh hoặc người giám hộ.',
       columnHeaderVariations: 'Biến thể tiêu đề',
       headerVariationsDescription:
         'Các cột CSV của bạn có thể sử dụng các biến thể khác nhau của những tên này (không phân biệt chữ hoa chữ thường):',
@@ -986,6 +959,7 @@ export default {
     backend: {
       validationFailed: 'Xác thực dữ liệu không thành công',
       duplicateEmail: 'Email đã tồn tại',
+      duplicateStudentCode: 'Mã số sinh viên đã tồn tại',
       unauthorized: 'Bạn không có quyền nhập học sinh',
       serverError: 'Đã xảy ra lỗi máy chủ',
       networkError: 'Lỗi kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.',

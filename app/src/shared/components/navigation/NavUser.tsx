@@ -1,6 +1,15 @@
 'use client';
 
-import { BadgeCheck, ChevronsUpDown, CreditCard, LogOut, Settings, Sparkles } from 'lucide-react';
+import {
+  BadgeCheck,
+  Check,
+  ChevronsUpDown,
+  CreditCard,
+  Languages,
+  LogOut,
+  Settings,
+  Sparkles,
+} from 'lucide-react';
 
 import {
   DropdownMenu,
@@ -8,7 +17,11 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@ui/dropdown-menu';
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/shared/components/ui/sidebar';
@@ -18,6 +31,11 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { UserAvatar } from '../common/UserAvatar';
+
+const LANGUAGES = [
+  { code: 'en', name: 'English', flag: '🇬🇧' },
+  { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
+];
 
 export function NavUser({
   user,
@@ -31,7 +49,12 @@ export function NavUser({
   const { isMobile } = useSidebar();
   const navigate = useNavigate();
   const { mutate: logout } = useLogout();
-  const { t } = useTranslation(I18N_NAMESPACES.AUTH);
+  const { t, i18n } = useTranslation(I18N_NAMESPACES.AUTH);
+
+  const changeLanguage = (code: string) => {
+    if (code !== i18n.language) i18n.changeLanguage(code);
+    window.dispatchEvent(new Event('languageChanged'));
+  };
 
   const handleLogout = async () => {
     logout(undefined, {
@@ -89,13 +112,17 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
+              <DropdownMenuItem asChild>
+                <NavLink to="/profile">
+                  <BadgeCheck />
+                  Account
+                </NavLink>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
+              <DropdownMenuItem asChild>
+                <NavLink to="/payment">
+                  <CreditCard />
+                  Billing
+                </NavLink>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <NavLink to="/settings">
@@ -103,6 +130,26 @@ export function NavUser({
                   Settings
                 </NavLink>
               </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Languages />
+                  Language
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    {LANGUAGES.map((lang) => (
+                      <DropdownMenuItem key={lang.code} onClick={() => changeLanguage(lang.code)}>
+                        <span className="text-lg leading-none">{lang.flag}</span>
+                        <span>{lang.name}</span>
+                        {i18n.language === lang.code && <Check className="ml-auto size-4" />}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>

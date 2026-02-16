@@ -39,6 +39,24 @@ const router = createBrowserRouter([
     }),
   },
   {
+    path: '/payment/success',
+    lazy: async () => ({
+      Component: (await import('@/features/payment/pages/PaymentSuccessPage')).PaymentSuccessPage,
+    }),
+  },
+  {
+    path: '/payment/error',
+    lazy: async () => ({
+      Component: (await import('@/features/payment/pages/PaymentErrorPage')).PaymentErrorPage,
+    }),
+  },
+  {
+    path: '/payment/cancel',
+    lazy: async () => ({
+      Component: (await import('@/features/payment/pages/PaymentCancelPage')).PaymentCancelPage,
+    }),
+  },
+  {
     element: (
       <TeacherRoute>
         <NavLayout />
@@ -224,6 +242,18 @@ const router = createBrowserRouter([
         path: 'submissions/:id/grade',
         lazy: async () => ({
           Component: (await import('@/features/assignment/pages')).TeacherGradingPage,
+        }),
+      },
+      {
+        path: 'payment',
+        lazy: async () => ({
+          Component: (await import('@/features/payment/pages/BuyCoinsPage')).BuyCoinsPage,
+        }),
+      },
+      {
+        path: 'payment/history',
+        lazy: async () => ({
+          Component: (await import('@/features/payment/pages/TransactionHistoryPage')).TransactionHistoryPage,
         }),
       },
       {

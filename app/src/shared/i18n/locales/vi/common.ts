@@ -13,6 +13,7 @@ export default {
       home: 'Trang chủ',
       admin: 'Quản Trị',
       questionRendererDemo: 'Demo Trình Hiển Thị Câu Hỏi',
+      buyCoins: 'Mua Coins',
     },
   },
   pages: {

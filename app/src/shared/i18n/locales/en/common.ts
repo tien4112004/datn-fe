@@ -13,6 +13,7 @@ export default {
       home: 'Home',
       admin: 'Administration',
       questionRendererDemo: 'Question Renderer (Demo)',
+      buyCoins: 'Buy Coins',
     },
   },
   pages: {

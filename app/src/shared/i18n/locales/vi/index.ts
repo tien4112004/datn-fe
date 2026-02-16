@@ -19,6 +19,7 @@ import comments from './comments';
 import { questionsVi as questions } from '@aiprimary/question';
 import dashboard from './dashboard';
 import notifications from './notifications';
+import payment from './payment';
 
 export default {
   common,
@@ -38,4 +39,5 @@ export default {
   questions,
   dashboard,
   notifications,
+  payment,
 };

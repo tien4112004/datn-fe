@@ -16,6 +16,8 @@ import { QuestionsListViewPanel } from '../viewer/QuestionsListViewPanel';
 import { GenerateQuestionsManager } from './GenerateQuestionsManager';
 import { GenerateMatrixManager } from './GenerateMatrixManager';
 import { FillMatrixGapsManager } from './FillMatrixGapsManager';
+import { MatrixTemplateLibraryDialog } from './MatrixTemplateLibraryDialog';
+import { MatrixTemplateSaveDialog } from './MatrixTemplateSaveDialog';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 import { useGenerateExamFromMatrix } from '../../hooks/useAssignmentApi';
@@ -34,6 +36,18 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
   const setQuestionBankOpen = useAssignmentEditorStore((state) => state.setQuestionBankOpen);
   const setContextCreateFormOpen = useAssignmentEditorStore((state) => state.setContextCreateFormOpen);
   const setContextLibraryDialogOpen = useAssignmentEditorStore((state) => state.setContextLibraryDialogOpen);
+  const isMatrixTemplateLibraryDialogOpen = useAssignmentEditorStore(
+    (state) => state.isMatrixTemplateLibraryDialogOpen
+  );
+  const setMatrixTemplateLibraryDialogOpen = useAssignmentEditorStore(
+    (state) => state.setMatrixTemplateLibraryDialogOpen
+  );
+  const isMatrixTemplateSaveDialogOpen = useAssignmentEditorStore(
+    (state) => state.isMatrixTemplateSaveDialogOpen
+  );
+  const setMatrixTemplateSaveDialogOpen = useAssignmentEditorStore(
+    (state) => state.setMatrixTemplateSaveDialogOpen
+  );
   const title = useAssignmentFormStore((state) => state.title);
   const subject = useAssignmentFormStore((state) => state.subject);
   const grade = useAssignmentFormStore((state) => state.grade);
@@ -41,6 +55,7 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
   const questions = useAssignmentFormStore((state) => state.questions);
   const contexts = useAssignmentFormStore((state) => state.contexts);
   const topics = useAssignmentFormStore((state) => state.topics);
+  const importMatrixTemplate = useAssignmentFormStore((state) => state.importMatrixTemplate);
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor' });
   const { t: tFillGaps } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.fillMatrixGaps' });
   const { t: tToolbar } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
@@ -236,6 +251,52 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
                     <p>{String(t('actions.tooltips.fillMatrixGaps'))}</p>
                   </TooltipContent>
                 </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setMatrixTemplateLibraryDialogOpen(true)}
+                      disabled={!subject || !grade}
+                      className="w-full"
+                    >
+                      <Library className="mr-2 h-4 w-4" />
+                      Template Library
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      {!subject || !grade
+                        ? 'Set subject and grade first to browse templates'
+                        : 'Browse and import matrix templates'}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setMatrixTemplateSaveDialogOpen(true)}
+                      disabled={!matrix || matrix.length === 0 || !subject || !grade}
+                      className="w-full"
+                    >
+                      <Save className="mr-2 h-4 w-4" />
+                      Save as Template
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      {!subject || !grade
+                        ? 'Set subject and grade first'
+                        : !matrix || matrix.length === 0
+                          ? 'Create a matrix first'
+                          : 'Save current matrix as a reusable template'}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
 
               {/* Divider */}
@@ -312,6 +373,25 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
 
       {/* Question List Dialog */}
       <QuestionListDialog />
+
+      {/* Matrix Template Library Dialog */}
+      <MatrixTemplateLibraryDialog
+        open={isMatrixTemplateLibraryDialogOpen}
+        onOpenChange={setMatrixTemplateLibraryDialogOpen}
+        currentGrade={grade}
+        currentSubject={subject}
+        onImport={importMatrixTemplate}
+      />
+
+      {/* Matrix Template Save Dialog */}
+      <MatrixTemplateSaveDialog
+        open={isMatrixTemplateSaveDialogOpen}
+        onOpenChange={setMatrixTemplateSaveDialogOpen}
+        matrix={matrix}
+        topics={topics}
+        subject={subject}
+        grade={grade}
+      />
     </div>
   );
 };

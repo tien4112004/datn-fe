@@ -80,12 +80,12 @@ export const MatrixGridView = ({ topics, matrixCells }: MatrixGridViewProps) => 
               <TableCell className="w-[160px] align-top font-medium">
                 <div className="space-y-1">
                   <div className="whitespace-normal break-words">{topic.name}</div>
-                  {/* Display subtopics as informational chips */}
-                  {topic.subtopics && topic.subtopics.length > 0 && (
+                  {/* Display chapters as informational chips */}
+                  {topic.chapters && topic.chapters.length > 0 && (
                     <div className="flex flex-wrap gap-1 pt-1">
-                      {topic.subtopics.map((subtopic, idx) => (
+                      {topic.chapters.map((chapter, idx) => (
                         <Badge key={idx} variant="secondary" className="text-xs">
-                          {subtopic}
+                          {chapter}
                         </Badge>
                       ))}
                     </div>

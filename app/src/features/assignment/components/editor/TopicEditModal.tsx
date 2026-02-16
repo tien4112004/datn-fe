@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Trash2, Plus, X, Info } from 'lucide-react';
+import { Trash2, Info } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -14,8 +14,10 @@ import { Input } from '@/shared/components/ui/input';
 import { Textarea } from '@/shared/components/ui/textarea';
 import { Label } from '@/shared/components/ui/label';
 import { Checkbox } from '@/shared/components/ui/checkbox';
+import { Badge } from '@/shared/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
+import { useQuestionBankChapters } from '../../hooks/useQuestionBankApi';
 
 interface TopicEditModalProps {
   topicId: string | null;
@@ -27,6 +29,8 @@ export const TopicEditModal = ({ topicId, open, onOpenChange }: TopicEditModalPr
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrixEditor' });
 
   const topics = useAssignmentFormStore((state) => state.topics);
+  const subject = useAssignmentFormStore((state) => state.subject);
+  const grade = useAssignmentFormStore((state) => state.grade);
   const updateTopic = useAssignmentFormStore((state) => state.updateTopic);
   const removeTopic = useAssignmentFormStore((state) => state.removeTopic);
 
@@ -34,15 +38,21 @@ export const TopicEditModal = ({ topicId, open, onOpenChange }: TopicEditModalPr
 
   const [name, setName] = useState(topic?.name || '');
   const [description, setDescription] = useState(topic?.description || '');
-  const [subtopics, setSubtopics] = useState<string[]>(topic?.subtopics || []);
+  const [chapters, setChapters] = useState<string[]>(topic?.chapters || []);
   const [hasContext, setHasContext] = useState<boolean>(topic?.hasContext || false);
+
+  // Fetch chapters from API
+  const { data: availableChapters, isLoading: chaptersLoading } = useQuestionBankChapters(
+    subject || undefined,
+    grade || undefined
+  );
 
   // Update local state when topic changes
   useEffect(() => {
     if (topic) {
       setName(topic.name);
       setDescription(topic.description || '');
-      setSubtopics(topic.subtopics || []);
+      setChapters(topic.chapters || []);
       setHasContext(topic.hasContext || false);
     }
   }, [topic]);
@@ -52,7 +62,7 @@ export const TopicEditModal = ({ topicId, open, onOpenChange }: TopicEditModalPr
       updateTopic(topicId, {
         name,
         description,
-        subtopics: subtopics.length > 0 ? subtopics : undefined,
+        chapters: chapters.length > 0 ? chapters : undefined,
         hasContext: hasContext || undefined,
       });
       onOpenChange(false);
@@ -66,18 +76,8 @@ export const TopicEditModal = ({ topicId, open, onOpenChange }: TopicEditModalPr
     }
   };
 
-  const handleAddSubtopic = () => {
-    setSubtopics([...subtopics, '']);
-  };
-
-  const handleSubtopicChange = (index: number, value: string) => {
-    const updated = [...subtopics];
-    updated[index] = value;
-    setSubtopics(updated);
-  };
-
-  const handleRemoveSubtopic = (index: number) => {
-    setSubtopics(subtopics.filter((_, i) => i !== index));
+  const handleChapterToggle = (chapterName: string, checked: boolean) => {
+    setChapters((prev) => (checked ? [...prev, chapterName] : prev.filter((c) => c !== chapterName)));
   };
 
   if (!topic) {
@@ -151,47 +151,53 @@ export const TopicEditModal = ({ topicId, open, onOpenChange }: TopicEditModalPr
             </p>
           </div>
 
-          {/* Subtopics Section */}
+          {/* Chapters Section */}
           <div className="space-y-2 border-t pt-3">
-            <div className="flex items-center justify-between">
-              <Label className="text-sm font-semibold">{t('subtopics', 'Subtopics (Optional)')}</Label>
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                onClick={handleAddSubtopic}
-                className="h-6 px-2 text-xs"
-              >
-                <Plus className="mr-1 h-3 w-3" />
-                {t('addSubtopic', 'Add')}
-              </Button>
-            </div>
-            <p className="text-xs text-gray-500">{t('subtopicsHint', 'For informational purposes only.')}</p>
+            <Label className="text-sm font-semibold">{t('chapters', 'Chapters (Optional)')}</Label>
+            <p className="text-xs text-gray-500">
+              {t('chaptersHint', 'Select chapters from the curriculum. Used as informational metadata.')}
+            </p>
 
-            {subtopics.length > 0 ? (
-              <div className="space-y-2">
-                {subtopics.map((subtopic, idx) => (
-                  <div key={idx} className="flex gap-2">
-                    <Input
-                      value={subtopic}
-                      onChange={(e) => handleSubtopicChange(idx, e.target.value)}
-                      placeholder={t('subtopicPlaceholder', `Subtopic ${idx + 1}`)}
-                      className="text-sm"
+            {/* Selected chapters as badges */}
+            {chapters.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {chapters.map((chapter, idx) => (
+                  <Badge key={idx} variant="secondary" className="text-xs">
+                    {chapter}
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            {/* Chapter checkbox list */}
+            {!subject || !grade ? (
+              <p className="text-xs italic text-gray-400">
+                {t('chaptersRequireGradeSubject', 'Set grade and subject to see available chapters')}
+              </p>
+            ) : chaptersLoading ? (
+              <p className="text-xs italic text-gray-400">{t('chaptersLoading', 'Loading chapters...')}</p>
+            ) : availableChapters && availableChapters.length > 0 ? (
+              <div className="max-h-48 space-y-1 overflow-y-auto rounded border p-2">
+                {availableChapters.map((ch) => (
+                  <div key={ch.id} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`modal-chapter-${ch.id}`}
+                      checked={chapters.includes(ch.name)}
+                      onCheckedChange={(checked) => handleChapterToggle(ch.name, checked as boolean)}
                     />
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleRemoveSubtopic(idx)}
-                      className="text-red-500 hover:bg-red-50 hover:text-red-600"
+                    <label
+                      htmlFor={`modal-chapter-${ch.id}`}
+                      className="text-xs leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                     >
-                      <X className="h-4 w-4" />
-                    </Button>
+                      {ch.name}
+                    </label>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs italic text-gray-400">{t('noSubtopics', 'No subtopics added')}</p>
+              <p className="text-xs italic text-gray-400">
+                {t('noChaptersAvailable', 'No chapters available for this grade and subject')}
+              </p>
             )}
           </div>
         </div>

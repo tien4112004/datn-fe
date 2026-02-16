@@ -27,15 +27,15 @@ export interface AssignmentTopic {
   id: string;
   name: string;
   description?: string;
-  subtopics?: string[]; // Informational subtopic names (not used for filtering)
+  chapters?: string[]; // Chapter names from curriculum (fetched via chapters API)
   hasContext?: boolean; // Whether to use reading passages for this topic
 }
 
-// Matrix dimension topic (topics are the first dimension, subtopics are informational)
+// Matrix dimension topic (topics are the first dimension, chapters are informational)
 export interface MatrixDimensionTopic {
   id: string;
   name: string;
-  subtopics?: string[]; // Informational subtopic names
+  chapters?: string[]; // Chapter names from curriculum
 }
 
 // Matrix cell (topic × difficulty × questionType) - flat representation for UI

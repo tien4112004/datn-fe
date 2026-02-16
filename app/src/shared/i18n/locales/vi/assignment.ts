@@ -441,7 +441,7 @@ export default {
       topicDescription: 'Mô tả chủ đề',
       topicPlaceholder: 'Tên chủ đề...',
       descriptionPlaceholder: 'Mô tả chủ đề (tùy chọn)...',
-      addSubtopic: 'Thêm chủ đề con',
+      addChapter: 'Thêm chương',
       parentTopic: 'Nhóm chủ đề',
       parentTopicPlaceholder: 'Tên nhóm chủ đề...',
       editGroup: 'Chỉnh sửa nhóm chủ đề',
@@ -508,7 +508,7 @@ export default {
       generateMatrix: 'Tạo ma trận',
       tooltips: {
         addTopic: 'Thêm chủ đề mới',
-        addSubtopic: 'Thêm chủ đề con vào nhóm này',
+        addChapter: 'Thêm chương vào nhóm này',
         editGroup: 'Đổi tên nhóm chủ đề',
         editTopic: 'Sửa thông tin chủ đề',
         cellInput: 'Số câu hỏi yêu cầu',

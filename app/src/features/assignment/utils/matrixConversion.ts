@@ -26,7 +26,7 @@ import type { MatrixCell, ApiMatrix, AssignmentTopic, MatrixDimensionTopic } fro
  *
  * @param cells - Flat array of MatrixCell from UI
  * @param metadata - Matrix metadata (grade, subject)
- * @param topics - Store topics (topics with optional subtopics metadata)
+ * @param topics - Store topics (topics with optional chapters metadata)
  * @returns ApiMatrix with topics as first dimension
  */
 export function cellsToApiMatrix(
@@ -53,7 +53,7 @@ export function cellsToApiMatrix(
   const dimensionTopics: MatrixDimensionTopic[] = topics.map((t) => ({
     id: t.id,
     name: t.name,
-    subtopics: t.subtopics, // Pass through informational subtopics
+    chapters: t.chapters, // Pass through chapter names
   }));
 
   // Build 3D matrix — rows are topics (not subtopics)
@@ -144,7 +144,7 @@ export function apiMatrixToViewData(
   const topics: AssignmentTopic[] = dimensions.topics.map((topic) => ({
     id: topic.id || createTopicId(),
     name: topic.name,
-    subtopics: topic.subtopics, // Carry over informational data
+    chapters: topic.chapters, // Carry over chapter names
   }));
 
   // Count questions per cell if questions are provided

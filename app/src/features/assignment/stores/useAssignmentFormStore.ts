@@ -7,8 +7,12 @@ import type {
   AssignmentContext,
   AssignmentValidationErrors,
 } from '../types';
+import type { MatrixTemplate } from '../types/matrixTemplate';
 import { generateId, createCellId } from '@aiprimary/core';
-import type { Grade, SubjectCode } from '@aiprimary/core';
+import type { Grade } from '@aiprimary/core/assessment/grades.js';
+import type { SubjectCode } from '@aiprimary/core';
+import { apiMatrixToViewData } from '../utils/matrixConversion';
+import { toast } from 'sonner';
 
 /**
  * Sync matrix cell counts based on current questions
@@ -89,6 +93,7 @@ interface AssignmentFormStore {
   removeMatrixCell: (cellId: string) => void;
   updateMatrixCell: (cellId: string, updates: Partial<MatrixCell>) => void;
   syncMatrix: () => void; // Manual sync if needed
+  importMatrixTemplate: (template: MatrixTemplate) => void;
 
   // === GETTERS: Derived State ===
   getTotalPoints: () => number;
@@ -432,6 +437,23 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
           false,
           'assignment/syncMatrix'
         ),
+
+      importMatrixTemplate: (template) => {
+        const { topics, cells } = apiMatrixToViewData(template.matrix);
+
+        set(
+          {
+            matrix: cells,
+            topics: topics,
+            isDirty: true,
+          },
+          false,
+          'assignment/importMatrixTemplate'
+        );
+
+        dispatchDirtyEvent(true);
+        toast.success('Template imported successfully');
+      },
 
       // === GETTERS ===
       getTotalPoints: () => {

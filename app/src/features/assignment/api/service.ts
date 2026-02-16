@@ -143,22 +143,12 @@ export function transformAssignmentToFormData(assignment: Assignment): Assignmen
   const difficulties = getAllDifficulties();
   const questionTypes = getAllQuestionTypes();
 
-  // Flatten topic > subtopic hierarchy into a flat topics list
-  let topics: AssignmentTopic[] = (assignment.matrix?.dimensions?.topics ?? []).flatMap((topic) =>
-    (topic.subtopics ?? [])
-      .filter((subtopic: any) => {
-        // subtopic is defined as string[], so filter out empty strings
-        return typeof subtopic === 'string' ? subtopic.trim() : true;
-      })
-      .map((subtopic: any) => {
-        // Since subtopics are strings, just use them as names
-        const name = typeof subtopic === 'string' ? subtopic : String(subtopic);
-        return {
-          id: createTopicId(),
-          name,
-        };
-      })
-  );
+  // Use topics directly from matrix dimensions (topics are the primary dimension)
+  let topics: AssignmentTopic[] = (assignment.matrix?.dimensions?.topics ?? []).map((topic) => ({
+    id: topic.id || createTopicId(),
+    name: topic.name,
+    chapters: topic.chapters, // Carry over chapter names
+  }));
 
   // Fall back to a default topic if empty
   if (topics.length === 0) {

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
-import { Label } from '@/shared/components/ui/label';
+import { CreditCard, Landmark } from 'lucide-react';
+import { cn } from '@/shared/lib/utils';
 import type { PaymentGate } from '../types';
 
 interface GatewaySelectorProps {
@@ -8,26 +8,39 @@ interface GatewaySelectorProps {
   onChange: (gate: PaymentGate) => void;
 }
 
+const PAYMENT_GATEWAYS = [
+  { id: 'SEPAY' as const, icon: Landmark, labelKey: 'buyCoins.sepay' },
+  { id: 'PAYOS' as const, icon: CreditCard, labelKey: 'buyCoins.payos' },
+];
+
 export function GatewaySelector({ value, onChange }: GatewaySelectorProps) {
   const { t } = useTranslation('payment');
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <label className="text-sm font-medium">{t('buyCoins.paymentMethod')}</label>
-      <RadioGroup value={value} onValueChange={(v) => onChange(v as PaymentGate)} className="flex gap-6">
-        <div className="flex items-center gap-2">
-          <RadioGroupItem value="SEPAY" id="gate-sepay" />
-          <Label htmlFor="gate-sepay" className="cursor-pointer">
-            {t('buyCoins.sepay')}
-          </Label>
-        </div>
-        <div className="flex items-center gap-2">
-          <RadioGroupItem value="PAYOS" id="gate-payos" />
-          <Label htmlFor="gate-payos" className="cursor-pointer">
-            {t('buyCoins.payos')}
-          </Label>
-        </div>
-      </RadioGroup>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {PAYMENT_GATEWAYS.map((gateway) => {
+          const Icon = gateway.icon;
+          const isSelected = value === gateway.id;
+          return (
+            <button
+              key={gateway.id}
+              type="button"
+              onClick={() => onChange(gateway.id)}
+              className={cn(
+                'hover:border-primary/50 flex items-center gap-3 rounded-lg border-2 p-4 text-left transition-all',
+                isSelected ? 'border-primary bg-primary/5' : 'border-border bg-background'
+              )}
+            >
+              <Icon className={cn('size-5', isSelected ? 'text-primary' : 'text-muted-foreground')} />
+              <span className={cn('text-sm font-medium', isSelected && 'text-primary')}>
+                {t(gateway.labelKey as never)}
+              </span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

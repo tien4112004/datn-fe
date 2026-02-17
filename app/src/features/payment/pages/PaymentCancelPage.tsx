@@ -10,9 +10,11 @@ export function PaymentCancelPage() {
     <div className="flex min-h-screen items-center justify-center p-6">
       <div className="w-full max-w-md space-y-6 text-center">
         <Ban className="text-muted-foreground mx-auto size-16" />
-        <h1 className="text-2xl font-bold">{t('cancel.title')}</h1>
-        <p className="text-muted-foreground">{t('cancel.message')}</p>
-        <div className="flex justify-center gap-3">
+        <div>
+          <h1 className="text-2xl font-bold">{t('cancel.title')}</h1>
+          <p className="text-muted-foreground mt-2">{t('cancel.message')}</p>
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Button asChild>
             <Link to="/payment">{t('cancel.backToCoins')}</Link>
           </Button>

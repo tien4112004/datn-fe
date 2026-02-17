@@ -10,6 +10,8 @@ export default {
     popular: 'Popular',
     selected: 'Selected',
     select: 'Select',
+    selectPackage: 'Select a package',
+    selectPackagePrompt: 'Please select a coin package to continue',
     paymentMethod: 'Payment Method',
     sepay: 'Sepay (Bank Transfer)',
     payos: 'PayOS',

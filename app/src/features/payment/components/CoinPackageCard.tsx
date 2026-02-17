@@ -1,7 +1,5 @@
-import { Coins } from 'lucide-react';
+import { Coins, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent } from '@/shared/components/ui/card';
-import { Button } from '@/shared/components/ui/button';
 import { cn } from '@/shared/lib/utils';
 import type { CoinPackage } from '../constants';
 import { formatVND } from '../constants';
@@ -16,11 +14,12 @@ export function CoinPackageCard({ pkg, selected, onSelect }: CoinPackageCardProp
   const { t } = useTranslation('payment');
 
   return (
-    <Card
+    <button
+      type="button"
       className={cn(
-        'relative cursor-pointer transition-all hover:shadow-md',
-        selected && 'ring-primary ring-2',
-        pkg.popular && 'border-primary'
+        'hover:border-primary/50 relative flex flex-col items-center gap-3 rounded-lg border-2 p-6 transition-all hover:shadow-sm',
+        selected ? 'border-primary bg-primary/5' : 'border-border bg-background',
+        pkg.popular && !selected && 'border-primary/30'
       )}
       onClick={() => onSelect(pkg)}
     >
@@ -29,22 +28,15 @@ export function CoinPackageCard({ pkg, selected, onSelect }: CoinPackageCardProp
           {t('buyCoins.popular')}
         </div>
       )}
-      <CardContent className="flex flex-col items-center gap-3 pt-6">
-        <Coins className="size-10 text-yellow-500" />
-        <div className="text-2xl font-bold">{pkg.coins}</div>
-        <div className="text-muted-foreground text-sm">{t('buyCoins.coins')}</div>
-        <div className="text-lg font-semibold">{formatVND(pkg.price)}</div>
-        <Button
-          variant={selected ? 'default' : 'outline'}
-          className="w-full"
-          onClick={(e) => {
-            e.stopPropagation();
-            onSelect(pkg);
-          }}
-        >
-          {selected ? t('buyCoins.selected') : t('buyCoins.select')}
-        </Button>
-      </CardContent>
-    </Card>
+      {selected && (
+        <div className="bg-primary absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full">
+          <Check className="text-primary-foreground size-4" />
+        </div>
+      )}
+      <Coins className="size-10 text-yellow-500" />
+      <div className="text-2xl font-bold">{pkg.coins}</div>
+      <div className="text-muted-foreground text-sm">{t('buyCoins.coins')}</div>
+      <div className="text-lg font-semibold">{formatVND(pkg.price)}</div>
+    </button>
   );
 }

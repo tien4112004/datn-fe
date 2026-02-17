@@ -10,6 +10,8 @@ export default {
     popular: 'Phổ biến',
     selected: 'Đã chọn',
     select: 'Chọn',
+    selectPackage: 'Chọn gói',
+    selectPackagePrompt: 'Vui lòng chọn một gói coin để tiếp tục',
     paymentMethod: 'Phương thức thanh toán',
     sepay: 'Sepay (Chuyển khoản)',
     payos: 'PayOS',

@@ -10,9 +10,11 @@ export function PaymentErrorPage() {
     <div className="flex min-h-screen items-center justify-center p-6">
       <div className="w-full max-w-md space-y-6 text-center">
         <XCircle className="text-destructive mx-auto size-16" />
-        <h1 className="text-2xl font-bold">{t('error.title')}</h1>
-        <p className="text-muted-foreground">{t('error.message')}</p>
-        <div className="flex justify-center gap-3">
+        <div>
+          <h1 className="text-2xl font-bold">{t('error.title')}</h1>
+          <p className="text-muted-foreground mt-2">{t('error.message')}</p>
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Button asChild>
             <Link to="/payment">{t('error.tryAgain')}</Link>
           </Button>

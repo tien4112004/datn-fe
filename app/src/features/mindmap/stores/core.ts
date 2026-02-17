@@ -2,9 +2,10 @@ import type { Connection } from '@xyflow/react';
 import { addEdge, applyEdgeChanges, applyNodeChanges } from '@xyflow/react';
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
-import { getRootNodeOfSubtree, DEFAULT_LAYOUT_TYPE } from '../services/utils';
+import { DEFAULT_LAYOUT_TYPE, getRootNodeOfSubtree } from '../services/utils';
 import type { LayoutType, MindMapEdge, MindMapNode } from '../types';
 import { MINDMAP_TYPES, PATH_TYPES } from '../types';
+import type { AIPanelContext } from '../types/aiModification';
 import { SIDE } from '../types/constants';
 
 export interface CoreState {
@@ -20,6 +21,11 @@ export interface CoreState {
   onConnect: (connection: Connection) => void;
   getNode: (nodeId: string) => MindMapNode | null;
   getRoot: (nodeId: string) => MindMapNode | null;
+  /**
+   * Computes the current AI panel context based on node selection
+   * Returns one of: no-selection, single-node, same-branch, cross-branch
+   */
+  getAIContext: () => AIPanelContext;
   getNodeLength: () => number;
   setNodes: (updater: MindMapNode[] | ((nodes: MindMapNode[]) => MindMapNode[])) => void;
   setEdges: (updater: MindMapEdge[] | ((edges: MindMapEdge[]) => MindMapEdge[])) => void;
@@ -260,6 +266,120 @@ export const useCoreStore = create<CoreState>()(
         getRoot: (nodeId: string) => {
           const { nodes } = get();
           return getRootNodeOfSubtree(nodeId, nodes);
+        },
+
+        getAIContext: () => {
+          const { selectedNodeIds, getNode, getRoot, nodes } = get();
+          const selectedCount = selectedNodeIds.size;
+
+          // No selection
+          if (selectedCount === 0) {
+            return { type: 'no-selection' };
+          }
+
+          // Single node selection
+          if (selectedCount === 1) {
+            const nodeId = Array.from(selectedNodeIds)[0];
+            const node = getNode(nodeId);
+
+            if (!node) {
+              return { type: 'no-selection' };
+            }
+
+            // Skip deprecated node types
+            if (node.type === MINDMAP_TYPES.IMAGE_NODE || node.type === MINDMAP_TYPES.SHAPE_NODE) {
+              return { type: 'no-selection' };
+            }
+
+            // Get parent info
+            const parentNode = node.data.parentId ? getNode(node.data.parentId) : null;
+            const parentContent =
+              typeof parentNode?.data.content === 'string' ? parentNode.data.content : undefined;
+
+            // Compute siblings: find all nodes with the same parentId
+            const siblingContents: string[] = [];
+            if (node.data.parentId) {
+              const siblings = nodes.filter(
+                (n) => n.data.parentId === node.data.parentId && n.id !== node.id
+              );
+              // Limit to 10 siblings to prevent token bloat
+              const limitedSiblings = siblings.slice(0, 10);
+              limitedSiblings.forEach((sibling) => {
+                if (typeof sibling.data.content === 'string' && sibling.data.content.trim()) {
+                  siblingContents.push(sibling.data.content);
+                }
+              });
+            }
+
+            // Compute full ancestry path: walk up from current node to root
+            const ancestryPath: string[] = [];
+            let currentNode = parentNode; // Start from parent (don't include current node)
+            const visited = new Set<string>([node.id]); // Prevent infinite loops
+
+            while (currentNode && !visited.has(currentNode.id)) {
+              visited.add(currentNode.id);
+              if (typeof currentNode.data.content === 'string' && currentNode.data.content.trim()) {
+                ancestryPath.unshift(currentNode.data.content); // Add to beginning
+              }
+              currentNode = currentNode.data.parentId ? getNode(currentNode.data.parentId) : null;
+            }
+
+            return {
+              type: 'single-node',
+              node,
+              parentContent,
+              siblingContents,
+              ancestryPath, // Full path from root to immediate parent
+              level: node.data.level || 0,
+            };
+          }
+
+          // Multiple selections - check if same branch
+          const allNodes = Array.from(selectedNodeIds)
+            .map((id) => getNode(id))
+            .filter((n) => n !== null) as any[];
+
+          // Check if all nodes share the same root
+          const roots = allNodes.map((node) => getRoot(node.id)?.id).filter(Boolean);
+          const uniqueRoots = new Set(roots);
+          const isSameBranch = uniqueRoots.size === 1;
+
+          if (isSameBranch) {
+            // Get first node's parent for context
+            const firstNode = allNodes[0];
+            const parentNode = firstNode.data.parentId ? getNode(firstNode.data.parentId) : null;
+            const parentContent =
+              typeof parentNode?.data.content === 'string' ? parentNode.data.content : undefined;
+
+            // Compute ancestry path for branch context
+            const ancestryPath: string[] = [];
+            let currentNode = parentNode;
+            const visited = new Set<string>();
+            allNodes.forEach((n) => visited.add(n.id)); // Don't include selected nodes
+
+            while (currentNode && !visited.has(currentNode.id)) {
+              visited.add(currentNode.id);
+              if (typeof currentNode.data.content === 'string' && currentNode.data.content.trim()) {
+                ancestryPath.unshift(currentNode.data.content);
+              }
+              currentNode = currentNode.data.parentId ? getNode(currentNode.data.parentId) : null;
+            }
+
+            return {
+              type: 'same-branch',
+              nodes: allNodes,
+              parentContent,
+              ancestryPath, // Full path from root to parent
+              level: firstNode.data.level || 0,
+              nodeCount: selectedCount,
+            };
+          }
+
+          // Cross-branch selection
+          return {
+            type: 'cross-branch',
+            nodeCount: selectedCount,
+          };
         },
 
         getNodeLength: () => {

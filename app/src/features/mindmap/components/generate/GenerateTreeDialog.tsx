@@ -1,34 +1,34 @@
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Sparkles, Settings2 } from 'lucide-react';
-import { useForm, Controller } from 'react-hook-form';
 import { useReactFlow } from '@xyflow/react';
+import { Settings2, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
+import { AutosizeTextarea } from '@/components/ui/autosize-textarea';
+import { Button } from '@/components/ui/button';
+import { MODEL_TYPES, useModels } from '@/features/model';
+import { ModelSelect } from '@/features/model/components/ModelSelect';
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from '@/shared/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { AutosizeTextarea } from '@/components/ui/autosize-textarea';
 import { Label } from '@/shared/components/ui/label';
+import { ScrollArea } from '@/shared/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { Separator } from '@/shared/components/ui/separator';
-import { ScrollArea } from '@/shared/components/ui/scroll-area';
-import { LAYOUT_TYPE } from '../../types';
-import type { MindMapNode, MindMapEdge } from '../../types';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
-import { ModelSelect } from '@/features/model/components/ModelSelect';
-import { useModels, MODEL_TYPES } from '@/features/model';
 import { getAllGrades, getAllSubjects } from '@aiprimary/core';
-import { LANGUAGE_OPTIONS, MAX_DEPTH_OPTIONS, MAX_BRANCHES_OPTIONS } from '../../types/form';
-import type { CreateMindmapFormData } from '../../types/form';
 import { useGenerateMindmap } from '../../hooks/useApi';
 import { convertAiDataToMindMapNodes, getTreeLayoutType } from '../../services/utils';
 import { useCoreStore, useLayoutStore, useUndoRedoStore } from '../../stores';
+import type { MindMapEdge, MindMapNode } from '../../types';
+import { LAYOUT_TYPE } from '../../types';
 import { MINDMAP_TYPES } from '../../types/constants';
+import type { CreateMindmapFormData } from '../../types/form';
+import { LANGUAGE_OPTIONS, MAX_BRANCHES_OPTIONS, MAX_DEPTH_OPTIONS } from '../../types/form';
 
 interface GenerateTreeDialogProps {
   isOpen: boolean;

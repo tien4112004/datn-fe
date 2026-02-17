@@ -21,6 +21,8 @@ interface ContextLibraryDialogProps {
   onOpenChange: (open: boolean) => void;
   existingTitles: Set<string>;
   onImport: (contexts: Context[]) => void;
+  defaultSubject?: string;
+  defaultGrade?: string;
 }
 
 export const ContextLibraryDialog = ({
@@ -28,6 +30,8 @@ export const ContextLibraryDialog = ({
   onOpenChange,
   existingTitles,
   onImport,
+  defaultSubject,
+  defaultGrade,
 }: ContextLibraryDialogProps) => {
   const { t } = useTranslation('assignment', {
     keyPrefix: 'assignmentEditor.contextsPanel',
@@ -50,7 +54,13 @@ export const ContextLibraryDialog = ({
   }, [debouncedSetSearch]);
 
   const { contexts, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteContextList(
-    open ? { search: debouncedSearch || undefined } : {}
+    open
+      ? {
+          search: debouncedSearch || undefined,
+          ...(defaultSubject ? { subject: [defaultSubject] } : {}),
+          ...(defaultGrade ? { grade: [defaultGrade] } : {}),
+        }
+      : {}
   );
 
   // Reset state when dialog closes

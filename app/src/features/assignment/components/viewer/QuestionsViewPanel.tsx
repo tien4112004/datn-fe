@@ -25,16 +25,14 @@ export const QuestionsViewPanel = ({ assignment }: QuestionsViewPanelProps) => {
   const questions = (assignment.questions || []) as AssignmentQuestionWithTopic[];
   const assignmentContexts = ((assignment as any).contexts || []) as AssignmentContext[];
 
-  // Build topics map from matrix dimensions (topics live inside matrix, not as a separate field)
+  // Build topics map from matrix dimensions (topics are the primary dimension)
   const topicsMap = useMemo(() => {
     const map = new Map<string, string>();
     const dims = assignment.matrix?.dimensions?.topics;
     if (dims) {
-      dims.forEach((topic) =>
-        (topic.subtopics ?? []).forEach((sub) => {
-          if (sub.id) map.set(sub.id, sub.name);
-        })
-      );
+      dims.forEach((topic) => {
+        if (topic.id && topic.name) map.set(topic.id, topic.name);
+      });
     }
     return map;
   }, [assignment.matrix]);

@@ -10,7 +10,8 @@ type MainView =
   | 'contexts'
   | 'questionsList'
   | 'generateQuestions'
-  | 'generateMatrix';
+  | 'generateMatrix'
+  | 'fillMatrixGaps';
 
 interface AssignmentEditorState {
   // UI State
@@ -24,6 +25,8 @@ interface AssignmentEditorState {
   isMatrixEditorOpen: boolean;
   isContextCreateFormOpen: boolean;
   isContextLibraryDialogOpen: boolean;
+  isMatrixTemplateLibraryDialogOpen: boolean;
+  isMatrixTemplateSaveDialogOpen: boolean;
   mainView: MainView;
 
   // Actions
@@ -38,6 +41,8 @@ interface AssignmentEditorState {
   setMatrixEditorOpen: (open: boolean) => void;
   setContextCreateFormOpen: (open: boolean) => void;
   setContextLibraryDialogOpen: (open: boolean) => void;
+  setMatrixTemplateLibraryDialogOpen: (open: boolean) => void;
+  setMatrixTemplateSaveDialogOpen: (open: boolean) => void;
   setMainView: (view: MainView) => void;
 
   // Question operations (these will be used by components to update form)
@@ -69,6 +74,8 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       isMatrixEditorOpen: false,
       isContextCreateFormOpen: false,
       isContextLibraryDialogOpen: false,
+      isMatrixTemplateLibraryDialogOpen: false,
+      isMatrixTemplateSaveDialogOpen: false,
       mainView: 'info',
 
       // UI actions
@@ -96,6 +103,8 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       setMatrixEditorOpen: (open) => set({ isMatrixEditorOpen: open }),
       setContextCreateFormOpen: (open) => set({ isContextCreateFormOpen: open }),
       setContextLibraryDialogOpen: (open) => set({ isContextLibraryDialogOpen: open }),
+      setMatrixTemplateLibraryDialogOpen: (open) => set({ isMatrixTemplateLibraryDialogOpen: open }),
+      setMatrixTemplateSaveDialogOpen: (open) => set({ isMatrixTemplateSaveDialogOpen: open }),
 
       // Reorder questions (used with drag-drop)
       reorderQuestions: (questions, oldIndex, newIndex) => {

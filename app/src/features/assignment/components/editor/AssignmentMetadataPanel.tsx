@@ -36,10 +36,10 @@ export const AssignmentMetadataPanel = () => {
       <div>
         <div className="flex items-center gap-3 border-b pb-4">
           <FileText className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Basic Information</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('basicInformation')}</h2>
         </div>
 
-        <div className="space-y-4 px-2">
+        <div className="space-y-4 px-2 pt-4">
           <div>
             <div className="mb-1.5 flex items-center gap-1.5">
               <Label htmlFor="title" className="text-xs text-gray-600 dark:text-gray-400">
@@ -80,7 +80,7 @@ export const AssignmentMetadataPanel = () => {
                   </TooltipContent>
                 </Tooltip>
               </div>
-              <Select value={subject} onValueChange={setSubject}>
+              <Select value={subject as string} onValueChange={(val) => setSubject(val as any)}>
                 <SelectTrigger id="subject" className="h-9 text-sm" aria-invalid={!!subjectError}>
                   <SelectValue placeholder={t('fields.subjectPlaceholder')} />
                 </SelectTrigger>
@@ -109,7 +109,7 @@ export const AssignmentMetadataPanel = () => {
                   </TooltipContent>
                 </Tooltip>
               </div>
-              <Select value={grade} onValueChange={setGrade}>
+              <Select value={grade as string} onValueChange={(val) => setGrade(val as any)}>
                 <SelectTrigger id="grade" className="h-9 text-sm">
                   <SelectValue placeholder={t('fields.gradePlaceholder')} />
                 </SelectTrigger>

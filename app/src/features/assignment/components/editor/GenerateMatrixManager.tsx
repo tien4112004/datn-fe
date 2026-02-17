@@ -23,7 +23,7 @@ import type { AssignmentTopic, MatrixCell, ApiMatrix } from '../../types';
 
 /**
  * Transform ExamMatrixDtoResponse to AssignmentTopic[] + MatrixCell[]
- * Reuses the same logic as transformAssignmentToFormData in api/service.ts
+ * Topics are now flat (no subtopic hierarchy flattening)
  */
 function transformGeneratedMatrix(response: GenerateMatrixResponse): {
   topics: AssignmentTopic[];
@@ -32,14 +32,12 @@ function transformGeneratedMatrix(response: GenerateMatrixResponse): {
   const difficulties = getAllDifficulties();
   const questionTypes = getAllQuestionTypes();
 
-  // Flatten topic > subtopic hierarchy into flat topics list
-  const topics: AssignmentTopic[] = response.dimensions.topics.flatMap((topic) =>
-    (topic.subtopics ?? []).map((sub) => ({
-      id: sub.id || createTopicId(),
-      name: sub.name,
-      parentTopic: topic.name,
-    }))
-  );
+  // Map topics directly (subtopics from API response become chapters)
+  const topics: AssignmentTopic[] = response.dimensions.topics.map((topic) => ({
+    id: topic.id || createTopicId(),
+    name: topic.name,
+    chapters: topic.subtopics?.map((s) => s.name) || [],
+  }));
 
   // Create full matrix cells grid for all topics
   const fullMatrixCells = topics.flatMap((topic) =>
@@ -52,8 +50,9 @@ function transformGeneratedMatrix(response: GenerateMatrixResponse): {
     subject: response.metadata.subject as any,
     dimensions: {
       topics: response.dimensions.topics.map((t) => ({
+        id: t.id,
         name: t.name,
-        subtopics: (t.subtopics ?? []).map((s) => ({ id: s.id, name: s.name })),
+        chapters: t.subtopics?.map((s) => s.name) || [],
       })),
       difficulties: response.dimensions.difficulties as any[],
       questionTypes: response.dimensions.questionTypes as any[],

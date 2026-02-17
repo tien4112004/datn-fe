@@ -1,7 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAssignmentApiService } from '../api';
 import { assignmentKeys } from '../api/assignmentApi';
-import type { CreateAssignmentRequest, UpdateAssignmentRequest, GenerateMatrixRequest } from '../types';
+import type {
+  CreateAssignmentRequest,
+  UpdateAssignmentRequest,
+  GenerateMatrixRequest,
+  GenerateExamFromMatrixRequest,
+} from '../types';
 
 /**
  * Hook to fetch list of assignments with optional filters
@@ -161,5 +166,17 @@ export const useGenerateMatrix = () => {
 
   return useMutation({
     mutationFn: (request: GenerateMatrixRequest) => service.generateMatrix(request),
+  });
+};
+
+/**
+ * Hook to generate an exam from a matrix (detects gaps)
+ * @returns Mutation function and state that returns ExamDraftDto with gaps
+ */
+export const useGenerateExamFromMatrix = () => {
+  const service = getAssignmentApiService();
+
+  return useMutation({
+    mutationFn: (request: GenerateExamFromMatrixRequest) => service.generateExamFromMatrix(request),
   });
 };

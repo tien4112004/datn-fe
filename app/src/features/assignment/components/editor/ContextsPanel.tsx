@@ -30,6 +30,8 @@ export const ContextsPanel = () => {
   const addContext = useAssignmentFormStore((state) => state.addContext);
   const updateContext = useAssignmentFormStore((state) => state.updateContext);
   const removeContext = useAssignmentFormStore((state) => state.removeContext);
+  const subject = useAssignmentFormStore((state) => state.subject);
+  const grade = useAssignmentFormStore((state) => state.grade);
 
   // UI state from editor store (triggered by sidebar buttons)
   const showCreateForm = useAssignmentEditorStore((state) => state.isContextCreateFormOpen);
@@ -180,6 +182,8 @@ export const ContextsPanel = () => {
         onOpenChange={setShowLibraryDialog}
         existingTitles={existingTitles}
         onImport={handleImportFromLibrary}
+        defaultSubject={subject || undefined}
+        defaultGrade={grade || undefined}
       />
     </div>
   );

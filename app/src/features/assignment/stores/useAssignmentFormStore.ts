@@ -7,7 +7,12 @@ import type {
   AssignmentContext,
   AssignmentValidationErrors,
 } from '../types';
+import type { MatrixTemplate } from '../types/matrixTemplate';
 import { generateId, createCellId } from '@aiprimary/core';
+import type { Grade } from '@aiprimary/core/assessment/grades.js';
+import type { SubjectCode } from '@aiprimary/core';
+import { apiMatrixToViewData } from '../utils/matrixConversion';
+import { toast } from 'sonner';
 
 /**
  * Sync matrix cell counts based on current questions
@@ -49,8 +54,8 @@ interface AssignmentFormStore {
   // === FORM DATA ===
   title: string;
   description: string;
-  subject: string;
-  grade: string;
+  subject: SubjectCode | '';
+  grade: Grade | '';
   topics: AssignmentTopic[];
   questions: AssignmentQuestionWithTopic[];
   matrix: MatrixCell[];
@@ -64,8 +69,8 @@ interface AssignmentFormStore {
   // === ACTIONS: Metadata ===
   setTitle: (title: string) => void;
   setDescription: (description: string) => void;
-  setSubject: (subject: string) => void;
-  setGrade: (grade: string) => void;
+  setSubject: (subject: SubjectCode) => void;
+  setGrade: (grade: Grade) => void;
   setShuffleQuestions: (shuffle: boolean) => void;
 
   // === ACTIONS: Topics ===
@@ -88,6 +93,7 @@ interface AssignmentFormStore {
   removeMatrixCell: (cellId: string) => void;
   updateMatrixCell: (cellId: string, updates: Partial<MatrixCell>) => void;
   syncMatrix: () => void; // Manual sync if needed
+  importMatrixTemplate: (template: MatrixTemplate) => void;
 
   // === GETTERS: Derived State ===
   getTotalPoints: () => number;
@@ -432,6 +438,23 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
           'assignment/syncMatrix'
         ),
 
+      importMatrixTemplate: (template) => {
+        const { topics, cells } = apiMatrixToViewData(template.matrix);
+
+        set(
+          {
+            matrix: cells,
+            topics: topics,
+            isDirty: true,
+          },
+          false,
+          'assignment/importMatrixTemplate'
+        );
+
+        dispatchDirtyEvent(true);
+        toast.success('Template imported successfully');
+      },
+
       // === GETTERS ===
       getTotalPoints: () => {
         const { questions } = get();
@@ -512,7 +535,12 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
       },
 
       reset: (data) => {
-        const newState = { ...initialState, ...data };
+        const newState = {
+          ...initialState,
+          ...data,
+          subject: (data?.subject || initialState.subject) as SubjectCode | '',
+          grade: (data?.grade || initialState.grade) as Grade | '',
+        };
         set(newState, false, 'assignment/reset');
         dispatchDirtyEvent(false);
       },
@@ -523,8 +551,8 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
         const newState = {
           title: data.title || '',
           description: data.description || '',
-          subject: data.subject || '',
-          grade: data.grade || '',
+          subject: (data.subject || '') as SubjectCode | '',
+          grade: (data.grade || '') as Grade | '',
           topics: data.topics || [],
           questions,
           matrix: syncMatrixCounts(questions, matrix),

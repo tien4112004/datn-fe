@@ -49,6 +49,7 @@ export default {
     difficulty: 'Độ khó',
     grade: 'Lớp',
     validationErrors: 'Lỗi xác thực',
+    contextDescription: 'Tùy chọn: Chọn đoạn văn đọc hiểu để cung cấp ngữ cảnh cho câu hỏi này',
 
     // Toast messages
     createSuccess: 'Tạo câu hỏi thành công',

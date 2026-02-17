@@ -283,6 +283,7 @@ export default {
       actions: 'Hành động',
       cancel: 'Hủy',
       save: 'Lưu bài tập',
+      fillMatrixGaps: 'Tạo câu hỏi từ khoảng trống ma trận',
       saving: 'Đang lưu...',
       tooltips: {
         save: 'Lưu thay đổi',
@@ -291,6 +292,7 @@ export default {
         fromBank: 'Thêm từ kho câu hỏi',
         addContext: 'Tạo đoạn văn mới',
         fromLibrary: 'Nhập từ thư viện đoạn văn',
+        fillMatrixGaps: 'Phát hiện khoảng trống trong ma trận và tạo câu hỏi để lấp đầy',
       },
     },
 
@@ -358,6 +360,7 @@ export default {
 
     // Bảng điều khiển thông tin bài tập
     metadata: {
+      basicInformation: 'Thông tin cơ bản',
       panelTitle: 'Thông tin bài tập',
       edit: 'Chỉnh sửa',
       title: 'Thông tin bài tập',
@@ -439,7 +442,7 @@ export default {
       topicDescription: 'Mô tả chủ đề',
       topicPlaceholder: 'Tên chủ đề...',
       descriptionPlaceholder: 'Mô tả chủ đề (tùy chọn)...',
-      addSubtopic: 'Thêm chủ đề con',
+      addChapter: 'Thêm chương',
       parentTopic: 'Nhóm chủ đề',
       parentTopicPlaceholder: 'Tên nhóm chủ đề...',
       editGroup: 'Chỉnh sửa nhóm chủ đề',
@@ -454,6 +457,11 @@ export default {
       tableHeaders: {
         topic: 'Chủ đề',
       },
+      useContextLabel: 'Sử dụng đoạn văn đọc hiểu',
+      useContextHint:
+        'Khi bật, AI sẽ sử dụng các đoạn văn đọc hiểu khi tạo câu hỏi cho chủ đề này thông qua Điền khoảng trống trong ma trận',
+      useContextDescription: 'Cài đặt này được sử dụng khi tạo câu hỏi với Điền khoảng trống trong ma trận',
+      usesContext: 'Sử dụng đoạn văn đọc hiểu',
     },
 
     // Bảng quản lý đoạn văn
@@ -501,7 +509,7 @@ export default {
       generateMatrix: 'Tạo ma trận',
       tooltips: {
         addTopic: 'Thêm chủ đề mới',
-        addSubtopic: 'Thêm chủ đề con vào nhóm này',
+        addChapter: 'Thêm chương vào nhóm này',
         editGroup: 'Đổi tên nhóm chủ đề',
         editTopic: 'Sửa thông tin chủ đề',
         cellInput: 'Số câu hỏi yêu cầu',
@@ -523,18 +531,33 @@ export default {
       fields: {
         name: 'Tên ma trận',
         namePlaceholder: 'Nhập tên ma trận',
+        nameHelp: 'Một tên duy nhất để xác định ma trận này',
         grade: 'Khối lớp',
         gradePlaceholder: 'Chọn khối lớp',
+        gradeHelp: 'Khối lớp sẽ ảnh hưởng đến độ khó và loại câu hỏi được đề xuất',
         subject: 'Môn học',
         subjectPlaceholder: 'Chọn môn học',
+        subjectHelp: 'Lọc câu hỏi theo môn học để tạo ra ma trận phù hợp',
         totalQuestions: 'Tổng số câu hỏi',
+        totalQuestionsHelp: 'Tổng số câu hỏi mà bạn muốn có trong ma trận',
         totalPoints: 'Tổng điểm',
+        totalPointsHelp: 'Tổng điểm cho tất cả câu hỏi',
         difficulties: 'Mức độ khó',
+        difficultiesHelp:
+          'KIẾN THỨC: Nhớ lại thông tin. HIỂU BIẾT: Giải thích ý tưởng. ỨNG DỤNG: Sử dụng ý tưởng',
         questionTypes: 'Loại câu hỏi',
+        questionTypesHelp:
+          'TRẮC NGHIỆM: Chọn 1 câu trả lời. ĐIỀN ĐẠO: Điền từ/câu thiếu. GHÉP ĐÔI: Ghép cặp. TỰ LUẬN: Câu trả lời mở',
         prompt: 'Yêu cầu',
         promptPlaceholder: 'Mô tả những gì bạn muốn ma trận tập trung vào...',
+        promptHelp: 'Ví dụ: "Tập trung vào chương 1-3", "Nhấn mạnh các ứng dụng thực tế"',
+        language: 'Ngôn ngữ',
+        languageVietnamese: 'Tiếng Việt',
+        languageEnglish: 'English',
+        languageHelp: 'Ngôn ngữ được sử dụng cho các chủ đề được tạo',
         model: 'Mô hình AI',
         modelPlaceholder: 'Chọn mô hình AI',
+        modelHelp: 'Các mô hình khác nhau có tốc độ và độ chính xác khác nhau',
       },
       actions: {
         cancel: 'Hủy',
@@ -563,6 +586,73 @@ export default {
         replace: 'Thay thế',
         merge: 'Gộp',
         cancel: 'Hủy',
+      },
+      savePreset: {
+        title: 'Lưu cấu hình là mẫu',
+        description: 'Lưu cấu hình hiện tại để sử dụng lại sau này',
+        fields: {
+          name: 'Tên mẫu',
+          namePlaceholder: 'Nhập tên mẫu (tối đa 50 ký tự)',
+          description: 'Mô tả',
+          descriptionPlaceholder: 'Mô tả ngắn về mẫu này (tùy chọn)',
+          icon: 'Biểu tượng',
+        },
+        errors: {
+          nameRequired: 'Tên mẫu là bắt buộc',
+          nameTooLong: 'Tên mẫu không được vượt quá 50 ký tự',
+        },
+        save: 'Lưu mẫu',
+      },
+    },
+
+    fillMatrixGaps: {
+      title: 'Tạo câu hỏi từ khoảng trống ma trận',
+      detecting: 'Đang phát hiện khoảng trống...',
+      noGaps: 'Không có khoảng trống! Ma trận đã hoàn chỉnh.',
+      gapsFound: 'Phát hiện {{count}} khoảng trống cần {{total}} câu hỏi',
+      selectGaps: 'Chọn khoảng trống để điền',
+      generatingQuestions: 'Đang tạo câu hỏi cho {{count}} khoảng trống...',
+      success: 'Điền thành công {{count}} khoảng trống',
+      status: {
+        allRequirementsMet: 'Tất cả yêu cầu ma trận đã được đáp ứng',
+      },
+      gapDetails: {
+        title: 'Chi tiết khoảng trống',
+        topic: 'Chủ đề',
+        difficulty: 'Mức độ khó',
+        type: 'Loại câu hỏi',
+        needed: 'Cần {{count}} câu hỏi nữa',
+        available: '{{available}} / {{required}}',
+        selected: 'Đã chọn',
+        select: 'Chọn',
+      },
+      errors: {
+        noMatrix: 'Không có ma trận. Vui lòng tạo ma trận trước.',
+        noRequirements: 'Ma trận không có yêu cầu nào. Vui lòng thêm yêu cầu vào ma trận.',
+        noGapsSelected: 'Vui lòng chọn ít nhất một khoảng trống để điền',
+        modelRequired: 'Vui lòng chọn mô hình AI trước khi tạo câu hỏi',
+        detectionFailed: 'Không thể phát hiện khoảng trống',
+        generationFailed: 'Không thể tạo câu hỏi',
+        missingMetadata:
+          'Vui lòng thiết lập khối lớp và môn học trước khi tạo câu hỏi từ khoảng trống ma trận.',
+      },
+      actions: {
+        selectAll: 'Chọn tất cả',
+        clearAll: 'Bỏ chọn',
+        backToMatrix: 'Quay lại ma trận',
+        backToReview: 'Quay lại xem xét',
+        generateQuestions: 'Tạo câu hỏi',
+        fillMatrixGaps: 'Tạo câu hỏi từ khoảng trống ma trận',
+      },
+      fields: {
+        model: 'Mô hình AI',
+        modelPlaceholder: 'Chọn mô hình AI',
+        additionalPrompt: 'Yêu cầu bổ sung',
+        additionalPromptPlaceholder: 'VD: Tập trung vào các ứng dụng thực tế',
+        promptHint: 'Nhập bối cảnh bổ sung để hướng dẫn việc tạo câu hỏi',
+      },
+      tooltips: {
+        fillMatrixGaps: 'Phát hiện khoảng trống trong ma trận và tạo câu hỏi để lấp đầy',
       },
     },
 
@@ -627,6 +717,15 @@ export default {
         contexts: 'Quản lý đoạn văn đọc hiểu',
         questionNumber: 'Nhấp để sửa, kéo để sắp xếp',
       },
+    },
+
+    // Hộp thoại danh sách câu hỏi
+    questionList: {
+      title: 'Tất cả câu hỏi',
+      emptyMessage: 'Chưa có câu hỏi nào',
+      dragHint: 'Kéo câu hỏi để sắp xếp lại',
+      questionNumber: 'CH{{number}}',
+      close: 'Đóng',
     },
 
     // Ô ma trận
@@ -1274,5 +1373,49 @@ export default {
       feedbackForQuestion: 'Nhận xét cho câu này (Tùy chọn)',
       questionFeedbackPlaceholder: 'Thêm nhận xét cụ thể về câu trả lời này...',
     },
+  },
+  matrixTemplateLibrary: {
+    title: 'Thư viện Mẫu Ma trận',
+    description: 'Duyệt và nhập các mẫu ma trận để nhanh chóng thiết lập cấu trúc bài tập.',
+    searchPlaceholder: 'Tìm kiếm mẫu...',
+    loading: 'Đang tải mẫu...',
+    noTemplates: 'Không tìm thấy mẫu nào. Tạo mẫu đầu tiên để sử dụng lại sau!',
+    importTemplate: 'Nhập Mẫu',
+    tabs: {
+      personal: 'Cá nhân',
+      public: 'Công khai',
+    },
+    badges: {
+      public: 'Công khai',
+      incompatible: 'Không tương thích',
+    },
+    metadata: {
+      topics: 'chủ đề',
+      questions: 'câu hỏi',
+    },
+  },
+  matrixTemplateSave: {
+    title: 'Lưu Ma trận làm Mẫu',
+    description: 'Lưu cấu hình ma trận hiện tại làm mẫu có thể tái sử dụng cho các bài tập sau.',
+    nameLabel: 'Tên Mẫu',
+    namePlaceholder: 'ví dụ: Ma trận Toán Lớp 1 Chuẩn',
+    summary: 'Tóm tắt Ma trận',
+    totalQuestions: 'Tổng Câu hỏi',
+    save: 'Lưu Mẫu',
+    saving: 'Đang lưu...',
+    nameRequired: 'Tên mẫu là bắt buộc',
+    metadataRequired: 'Môn học và lớp là bắt buộc',
+    matrixEmpty: 'Ma trận phải có ít nhất một chủ đề và ô',
+    saveSuccess: 'Lưu mẫu thành công',
+    saveFailed: 'Lưu mẫu thất bại',
+  },
+  matrixActions: {
+    templateLibrary: 'Thư viện Mẫu',
+    templateLibraryTooltip: 'Duyệt và nhập các mẫu ma trận',
+    templateLibraryDisabled: 'Đặt môn học và lớp trước để duyệt mẫu',
+    saveAsTemplate: 'Lưu làm Mẫu',
+    saveAsTemplateTooltip: 'Lưu ma trận hiện tại làm mẫu có thể tái sử dụng',
+    saveAsTemplateDisabledMetadata: 'Đặt môn học và lớp trước',
+    saveAsTemplateDisabledMatrix: 'Tạo ma trận trước',
   },
 };

@@ -175,4 +175,8 @@ export default {
     vietnamese: 'Vietnamese',
     english: 'English',
   },
+  grade: 'Grade',
+  subject: 'Subject',
+  topics: 'Topics',
+  characters: 'characters',
 };

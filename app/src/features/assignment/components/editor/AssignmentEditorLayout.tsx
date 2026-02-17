@@ -1,5 +1,7 @@
-import { Save, Wand2, Database, Plus, Library } from 'lucide-react';
+import { useState } from 'react';
+import { Save, Wand2, Database, Plus, Library, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { Button } from '@/shared/components/ui/button';
 import LoadingButton from '@/shared/components/common/LoadingButton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
@@ -13,8 +15,14 @@ import { QuestionListDialog } from './QuestionListDialog';
 import { QuestionsListViewPanel } from '../viewer/QuestionsListViewPanel';
 import { GenerateQuestionsManager } from './GenerateQuestionsManager';
 import { GenerateMatrixManager } from './GenerateMatrixManager';
+import { FillMatrixGapsManager } from './FillMatrixGapsManager';
+import { MatrixTemplateLibraryDialog } from './MatrixTemplateLibraryDialog';
+import { MatrixTemplateSaveDialog } from './MatrixTemplateSaveDialog';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
+import { useGenerateExamFromMatrix } from '../../hooks/useAssignmentApi';
+import { cellsToApiMatrix } from '../../utils/matrixConversion';
+import type { ExamDraftDto } from '../../types/assignment';
 
 interface AssignmentEditorLayoutProps {
   onCancel: () => void;
@@ -28,13 +36,74 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
   const setQuestionBankOpen = useAssignmentEditorStore((state) => state.setQuestionBankOpen);
   const setContextCreateFormOpen = useAssignmentEditorStore((state) => state.setContextCreateFormOpen);
   const setContextLibraryDialogOpen = useAssignmentEditorStore((state) => state.setContextLibraryDialogOpen);
+  const isMatrixTemplateLibraryDialogOpen = useAssignmentEditorStore(
+    (state) => state.isMatrixTemplateLibraryDialogOpen
+  );
+  const setMatrixTemplateLibraryDialogOpen = useAssignmentEditorStore(
+    (state) => state.setMatrixTemplateLibraryDialogOpen
+  );
+  const isMatrixTemplateSaveDialogOpen = useAssignmentEditorStore(
+    (state) => state.isMatrixTemplateSaveDialogOpen
+  );
+  const setMatrixTemplateSaveDialogOpen = useAssignmentEditorStore(
+    (state) => state.setMatrixTemplateSaveDialogOpen
+  );
+  const title = useAssignmentFormStore((state) => state.title);
+  const subject = useAssignmentFormStore((state) => state.subject);
+  const grade = useAssignmentFormStore((state) => state.grade);
+  const matrix = useAssignmentFormStore((state) => state.matrix);
   const questions = useAssignmentFormStore((state) => state.questions);
   const contexts = useAssignmentFormStore((state) => state.contexts);
   const topics = useAssignmentFormStore((state) => state.topics);
+  const importMatrixTemplate = useAssignmentFormStore((state) => state.importMatrixTemplate);
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor' });
+  const { t: tFillGaps } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.fillMatrixGaps' });
   const { t: tToolbar } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
   const { t: tContextsPanel } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.contextsPanel' });
   const { t: tActions } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.actions' });
+  const { t: tMatrixActions } = useTranslation('assignment', { keyPrefix: 'matrixActions' });
+
+  // Fill Matrix Gaps state
+  const [fillMatrixDraft, setFillMatrixDraft] = useState<ExamDraftDto | null>(null);
+  const [isFillMatrixLoading, setIsFillMatrixLoading] = useState(false);
+  const detectGapsMutation = useGenerateExamFromMatrix();
+
+  const handleFillMatrixGaps = async () => {
+    // Validate matrix exists and has requirements
+    if (!matrix || matrix.length === 0) {
+      toast.error(String(tFillGaps('errors.noMatrix')));
+      return;
+    }
+
+    if (!matrix.some((cell) => cell.requiredCount > 0)) {
+      toast.error(String(tFillGaps('errors.noRequirements')));
+      return;
+    }
+
+    if (!grade || !subject) {
+      toast.error(String(tFillGaps('errors.missingMetadata')));
+      return;
+    }
+
+    setIsFillMatrixLoading(true);
+    try {
+      const apiMatrix = cellsToApiMatrix(matrix, { grade, subject }, topics);
+      const result = await detectGapsMutation.mutateAsync({
+        subject: subject || '',
+        title: title || 'Test Matrix',
+        matrix: apiMatrix,
+        missingStrategy: 'REPORT_GAPS',
+      });
+
+      setFillMatrixDraft(result);
+      setMainView('fillMatrixGaps');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(tFillGaps('errors.detectionFailed'));
+      toast.error(errorMessage);
+    } finally {
+      setIsFillMatrixLoading(false);
+    }
+  };
 
   return (
     <div className="grid grid-cols-1 gap-6 pb-4 lg:h-[calc(100vh-8rem)] lg:grid-cols-4">
@@ -54,6 +123,18 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
           <GenerateQuestionsManager />
         ) : mainView === 'generateMatrix' ? (
           <GenerateMatrixManager />
+        ) : mainView === 'fillMatrixGaps' && fillMatrixDraft ? (
+          <FillMatrixGapsManager
+            draft={fillMatrixDraft}
+            onClose={() => {
+              setMainView('matrix');
+              setFillMatrixDraft(null);
+            }}
+            onQuestionsAdded={() => {
+              setMainView('matrix');
+              setFillMatrixDraft(null);
+            }}
+          />
         ) : null}
       </div>
 
@@ -153,6 +234,70 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
                     <p>{tActions('tooltips.generateMatrix')}</p>
                   </TooltipContent>
                 </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={handleFillMatrixGaps}
+                      disabled={isFillMatrixLoading}
+                      className="w-full"
+                    >
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      {String(t('actions.fillMatrixGaps'))}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{String(t('actions.tooltips.fillMatrixGaps'))}</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setMatrixTemplateLibraryDialogOpen(true)}
+                      disabled={!subject || !grade}
+                      className="w-full"
+                    >
+                      <Library className="mr-2 h-4 w-4" />
+                      {tMatrixActions('templateLibrary')}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      {!subject || !grade
+                        ? tMatrixActions('templateLibraryDisabled')
+                        : tMatrixActions('templateLibraryTooltip')}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setMatrixTemplateSaveDialogOpen(true)}
+                      disabled={!matrix || matrix.length === 0 || !subject || !grade}
+                      className="w-full"
+                    >
+                      <Save className="mr-2 h-4 w-4" />
+                      {tMatrixActions('saveAsTemplate')}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      {!subject || !grade
+                        ? tMatrixActions('saveAsTemplateDisabledMetadata')
+                        : !matrix || matrix.length === 0
+                          ? tMatrixActions('saveAsTemplateDisabledMatrix')
+                          : tMatrixActions('saveAsTemplateTooltip')}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
 
               {/* Divider */}
@@ -229,6 +374,25 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
 
       {/* Question List Dialog */}
       <QuestionListDialog />
+
+      {/* Matrix Template Library Dialog */}
+      <MatrixTemplateLibraryDialog
+        open={isMatrixTemplateLibraryDialogOpen}
+        onOpenChange={setMatrixTemplateLibraryDialogOpen}
+        currentGrade={grade}
+        currentSubject={subject}
+        onImport={importMatrixTemplate}
+      />
+
+      {/* Matrix Template Save Dialog */}
+      <MatrixTemplateSaveDialog
+        open={isMatrixTemplateSaveDialogOpen}
+        onOpenChange={setMatrixTemplateSaveDialogOpen}
+        matrix={matrix}
+        topics={topics}
+        subject={subject}
+        grade={grade}
+      />
     </div>
   );
 };

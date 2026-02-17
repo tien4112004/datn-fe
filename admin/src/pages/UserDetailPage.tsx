@@ -1,10 +1,11 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getAdminApiService } from '@/api/admin';
+import { useTokenUsageStats, useTokenUsageByModel, useTokenUsageByRequestType } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Coins, DollarSign, Activity, Database } from 'lucide-react';
 import { format } from 'date-fns';
 
 export function UserDetailPage() {
@@ -18,6 +19,15 @@ export function UserDetailPage() {
   });
 
   const user = data?.data;
+
+  // Fetch token usage data
+  const { data: tokenUsageData } = useTokenUsageStats(id || '', {});
+  const { data: tokenUsageByModelData } = useTokenUsageByModel(id || '');
+  const { data: tokenUsageByTypeData } = useTokenUsageByRequestType(id || '');
+
+  const tokenStats = tokenUsageData?.data;
+  const tokenByModel = tokenUsageByModelData?.data || [];
+  const tokenByType = tokenUsageByTypeData?.data || [];
 
   if (isLoading) {
     return (
@@ -56,11 +66,63 @@ export function UserDetailPage() {
         </div>
       </div>
 
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Coins</CardTitle>
+            <Coins className="text-muted-foreground h-4 w-4" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-amber-600">
+              {tokenStats?.totalCoin ? parseInt(tokenStats.totalCoin).toLocaleString() : '0'}
+            </div>
+            <p className="text-muted-foreground text-xs">Coins used</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
+            <DollarSign className="text-muted-foreground h-4 w-4" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">
+              ${tokenStats?.totalMoney ? parseFloat(tokenStats.totalMoney).toFixed(2) : '0.00'}
+            </div>
+            <p className="text-muted-foreground text-xs">USD equivalent</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
+            <Activity className="text-muted-foreground h-4 w-4" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {tokenStats?.totalRequests?.toLocaleString() || '0'}
+            </div>
+            <p className="text-muted-foreground text-xs">API requests made</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Tokens</CardTitle>
+            <Database className="text-muted-foreground h-4 w-4" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {tokenStats?.totalTokens?.toLocaleString() || '0'}
+            </div>
+            <p className="text-muted-foreground text-xs">Tokens processed</p>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card>
         <CardHeader>
-          <CardTitle>
-            {user.firstName} {user.lastName}
-          </CardTitle>
+          <CardTitle>User Information</CardTitle>
           <CardDescription>{user.email}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -111,6 +173,74 @@ export function UserDetailPage() {
           </div>
         </CardContent>
       </Card>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Token Usage by Model</CardTitle>
+            <CardDescription>Token consumption breakdown by AI model</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {tokenByModel.length > 0 ? (
+              <div className="space-y-4">
+                {tokenByModel.map((item, index) => (
+                  <div key={index} className="flex items-center justify-between border-b pb-3 last:border-0">
+                    <div className="space-y-1">
+                      <p className="font-medium">{item.model || 'Unknown Model'}</p>
+                      <p className="text-muted-foreground text-sm">
+                        {item.totalRequests?.toLocaleString() || 0} requests
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold">
+                        {item.totalTokens?.toLocaleString() || 0} tokens
+                      </p>
+                      <p className="text-muted-foreground text-sm">
+                        {item.totalCoin ? `${parseInt(item.totalCoin).toLocaleString()} coins` : '-'}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">No model usage data available</p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Usage by Request Type</CardTitle>
+            <CardDescription>Token consumption breakdown by request type</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {tokenByType.length > 0 ? (
+              <div className="space-y-4">
+                {tokenByType.map((item, index) => (
+                  <div key={index} className="flex items-center justify-between border-b pb-3 last:border-0">
+                    <div className="space-y-1">
+                      <p className="font-medium capitalize">{item.requestType || 'Unknown Type'}</p>
+                      <p className="text-muted-foreground text-sm">
+                        {item.totalRequests?.toLocaleString() || 0} requests
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold">
+                        {item.totalTokens?.toLocaleString() || 0} tokens
+                      </p>
+                      <p className="text-muted-foreground text-sm">
+                        {item.totalCoin ? `${parseInt(item.totalCoin).toLocaleString()} coins` : '-'}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">No request type data available</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

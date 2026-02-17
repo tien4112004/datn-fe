@@ -32,6 +32,7 @@ import type {
   CoinPricingQueryParams,
   EnumOption,
 } from '@/types/coin';
+import type { TokenUsageStats, TokenUsageFilterRequest } from '@/types/tokenUsage';
 import { parseQuestionBankCSV, exportQuestionsToCSV } from '@/utils/csvParser';
 import { validateQuestionBankCSV } from '@/utils/csvValidation';
 
@@ -638,6 +639,34 @@ export default class AdminRealApiService implements AdminApiService {
 
   async deleteMatrixTemplate(id: string): Promise<ApiResponse<void>> {
     const response = await api.delete<ApiResponse<void>>(`${this.baseUrl}/api/matrix-templates/${id}`);
+    return response.data;
+  }
+
+  // Token Usage
+  async getTokenUsageStats(
+    userId: string,
+    filters?: TokenUsageFilterRequest
+  ): Promise<ApiResponse<TokenUsageStats>> {
+    const response = await api.get<ApiResponse<TokenUsageStats>>(
+      `${this.baseUrl}/api/admin/token-usage/users/${userId}/stats`,
+      {
+        params: filters,
+      }
+    );
+    return response.data;
+  }
+
+  async getTokenUsageByModel(userId: string): Promise<ApiResponse<TokenUsageStats[]>> {
+    const response = await api.get<ApiResponse<TokenUsageStats[]>>(
+      `${this.baseUrl}/api/admin/token-usage/users/${userId}/by-model`
+    );
+    return response.data;
+  }
+
+  async getTokenUsageByRequestType(userId: string): Promise<ApiResponse<TokenUsageStats[]>> {
+    const response = await api.get<ApiResponse<TokenUsageStats[]>>(
+      `${this.baseUrl}/api/admin/token-usage/users/${userId}/by-request-type`
+    );
     return response.data;
   }
 }

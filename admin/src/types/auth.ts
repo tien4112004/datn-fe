@@ -11,6 +11,8 @@ export interface User {
   createdAt?: string;
   updatedAt?: string;
   role?: string;
+  totalCoin?: string;
+  totalMoney?: string;
 }
 
 export interface LoginRequest {

@@ -15,3 +15,47 @@ export type QuestionBankItem = Question & {
   createdAt?: string;
   updatedAt?: string;
 };
+
+/**
+ * Paginated response for question bank listing
+ */
+export interface QuestionBankListResponse {
+  questions: QuestionBankItem[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+/**
+ * Request payload for creating a question
+ */
+export interface CreateQuestionRequest {
+  question: Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>;
+}
+
+/**
+ * Request payload for updating a question
+ */
+export interface UpdateQuestionRequest {
+  question: Partial<QuestionBankItem>;
+}
+
+/**
+ * Chapter metadata from backend API
+ */
+export interface ChapterResponse {
+  id: string;
+  name: string;
+  grade: string;
+  subject: string;
+  sortOrder: string;
+}
+
+/**
+ * Result of a CSV/bulk import operation
+ */
+export interface ImportResult {
+  success: number;
+  failed: number;
+  errors?: Array<{ row: number; error: string }>;
+}

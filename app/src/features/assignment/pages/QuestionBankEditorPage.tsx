@@ -16,7 +16,7 @@ import { CriticalError } from '@aiprimary/api';
 import { ERROR_TYPE } from '@/shared/constants';
 import { useContext } from '@/features/assignment/hooks/useContextApi';
 import { ContextSelector } from '@/features/question/components/shared/ContextSelector';
-import { MarkdownPreview } from '@/features/question/components/shared/MarkdownPreview';
+import { MarkdownPreview } from '@aiprimary/question/shared';
 import type { CreateQuestionRequest, Question, QuestionBankItem } from '@/features/assignment/types';
 import {
   DIFFICULTY,

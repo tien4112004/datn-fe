@@ -8,7 +8,7 @@ import {
   getDifficultyI18nKey,
   getQuestionTypeI18nKey,
 } from '@aiprimary/core';
-import { QuestionTypeIcon } from '@/features/question/components/shared/QuestionTypeIcon';
+import { QuestionTypeIcon } from '@aiprimary/question/shared';
 import type { MatrixCell, AssignmentTopic, QuestionType } from '../../types';
 import { MatrixCellView } from './MatrixCellView';
 

@@ -16,7 +16,7 @@ import classes from './classes';
 import assignment from './assignment';
 import admin from './admin';
 import comments from './comments';
-import questions from './questions';
+import { questionsEn as questions } from '@aiprimary/question';
 import dashboard from './dashboard';
 import notifications from './notifications';
 

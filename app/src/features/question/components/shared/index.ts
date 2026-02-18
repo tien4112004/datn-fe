@@ -1,12 +1,7 @@
-export { MarkdownEditor } from './MarkdownEditor';
-export { MarkdownPreview } from './MarkdownPreview';
-export { QuestionTitle } from './QuestionTitle';
+// App-specific components (not moved to shared package)
 export { ImageUploader } from './ImageUploader';
-export { DifficultyBadge } from './DifficultyBadge';
-export { QuestionTypeIcon } from './QuestionTypeIcon';
-export { QuestionNumber } from './QuestionNumber';
+export { ImageStorageDialog } from './ImageStorageDialog';
 export { ContextSelector } from './ContextSelector';
-export { ExplanationSection } from './ExplanationSection';
-export { GradeFeedback } from './GradeFeedback';
-export type { ExplanationMode } from './ExplanationSection';
-export { indexToLetter } from './numberingUtils';
+
+// Re-export from shared package for convenience
+export * from '@aiprimary/question/shared';

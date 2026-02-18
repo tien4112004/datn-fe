@@ -17,6 +17,7 @@
   "dependencies": {
     "@aiprimary/api": "workspace:*",
     "@aiprimary/core": "workspace:*",
+    "@aiprimary/question": "workspace:*",
     "@aiprimary/ui": "workspace:*",
     "@blocknote/core": "^0.35.0",
     "@blocknote/mantine": "^0.35.0",

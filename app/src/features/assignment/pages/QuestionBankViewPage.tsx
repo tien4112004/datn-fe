@@ -21,7 +21,7 @@ import {
 } from '@ui/alert-dialog';
 import { useDeleteQuestions, useDuplicateQuestion } from '@/features/assignment/hooks/useQuestionBankApi';
 import { useContext } from '@/features/assignment/hooks/useContextApi';
-import { MarkdownPreview } from '@/features/question/components/shared/MarkdownPreview';
+import { MarkdownPreview } from '@aiprimary/question/shared';
 import { QuestionRenderer } from '@/features/question';
 import { VIEW_MODE } from '@/features/assignment/types';
 import type { QuestionBankItem, Question } from '@/features/assignment/types';

@@ -5,7 +5,7 @@ import { Button } from '@ui/button';
 import { Input } from '@ui/input';
 import { Textarea } from '@ui/textarea';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/collapsible';
-import { MarkdownPreview } from '@/features/question/components/shared/MarkdownPreview';
+import { MarkdownPreview } from '@aiprimary/question/shared';
 import type { AssignmentContext } from '../../types';
 
 interface EditableContextDisplayProps {

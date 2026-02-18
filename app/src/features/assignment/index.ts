@@ -16,8 +16,8 @@ export * from './pages';
 // Components
 // Re-export from question feature for backward compatibility
 export { QuestionRenderer } from '@/features/question';
-export * from '@/features/question/components/shared';
-export * from '@/features/question/components/multiple-choice';
-export * from '@/features/question/components/matching';
-export * from '@/features/question/components/open-ended';
-export * from '@/features/question/components/fill-in-blank';
+export * from '@aiprimary/question/shared';
+export * from '@aiprimary/question/multiple-choice';
+export * from '@aiprimary/question/matching';
+export * from '@aiprimary/question/open-ended';
+export * from '@aiprimary/question/fill-in-blank';

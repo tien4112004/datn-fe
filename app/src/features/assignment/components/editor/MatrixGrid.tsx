@@ -16,7 +16,7 @@ import {
   getQuestionTypeI18nKey,
 } from '@aiprimary/core';
 import { generateId } from '@aiprimary/core';
-import { QuestionTypeIcon } from '@/features/question/components/shared/QuestionTypeIcon';
+import { QuestionTypeIcon } from '@aiprimary/question/shared';
 import type { QuestionType } from '@/features/assignment/types';
 
 export const MatrixGrid = () => {

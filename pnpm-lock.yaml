@@ -61,6 +61,9 @@ importers:
       '@aiprimary/frontend-data':
         specifier: workspace:*
         version: link:../packages/frontend-data
+      '@aiprimary/question':
+        specifier: workspace:*
+        version: link:../packages/question
       '@aiprimary/ui':
         specifier: workspace:*
         version: link:../packages/ui
@@ -94,6 +97,9 @@ importers:
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
+      i18next:
+        specifier: ^25.3.2
+        version: 25.7.1(typescript@5.9.3)
       lucide-react:
         specifier: ^0.525.0
         version: 0.525.0(react@19.1.0)
@@ -109,6 +115,9 @@ importers:
       react-hook-form:
         specifier: ^7.61.1
         version: 7.61.1(react@19.1.0)
+      react-i18next:
+        specifier: ^15.6.0
+        version: 15.7.4(i18next@25.7.1(typescript@5.9.3))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.3)
       react-markdown:
         specifier: ^9.0.1
         version: 9.1.0(@types/react@19.1.8)(react@19.1.0)
@@ -188,6 +197,9 @@ importers:
       '@aiprimary/core':
         specifier: workspace:*
         version: link:../packages/core
+      '@aiprimary/question':
+        specifier: workspace:*
+        version: link:../packages/question
       '@aiprimary/ui':
         specifier: workspace:*
         version: link:../packages/ui
@@ -473,6 +485,49 @@ importers:
       typescript-eslint:
         specifier: ^8.54.0
         version: 8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
+
+  packages/question:
+    dependencies:
+      '@aiprimary/core':
+        specifier: workspace:*
+        version: link:../core
+      '@aiprimary/ui':
+        specifier: workspace:*
+        version: link:../ui
+      '@dnd-kit/core':
+        specifier: ^6.3.1
+        version: 6.3.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      i18next:
+        specifier: ^25.0.0
+        version: 25.7.1(typescript@5.9.3)
+      lucide-react:
+        specifier: ^0.525.0
+        version: 0.525.0(react@19.1.0)
+      react:
+        specifier: ^19.0.0
+        version: 19.1.0
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.1.0(react@19.1.0)
+      react-i18next:
+        specifier: ^15.0.0
+        version: 15.7.4(i18next@25.7.1(typescript@5.9.3))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.3)
+      react-markdown:
+        specifier: ^10.1.0
+        version: 10.1.0(@types/react@19.1.8)(react@19.1.0)
+      remark-gfm:
+        specifier: ^4.0.0
+        version: 4.0.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.1.8
+        version: 19.1.8
+      '@types/react-dom':
+        specifier: ^19.1.6
+        version: 19.1.6(@types/react@19.1.8)
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
 
   packages/ui:
     dependencies:

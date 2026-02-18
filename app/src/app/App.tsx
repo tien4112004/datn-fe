@@ -6,6 +6,8 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AuthProvider } from '@/shared/context/auth';
 import { Toaster } from '@ui/sonner';
 import { NotificationInitializer } from '@/features/notifications';
+import { QuestionConfigProvider } from '@aiprimary/question';
+import { ImageUploader } from '@/features/question/components/shared/ImageUploader';
 
 const queryClient = new QueryClient();
 
@@ -14,8 +16,10 @@ export default function App() {
     <>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <NotificationInitializer />
-          <RouterProvider router={router} />
+          <QuestionConfigProvider imageUploader={ImageUploader}>
+            <NotificationInitializer />
+            <RouterProvider router={router} />
+          </QuestionConfigProvider>
         </AuthProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>

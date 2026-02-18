@@ -35,6 +35,10 @@
       "@/components/*": ["./src/shared/components/*"],
       "@ui": ["../packages/ui/src"],
       "@ui/*": ["../packages/ui/src/*"],
+      "@aiprimary/question": ["../packages/question/src"],
+      "@aiprimary/question/*": ["../packages/question/src/*"],
+      "@question": ["../packages/question/src"],
+      "@question/*": ["../packages/question/src/*"],
       "@/*": ["./src/*"],
       "@/tests/*": ["./tests/*"]
     }

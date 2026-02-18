@@ -6,7 +6,7 @@ import { QUESTION_TYPE, VIEW_MODE } from '@/features/assignment/types';
 import { ContextDisplay, useContext as useContextQuery } from '@/features/context';
 import { Label } from '@ui/label';
 import { cn } from '@/shared/lib/utils';
-import { QuestionNumber } from './shared/QuestionNumber';
+import { QuestionNumber } from '@aiprimary/question/shared';
 import { ContextSelector } from './shared/ContextSelector';
 import {
   MultipleChoiceEditing,
@@ -14,28 +14,28 @@ import {
   MultipleChoiceDoing,
   MultipleChoiceAfterAssessment,
   MultipleChoiceGrading,
-} from './multiple-choice';
+} from '@aiprimary/question/multiple-choice';
 import {
   OpenEndedEditing,
   OpenEndedViewing,
   OpenEndedDoing,
   OpenEndedAfterAssessment,
   OpenEndedGrading,
-} from './open-ended';
+} from '@aiprimary/question/open-ended';
 import {
   FillInBlankEditing,
   FillInBlankViewing,
   FillInBlankDoing,
   FillInBlankAfterAssessment,
   FillInBlankGrading,
-} from './fill-in-blank';
+} from '@aiprimary/question/fill-in-blank';
 import {
   MatchingEditing,
   MatchingViewing,
   MatchingDoing,
   MatchingAfterAssessment,
   MatchingGrading,
-} from './matching';
+} from '@aiprimary/question/matching';
 
 interface QuestionRendererProps {
   question: Question;

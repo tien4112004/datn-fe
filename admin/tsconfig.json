@@ -5,6 +5,10 @@
     "paths": {
       "@ui": ["../packages/ui/src"],
       "@ui/*": ["../packages/ui/src/*"],
+      "@aiprimary/question": ["../packages/question/src"],
+      "@aiprimary/question/*": ["../packages/question/src/*"],
+      "@question": ["../packages/question/src"],
+      "@question/*": ["../packages/question/src/*"],
       "@/*": ["./src/*"],
       "@/components/*": ["./src/components/*"],
       "@/lib/*": ["./src/lib/*"],

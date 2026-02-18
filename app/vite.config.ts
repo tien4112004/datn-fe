@@ -68,6 +68,7 @@ export default defineConfig(({ mode }) => {
         '@/services': path.resolve(__dirname, './src/shared/services'),
         '@/context': path.resolve(__dirname, './src/shared/context'),
         '@': path.resolve(__dirname, './src'),
+        '@question': path.resolve(__dirname, '../packages/question/src'),
         '@ui': path.resolve(__dirname, '../packages/ui/src'),
       },
     },

@@ -6,7 +6,7 @@ import { cn } from '@/shared/lib/utils';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import type { QuestionBankItem } from '../../types';
 import { VIEW_MODE } from '../../types';
-import { QuestionTypeIcon, DifficultyBadge } from '@/features/question/components/shared';
+import { QuestionTypeIcon, DifficultyBadge } from '@aiprimary/question/shared';
 import { QuestionRenderer } from '@/features/question/components/QuestionRenderer';
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@ui/hover-card';
 import { ScrollArea } from '@ui/scroll-area';

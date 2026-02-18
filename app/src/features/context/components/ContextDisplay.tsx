@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { BookOpen, ChevronDown, ChevronUp, User } from 'lucide-react';
 import { Button } from '@ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/collapsible';
-import { MarkdownPreview } from '@/features/question/components/shared/MarkdownPreview';
+import { MarkdownPreview } from '@aiprimary/question/shared';
 import type { Context } from '../types';
 
 interface ContextDisplayProps {

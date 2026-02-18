@@ -13,3 +13,6 @@ export * from './multiple-choice';
 export * from './matching';
 export * from './fill-in-blank';
 export * from './open-ended';
+
+// Matrix components & utils
+export * from './matrix';

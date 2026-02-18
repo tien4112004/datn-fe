@@ -441,6 +441,32 @@ export default {
     },
   },
 
+  // Matrix components
+  matrix: {
+    cell: {
+      required: 'Yêu cầu:',
+      ok: 'OK',
+      needMore: 'Cần thêm {{count}}',
+      extra: 'Thừa {{count}}',
+    },
+    builder: {
+      tooltips: {
+        addTopic: 'Thêm chủ đề mới',
+        editTopic: 'Sửa thông tin chủ đề',
+        cellInput: 'Số câu hỏi yêu cầu',
+        removeCell: 'Xóa ô',
+        addCell: 'Thêm ô tiêu chí',
+      },
+    },
+    editor: {
+      emptyMessage: 'Thêm chủ đề để xem ma trận',
+      tableHeaders: {
+        topic: 'Chủ đề',
+      },
+      usesContext: 'Sử dụng đoạn văn đọc hiểu',
+    },
+  },
+
   submissionsResult: {
     notFound: 'Không tìm thấy bài nộp',
     yourGradedSubmission: 'Bài nộp đã được chấm của bạn',

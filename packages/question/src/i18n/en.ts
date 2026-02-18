@@ -439,6 +439,32 @@ export default {
     },
   },
 
+  // Matrix components
+  matrix: {
+    cell: {
+      required: 'Required:',
+      ok: 'OK',
+      needMore: 'Need {{count}} more',
+      extra: '{{count}} extra',
+    },
+    builder: {
+      tooltips: {
+        addTopic: 'Add new topic',
+        editTopic: 'Edit topic details',
+        cellInput: 'Required question count',
+        removeCell: 'Remove cell',
+        addCell: 'Add question requirement',
+      },
+    },
+    editor: {
+      emptyMessage: 'Add topics to see the matrix',
+      tableHeaders: {
+        topic: 'Topic',
+      },
+      usesContext: 'Uses reading passages',
+    },
+  },
+
   submissionsResult: {
     notFound: 'Submission not found',
     yourGradedSubmission: 'Your Graded Submission',

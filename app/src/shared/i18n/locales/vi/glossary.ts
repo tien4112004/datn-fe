@@ -8,6 +8,7 @@ export default {
     presentation: 'Đang tải thuyết trình...',
     generatingPresentation: 'Đang tạo thuyết trình...',
     savingPresentation: 'Đang lưu thuyết trình...',
+    page: 'Đang tải trang...',
   },
   actions: {
     confirm: 'Xác nhận',

@@ -7,7 +7,7 @@ import { Button } from '@ui/button';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useCoreStore } from '../stores';
+import { useCoreStore, useLayoutStore } from '../stores';
 import {
   type Mindmap,
   type MindmapMobileGenerationRequest,
@@ -15,11 +15,6 @@ import {
   MINDMAP_TYPES,
 } from '../types';
 import { MindmapPermissionProvider } from '../contexts/MindmapPermissionContext';
-
-/**
- * Migrate layout data from mindmap metadata to root nodes.
- * This ensures backward compatibility with mindmaps that stored layout data globally.
- */
 import { migrateLayoutDataToRootNodes } from '../utils/layoutUtils';
 import { useCommentDrawerTrigger, useGenerateMindmap, useUpdateMindmap } from '../hooks';
 import { CommentDrawer } from '@/features/comments';
@@ -71,7 +66,7 @@ const MindmapEmbedPage = () => {
   // Generation hooks
   const generateMutation = useGenerateMindmap();
   const updateMindmapMutation = useUpdateMindmap();
-  const { applyAutoLayout } = useLayout();
+  const { applyAutoLayout } = useLayoutStore();
 
   const userPermission = mindmap?.permission;
 
@@ -163,18 +158,15 @@ const MindmapEmbedPage = () => {
       );
 
       // Step 3: Update the mindmap with generated content
-      // Backend expects multipart/form-data with JSON blob (not plain JSON)
       const updateData = {
         title: request.topic,
         nodes,
         edges,
       };
-      const formData = new FormData();
-      formData.append('data', new Blob([JSON.stringify(updateData)], { type: 'application/json' }));
 
       await updateMindmapMutation.mutateAsync({
         id: mindmap.id,
-        data: formData,
+        data: updateData,
       });
 
       // Step 4: Set nodes/edges in store for display

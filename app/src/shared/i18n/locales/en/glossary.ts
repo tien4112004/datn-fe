@@ -8,6 +8,7 @@ export default {
     presentation: 'Loading presentation...',
     generatingPresentation: 'Generating presentation...',
     savingPresentation: 'Saving presentation...',
+    page: 'Loading page...',
   },
   actions: {
     confirm: 'Confirm',

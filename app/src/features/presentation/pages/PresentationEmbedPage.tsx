@@ -117,7 +117,7 @@ const PresentationEmbedPage = () => {
         documentType="presentation"
         userPermission={userPermission || 'read'}
       />
-    </>
+    </div>
   );
 };
 

@@ -65,6 +65,7 @@ export {
 } from './assessment/constantHelpers';
 export * from './assessment/question';
 export * from './assessment/answer';
+export * from './assessment/assignment';
 export * from './assessment/questionBank';
 export * from './assessment/examDraft';
 export * from './assessment/assessmentMatrix';

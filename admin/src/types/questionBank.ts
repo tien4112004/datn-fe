@@ -1,26 +1,12 @@
 /**
  * Admin Question Bank Type Definitions
  *
- * This module contains admin-specific type definitions for question bank management.
- * Core constants and types are imported from @aiprimary/core for consistency.
+ * Core types are imported from @aiprimary/core for consistency.
  */
 
-// Import core types and constants
-import type { Question, QuestionType, Difficulty, SubjectCode, BankType } from '@aiprimary/core';
+import type { QuestionType, Difficulty, SubjectCode, BankType, QuestionBankItem } from '@aiprimary/core';
 
-/**
- * QuestionBankItem combines Question with additional metadata for the bank
- */
-export type QuestionBankItem = Question & {
-  subject: SubjectCode;
-  bankType: BankType;
-  grade?: string;
-  chapter?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string; // User ID of creator
-  points?: number; // For scoring
-};
+export type { QuestionBankItem } from '@aiprimary/core';
 
 /**
  * Filters for querying the question bank

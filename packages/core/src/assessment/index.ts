@@ -19,6 +19,7 @@ export * from './constants';
 export * from './constantHelpers';
 export * from './question';
 export * from './answer';
+export * from './assignment';
 export * from './questionBank';
 export * from './examDraft';
 export * from './assessmentMatrix';

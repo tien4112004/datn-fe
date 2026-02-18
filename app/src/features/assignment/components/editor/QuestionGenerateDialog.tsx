@@ -8,13 +8,13 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
-} from '@/shared/components/ui/dialog';
-import { Button } from '@/shared/components/ui/button';
-import { Label } from '@/shared/components/ui/label';
-import { Textarea } from '@/shared/components/ui/textarea';
-import { Input } from '@/shared/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/shared/components/ui/tooltip';
+} from '@ui/dialog';
+import { Button } from '@ui/button';
+import { Label } from '@ui/label';
+import { Textarea } from '@ui/textarea';
+import { Input } from '@ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/tooltip';
 import {
   useGenerateQuestions,
   useQuestionBankChapters,

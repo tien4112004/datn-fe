@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/tooltip';
 import type { MatrixCell } from '../../types';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 

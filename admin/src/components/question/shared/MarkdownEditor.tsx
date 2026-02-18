@@ -1,4 +1,4 @@
-import { AutosizeTextarea } from '@/components/ui/autosize-textarea';
+import { AutosizeTextarea } from '@ui/autosize-textarea';
 import { cn } from '@/lib/utils';
 
 interface MarkdownEditorProps {

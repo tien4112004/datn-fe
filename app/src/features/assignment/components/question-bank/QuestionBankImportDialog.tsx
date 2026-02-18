@@ -6,10 +6,10 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
-} from '@/shared/components/ui/dialog';
-import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
-import { Alert, AlertDescription } from '@/shared/components/ui/alert';
+} from '@ui/dialog';
+import { Button } from '@ui/button';
+import { Input } from '@ui/input';
+import { Alert, AlertDescription } from '@ui/alert';
 import { useImportQuestions } from '@/features/assignment/hooks/useQuestionBankApi';
 import { downloadCSVTemplate } from '@/features/assignment/utils/csvTemplateGenerator';
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle, Download } from 'lucide-react';

@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { Button } from '@/shared/components/ui/button';
-import { Label } from '@/shared/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+import { Button } from '@ui/button';
+import { Label } from '@ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
 import { useTranslation } from 'react-i18next';
 import { useReactFlow, getViewportForBounds } from '@xyflow/react';
 import { generateFilename, downloadFile, getMindmapViewport, getImageData } from './utils';
 import { PreviewCard } from './PreviewCard';
 import { usePreview } from './usePreview';
 import { useLatest } from '@/hooks/useLatest';
-import { Slider } from '@/components/ui/slider';
+import { Slider } from '@ui/slider';
 
 interface ExportImageTabProps {
   format: 'png' | 'jpg';

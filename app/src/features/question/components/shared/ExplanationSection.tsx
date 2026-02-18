@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Label } from '@/shared/components/ui/label';
+import { Label } from '@ui/label';
 import { cn } from '@/shared/lib/utils';
 import { MarkdownEditor } from './MarkdownEditor';
 import { MarkdownPreview } from './MarkdownPreview';

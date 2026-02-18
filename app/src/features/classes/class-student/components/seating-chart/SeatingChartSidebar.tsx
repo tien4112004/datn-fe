@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import type { Student, Layout } from '@/features/classes/shared/types';
 import { Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';

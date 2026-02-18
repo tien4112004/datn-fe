@@ -1,5 +1,5 @@
-import { Button } from '@/shared/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
+import { Button } from '@ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/tooltip';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import type { Difficulty, QuestionType } from '@aiprimary/core';
 import { Plus } from 'lucide-react';

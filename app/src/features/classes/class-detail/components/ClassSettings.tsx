@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/card';
+import { Button } from '@ui/button';
 import { useTranslation } from 'react-i18next';
 import { useUpdateClass, useDeleteClass } from '../../shared/hooks/useApi';
 import type { Class } from '../../shared/types';
@@ -14,7 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/shared/components/ui/alert-dialog';
+} from '@ui/alert-dialog';
 import { useState } from 'react';
 
 interface ClassSettingsProps {

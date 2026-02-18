@@ -1,6 +1,6 @@
 import type { OpenEndedQuestion } from '@/types/questionBank';
 import { MarkdownPreview } from '../shared';
-import { Label } from '@/components/ui/label';
+import { Label } from '@ui/label';
 import { cn } from '@/lib/utils';
 
 interface OpenEndedViewingProps {

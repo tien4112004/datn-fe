@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight, Clock, AlertCircle } from 'lucide-react';
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import { useTranslation } from 'react-i18next';
 import {
   format,

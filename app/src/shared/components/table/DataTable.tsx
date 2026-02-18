@@ -2,7 +2,7 @@ import { flexRender, type Row, type Table as TableType } from '@tanstack/react-t
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from '@ui/table';
 import TablePagination from './TablePagination';
 import SkeletonTable from './SkeletonTable';
-import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from '@/components/ui/context-menu';
+import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from '@ui/context-menu';
 import { useLayoutEffect, useRef, useState } from 'react';
 import calculateTableSizing from './tableSizing';
 import { useWindowSize } from 'usehooks-ts';

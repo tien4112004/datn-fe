@@ -1,10 +1,10 @@
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { NumberInput } from '@/components/ui/number-input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@ui/button';
+import { Checkbox } from '@ui/checkbox';
+import { Input } from '@ui/input';
+import { Label } from '@ui/label';
+import { NumberInput } from '@ui/number-input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
+import { Textarea } from '@ui/textarea';
 import type { Gradient, PPTElementOutline, PPTElementShadow, SlideTheme } from '@aiprimary/core';
 import { Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';

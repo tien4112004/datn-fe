@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';

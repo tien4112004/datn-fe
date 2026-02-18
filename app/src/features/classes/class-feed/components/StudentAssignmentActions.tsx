@@ -11,12 +11,12 @@ import {
   ChevronUp,
   Eye,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import { useSubmissionsByPost } from '@/features/assignment/hooks';
 import { useAuth } from '@/context/auth';
 import { useFormattedDistance } from '@/shared/lib/date-utils';
 import type { Submission } from '@aiprimary/core';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
 
 interface StudentAssignmentActionsProps {
   postId: string;

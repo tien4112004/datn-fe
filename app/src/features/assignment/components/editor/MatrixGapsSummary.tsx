@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, AlertDescription, AlertTitle } from '@/shared/components/ui/alert';
-import { Badge } from '@/shared/components/ui/badge';
-import { Button } from '@/shared/components/ui/button';
-import { Card, CardContent } from '@/shared/components/ui/card';
-import { Checkbox } from '@/shared/components/ui/checkbox';
-import { Label } from '@/shared/components/ui/label';
+import { Alert, AlertDescription, AlertTitle } from '@ui/alert';
+import { Badge } from '@ui/badge';
+import { Button } from '@ui/button';
+import { Card, CardContent } from '@ui/card';
+import { Checkbox } from '@ui/checkbox';
+import { Label } from '@ui/label';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import type { MatrixGapDto } from '@/features/assignment/types/assignment';

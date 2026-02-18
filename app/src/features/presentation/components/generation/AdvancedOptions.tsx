@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { Label } from '@/shared/components/ui/label';
-import { CardTitle } from '@/shared/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
+import { Label } from '@ui/label';
+import { CardTitle } from '@ui/card';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Controller } from 'react-hook-form';

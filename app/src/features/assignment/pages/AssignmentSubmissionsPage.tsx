@@ -1,7 +1,7 @@
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -18,7 +18,7 @@ import { useSubmissionsByPost } from '../hooks';
 import { useAssignmentPublic } from '../hooks/useAssignmentApi';
 import { useFormattedDistance } from '@/shared/lib/date-utils';
 import type { Submission } from '@aiprimary/core';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
 
 export const AssignmentSubmissionsPage = () => {
   const { id } = useParams<{ id: string }>();

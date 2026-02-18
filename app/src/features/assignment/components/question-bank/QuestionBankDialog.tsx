@@ -7,9 +7,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/shared/components/ui/dialog';
-import { Button } from '@/shared/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
+} from '@ui/dialog';
+import { Button } from '@ui/button';
+import { Tabs, TabsList, TabsTrigger } from '@ui/tabs';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { toast } from 'sonner';
 import type { Question } from '../../types';

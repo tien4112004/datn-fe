@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Grid3x3, Edit } from 'lucide-react';
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 import { MatrixEmptyState } from './MatrixEmptyState';

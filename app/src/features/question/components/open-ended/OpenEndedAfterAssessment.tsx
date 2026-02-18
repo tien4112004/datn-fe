@@ -3,7 +3,7 @@ import type { OpenEndedQuestion, OpenEndedAnswer } from '@/features/assignment/t
 import type { Grade } from '@aiprimary/core';
 import { MarkdownPreview, QuestionTitle, GradeFeedback } from '../shared';
 
-import { Badge } from '@/shared/components/ui/badge';
+import { Badge } from '@ui/badge';
 
 interface OpenEndedAfterAssessmentProps {
   question: OpenEndedQuestion;

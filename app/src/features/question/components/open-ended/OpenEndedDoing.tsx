@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { OpenEndedQuestion, OpenEndedAnswer } from '@/features/assignment/types';
 import { QuestionTitle } from '../shared';
 
-import { AutosizeTextarea } from '@/shared/components/ui/autosize-textarea';
+import { AutosizeTextarea } from '@ui/autosize-textarea';
 import { QUESTION_TYPE } from '@/features/assignment/types';
 
 interface OpenEndedDoingProps {

@@ -8,7 +8,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/shared/components/ui/alert-dialog';
+} from '@ui/alert-dialog';
 
 export interface DeleteConfirmationDialogProps {
   open: boolean;

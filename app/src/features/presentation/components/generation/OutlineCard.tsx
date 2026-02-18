@@ -1,7 +1,7 @@
 import RichTextEditor from '@/shared/components/rte/RichTextEditor';
 import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
-import { Button } from '@/shared/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { Button } from '@ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/card';
 import { cn } from '@/shared/lib/utils';
 import { useSortable } from '@dnd-kit/sortable';
 import { Trash } from 'lucide-react';

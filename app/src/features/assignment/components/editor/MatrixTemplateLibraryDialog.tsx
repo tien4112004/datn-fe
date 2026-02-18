@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2, Calendar, Grid3x3, FileText } from 'lucide-react';
 import { debounce } from 'lodash';
-import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
-import { Tabs, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
-import { Badge } from '@/shared/components/ui/badge';
+import { Button } from '@ui/button';
+import { Input } from '@ui/input';
+import { Tabs, TabsList, TabsTrigger } from '@ui/tabs';
+import { Badge } from '@ui/badge';
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/shared/components/ui/dialog';
+} from '@ui/dialog';
 import { cn } from '@/shared/lib/utils';
 import { useInfiniteMatrixTemplateList } from '../../hooks/useMatrixTemplateApi';
 import type { MatrixTemplate, BankType } from '../../types/matrixTemplate';

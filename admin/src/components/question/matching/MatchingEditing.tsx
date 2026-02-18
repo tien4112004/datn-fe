@@ -1,8 +1,8 @@
 import type { MatchingQuestion, MatchingPair } from '@/types/questionBank';
 import { MarkdownEditor, ImageUploader, DifficultyBadge } from '../shared';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { Button } from '@ui/button';
+import { Label } from '@ui/label';
+import { Switch } from '@ui/switch';
 import { Plus, Trash2, ImagePlus, X, Shuffle } from 'lucide-react';
 import { generateId } from '@/lib/utils';
 

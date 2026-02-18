@@ -1,6 +1,6 @@
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import {
   Clock,
   CheckCircle2,

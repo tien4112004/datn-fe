@@ -3,7 +3,7 @@ import { useCoreStore } from '../../stores';
 import { findAllRootNodes, areNodesEqualForTree } from '../../services/utils';
 import { TreeView } from './TreeView';
 import { useTreeKeyboardShortcuts } from '../../hooks/useTreeKeyboardShortcuts';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@ui/scroll-area';
 
 export const TreePanelContent = () => {
   // Use custom equality check to prevent list rebuilds on selection

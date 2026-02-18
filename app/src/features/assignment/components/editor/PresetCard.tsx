@@ -1,5 +1,5 @@
-import { Button } from '@/shared/components/ui/button';
-import { Badge } from '@/shared/components/ui/badge';
+import { Button } from '@ui/button';
+import { Badge } from '@ui/badge';
 import { Trash2, Pencil } from 'lucide-react';
 import { getPresetIconComponent } from '@/features/assignment/utils/presetManager';
 import type { MatrixPreset } from '@/features/assignment/utils/presetManager';

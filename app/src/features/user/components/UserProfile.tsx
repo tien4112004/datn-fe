@@ -1,7 +1,7 @@
 import { UserProfileForm } from './UserProfileForm';
 import { AvatarUploader } from './AvatarUploader';
 import { useUserProfile } from '../hooks/useApi';
-import { Alert, AlertDescription, AlertTitle } from '@/shared/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@ui/alert';
 import { Terminal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

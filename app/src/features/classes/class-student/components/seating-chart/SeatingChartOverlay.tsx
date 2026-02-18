@@ -1,4 +1,4 @@
-import { Card } from '@/components/ui/card';
+import { Card } from '@ui/card';
 import { DragOverlay } from '@dnd-kit/core';
 import { Users } from 'lucide-react';
 

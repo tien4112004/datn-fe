@@ -4,21 +4,15 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { AutosizeTextarea } from '@/components/ui/autosize-textarea';
-import { Button } from '@/components/ui/button';
+import { AutosizeTextarea } from '@ui/autosize-textarea';
+import { Button } from '@ui/button';
 import { MODEL_TYPES, useModels } from '@/features/model';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/shared/components/ui/dialog';
-import { Label } from '@/shared/components/ui/label';
-import { ScrollArea } from '@/shared/components/ui/scroll-area';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { Separator } from '@/shared/components/ui/separator';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@ui/dialog';
+import { Label } from '@ui/label';
+import { ScrollArea } from '@ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
+import { Separator } from '@ui/separator';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { getAllGrades, getAllSubjects } from '@aiprimary/core';
 import { useGenerateMindmap } from '../../hooks/useApi';

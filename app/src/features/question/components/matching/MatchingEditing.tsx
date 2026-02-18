@@ -1,9 +1,9 @@
 import type { MatchingQuestion, MatchingPair } from '@/features/assignment/types';
 import { MarkdownEditor, ImageUploader, DifficultyBadge } from '../shared';
-import { Button } from '@/shared/components/ui/button';
-import { Label } from '@/shared/components/ui/label';
-import { Switch } from '@/shared/components/ui/switch';
-import { Badge } from '@/shared/components/ui/badge';
+import { Button } from '@ui/button';
+import { Label } from '@ui/label';
+import { Switch } from '@ui/switch';
+import { Badge } from '@ui/badge';
 import { Plus, Trash2, ImagePlus, X, Shuffle } from 'lucide-react';
 import { generateId } from '@/shared/lib/utils';
 import { useTranslation } from 'react-i18next';

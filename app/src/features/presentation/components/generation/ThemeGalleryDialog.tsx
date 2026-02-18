@@ -1,12 +1,6 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/shared/components/ui/dialog';
-import { ScrollArea } from '@/shared/components/ui/scroll-area';
-import { Button } from '@/shared/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@ui/dialog';
+import { ScrollArea } from '@ui/scroll-area';
+import { Button } from '@ui/button';
 import { useTranslation } from 'react-i18next';
 import { ThemePreviewCard } from './ThemePreviewCard';
 import type { SlideTheme } from '../../types/slide';

@@ -1,4 +1,4 @@
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 
 interface CommentListErrorProps {
   error: Error | string;

@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import { cn } from '@/shared/lib/utils';
 import type { NodeProps } from '@xyflow/react';
 import { Loader2, Network, Upload, X } from 'lucide-react';

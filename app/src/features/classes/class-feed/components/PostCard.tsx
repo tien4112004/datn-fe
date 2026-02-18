@@ -1,6 +1,6 @@
 import { UserAvatar } from '@/components/common/UserAvatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@ui/badge';
+import { Button } from '@ui/button';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { parseDateSafe } from '@/shared/utils/date';
 import { format, formatDistanceToNow } from 'date-fns';

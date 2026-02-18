@@ -2,9 +2,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getAdminApiService } from '@/api/admin';
 import { useTokenUsageStats, useTokenUsageByModel, useTokenUsageByRequestType } from '@/hooks';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
+import { Separator } from '@ui/separator';
 import { ArrowLeft, Coins, DollarSign, Activity, Database } from 'lucide-react';
 import { format } from 'date-fns';
 

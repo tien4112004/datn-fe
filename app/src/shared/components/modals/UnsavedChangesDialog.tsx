@@ -6,8 +6,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/shared/components/ui/dialog';
-import { Button } from '@/shared/components/ui/button';
+} from '@ui/dialog';
+import { Button } from '@ui/button';
 
 interface UnsavedChangesDialogProps {
   open: boolean;

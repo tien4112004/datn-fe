@@ -2,9 +2,9 @@ import { useCallback, useMemo, useState } from 'react';
 import { useCoinPricing, useCreateCoinPricing, useUpdateCoinPricing, useDeleteCoinPricing } from '@/hooks';
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
+import { Button } from '@ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,7 +14,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from '@ui/alert-dialog';
 import { DataTable } from '@/components/table';
 import { CoinPricingFormDialog } from '@/components/coin/CoinPricingFormDialog';
 import { Plus, Pencil, Trash2, Coins } from 'lucide-react';

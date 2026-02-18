@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/shared/components/ui/button';
-import { Label } from '@/shared/components/ui/label';
-import { Textarea } from '@/shared/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
-import { Badge } from '@/shared/components/ui/badge';
-import { Progress } from '@/shared/components/ui/progress';
+import { Button } from '@ui/button';
+import { Label } from '@ui/label';
+import { Textarea } from '@ui/textarea';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
+import { Badge } from '@ui/badge';
+import { Progress } from '@ui/progress';
 import { Loader2, ArrowLeft, Sparkles, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';

@@ -4,7 +4,7 @@ import router from './router';
 import '@/shared/i18n';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AuthProvider } from '@/shared/context/auth';
-import { Toaster } from '@/shared/components/ui/sonner';
+import { Toaster } from '@ui/sonner';
 import { NotificationInitializer } from '@/features/notifications';
 
 const queryClient = new QueryClient();

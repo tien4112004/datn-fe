@@ -4,7 +4,7 @@ import type { ViewMode } from '@/features/assignment/types';
 import type { Context } from '@/features/context';
 import { QUESTION_TYPE, VIEW_MODE } from '@/features/assignment/types';
 import { ContextDisplay, useContext as useContextQuery } from '@/features/context';
-import { Label } from '@/shared/components/ui/label';
+import { Label } from '@ui/label';
 import { cn } from '@/shared/lib/utils';
 import { QuestionNumber } from './shared/QuestionNumber';
 import { ContextSelector } from './shared/ContextSelector';

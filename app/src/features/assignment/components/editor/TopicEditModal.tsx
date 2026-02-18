@@ -8,14 +8,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/shared/components/ui/dialog';
-import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
-import { Textarea } from '@/shared/components/ui/textarea';
-import { Label } from '@/shared/components/ui/label';
-import { Checkbox } from '@/shared/components/ui/checkbox';
-import { Badge } from '@/shared/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
+} from '@ui/dialog';
+import { Button } from '@ui/button';
+import { Input } from '@ui/input';
+import { Textarea } from '@ui/textarea';
+import { Label } from '@ui/label';
+import { Checkbox } from '@ui/checkbox';
+import { Badge } from '@ui/badge';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/tooltip';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 import { useQuestionBankChapters } from '../../hooks/useQuestionBankApi';
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Sparkles, Plus, Upload } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useCreateBlankPresentation } from '@/features/presentation/hooks';
 import { useCreateBlankMindmap } from '@/features/mindmap/hooks';

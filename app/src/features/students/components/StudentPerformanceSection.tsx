@@ -1,6 +1,6 @@
 import { TrendingUp, CheckCircle2, Clock, AlertCircle, Target, BarChart3, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@ui/card';
 import type { StudentPerformance } from '../types';
 import { MetricCard } from './MetricCard';
 import { PerformanceTrendChart } from './PerformanceTrendChart';

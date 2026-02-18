@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { Presentation } from '@/features/presentation/types/presentation';
 import { usePresentationManager } from '@/features/presentation/hooks/usePresentationManager';
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import { MoreHorizontal } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@ui/dropdown-menu';
 import { SearchBar } from '@/shared/components/common/SearchBar';
 import { ThumbnailWrapperV2 } from '@/features/presentation/components/others/ThumbnailWrapper';
 import TablePagination from '@/shared/components/table/TablePagination';
@@ -14,7 +14,7 @@ import { ActionContent } from './ActionButton';
 import { RenameFileDialog } from '@/components/modals/RenameFileDialog';
 import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfirmationDialog';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
-import { SkeletonGrid } from '@/shared/components/ui/skeleton-card';
+import { SkeletonGrid } from '@ui/skeleton-card';
 
 const PresentationGrid = () => {
   const { t } = useTranslation('common', { keyPrefix: 'table' });

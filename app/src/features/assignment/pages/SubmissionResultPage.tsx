@@ -1,8 +1,8 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/shared/components/ui/button';
-import { Separator } from '@/shared/components/ui/separator';
+import { Button } from '@ui/button';
+import { Separator } from '@ui/separator';
 import { cn } from '@/shared/lib/utils';
 import {
   ChevronLeft,

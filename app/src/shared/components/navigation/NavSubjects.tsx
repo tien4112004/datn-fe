@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu';
+} from '@ui/dropdown-menu';
 import {
   SidebarGroup,
   SidebarGroupLabel,

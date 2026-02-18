@@ -1,4 +1,4 @@
-import { Progress } from '@/shared/components/ui/progress';
+import { Progress } from '@ui/progress';
 import type { ClassSummary } from '../types';
 import { getScoreColorClasses } from '../utils/colorUtils';
 import { cn } from '@/shared/lib/utils';

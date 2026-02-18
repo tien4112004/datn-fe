@@ -1,6 +1,6 @@
 import { DataTable, TablePagination } from '@/components/table';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@ui/dialog';
 import { useContexts, useDeleteContext } from '@/hooks';
 import type { Context } from '@/types/context';
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';

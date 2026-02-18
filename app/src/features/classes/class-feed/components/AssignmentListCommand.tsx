@@ -1,17 +1,10 @@
-import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/popover';
 import { cn } from '@/shared/lib/utils';
 import { Check, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  Command,
-} from '@/components/ui/command';
+import { CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, Command } from '@ui/command';
 import { useAssignmentList } from '@/features/assignment/hooks';
 import type { Assignment } from '@/features/assignment';
 

@@ -1,8 +1,8 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@ui/button';
+import { Skeleton } from '@ui/skeleton';
 import { usePost, useDeletePost, usePinPost } from '../hooks/useApi';
 import { PostCard } from '../components/PostCard';
 import { CommentThread } from '../components/CommentThread';

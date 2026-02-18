@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FileQuestion, Clock, Eye, Edit, Trophy, ChevronDown, ChevronUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@ui/button';
+import { Skeleton } from '@ui/skeleton';
 import { useSubmissionsByPost } from '@/features/assignment/hooks';
 import { SubmissionStatusBadge } from '@/features/assignment/components/SubmissionStatusBadge';
 import { useFormattedDistance } from '@/shared/lib/date-utils';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
 
 interface SubmissionStatisticsProps {
   postId: string;

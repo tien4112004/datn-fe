@@ -1,8 +1,8 @@
 import type { OpenEndedQuestion } from '@/types/questionBank';
 import { MarkdownEditor, ImageUploader, DifficultyBadge } from '../shared';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@ui/button';
+import { Input } from '@ui/input';
+import { Label } from '@ui/label';
 import { ImagePlus, X } from 'lucide-react';
 
 interface OpenEndedEditingProps {

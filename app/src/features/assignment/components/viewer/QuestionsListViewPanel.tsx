@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { VIEW_MODE } from '@aiprimary/core';
 import { QuestionRenderer } from '@/features/question/components/QuestionRenderer';
 import { ContextDisplay } from '@/features/context';
-import { Badge } from '@/shared/components/ui/badge';
+import { Badge } from '@ui/badge';
 import type { Assignment, AssignmentQuestionWithTopic, AssignmentContext } from '../../types';
 import { groupQuestionsByContext, getQuestionDisplayNumber } from '../../utils/questionGrouping';
 

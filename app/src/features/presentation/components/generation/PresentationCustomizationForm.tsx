@@ -1,13 +1,6 @@
 import { Controller, type Control } from 'react-hook-form';
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card';
-import { Button } from '@/shared/components/ui/button';
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
+import { Button } from '@ui/button';
 import { Palette, Sparkles, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ModelSelect } from '@/features/model/components/ModelSelect';

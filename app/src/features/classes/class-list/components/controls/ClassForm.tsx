@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useClassForm, type ClassSchema } from '../../../shared/hooks/useClassForm';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@ui/button';
+import { Input } from '@ui/input';
+import { Label } from '@ui/label';
+import { Textarea } from '@ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
+import { Alert, AlertDescription, AlertTitle } from '@ui/alert';
+import { Separator } from '@ui/separator';
 import { AlertCircle, Loader2, BookOpen, Calendar, MapPin } from 'lucide-react';
 import { getElementaryGrades } from '@aiprimary/core';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Checkbox } from '@ui/checkbox';
 import { getCurrentAcademicYear } from '../../../shared/utils/grades';
 
 interface ClassFormProps {

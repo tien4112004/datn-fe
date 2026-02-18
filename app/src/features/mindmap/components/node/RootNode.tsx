@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
+import { Button } from '@ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/popover';
 import type { NodeProps } from '@xyflow/react';
 import { Network, Workflow } from 'lucide-react';
 import { memo, useCallback, useState } from 'react';

@@ -1,4 +1,4 @@
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import { CornerDownRight, Plus, Trash } from 'lucide-react';
 import { useCoreStore, useNodeOperationsStore } from '../../stores';
 import type { MindMapNode } from '../../types';

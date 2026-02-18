@@ -9,7 +9,7 @@ import { useCallback } from 'react';
 import { Upload, FileText, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { CsvFileInfo, ImportError } from '@/features/classes/import-student/types/csvImport';
-import { Input } from '@/components/ui/input';
+import { Input } from '@ui/input';
 
 interface FileUploadZoneProps {
   onFileSelect: (file: File) => void;

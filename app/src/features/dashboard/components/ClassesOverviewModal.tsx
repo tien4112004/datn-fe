@@ -1,17 +1,11 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/shared/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@ui/dialog';
 import { useAtRiskStudents } from '../hooks/useAtRiskStudents';
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
-import { Badge } from '@/shared/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@ui/avatar';
+import { Badge } from '@ui/badge';
 import { School, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
-import { ScrollArea } from '@/shared/components/ui/scroll-area';
+import { ScrollArea } from '@ui/scroll-area';
 import { useState } from 'react';
-import { Card, CardContent } from '@/shared/components/ui/card';
+import { Card, CardContent } from '@ui/card';
 import type { ClassAtRiskStudents } from '../api/types';
 import { useTranslation } from 'react-i18next';
 

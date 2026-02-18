@@ -1,4 +1,4 @@
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import { cn } from '@/shared/lib/utils';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useCallback, useEffect, useRef } from 'react';

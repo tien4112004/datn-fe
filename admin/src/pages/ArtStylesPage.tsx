@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { ArtStyleFormDialog } from '@/components/art-style/ArtStyleFormDialog';
 import { DataTable, TablePagination } from '@/components/table';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
 import type { ArtStyleRequest } from '@/types/api';
 import type { ArtStyle } from '@aiprimary/core';
 import { Edit, Image, Plus } from 'lucide-react';

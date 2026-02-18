@@ -1,15 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Search, ChevronDown, Loader2, Eye, MessageSquare, Lock, Globe, Check, X } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/components/ui/dialog';
-import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/dialog';
+import { Button } from '@ui/button';
+import { Input } from '@ui/input';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@ui/avatar';
 import { useMindmapApiService } from '../../api';
 import { useUserProfileApiService } from '@/features/user/api';
 import type { User, PermissionLevel } from '../../types/share';

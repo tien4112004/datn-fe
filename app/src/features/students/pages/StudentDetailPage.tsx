@@ -1,8 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { AlertCircle, RefreshCcw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/shared/components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '@/shared/components/ui/alert';
+import { Button } from '@ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@ui/alert';
 import { useStudent, useStudentPerformance } from '../hooks/useApi';
 import { StudentInfoSection } from '../components/StudentInfoSection';
 import { StudentPerformanceSection } from '../components/StudentPerformanceSection';

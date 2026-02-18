@@ -2,8 +2,8 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Users, Settings, MessageSquare, GraduationCap, Calendar, Edit, FolderOpen } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@ui/badge';
+import { Button } from '@ui/button';
 import { getGradeLabel } from '../../shared/utils/grades';
 
 import { ClassStudentView } from '../../class-student';

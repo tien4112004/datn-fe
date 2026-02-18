@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { FileQuestion, BookOpen } from 'lucide-react';
 import { VIEW_MODE, getQuestionTypeName, getDifficultyName } from '@aiprimary/core';
 import { QuestionRenderer } from '@/features/question/components/QuestionRenderer';
-import { Badge } from '@/shared/components/ui/badge';
+import { Badge } from '@ui/badge';
 import type { Assignment, AssignmentQuestionWithTopic, AssignmentContext } from '../../types';
 import { useAssignmentViewerStore } from '../../stores/useAssignmentViewerStore';
 import { LabelValuePair } from './LabelValuePair';

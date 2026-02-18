@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import type { OpenEndedQuestion } from '@/features/assignment/types';
 import { MarkdownPreview, QuestionTitle } from '../shared';
-import { Label } from '@/shared/components/ui/label';
+import { Label } from '@ui/label';
 import { cn } from '@/shared/lib/utils';
 
 interface OpenEndedViewingProps {

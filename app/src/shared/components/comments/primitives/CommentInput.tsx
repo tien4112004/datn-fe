@@ -1,4 +1,4 @@
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import { UserAvatar } from '@/shared/components/common/UserAvatar';
 import { cn } from '@/shared/lib/utils';
 

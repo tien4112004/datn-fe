@@ -1,5 +1,5 @@
 import { School, ClipboardCheck, Users } from 'lucide-react';
-import { Card, CardContent } from '@/shared/components/ui/card';
+import { Card, CardContent } from '@ui/card';
 import { useTeacherSummary } from '../hooks/useTeacherSummary';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

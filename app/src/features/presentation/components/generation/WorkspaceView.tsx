@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Controller } from 'react-hook-form';
 import { CircleAlert, RotateCcw } from 'lucide-react';
 import OutlineWorkspace from './OutlineWorkspace';
-import { AutosizeTextarea } from '@/shared/components/ui/autosize-textarea';
+import { AutosizeTextarea } from '@ui/autosize-textarea';
 import {
   Select,
   SelectContent,
@@ -11,7 +11,7 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@/shared/components/ui/select';
+} from '@ui/select';
 import { getAllGrades, getAllSubjects } from '@aiprimary/core';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { LANGUAGE_OPTIONS, SLIDE_COUNT_OPTIONS } from '@/features/presentation/types';

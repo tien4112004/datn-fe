@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BookOpen, ChevronDown, ChevronUp, User } from 'lucide-react';
-import { Button } from '@/shared/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/shared/components/ui/collapsible';
+import { Button } from '@ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/collapsible';
 import { MarkdownPreview } from '@/features/question/components/shared/MarkdownPreview';
 import type { Context } from '../types';
 

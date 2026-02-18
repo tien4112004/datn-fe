@@ -1,9 +1,9 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/shared/components/ui/button';
-import { Textarea } from '@/shared/components/ui/textarea';
-import { Label } from '@/shared/components/ui/label';
+import { Button } from '@ui/button';
+import { Textarea } from '@ui/textarea';
+import { Label } from '@ui/label';
 
 import { cn } from '@/shared/lib/utils';
 import {

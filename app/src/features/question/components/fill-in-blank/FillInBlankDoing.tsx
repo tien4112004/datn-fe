@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion, FillInBlankAnswer } from '@/features/assignment/types';
 import { QUESTION_TYPE } from '@/features/assignment/types';
 import { QuestionTitle } from '../shared';
-import { Input } from '@/shared/components/ui/input';
+import { Input } from '@ui/input';
 
 interface FillInBlankDoingProps {
   question: FillInBlankQuestion;

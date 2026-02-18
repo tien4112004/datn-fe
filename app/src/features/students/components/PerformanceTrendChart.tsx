@@ -1,5 +1,5 @@
 import * as RechartsPrimitive from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/shared/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@ui/chart';
 import type { PerformanceTrend } from '../types';
 
 interface PerformanceTrendChartProps {

@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import { cn } from '@/shared/lib/utils';
 import {
   Clock,
@@ -29,7 +29,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/shared/components/ui/dialog';
+} from '@ui/dialog';
 import { useAssignmentPublic } from '../hooks/useAssignmentApi';
 import { useCreateSubmission } from '../hooks';
 

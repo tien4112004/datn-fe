@@ -33,7 +33,8 @@
       "@/assets/*": ["./src/shared/assets/*"],
       "@/context/*": ["./src/shared/context/*"],
       "@/components/*": ["./src/shared/components/*"],
-      "@ui/*": ["./src/shared/components/ui/*"],
+      "@ui": ["../packages/ui/src"],
+      "@ui/*": ["../packages/ui/src/*"],
       "@/*": ["./src/*"],
       "@/tests/*": ["./tests/*"]
     }

@@ -6,7 +6,7 @@ import DataTable from '@/components/table/DataTable';
 import { SearchBar } from '@/shared/components/common/SearchBar';
 import { useSharedResources } from '../hooks';
 import type { SharedResource } from '../types';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@ui/badge';
 import { BrainCircuit, Presentation } from 'lucide-react';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 import { useState } from 'react';

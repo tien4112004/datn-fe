@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader } from '@/shared/components/ui/card';
-import { Separator } from '@/shared/components/ui/separator';
+import { Card, CardContent, CardHeader } from '@ui/card';
+import { Separator } from '@ui/separator';
 
 /**
  * Skeleton loader for Student Detail Page

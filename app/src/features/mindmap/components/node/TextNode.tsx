@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import type { TextNode } from '@/features/mindmap/types';
 import { DRAGHANDLE } from '@/features/mindmap/types/constants';
 import type { NodeProps } from '@xyflow/react';

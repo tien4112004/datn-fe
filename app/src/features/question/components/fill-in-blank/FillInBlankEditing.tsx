@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion, BlankSegment } from '@/features/assignment/types';
 import { ImageUploader, ExplanationSection } from '../shared';
-import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
-import { Label } from '@/shared/components/ui/label';
-import { Switch } from '@/shared/components/ui/switch';
-import { Textarea } from '@/shared/components/ui/textarea';
+import { Button } from '@ui/button';
+import { Input } from '@ui/input';
+import { Label } from '@ui/label';
+import { Switch } from '@ui/switch';
+import { Textarea } from '@ui/textarea';
 import { ImagePlus, X } from 'lucide-react';
 import { generateId } from '@/shared/lib/utils';
 

@@ -1,15 +1,9 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/shared/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@ui/dialog';
 import { useGradingQueue } from '../hooks/useGradingQueue';
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
-import { Badge } from '@/shared/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@ui/avatar';
+import { Badge } from '@ui/badge';
 import { AlertCircle, CheckCircle2, Clock } from 'lucide-react';
-import { ScrollArea } from '@/shared/components/ui/scroll-area';
+import { ScrollArea } from '@ui/scroll-area';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 

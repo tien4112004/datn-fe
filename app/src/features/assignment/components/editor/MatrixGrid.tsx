@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pencil, BookOpen } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
-import { Button } from '@/shared/components/ui/button';
-import { Badge } from '@/shared/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/tooltip';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
+import { Button } from '@ui/button';
+import { Badge } from '@ui/badge';
 import { MatrixCell } from './MatrixCell';
 import { EmptyMatrixCell } from './EmptyMatrixCell';
 import { TopicEditModal } from './TopicEditModal';

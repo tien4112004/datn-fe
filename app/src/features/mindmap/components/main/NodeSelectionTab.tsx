@@ -1,14 +1,9 @@
 import { Trash2, Copy, Plus, Palette, GitBranch, MousePointerClick, ChevronDown } from 'lucide-react';
 import { memo } from 'react';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/shared/components/ui/label';
-import { Checkbox } from '@/shared/components/ui/checkbox';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from '@/shared/components/ui/dropdown-menu';
+import { Button } from '@ui/button';
+import { Label } from '@ui/label';
+import { Checkbox } from '@ui/checkbox';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@ui/dropdown-menu';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { useNodeSelection } from '../../hooks/useNodeSelection';

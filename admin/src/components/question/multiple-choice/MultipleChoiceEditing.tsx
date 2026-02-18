@@ -1,9 +1,9 @@
 import type { MultipleChoiceQuestion, MultipleChoiceOption } from '@/types/questionBank';
 import { MarkdownEditor, ImageUploader, DifficultyBadge } from '../shared';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Switch } from '@/components/ui/switch';
+import { Button } from '@ui/button';
+import { Label } from '@ui/label';
+import { RadioGroup, RadioGroupItem } from '@ui/radio-group';
+import { Switch } from '@ui/switch';
 import { Plus, Trash2, ImagePlus, X, Shuffle } from 'lucide-react';
 import { generateId } from '@/lib/utils';
 

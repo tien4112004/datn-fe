@@ -13,7 +13,7 @@ import {
   type XYPosition,
 } from '@xyflow/react';
 
-import { ToggleGroup, ToggleGroupItem } from '@/shared/components/ui/toggle-group';
+import { ToggleGroup, ToggleGroupItem } from '@ui/toggle-group';
 
 export const ViewportLogger = () => {
   const viewport = useStore(

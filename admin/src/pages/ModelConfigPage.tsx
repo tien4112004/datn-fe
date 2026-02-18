@@ -2,9 +2,9 @@ import { useCallback, useMemo } from 'react';
 import { useModels, usePatchModel } from '@/hooks';
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
+import { Switch } from '@ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
 import { toast } from 'sonner';
 import { DataTable } from '@/components/table';
 import type { Model, ModelType } from '@aiprimary/core';

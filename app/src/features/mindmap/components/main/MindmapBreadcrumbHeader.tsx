@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Input } from '@/shared/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Input } from '@ui/input';
+import { Button } from '@ui/button';
 import { useMindmapPermissionContext } from '../../contexts/MindmapPermissionContext';
 import { useAuth } from '@/shared/context/auth';
 import {
@@ -11,7 +11,7 @@ import {
   BreadcrumbLink,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/shared/components/ui/breadcrumb';
+} from '@ui/breadcrumb';
 import { useUpdateMindmapTitle } from '../../hooks/useApi';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';

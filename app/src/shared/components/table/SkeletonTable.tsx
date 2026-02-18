@@ -1,5 +1,5 @@
-import { Skeleton } from '@/shared/components/ui/skeleton';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
+import { Skeleton } from '@ui/skeleton';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
 
 const SkeletonTable = ({ rows, columns }: { rows: number; columns: number }) => {
   return (

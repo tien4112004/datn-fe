@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion, FillInBlankAnswer } from '@/features/assignment/types';
 import { QuestionTitle } from '../shared';
-import { Label } from '@/shared/components/ui/label';
-import { Textarea } from '@/shared/components/ui/textarea';
+import { Label } from '@ui/label';
+import { Textarea } from '@ui/textarea';
 import { CheckCircle2, XCircle, Trophy } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 

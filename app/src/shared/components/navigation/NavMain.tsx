@@ -2,7 +2,7 @@
 
 import { type LucideIcon } from 'lucide-react';
 
-import { Collapsible } from '@/shared/components/ui/collapsible';
+import { Collapsible } from '@ui/collapsible';
 import {
   SidebarGroup,
   SidebarMenu,

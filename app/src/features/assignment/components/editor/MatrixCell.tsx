@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
-import { Input } from '@/shared/components/ui/input';
-import { Button } from '@/shared/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
+import { Input } from '@ui/input';
+import { Button } from '@ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/tooltip';
 import type { MatrixCell as MatrixCellType } from '../../types';
 import { validateMatrixCell } from '../../utils';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';

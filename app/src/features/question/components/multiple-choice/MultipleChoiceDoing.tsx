@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import type { MultipleChoiceQuestion, MultipleChoiceAnswer } from '@/features/assignment/types';
 import { MarkdownPreview, QuestionTitle } from '../shared';
 
-import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
-import { Label } from '@/shared/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@ui/radio-group';
+import { Label } from '@ui/label';
 import { QUESTION_TYPE } from '@/features/assignment/types';
 import { cn } from '@/shared/lib/utils';
 

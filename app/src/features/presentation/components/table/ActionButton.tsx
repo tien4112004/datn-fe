@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Popover, PopoverTrigger, PopoverContent } from '@ui/popover';
 import { EllipsisVerticalIcon, Eye, Edit, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 
 type ActionButtonProps = {
   onViewDetail?: () => void;

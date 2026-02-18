@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { AutosizeTextarea } from '@/shared/components/ui/autosize-textarea';
+import { AutosizeTextarea } from '@ui/autosize-textarea';
 import { cn } from '@/shared/lib/utils';
 
 interface MarkdownEditorProps {

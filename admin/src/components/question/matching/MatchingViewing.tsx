@@ -1,7 +1,7 @@
 import type { MatchingQuestion } from '@/types/questionBank';
 import { MarkdownPreview } from '../shared';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
+import { Label } from '@ui/label';
+import { Badge } from '@ui/badge';
 import { Shuffle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

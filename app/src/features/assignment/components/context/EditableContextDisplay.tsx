@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BookOpen, ChevronDown, ChevronUp, Pencil, Unlink, Info, Trash2 } from 'lucide-react';
-import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
-import { Textarea } from '@/shared/components/ui/textarea';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/shared/components/ui/collapsible';
+import { Button } from '@ui/button';
+import { Input } from '@ui/input';
+import { Textarea } from '@ui/textarea';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/collapsible';
 import { MarkdownPreview } from '@/features/question/components/shared/MarkdownPreview';
 import type { AssignmentContext } from '../../types';
 

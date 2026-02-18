@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { getAllDifficulties, getDifficultyI18nKey } from '@aiprimary/core';
 import type { MatrixCell } from '../../types';
-import { Badge } from '@/shared/components/ui/badge';
+import { Badge } from '@ui/badge';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 
 const getCellStatus = (cell: MatrixCell): 'valid' | 'warning' | 'info' => {

@@ -1,6 +1,6 @@
-import { Label } from '@/shared/components/ui/label';
-import { ScrollArea } from '@/shared/components/ui/scroll-area';
-import { Separator } from '@/shared/components/ui/separator';
+import { Label } from '@ui/label';
+import { ScrollArea } from '@ui/scroll-area';
+import { Separator } from '@ui/separator';
 import DOMPurify from 'dompurify';
 import { GitFork, Layers, MessageSquare } from 'lucide-react';
 import React, { useState } from 'react';

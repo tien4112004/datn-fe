@@ -1,9 +1,9 @@
-import { AutosizeTextarea } from '@/components/ui/autosize-textarea';
-import { Card, CardContent, CardTitle } from '@/components/ui/card';
+import { AutosizeTextarea } from '@ui/autosize-textarea';
+import { Card, CardContent, CardTitle } from '@ui/card';
 import ExamplePrompts from '@/features/projects/components/ExamplePrompts';
 import ResourceTypeSwitcher from '@/features/projects/components/ResourceTypeSwitcher';
 import { Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
 import { useSearchParams, useNavigate } from 'react-router-dom';

@@ -68,7 +68,7 @@ export default defineConfig(({ mode }) => {
         '@/services': path.resolve(__dirname, './src/shared/services'),
         '@/context': path.resolve(__dirname, './src/shared/context'),
         '@': path.resolve(__dirname, './src'),
-        '@ui': path.resolve(__dirname, './src/shared/components/ui'),
+        '@ui': path.resolve(__dirname, '../packages/ui/src'),
       },
     },
     optimizeDeps: {

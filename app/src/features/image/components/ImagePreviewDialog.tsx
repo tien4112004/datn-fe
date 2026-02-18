@@ -1,13 +1,7 @@
 import { Share2, Download } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/shared/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/shared/components/ui/dialog';
+import { Button } from '@ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@ui/dialog';
 import { useImagePreview } from '../context/ImagePreviewContext';
 
 const ImagePreviewDialog = () => {

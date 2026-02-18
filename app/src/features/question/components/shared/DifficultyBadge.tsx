@@ -1,4 +1,4 @@
-import { Badge } from '@/shared/components/ui/badge';
+import { Badge } from '@ui/badge';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/lib/utils';
 import { DIFFICULTY, type Difficulty, getDifficultyI18nKey } from '@aiprimary/core';

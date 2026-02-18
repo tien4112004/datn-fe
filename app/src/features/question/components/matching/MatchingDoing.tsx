@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { MatchingQuestion, MatchingAnswer } from '@/features/assignment/types';
 import { MarkdownPreview, QuestionTitle } from '../shared';
 
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import {
   DndContext,
   DragOverlay,

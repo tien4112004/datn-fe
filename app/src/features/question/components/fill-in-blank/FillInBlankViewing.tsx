@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion } from '@/features/assignment/types';
 import { ExplanationSection, QuestionTitle } from '../shared';
-import { Label } from '@/shared/components/ui/label';
-import { Badge } from '@/shared/components/ui/badge';
+import { Label } from '@ui/label';
+import { Badge } from '@ui/badge';
 import { cn } from '@/shared/lib/utils';
 
 interface FillInBlankViewingProps {

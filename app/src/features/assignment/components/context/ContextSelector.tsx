@@ -2,16 +2,9 @@ import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check, ChevronsUpDown, BookOpen } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
-import { Button } from '@/shared/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/shared/components/ui/command';
+import { Button } from '@ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@ui/command';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 
 interface ContextSelectorProps {

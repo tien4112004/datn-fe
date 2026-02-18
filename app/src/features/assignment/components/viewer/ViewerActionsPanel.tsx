@@ -1,4 +1,4 @@
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import { Edit, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

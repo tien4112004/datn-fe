@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import type { FillInBlankQuestion, FillInBlankSegment } from '@/types/questionBank';
 import { MarkdownEditor, ImageUploader } from '../shared';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@ui/button';
+import { Input } from '@ui/input';
+import { Label } from '@ui/label';
+import { Switch } from '@ui/switch';
+import { Textarea } from '@ui/textarea';
 import { ImagePlus, X } from 'lucide-react';
 import { generateId } from '@/lib/utils';
 

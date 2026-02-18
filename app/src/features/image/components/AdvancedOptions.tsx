@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react';
-import { Label } from '@/components/ui/label';
-import { AutosizeTextarea } from '@/components/ui/autosize-textarea';
-import { CardTitle } from '@/shared/components/ui/card';
+import { Label } from '@ui/label';
+import { AutosizeTextarea } from '@ui/autosize-textarea';
+import { CardTitle } from '@ui/card';
 import { ChevronDown, ChevronUp, Ban } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

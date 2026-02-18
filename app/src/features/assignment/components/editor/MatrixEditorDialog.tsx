@@ -6,8 +6,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/shared/components/ui/dialog';
-import { Button } from '@/shared/components/ui/button';
+} from '@ui/dialog';
+import { Button } from '@ui/button';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { TopicManager } from './TopicManager';
 import { MatrixGrid } from './MatrixGrid';

@@ -7,8 +7,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
-import { Switch } from '@/components/ui/switch';
-
 export const AssignmentMetadataPanel = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.metadata' });
 
@@ -17,12 +15,10 @@ export const AssignmentMetadataPanel = () => {
   const description = useAssignmentFormStore((state) => state.description);
   const subject = useAssignmentFormStore((state) => state.subject);
   const grade = useAssignmentFormStore((state) => state.grade);
-  const shuffleQuestions = useAssignmentFormStore((state) => state.shuffleQuestions);
   const setTitle = useAssignmentFormStore((state) => state.setTitle);
   const setDescription = useAssignmentFormStore((state) => state.setDescription);
   const setSubject = useAssignmentFormStore((state) => state.setSubject);
   const setGrade = useAssignmentFormStore((state) => state.setGrade);
-  const setShuffleQuestions = useAssignmentFormStore((state) => state.setShuffleQuestions);
   const validationErrors = useAssignmentFormStore((state) => state.validationErrors);
   const titleError = validationErrors?.assignment?.title;
   const subjectError = validationErrors?.assignment?.subject;
@@ -146,24 +142,6 @@ export const AssignmentMetadataPanel = () => {
               rows={4}
               placeholder={t('fields.descriptionPlaceholder')}
             />
-          </div>
-
-          <div className="flex items-center gap-2 pt-2">
-            <Switch id="shuffle" checked={shuffleQuestions} onCheckedChange={setShuffleQuestions} />
-            <Label
-              htmlFor="shuffle"
-              className="flex items-center gap-1.5 text-sm text-gray-700 dark:text-gray-300"
-            >
-              {t('fields.shuffleQuestions')}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <HelpCircle className="h-3.5 w-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="max-w-xs">{t('tooltips.shuffleQuestions')}</p>
-                </TooltipContent>
-              </Tooltip>
-            </Label>
           </div>
         </div>
       </div>

@@ -43,8 +43,6 @@ export const AssignmentMetadataViewPanel = ({ assignment }: AssignmentMetadataVi
 
         <LabelValuePair label={t('fields.description')} value={assignment.description} emptyText="—" />
 
-        <LabelValuePair label={t('fields.shuffleQuestions')} value={assignment.shuffleQuestions} />
-
         {assignment.createdAt && (
           <LabelValuePair
             label={t('fields.createdAt')}

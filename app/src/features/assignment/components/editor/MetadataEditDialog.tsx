@@ -11,7 +11,6 @@ import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Textarea } from '@/shared/components/ui/textarea';
-import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
@@ -25,13 +24,10 @@ export const MetadataEditDialog = () => {
   const description = useAssignmentFormStore((state) => state.description);
   const subject = useAssignmentFormStore((state) => state.subject);
   const grade = useAssignmentFormStore((state) => state.grade);
-  const shuffleQuestions = useAssignmentFormStore((state) => state.shuffleQuestions);
   const setTitle = useAssignmentFormStore((state) => state.setTitle);
   const setDescription = useAssignmentFormStore((state) => state.setDescription);
   const setSubject = useAssignmentFormStore((state) => state.setSubject);
   const setGrade = useAssignmentFormStore((state) => state.setGrade);
-  const setShuffleQuestions = useAssignmentFormStore((state) => state.setShuffleQuestions);
-
   const isMetadataDialogOpen = useAssignmentEditorStore((state) => state.isMetadataDialogOpen);
   const setMetadataDialogOpen = useAssignmentEditorStore((state) => state.setMetadataDialogOpen);
 
@@ -106,20 +102,6 @@ export const MetadataEditDialog = () => {
               placeholder={t('placeholders.description')}
               rows={3}
             />
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="shuffleQuestions"
-              checked={shuffleQuestions}
-              onCheckedChange={(checked) => setShuffleQuestions(checked as boolean)}
-            />
-            <Label
-              htmlFor="shuffleQuestions"
-              className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              {t('fields.shuffleQuestions')}
-            </Label>
           </div>
         </div>
 

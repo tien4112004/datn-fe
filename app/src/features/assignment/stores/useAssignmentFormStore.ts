@@ -60,8 +60,6 @@ interface AssignmentFormStore {
   questions: AssignmentQuestionWithTopic[];
   matrix: MatrixCell[];
   contexts: AssignmentContext[];
-  shuffleQuestions: boolean;
-
   // === FORM STATE ===
   isDirty: boolean;
   validationErrors: AssignmentValidationErrors | null;
@@ -71,8 +69,6 @@ interface AssignmentFormStore {
   setDescription: (description: string) => void;
   setSubject: (subject: SubjectCode) => void;
   setGrade: (grade: Grade) => void;
-  setShuffleQuestions: (shuffle: boolean) => void;
-
   // === ACTIONS: Topics ===
   addTopic: (topic: AssignmentTopic) => void;
   removeTopic: (topicId: string) => void;
@@ -118,7 +114,6 @@ interface AssignmentFormStore {
     questions?: AssignmentQuestionWithTopic[];
     matrix?: MatrixCell[];
     contexts?: AssignmentContext[];
-    shuffleQuestions?: boolean;
   }) => void;
 }
 
@@ -131,7 +126,6 @@ const initialState = {
   questions: [],
   matrixCells: [],
   contexts: [] as AssignmentContext[],
-  shuffleQuestions: false,
   isDirty: false,
   validationErrors: null,
 };
@@ -161,11 +155,6 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
 
       setGrade: (grade) => {
         set({ grade, isDirty: true }, false, 'assignment/setGrade');
-        dispatchDirtyEvent(true);
-      },
-
-      setShuffleQuestions: (shuffleQuestions) => {
-        set({ shuffleQuestions, isDirty: true }, false, 'assignment/setShuffleQuestions');
         dispatchDirtyEvent(true);
       },
 
@@ -557,7 +546,6 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
           questions,
           matrix: syncMatrixCounts(questions, matrix),
           contexts: data.contexts || [],
-          shuffleQuestions: data.shuffleQuestions || false,
           isDirty: false,
           validationErrors: null,
         };

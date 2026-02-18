@@ -66,7 +66,6 @@ export interface AssignmentFormData {
   contexts: AssignmentContext[];
   questions: AssignmentQuestionWithTopic[];
   matrix: MatrixCell[];
-  shuffleQuestions?: boolean; // Shuffle questions for each student (default: false)
 }
 
 // Assignment (full entity)
@@ -81,7 +80,6 @@ export interface Assignment {
   questions?: (AssignmentQuestion | AssignmentQuestionWithTopic)[];
   matrix?: ApiMatrix;
   totalPoints?: number;
-  shuffleQuestions?: boolean;
   createdAt?: string;
   updatedAt?: string;
   maxSubmissions?: number;
@@ -154,7 +152,6 @@ export interface CreateAssignmentRequest {
   topics?: TopicRequest[];
   contexts?: AssignmentContext[];
   matrix?: ApiMatrix; // Full 3D matrix structure with lowercase enums
-  shuffleQuestions?: boolean;
 }
 
 export interface UpdateAssignmentRequest {
@@ -166,7 +163,6 @@ export interface UpdateAssignmentRequest {
   topics?: TopicRequest[];
   contexts?: AssignmentContext[];
   matrix?: ApiMatrix; // Full 3D matrix structure with lowercase enums
-  shuffleQuestions?: boolean;
 }
 
 // Generate matrix request (calls POST /api/exams/generate-matrix)
@@ -214,7 +210,6 @@ export interface GenerateExamFromMatrixRequest {
   subject: string; // Required: "T", "TV", "TA"
   title: string; // Required: Exam title
   description?: string; // Optional: Exam description
-  timeLimitMinutes?: number; // Optional: Time limit
   missingStrategy?: 'REPORT_GAPS' | 'GENERATE_WITH_AI' | 'FAIL_FAST'; // Default: REPORT_GAPS
   includePersonalQuestions?: boolean; // Default: true
   provider?: string; // For GENERATE_WITH_AI (default: "google")
@@ -236,7 +231,6 @@ export interface ExamDraftDto {
   id: string; // Draft ID
   title: string; // Exam title
   description?: string; // Exam description
-  duration?: number; // Time limit in minutes
   ownerId: string; // Teacher ID
   subject: string; // Subject code
   grade: string; // Grade level

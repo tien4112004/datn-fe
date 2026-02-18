@@ -229,6 +229,14 @@ export default {
   errors: {
     cannotMoveToDescendant: 'Không thể di chuyển nút đến các nút con của nó',
   },
+  embed: {
+    generating: 'Đang tạo sơ đồ tư duy...',
+    generatingSubtitle: 'Điều này có thể mất một chút thời gian',
+    generationFailed: 'Tạo thất bại',
+  },
+  node: {
+    loadingImage: 'Đang tải hình ảnh...',
+  },
   saving: {
     cannotSaveInViewMode: 'Không thể lưu ở chế độ xem',
     cannotSaveInPresenterMode: 'Không thể lưu khi đang ở chế độ trình chiếu',

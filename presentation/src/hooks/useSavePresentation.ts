@@ -95,21 +95,18 @@ export function useSavePresentation(presentationId: string, pinia: Pinia) {
     }
 
     // Call API to update presentation with FormData
-    updatePresentationMutation.mutate(
-      { presentationId, data: formData },
-      {
-        onSuccess: () => {
-          // Mark as saved in store
-          saveStore.markSaved();
-          // Dispatch success message
-          dispatchMessage('success', 'Presentation saved successfully');
-        },
-        onError: (error) => {
-          console.error('Failed to save presentation:', error);
-          dispatchMessage('error', 'Failed to save presentation');
-        },
-      }
-    );
+    try {
+      await updatePresentationMutation.mutateAsync({ presentationId, data: formData });
+
+      // Mark as saved in store
+      saveStore.markSaved();
+      // Dispatch success message
+      dispatchMessage('success', 'Presentation saved successfully');
+    } catch (error) {
+      console.error('Failed to save presentation:', error);
+      dispatchMessage('error', 'Failed to save presentation');
+      throw error;
+    }
   }
 
   /**

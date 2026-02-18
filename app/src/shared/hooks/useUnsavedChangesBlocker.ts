@@ -16,40 +16,47 @@ export interface UseUnsavedChangesBlockerOptions {
    * When ref.current is true, navigation will not be blocked
    */
   skipBlockingRef?: RefObject<boolean>;
+  /**
+   * Optional async function to auto-save before navigating away.
+   * When provided, blocked navigation triggers this instead of showing the dialog.
+   * On success: navigation proceeds silently.
+   * On failure/timeout: falls back to showing the dialog.
+   */
+  autoSave?: () => Promise<void>;
+  /**
+   * Timeout in milliseconds for the autoSave function.
+   * If autoSave takes longer than this, falls back to the dialog.
+   * Default: 10000 (10 seconds)
+   */
+  autoSaveTimeout?: number;
 }
 
 /**
- * Shared hook to block navigation when there are unsaved changes
- * Can be used by any feature that dispatches a custom event with dirty state
+ * Shared hook to block navigation when there are unsaved changes.
+ * Supports optional auto-save: when `autoSave` is provided, navigation
+ * triggers a silent save instead of showing a dialog. The dialog is shown
+ * only if auto-save fails or times out.
  *
  * @param options Configuration options for the blocker
- * @returns Object with dialog state and handlers
- *
- * @example
- * ```tsx
- * // In your store/dirty state:
- * window.dispatchEvent(
- *   new CustomEvent('app.my-feature.dirty-state-changed', {
- *     detail: { isDirty: true }
- *   })
- * );
- *
- * // In your component:
- * const { showDialog, setShowDialog, handleStay, handleProceed } =
- *   useUnsavedChangesBlocker({
- *     eventName: 'app.my-feature.dirty-state-changed'
- *   });
- * ```
+ * @returns Object with dialog state, handlers, and auto-save status
  */
 export const useUnsavedChangesBlocker = (options: UseUnsavedChangesBlockerOptions = {}) => {
-  const { eventName = 'app.unsaved-changes', skipBlockingRef } = options;
+  const { eventName = 'app.unsaved-changes', skipBlockingRef, autoSave, autoSaveTimeout = 10000 } = options;
 
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
 
   // Use ref to avoid stale closure in useBlocker callback
   const hasUnsavedChangesRef = useRef(hasUnsavedChanges);
   hasUnsavedChangesRef.current = hasUnsavedChanges;
+
+  // Track whether auto-save has been attempted for the current block
+  const autoSaveAttemptedRef = useRef(false);
+
+  // Keep latest autoSave ref to avoid stale closures
+  const autoSaveRef = useRef(autoSave);
+  autoSaveRef.current = autoSave;
 
   // Listen to dirty state changes
   useEffect(() => {
@@ -84,12 +91,37 @@ export const useUnsavedChangesBlocker = (options: UseUnsavedChangesBlockerOption
     )
   );
 
-  // Show dialog when navigation is blocked
+  // Handle blocked navigation: auto-save or show dialog
   useEffect(() => {
     if (blocker.state === 'blocked') {
-      setShowDialog(true);
+      if (autoSaveRef.current && !autoSaveAttemptedRef.current) {
+        // Auto-save: attempt save, then proceed or fall back to dialog
+        autoSaveAttemptedRef.current = true;
+        setIsAutoSaving(true);
+
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error('Auto-save timeout')), autoSaveTimeout);
+        });
+
+        Promise.race([autoSaveRef.current(), timeoutPromise])
+          .then(() => {
+            setIsAutoSaving(false);
+            blocker.proceed?.();
+          })
+          .catch((error) => {
+            console.error('Auto-save failed, showing dialog:', error);
+            setIsAutoSaving(false);
+            setShowDialog(true);
+          });
+      } else {
+        // No autoSave or already attempted: show dialog
+        setShowDialog(true);
+      }
+    } else {
+      // Reset attempt tracking when blocker is no longer blocked
+      autoSaveAttemptedRef.current = false;
     }
-  }, [blocker.state]);
+  }, [blocker.state, autoSaveTimeout]);
 
   const handleProceed = () => {
     setShowDialog(false);
@@ -108,6 +140,7 @@ export const useUnsavedChangesBlocker = (options: UseUnsavedChangesBlockerOption
 
   return {
     hasUnsavedChanges,
+    isAutoSaving,
     showDialog,
     setShowDialog: handleCloseDialog,
     handleStay,

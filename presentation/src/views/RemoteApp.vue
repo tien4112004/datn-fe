@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, watch, computed, provide, getCurrentInstance } from 'vue';
+import { onMounted, onBeforeUnmount, ref, watch, computed, provide, getCurrentInstance } from 'vue';
 import { storeToRefs } from 'pinia';
 import { nanoid } from 'nanoid';
 import {
@@ -98,6 +98,9 @@ const errorState = ref({
   originalError: null as any,
 });
 
+// Save function reference for event bridge (React → Vue)
+let savePresentationFn: (() => Promise<void>) | null = null;
+
 // Computed loading state that combines processing and streaming states
 const isLoading = computed(() => {
   const loading = isProcessing.value || generationStore.isStreaming;
@@ -155,7 +158,21 @@ onMounted(async () => {
     slidesStore.setViewportSize(props.presentation.viewport.width);
   }
 
-  processorResult = usePresentationProcessor(
+  // Get pinia instance
+  const instance = getCurrentInstance();
+  const pinia = instance?.appContext.config.globalProperties.$pinia;
+
+  // Create save hook and provide to child components
+  if (pinia) {
+    const { savePresentation: saveFn } = useSavePresentation(props.presentation.id, pinia);
+    provide('savePresentationFn', saveFn);
+    savePresentationFn = saveFn;
+  }
+
+  // Event bridge: React can request a save via CustomEvent
+  window.addEventListener('app.presentation.request-save', handleSaveRequest);
+
+  const processorResult = usePresentationProcessor(
     props.presentation,
     props.presentation.id,
     generationStore.isStreaming,
@@ -243,6 +260,46 @@ watch(
 
 watch(isInitialLoad, () => {
   saveStore.reset();
+});
+
+// Handle save requests from React container (for auto-save on navigation)
+async function handleSaveRequest() {
+  if (!savePresentationFn) {
+    window.dispatchEvent(
+      new CustomEvent('app.presentation.save-failed', {
+        detail: { error: 'Save function not available' },
+      })
+    );
+    return;
+  }
+
+  if (containerStore.mode === 'view') {
+    window.dispatchEvent(
+      new CustomEvent('app.presentation.save-failed', {
+        detail: { error: 'Cannot save in view mode' },
+      })
+    );
+    return;
+  }
+
+  try {
+    await savePresentationFn();
+    window.dispatchEvent(
+      new CustomEvent('app.presentation.save-completed', {
+        detail: { success: true },
+      })
+    );
+  } catch (error) {
+    window.dispatchEvent(
+      new CustomEvent('app.presentation.save-failed', {
+        detail: { error: error instanceof Error ? error.message : 'Save failed' },
+      })
+    );
+  }
+}
+
+onBeforeUnmount(() => {
+  window.removeEventListener('app.presentation.request-save', handleSaveRequest);
 });
 
 // When the application is unloaded, record the current indexedDB database ID in localStorage for later database cleanup

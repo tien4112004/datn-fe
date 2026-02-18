@@ -5,10 +5,8 @@
  */
 export default {
   loading: {
-    page: 'Loading page...',
     presentation: 'Loading presentation...',
     generatingPresentation: 'Generating presentation...',
-    processingPresentation: 'Processing presentation...',
     savingPresentation: 'Saving presentation...',
   },
   actions: {

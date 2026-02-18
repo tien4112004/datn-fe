@@ -1,22 +1,19 @@
 <template>
   <div class="mobile-preview" ref="mobileRef">
-    <template v-if="slides.length > 0">
-      <div class="thumbnail-list">
-        <div class="thumbnail-item" v-for="(slide, index) in slides" :key="slide.id">
-          <ThumbnailSlide :slide="slide" :size="screenWidth - 20" :visible="index < slidesLoadLimit" />
-        </div>
+    <div class="thumbnail-list">
+      <div class="thumbnail-item" v-for="(slide, index) in slides" :key="slide.id">
+        <ThumbnailSlide :slide="slide" :size="screenWidth - 20" :visible="index < slidesLoadLimit" />
       </div>
-      <div class="menu">
-        <div class="menu-item" @click="changeMode('editor')">
-          <IconEdit class="icon" /> {{ $t('ui.mobile.preview.edit') }}
-        </div>
-        <Divider type="vertical" style="height: 30px" />
-        <div class="menu-item" @click="changeMode('player')">
-          <IconFullScreenPlay class="icon" /> {{ $t('ui.mobile.preview.play') }}
-        </div>
+    </div>
+    <!-- <div class="menu">
+      <div class="menu-item" @click="changeMode('editor')">
+        <IconEdit class="icon" /> {{ $t('ui.mobile.preview.edit') }}
       </div>
-    </template>
-    <EmptyMobilePreview v-else />
+      <Divider type="vertical" style="height: 30px" />
+      <div class="menu-item" @click="changeMode('player')">
+        <IconFullScreenPlay class="icon" /> {{ $t('ui.mobile.preview.play') }}
+      </div>
+    </div> -->
   </div>
 </template>
 

@@ -229,6 +229,14 @@ export default {
   errors: {
     cannotMoveToDescendant: 'Cannot move a node to one of its descendants',
   },
+  embed: {
+    generating: 'Generating mindmap...',
+    generatingSubtitle: 'This could take some time',
+    generationFailed: 'Generation Failed',
+  },
+  node: {
+    loadingImage: 'Loading image...',
+  },
   saving: {
     cannotSaveInViewMode: 'Cannot save in view mode',
     cannotSaveInPresenterMode: 'Cannot save while in presenter mode',

@@ -7,19 +7,19 @@ import { Separator } from '@/shared/components/ui/separator';
  */
 export function StudentDetailSkeleton() {
   return (
-    <div className="space-y-6 animate-pulse">
+    <div className="animate-pulse space-y-6">
       {/* Student Info Skeleton */}
       <Card>
         <CardHeader>
-          <div className="h-6 w-48 bg-muted rounded" />
+          <div className="bg-muted h-6 w-48 rounded" />
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Avatar and Name */}
           <div className="flex items-center gap-4">
-            <div className="h-20 w-20 rounded-full bg-muted" />
+            <div className="bg-muted h-20 w-20 rounded-full" />
             <div className="space-y-2">
-              <div className="h-8 w-48 bg-muted rounded" />
-              <div className="h-4 w-32 bg-muted rounded" />
+              <div className="bg-muted h-8 w-48 rounded" />
+              <div className="bg-muted h-4 w-32 rounded" />
             </div>
           </div>
 
@@ -29,8 +29,8 @@ export function StudentDetailSkeleton() {
           <div className="grid gap-4 sm:grid-cols-2">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="flex items-center gap-3">
-                <div className="h-4 w-4 bg-muted rounded" />
-                <div className="h-4 w-40 bg-muted rounded" />
+                <div className="bg-muted h-4 w-4 rounded" />
+                <div className="bg-muted h-4 w-40 rounded" />
               </div>
             ))}
           </div>
@@ -38,15 +38,15 @@ export function StudentDetailSkeleton() {
       </Card>
 
       {/* Performance Metrics Skeleton */}
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         {[1, 2, 3, 4, 5].map((i) => (
           <Card key={i}>
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <div className="h-12 w-12 bg-muted rounded-lg" />
-                <div className="space-y-2 flex-1">
-                  <div className="h-3 w-20 bg-muted rounded" />
-                  <div className="h-6 w-16 bg-muted rounded" />
+                <div className="bg-muted h-12 w-12 rounded-lg" />
+                <div className="flex-1 space-y-2">
+                  <div className="bg-muted h-3 w-20 rounded" />
+                  <div className="bg-muted h-6 w-16 rounded" />
                 </div>
               </div>
             </CardContent>
@@ -57,10 +57,10 @@ export function StudentDetailSkeleton() {
       {/* Chart Skeleton */}
       <Card>
         <CardHeader>
-          <div className="h-6 w-48 bg-muted rounded" />
+          <div className="bg-muted h-6 w-48 rounded" />
         </CardHeader>
         <CardContent>
-          <div className="h-[250px] bg-muted rounded" />
+          <div className="bg-muted h-[250px] rounded" />
         </CardContent>
       </Card>
     </div>

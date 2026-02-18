@@ -79,7 +79,8 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
 
         // Build request for this gap
         const request: GenerateQuestionsRequest = {
-          gradeLevel: '5', // Default grade, could be parameterized
+          grade: '5', // Default grade, could be parameterized
+          topic: gap.topic,
           prompt: `Generate ${gap.gapCount} ${gap.difficulty} level ${gap.questionType} question${gap.gapCount > 1 ? 's' : ''} about ${gap.topic}.${shouldUseContext ? ' Include a reading passage for context.' : ''}${additionalPrompt ? ' ' + additionalPrompt : ''}`,
           subject: subject || 'T',
           questionsPerDifficulty: {

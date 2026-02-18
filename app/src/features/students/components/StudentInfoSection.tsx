@@ -28,11 +28,7 @@ export function StudentInfoSection({ student }: StudentInfoSectionProps) {
 
   // Determine status variant
   const statusVariant =
-    student.status === 'active'
-      ? 'default'
-      : student.status === 'inactive'
-        ? 'secondary'
-        : 'outline';
+    student.status === 'active' ? 'default' : student.status === 'inactive' ? 'secondary' : 'outline';
 
   // Get translated status
   const getStatusLabel = (status: string) => {
@@ -62,18 +58,18 @@ export function StudentInfoSection({ student }: StudentInfoSectionProps) {
       </CardHeader>
       <CardContent className="space-y-4 pt-3">
         {/* Avatar and Name Section */}
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+        <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
           <UserAvatar
             src={student.avatarUrl || undefined}
             name={fullName}
             size="xl"
-            className="h-24 w-24 ring-2 ring-muted ring-offset-2 transition-transform duration-200 hover:scale-105"
+            className="ring-muted h-24 w-24 ring-2 ring-offset-2 transition-transform duration-200 hover:scale-105"
           />
-          <div className="flex-1 text-center sm:text-left space-y-1">
+          <div className="flex-1 space-y-1 text-center sm:text-left">
             <h2 className="text-3xl font-bold tracking-tight">{fullName}</h2>
-            <p className="text-base text-muted-foreground">@{student.username}</p>
+            <p className="text-muted-foreground text-base">@{student.username}</p>
             {student.dateOfBirth && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 {t('studentDetail.info.born')}: {formatDate(student.dateOfBirth, i18n.language)}
               </p>
             )}
@@ -84,7 +80,7 @@ export function StudentInfoSection({ student }: StudentInfoSectionProps) {
 
         {/* Contact Information Grid */}
         <div>
-          <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
+          <h3 className="text-muted-foreground mb-3 text-sm font-semibold uppercase tracking-wide">
             {t('studentDetail.info.contactInformation')}
           </h3>
           <div className="grid gap-2.5 sm:grid-cols-2">
@@ -105,7 +101,7 @@ export function StudentInfoSection({ student }: StudentInfoSectionProps) {
 
         {/* Parent Information Grid */}
         <div>
-          <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide flex items-center gap-2">
+          <h3 className="text-muted-foreground mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide">
             <Users className="h-4 w-4" />
             {t('studentDetail.info.parentInformation')}
           </h3>

@@ -90,9 +90,11 @@ export interface ChapterResponse {
  */
 export interface GenerateQuestionsRequest {
   /** Grade level: "1", "2", "3", "4", or "5" */
-  gradeLevel: string;
-  /** Prompt description for generating questions */
-  prompt: string;
+  grade: string;
+  /** Prompt description for generating questions (optional) */
+  prompt?: string;
+  /** Topic/prompt description for generating questions */
+  topic: string;
   /** Subject code: "T" (Math), "TV" (Vietnamese), "TA" (English) */
   subject: string;
   /** Chapter name (optional) - improves question relevance */

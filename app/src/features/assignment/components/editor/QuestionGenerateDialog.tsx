@@ -114,13 +114,7 @@ export function QuestionBankGenerateDialog({
   };
 
   const isFormValid = () => {
-    return (
-      prompt.trim().length > 0 &&
-      grade.length > 0 &&
-      subject.length > 0 &&
-      selectedTypes.length > 0 &&
-      getTotalQuestions() > 0
-    );
+    return grade.length > 0 && subject.length > 0 && selectedTypes.length > 0 && getTotalQuestions() > 0;
   };
 
   // Reset chapter when subject or grade changes
@@ -138,10 +132,6 @@ export function QuestionBankGenerateDialog({
     // Validation
     const errors: Record<string, boolean> = {};
 
-    if (!prompt.trim()) {
-      errors.prompt = true;
-      toast.error(t('validation.promptRequired'));
-    }
     if (!grade) {
       errors.grade = true;
       toast.error(t('validation.gradeRequired'));
@@ -173,13 +163,15 @@ export function QuestionBankGenerateDialog({
     }
 
     const request: GenerateQuestionsRequest = {
-      prompt: prompt.trim(),
-      gradeLevel: grade,
+      ...(prompt.trim() && { prompt: prompt.trim() }),
+      // TODO: Change this to use the correct topic/prompt field
+      topic: chapter || '',
+      grade: grade,
       subject,
       questionTypes: selectedTypes,
       questionsPerDifficulty: filteredDifficulties,
       ...(chapter && { chapter }),
-      ...(selectedModel && { provider: selectedModel.provider, model: selectedModel.name }),
+      ...(selectedModel && { provider: selectedModel.provider.toLowerCase(), model: selectedModel.name }),
     };
 
     try {
@@ -205,8 +197,28 @@ export function QuestionBankGenerateDialog({
           },
         });
       }
-    } catch (error) {
-      toast.error(t('toast.error'));
+    } catch (error: any) {
+      // Handle backend validation errors
+      if (error?.response?.data?.errorCode === 'VALIDATION_ERROR' && error?.response?.data?.data) {
+        const backendErrors: Record<string, boolean> = {};
+        const errorData = error.response.data.data;
+
+        // Map backend field names to frontend validation state
+        if (errorData.topic) {
+          backendErrors.prompt = true;
+        }
+        if (errorData.grade) {
+          backendErrors.grade = true;
+        }
+        if (errorData.subject) {
+          backendErrors.subject = true;
+        }
+
+        setValidationErrors(backendErrors);
+        toast.error(error.response.data.message || t('toast.error'));
+      } else {
+        toast.error(t('toast.error'));
+      }
     }
   };
 
@@ -245,9 +257,7 @@ export function QuestionBankGenerateDialog({
             {/* Prompt */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Label htmlFor="prompt">
-                  {t('fields.prompt')} <span className="text-red-500">*</span>
-                </Label>
+                <Label htmlFor="prompt">{t('fields.prompt')}</Label>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Info className="text-muted-foreground h-4 w-4" />

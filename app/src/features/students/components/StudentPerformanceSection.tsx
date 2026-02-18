@@ -29,17 +29,15 @@ export function StudentPerformanceSection({ performance }: StudentPerformanceSec
     <div className="space-y-6">
       {/* Section Header */}
       <div className="flex items-center gap-2">
-        <BarChart3 className="h-6 w-6 text-muted-foreground" />
+        <BarChart3 className="text-muted-foreground h-6 w-6" />
         <div>
           <h2 className="text-2xl font-bold tracking-tight">{t('studentDetail.analytics.title')}</h2>
-          <p className="text-sm text-muted-foreground">
-            {t('studentDetail.analytics.subtitle')}
-          </p>
+          <p className="text-muted-foreground text-sm">{t('studentDetail.analytics.subtitle')}</p>
         </div>
       </div>
 
       {/* Metrics Grid */}
-      <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
         <MetricCard
           icon={Target}
           label={t('studentDetail.analytics.metrics.overallAverage')}
@@ -113,7 +111,7 @@ export function StudentPerformanceSection({ performance }: StudentPerformanceSec
               <div key={index}>
                 <ClassPerformanceRow classSummary={classSummary} />
                 {index < performance.classSummaries.length - 1 && (
-                  <div className="mt-6 border-b border-muted" />
+                  <div className="border-muted mt-6 border-b" />
                 )}
               </div>
             ))}

@@ -99,9 +99,7 @@ export function UserDetailPage() {
             <Activity className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {tokenStats?.totalRequests?.toLocaleString() || '0'}
-            </div>
+            <div className="text-2xl font-bold">{tokenStats?.totalRequests?.toLocaleString() || '0'}</div>
             <p className="text-muted-foreground text-xs">API requests made</p>
           </CardContent>
         </Card>
@@ -112,9 +110,7 @@ export function UserDetailPage() {
             <Database className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {tokenStats?.totalTokens?.toLocaleString() || '0'}
-            </div>
+            <div className="text-2xl font-bold">{tokenStats?.totalTokens?.toLocaleString() || '0'}</div>
             <p className="text-muted-foreground text-xs">Tokens processed</p>
           </CardContent>
         </Card>
@@ -192,9 +188,7 @@ export function UserDetailPage() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold">
-                        {item.totalTokens?.toLocaleString() || 0} tokens
-                      </p>
+                      <p className="font-semibold">{item.totalTokens?.toLocaleString() || 0} tokens</p>
                       <p className="text-muted-foreground text-sm">
                         {item.totalCoin ? `${parseInt(item.totalCoin).toLocaleString()} coins` : '-'}
                       </p>
@@ -203,7 +197,7 @@ export function UserDetailPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-muted-foreground text-center py-8">No model usage data available</p>
+              <p className="text-muted-foreground py-8 text-center">No model usage data available</p>
             )}
           </CardContent>
         </Card>
@@ -225,9 +219,7 @@ export function UserDetailPage() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold">
-                        {item.totalTokens?.toLocaleString() || 0} tokens
-                      </p>
+                      <p className="font-semibold">{item.totalTokens?.toLocaleString() || 0} tokens</p>
                       <p className="text-muted-foreground text-sm">
                         {item.totalCoin ? `${parseInt(item.totalCoin).toLocaleString()} coins` : '-'}
                       </p>
@@ -236,7 +228,7 @@ export function UserDetailPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-muted-foreground text-center py-8">No request type data available</p>
+              <p className="text-muted-foreground py-8 text-center">No request type data available</p>
             )}
           </CardContent>
         </Card>

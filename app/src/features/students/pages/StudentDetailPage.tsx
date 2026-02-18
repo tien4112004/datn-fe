@@ -69,26 +69,17 @@ export default function StudentDetailPage() {
           <AlertTitle className="text-lg font-semibold">{t('studentDetail.unableToLoad')}</AlertTitle>
           <AlertDescription className="mt-2 space-y-3">
             <p>{t('studentDetail.errorReasons.description')}</p>
-            <ul className="list-disc list-inside space-y-1 text-sm">
+            <ul className="list-inside list-disc space-y-1 text-sm">
               <li>{t('studentDetail.errorReasons.incorrectId')}</li>
               <li>{t('studentDetail.errorReasons.noPermission')}</li>
               <li>{t('studentDetail.errorReasons.connectionIssue')}</li>
             </ul>
             <div className="flex gap-2 pt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRetryStudent}
-                className="gap-2"
-              >
+              <Button variant="outline" size="sm" onClick={handleRetryStudent} className="gap-2">
                 <RefreshCcw className="h-4 w-4" />
                 {t('studentDetail.actions.retry')}
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleBack}
-              >
+              <Button variant="ghost" size="sm" onClick={handleBack}>
                 {t('studentDetail.actions.goBack')}
               </Button>
             </div>
@@ -105,11 +96,7 @@ export default function StudentDetailPage() {
   return (
     <div className="container mx-auto max-w-6xl space-y-6 p-4 sm:p-6 lg:p-8">
       {/* Page Header with Breadcrumb */}
-      <PageHeader
-        title={fullName}
-        description={pageDescription}
-        onBack={handleBack}
-      />
+      <PageHeader title={fullName} description={pageDescription} onBack={handleBack} />
 
       {/* Student Information Card */}
       <section aria-label={t('studentDetail.sections.studentInformation')}>
@@ -120,10 +107,10 @@ export default function StudentDetailPage() {
       <section aria-label={t('studentDetail.sections.performanceAnalytics')}>
         {isLoadingPerformance ? (
           // Performance Loading State: Skeleton for performance section only
-          <div className="space-y-4 animate-pulse">
-            <div className="grid gap-4 grid-cols-2 lg:grid-cols-5">
+          <div className="animate-pulse space-y-4">
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="h-32 bg-muted rounded-lg" />
+                <div key={i} className="bg-muted h-32 rounded-lg" />
               ))}
             </div>
           </div>
@@ -131,15 +118,12 @@ export default function StudentDetailPage() {
           // Performance Error State: Helpful message with retry
           <Alert className="border-amber-200 dark:border-amber-800">
             <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-            <AlertTitle className="text-lg font-semibold">{t('studentDetail.performance.unavailable')}</AlertTitle>
+            <AlertTitle className="text-lg font-semibold">
+              {t('studentDetail.performance.unavailable')}
+            </AlertTitle>
             <AlertDescription className="mt-2 space-y-2">
               <p>{t('studentDetail.performance.unavailableDescription', { fullName })}</p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRetryPerformance}
-                className="gap-2 mt-3"
-              >
+              <Button variant="outline" size="sm" onClick={handleRetryPerformance} className="mt-3 gap-2">
                 <RefreshCcw className="h-4 w-4" />
                 {t('studentDetail.actions.tryAgain')}
               </Button>

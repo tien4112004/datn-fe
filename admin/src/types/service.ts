@@ -126,7 +126,10 @@ export interface AdminApiService extends Service {
   deleteMatrixTemplate(id: string): Promise<ApiResponse<void>>;
 
   // Token Usage
-  getTokenUsageStats(userId: string, filters?: TokenUsageFilterRequest): Promise<ApiResponse<TokenUsageStats>>;
+  getTokenUsageStats(
+    userId: string,
+    filters?: TokenUsageFilterRequest
+  ): Promise<ApiResponse<TokenUsageStats>>;
   getTokenUsageByModel(userId: string): Promise<ApiResponse<TokenUsageStats[]>>;
   getTokenUsageByRequestType(userId: string): Promise<ApiResponse<TokenUsageStats[]>>;
 }

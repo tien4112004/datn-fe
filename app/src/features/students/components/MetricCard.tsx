@@ -78,13 +78,13 @@ export function MetricCard({
         'hover:shadow-md'
       )}
     >
-      <CardContent className="flex items-center gap-4 py-1.5 px-4">
+      <CardContent className="flex items-center gap-4 px-4 py-1.5">
         {/* Icon Container */}
         <div
           className={cn(
             'rounded-lg transition-transform duration-200',
             colors.iconBg,
-            'p-2 flex items-center'
+            'flex items-center p-2'
           )}
           aria-hidden="true"
         >
@@ -92,10 +92,8 @@ export function MetricCard({
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-muted-foreground truncate">
-            {label}
-          </p>
+        <div className="min-w-0 flex-1">
+          <p className="text-muted-foreground truncate text-sm font-medium">{label}</p>
           <div className="flex items-baseline gap-2">
             <p className="text-2xl font-bold tabular-nums">{value}</p>
             {trend && trendValue && (

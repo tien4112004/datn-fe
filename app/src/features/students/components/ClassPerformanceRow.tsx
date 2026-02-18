@@ -15,7 +15,7 @@ export function ClassPerformanceRow({ classSummary }: ClassPerformanceRowProps) 
       <div className="flex items-center justify-between">
         <div className="flex-1">
           <h4 className="font-medium">{classSummary.className}</h4>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {classSummary.completedAssignments} of {classSummary.totalAssignments} assignments completed
           </p>
         </div>

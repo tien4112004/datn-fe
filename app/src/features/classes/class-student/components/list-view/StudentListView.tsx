@@ -79,10 +79,7 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
       accessorKey: 'fullName',
       header: t('table.fullName'),
       cell: ({ row }) => (
-        <Link
-          to={`/students/${row.original.id}`}
-          className="font-medium hover:underline"
-        >
+        <Link to={`/students/${row.original.id}`} className="font-medium hover:underline">
           {row.getValue('fullName')}
         </Link>
       ),

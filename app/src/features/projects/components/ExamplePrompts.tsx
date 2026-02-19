@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'motion/react';
-import { CardTitle } from '@/shared/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { CardTitle } from '@ui/card';
+import { Button } from '@ui/button';
 import { useExamplePrompts } from '../hooks/useExamplePrompts';
 import { type ExamplePromptType } from '../types/examplePrompt';
 import { Sparkles, Loader2 } from 'lucide-react';

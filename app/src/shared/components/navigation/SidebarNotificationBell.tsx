@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Popover, PopoverTrigger, PopoverContent } from '@/shared/components/ui/popover';
+import { Popover, PopoverTrigger, PopoverContent } from '@ui/popover';
 import { Bell } from 'lucide-react';
 import { SidebarMenuButton, SidebarMenuItem } from '@/shared/components/ui/sidebar';
 import { useState } from 'react';

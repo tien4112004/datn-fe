@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/shared/components/ui/button';
-import { Checkbox } from '@/shared/components/ui/checkbox';
-import { Label } from '@/shared/components/ui/label';
+import { Button } from '@ui/button';
+import { Checkbox } from '@ui/checkbox';
+import { Label } from '@ui/label';
 import { SearchBar } from '@/shared/components/common/SearchBar';
 import { X, Filter, ChevronDown } from 'lucide-react';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';

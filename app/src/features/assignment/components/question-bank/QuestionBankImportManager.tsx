@@ -11,8 +11,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/shared/components/ui/alert-dialog';
-import { Checkbox } from '@/shared/components/ui/checkbox';
+} from '@ui/alert-dialog';
+import { Checkbox } from '@ui/checkbox';
 import { QuestionBankDialog } from '../question-bank';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';

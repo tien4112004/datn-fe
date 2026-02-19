@@ -1,7 +1,7 @@
 import { Bell } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/shared/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
+import { Button } from '@ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/popover';
 import { useUnreadCount } from '../hooks/useApi';
 import { NotificationDropdown } from './NotificationDropdown';
 import { useState } from 'react';

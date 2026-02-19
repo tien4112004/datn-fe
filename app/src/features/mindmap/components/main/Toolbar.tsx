@@ -1,5 +1,5 @@
 import LoadingButton from '@/components/common/LoadingButton';
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import { CommentDrawer } from '@/features/comments';
 import { PermissionBadge } from '@/shared/components/common/PermissionBadge';
 import {
@@ -12,8 +12,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/shared/components/ui/alert-dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
+} from '@ui/alert-dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/tabs';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { cn } from '@/shared/lib/utils';
 import type { Permission } from '@/shared/utils/permission';

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 
 interface MatrixEmptyStateProps {
   onOpenEditor: () => void;

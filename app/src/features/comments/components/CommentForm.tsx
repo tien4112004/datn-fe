@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Button } from '@/shared/components/ui/button';
-import { Textarea } from '@/shared/components/ui/textarea';
+import { Button } from '@ui/button';
+import { Textarea } from '@ui/textarea';
 
 interface CommentFormProps {
   onSubmit: (content: string, mentionedUserIds: string[]) => void;

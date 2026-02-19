@@ -94,27 +94,5 @@ export interface Submission {
   gradedBy?: string; // User ID of teacher who graded
 }
 
-/**
- * Assignment entity
- * Represents a complete assignment with questions and metadata
- */
-export interface Assignment {
-  id: string; // Unique identifier for this assignment
-  classId: string; // Reference to the class this assignment belongs to
-  title: string; // Assignment title
-  description?: string; // Optional description (Markdown-enabled)
-  questions: import('./question').AssignmentQuestion[]; // Array of questions with assigned points
-  dueDate?: string; // Optional due date (ISO timestamp)
-  totalPoints?: number; // Total points possible (sum of all question points)
-  createdAt: string; // ISO timestamp of creation
-  updatedAt: string; // ISO timestamp of last update
-  status: 'draft' | 'published' | 'archived'; // Current status of the assignment
-  shuffleQuestions?: boolean; // Shuffle question order for each student (default: false)
-  maxSubmissions?: number; // Maximum number of submissions allowed
-  allowRetake?: boolean; // Whether retakes are allowed
-  showCorrectAnswers?: boolean; // Whether to show correct answers after submission
-  showScoreImmediately?: boolean; // Whether to show score immediately after submission
-  passingScore?: number; // Minimum score to pass
-  availableFrom?: string; // ISO timestamp when assignment becomes available
-  availableUntil?: string; // ISO timestamp when assignment is no longer available
-}
+// Assignment entity is now in ./assignment.ts
+export type { Assignment } from './assignment';

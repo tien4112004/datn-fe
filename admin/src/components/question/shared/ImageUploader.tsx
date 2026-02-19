@@ -1,9 +1,11 @@
 import { useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@ui/button';
+import { Input } from '@ui/input';
+import { Label } from '@ui/label';
 import { Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { api, getBackendUrl } from '@aiprimary/api';
+import type { ApiResponse } from '@aiprimary/api';
 
 interface ImageUploaderProps {
   value?: string;
@@ -13,20 +15,61 @@ interface ImageUploaderProps {
   disabled?: boolean;
 }
 
-// Simple helper to check if URL is valid image
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_DIMENSIONS = { width: 4096, height: 4096 };
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+const ALLOWED_EXTENSIONS = /\.(jpg|jpeg|png|gif|webp)$/i;
+
 const isValidImageUrl = (url: string): boolean => {
   if (!url) return false;
-  return url.startsWith('data:image/') || url.startsWith('http://') || url.startsWith('https://');
+  if (url.startsWith('data:image/')) return !url.startsWith('data:image/svg');
+  try {
+    const parsed = new URL(url);
+    if (!['http:', 'https:'].includes(parsed.protocol)) return false;
+    return ALLOWED_EXTENSIONS.test(parsed.pathname);
+  } catch {
+    return false;
+  }
 };
 
-// Convert file to base64 data URL
-const uploadImage = async (file: File): Promise<string> => {
+const getImageDimensions = (url: string): Promise<{ width: number; height: number }> => {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(new Error('Failed to read file'));
-    reader.readAsDataURL(file);
+    const img = new Image();
+    img.onload = () => resolve({ width: img.width, height: img.height });
+    img.onerror = reject;
+    img.src = url;
   });
+};
+
+const uploadImage = async (file: File): Promise<string> => {
+  if (file.size === 0) throw new Error('File is empty');
+  if (file.size > MAX_FILE_SIZE) {
+    const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+    throw new Error(`File size (${sizeMB} MB) exceeds the maximum allowed size of 5 MB`);
+  }
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type))
+    throw new Error('File must be an image (JPEG, PNG, GIF, or WebP)');
+
+  const objectUrl = URL.createObjectURL(file);
+  try {
+    const dimensions = await getImageDimensions(objectUrl);
+    if (dimensions.width > MAX_DIMENSIONS.width || dimensions.height > MAX_DIMENSIONS.height) {
+      throw new Error(
+        `Image dimensions (${dimensions.width}x${dimensions.height}) exceed maximum allowed (${MAX_DIMENSIONS.width}x${MAX_DIMENSIONS.height})`
+      );
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await api.post<
+      ApiResponse<{ cdnUrl: string; mediaType: string; extension: string; id: number }>
+    >(`${getBackendUrl()}/api/media/upload`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data.data.cdnUrl;
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
 };
 
 export const ImageUploader = ({

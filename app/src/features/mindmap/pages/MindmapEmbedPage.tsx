@@ -3,7 +3,7 @@ import '@xyflow/react/dist/style.css';
 import { Background, BackgroundVariant, MiniMap } from '@xyflow/react';
 import { MessageSquare, PanelRight, PanelRightOpen, X } from 'lucide-react';
 import { Flow, LogicHandler, Toolbar, MindmapControls } from '@/features/mindmap/components';
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import { useState, useEffect } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { useGoogleLogin } from '../hooks/useGoogleAuth';
 

@@ -7,7 +7,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/shared/components/ui/alert-dialog';
+} from '@ui/alert-dialog';
 import { ERROR_TYPE } from '@/shared/constants';
 import { CriticalError } from '@aiprimary/api';
 import type { Assignment } from '@aiprimary/core';

@@ -1,4 +1,4 @@
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import { Plus } from 'lucide-react';
 import { ClassListSimpleTable } from './components/ClassListSimpleTable';
 import { EnhancedCalendar } from './components/EnhancedCalendar';

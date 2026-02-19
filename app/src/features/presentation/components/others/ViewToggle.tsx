@@ -1,5 +1,5 @@
 import { LayoutGrid, List } from 'lucide-react';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { ToggleGroup, ToggleGroupItem } from '@ui/toggle-group';
 
 export type ViewMode = 'list' | 'grid';
 

@@ -60,6 +60,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@aiprimary/core': path.resolve(__dirname, '../packages/core/src'),
+        '@aiprimary/question': path.resolve(__dirname, '../packages/question/src'),
         '@/components': path.resolve(__dirname, './src/shared/components'),
         '@/utils': path.resolve(__dirname, './src/shared/lib/utils'),
         '@/hooks': path.resolve(__dirname, './src/shared/hooks'),
@@ -68,7 +69,8 @@ export default defineConfig(({ mode }) => {
         '@/services': path.resolve(__dirname, './src/shared/services'),
         '@/context': path.resolve(__dirname, './src/shared/context'),
         '@': path.resolve(__dirname, './src'),
-        '@ui': path.resolve(__dirname, './src/shared/components/ui'),
+        '@question': path.resolve(__dirname, '../packages/question/src'),
+        '@ui': path.resolve(__dirname, '../packages/ui/src'),
       },
     },
     optimizeDeps: {

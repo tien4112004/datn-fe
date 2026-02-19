@@ -5,12 +5,12 @@ import {
 import type { GenerateQuestionsRequest } from '@/features/assignment/types/questionBank';
 import { MODEL_TYPES, useModels } from '@/features/model';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
-import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
-import { Label } from '@/shared/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { Textarea } from '@/shared/components/ui/textarea';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/shared/components/ui/tooltip';
+import { Button } from '@ui/button';
+import { Input } from '@ui/input';
+import { Label } from '@ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
+import { Textarea } from '@ui/textarea';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/tooltip';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import {
   DIFFICULTY,

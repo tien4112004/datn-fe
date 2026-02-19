@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { MessageSquare } from 'lucide-react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/components/ui/sheet';
-import { ScrollArea } from '@/shared/components/ui/scroll-area';
-import { Separator } from '@/shared/components/ui/separator';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@ui/sheet';
+import { ScrollArea } from '@ui/scroll-area';
+import { Separator } from '@ui/separator';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';

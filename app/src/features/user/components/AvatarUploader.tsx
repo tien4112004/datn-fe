@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useUserProfile, useUpdateUserAvatar, useRemoveUserAvatar } from '../hooks/useApi';
 import { UserAvatar } from '@/shared/components/common/UserAvatar';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/card';
 import { Upload, Trash2 } from 'lucide-react';
 import LoadingButton from '@/shared/components/common/LoadingButton';
 import { useTranslation } from 'react-i18next';

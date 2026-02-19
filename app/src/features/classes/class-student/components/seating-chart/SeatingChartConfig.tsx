@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import {
   Dialog,
   DialogContent,
@@ -6,9 +6,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { NumberInput } from '@/components/ui/number-input';
+} from '@ui/dialog';
+import { Label } from '@ui/label';
+import { NumberInput } from '@ui/number-input';
 import type { Layout } from '@/features/classes/shared/types';
 import { Grid3x3, Settings2, Download } from 'lucide-react';
 import { useState } from 'react';

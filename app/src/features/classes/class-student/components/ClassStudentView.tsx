@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Users, List, LayoutGrid } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@ui/badge';
 
 import { StudentListView } from './list-view/StudentListView';
 import { SeatingChartView } from './seating-chart/SeatingChartView';

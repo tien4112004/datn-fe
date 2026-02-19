@@ -1,5 +1,5 @@
 import { ClassForm } from './ClassForm';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/dialog';
 import { useUpdateClass, type ClassSchema } from '@/features/classes/shared/hooks';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';

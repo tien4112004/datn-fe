@@ -7,7 +7,7 @@
 import { useState } from 'react';
 import { Upload } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import { CsvImportModal } from './CsvImportModal';
 
 interface CsvImportButtonProps {

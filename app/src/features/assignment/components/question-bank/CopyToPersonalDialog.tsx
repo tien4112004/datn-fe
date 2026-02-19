@@ -5,9 +5,9 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from '@/shared/components/ui/dialog';
-import { Button } from '@/shared/components/ui/button';
-import { Alert, AlertDescription } from '@/shared/components/ui/alert';
+} from '@ui/dialog';
+import { Button } from '@ui/button';
+import { Alert, AlertDescription } from '@ui/alert';
 import { Info } from 'lucide-react';
 import type { QuestionBankItem } from '@/features/assignment/types';
 import { useTranslation } from 'react-i18next';

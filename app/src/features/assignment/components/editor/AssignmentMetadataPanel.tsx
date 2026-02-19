@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import { FileText, HelpCircle } from 'lucide-react';
-import { Input } from '@/shared/components/ui/input';
-import { Textarea } from '@/shared/components/ui/textarea';
-import { Label } from '@/shared/components/ui/label';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+import { Input } from '@ui/input';
+import { Textarea } from '@ui/textarea';
+import { Label } from '@ui/label';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/tooltip';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
 import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 export const AssignmentMetadataPanel = () => {

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { List, FileText, Grid3x3, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/lib/utils';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/tooltip';
 import { CollapsibleSection } from '../editor/CollapsibleSection';
 import { useAssignmentViewerStore } from '../../stores/useAssignmentViewerStore';
 import { groupQuestionsByContext } from '../../utils/questionGrouping';

@@ -1,7 +1,7 @@
 import React, { Component, type ReactNode } from 'react';
 import { type AppError, CriticalError, isCriticalError } from '@aiprimary/api';
-import { Button } from '@/shared/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { Button } from '@ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/card';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ErrorPage from '@/shared/pages/ErrorPage';

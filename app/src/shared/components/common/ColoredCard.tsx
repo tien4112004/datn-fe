@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@ui/card';
 import { cn } from '../../lib/utils';
 
 export type ColorScheme = 'blue' | 'purple' | 'green' | 'amber' | 'red' | 'pink' | 'indigo';

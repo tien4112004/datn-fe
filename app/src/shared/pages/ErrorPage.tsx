@@ -1,6 +1,6 @@
-import { useSidebar } from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { useSidebar } from '@/shared/components/ui/sidebar';
+import { Button } from '@ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/card';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import React from 'react';

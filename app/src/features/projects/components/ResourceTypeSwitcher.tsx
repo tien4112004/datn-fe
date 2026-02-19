@@ -1,7 +1,7 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Presentation, Image, Brain } from 'lucide-react';
-import { Card, CardContent, CardTitle } from '@/shared/components/ui/card';
+import { Card, CardContent, CardTitle } from '@ui/card';
 
 export interface ResourceTypeSwitcherProps {
   className?: string;

@@ -1,7 +1,7 @@
 import { DataTable, TablePagination } from '@/components/table';
 import { ThemePreviewCard } from '@/components/theme';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
 import { useSlideThemes } from '@/hooks';
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { Edit, Plus } from 'lucide-react';

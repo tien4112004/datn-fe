@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import { Save } from 'lucide-react';
 import { useSaveMindmap } from '../../hooks/useSaving';
 import { useTranslation } from 'react-i18next';

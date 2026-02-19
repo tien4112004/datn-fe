@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@ui/button';
+import { Label } from '@ui/label';
+import { Textarea } from '@ui/textarea';
 import type { SlideTheme } from '@aiprimary/core';
 import { useEffect, useState } from 'react';
 import { ThemePreviewCard } from './ThemePreviewCard';

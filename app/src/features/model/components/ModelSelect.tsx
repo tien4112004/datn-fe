@@ -6,7 +6,7 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@/shared/components/ui/select';
+} from '@ui/select';
 import { type Model } from '@/features/model';
 import { MODEL_PROVIDERS_LOGO } from '@/features/presentation/types';
 import { useTranslation } from 'react-i18next';

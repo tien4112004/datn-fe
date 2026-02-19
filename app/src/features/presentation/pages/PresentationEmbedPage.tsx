@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { MessageSquare } from 'lucide-react';
 import VueRemoteWrapper from '@/features/presentation/components/remote/VueRemoteWrapper';
 import GlobalSpinner from '@/shared/components/common/GlobalSpinner';
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import { CommentDrawer } from '@/features/comments';
 import { getPresentationApiService } from '../api';
 import { useCommentDrawerTrigger } from '../hooks/useDetailPresentation';

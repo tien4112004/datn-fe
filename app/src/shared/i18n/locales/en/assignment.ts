@@ -463,6 +463,11 @@ export default {
         'When enabled, AI will use reading passages when generating questions for this topic through Fill Matrix Gaps',
       useContextDescription: 'This setting is used when generating questions with Fill Matrix Gaps',
       usesContext: 'Uses reading passages',
+      chapters: 'Chapters (Optional)',
+      chaptersHint: 'Select chapters from the curriculum. Used as informational metadata.',
+      chaptersRequireGradeSubject: 'Set grade and subject to see available chapters',
+      chaptersLoading: 'Loading chapters...',
+      noChaptersAvailable: 'No chapters available for this grade and subject',
     },
 
     // Contexts panel

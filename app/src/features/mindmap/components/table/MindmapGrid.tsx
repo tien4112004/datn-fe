@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { Mindmap } from '@/features/mindmap/types';
 import { useMindmaps, useUpdateMindmapTitle, useDeleteMindmap } from '@/features/mindmap/hooks';
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import { MoreHorizontal, BrainCircuit } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@ui/dropdown-menu';
 import { SearchBar } from '@/shared/components/common/SearchBar';
 import TablePagination from '@/shared/components/table/TablePagination';
 import { ActionContent } from '@/features/presentation/components';
@@ -16,7 +16,7 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
-import { SkeletonGrid } from '@/shared/components/ui/skeleton-card';
+import { SkeletonGrid } from '@ui/skeleton-card';
 
 const MindmapGrid = () => {
   const { t } = useTranslation('common', { keyPrefix: 'table' });

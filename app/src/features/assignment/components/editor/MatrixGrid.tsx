@@ -1,33 +1,17 @@
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Pencil, BookOpen } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
-import { Button } from '@/shared/components/ui/button';
-import { Badge } from '@/shared/components/ui/badge';
-import { MatrixCell } from './MatrixCell';
-import { EmptyMatrixCell } from './EmptyMatrixCell';
+import { MatrixGridEditor } from '@aiprimary/question/matrix';
 import { TopicEditModal } from './TopicEditModal';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
-import {
-  getAllDifficulties,
-  getAllQuestionTypes,
-  getDifficultyI18nKey,
-  getQuestionTypeI18nKey,
-} from '@aiprimary/core';
 import { generateId } from '@aiprimary/core';
-import { QuestionTypeIcon } from '@/features/question/components/shared/QuestionTypeIcon';
-import type { QuestionType } from '@/features/assignment/types';
 
 export const MatrixGrid = () => {
-  const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.matrixEditor' });
-  const { t: tDifficulty } = useTranslation('questions');
-  const { t: tQuestionType } = useTranslation('questions');
-
   // Get data from store (matrix counts are auto-synced)
   const topics = useAssignmentFormStore((state) => state.topics);
   const matrixCells = useAssignmentFormStore((state) => state.matrix);
   const addTopic = useAssignmentFormStore((state) => state.addTopic);
+  const updateMatrixCell = useAssignmentFormStore((state) => state.updateMatrixCell);
+  const createMatrixCell = useAssignmentFormStore((state) => state.createMatrixCell);
+  const removeMatrixCell = useAssignmentFormStore((state) => state.removeMatrixCell);
 
   // Modal state
   const [editingTopicId, setEditingTopicId] = useState<string | null>(null);
@@ -45,147 +29,16 @@ export const MatrixGrid = () => {
     return () => window.removeEventListener('matrix.addTopic', handler);
   });
 
-  if (!topics || topics.length === 0) {
-    return (
-      <div className="space-y-4">
-        <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center dark:border-gray-700 dark:bg-gray-900">
-          <p className="text-sm text-gray-500">{t('emptyMessage')}</p>
-        </div>
-        <TopicEditModal
-          topicId={editingTopicId}
-          open={!!editingTopicId}
-          onOpenChange={(open) => !open && setEditingTopicId(null)}
-        />
-      </div>
-    );
-  }
-
-  const difficulties = getAllDifficulties();
-  const questionTypes = getAllQuestionTypes();
-
   return (
     <div className="space-y-4">
-      <div className="overflow-x-auto rounded-lg border">
-        <Table className="table-fixed">
-          <TableHeader>
-            {/* First header row: Topic + Difficulties spanning questionTypes */}
-            <TableRow>
-              <TableHead rowSpan={2} className="w-[160px] bg-gray-50 font-semibold dark:bg-gray-900">
-                {t('tableHeaders.topic')}
-              </TableHead>
-              {difficulties.map((difficulty) => (
-                <TableHead
-                  key={difficulty.value}
-                  colSpan={questionTypes.length}
-                  className="bg-gray-50 text-center text-xs font-semibold dark:bg-gray-900"
-                >
-                  {tDifficulty(getDifficultyI18nKey(difficulty.value) as any)}
-                </TableHead>
-              ))}
-            </TableRow>
-            {/* Second header row: Question types under each difficulty */}
-            <TableRow>
-              {difficulties.map((difficulty) =>
-                questionTypes.map((questionType) => (
-                  <TableHead
-                    key={`${difficulty.value}-${questionType.value}`}
-                    className="w-[70px] bg-gray-100 text-center dark:bg-gray-800"
-                  >
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="flex justify-center">
-                          <QuestionTypeIcon type={questionType.value as QuestionType} className="h-4 w-4" />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{tQuestionType(getQuestionTypeI18nKey(questionType.value) as any)}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TableHead>
-                ))
-              )}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {topics.map((topic) => (
-              <TableRow key={topic.id}>
-                <TableCell className="w-[160px] align-top font-medium">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1 space-y-1">
-                      <div className="whitespace-normal break-words">
-                        {topic.name || t('tableHeaders.topic')}
-                        {topic.hasContext && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <BookOpen className="ml-1 inline-block h-3 w-3 text-blue-600 dark:text-blue-400" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p className="text-xs">{t('usesContext', 'Uses reading passages')}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
-                      </div>
-                      {topic.description && (
-                        <div className="whitespace-normal break-words text-xs font-normal text-gray-500">
-                          {topic.description}
-                        </div>
-                      )}
-                      {/* Display chapters as informational chips */}
-                      {topic.chapters && topic.chapters.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-1">
-                          {topic.chapters.map((chapter, idx) => (
-                            <Badge key={idx} variant="secondary" className="text-xs">
-                              {chapter}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setEditingTopicId(topic.id)}
-                      className="h-8 w-8 shrink-0 p-0"
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </TableCell>
-                {difficulties.map((difficulty, difficultyIndex) =>
-                  questionTypes.map((questionType) => {
-                    const cell = matrixCells?.find(
-                      (c) =>
-                        c.topicId === topic.id &&
-                        c.difficulty === difficulty.value &&
-                        c.questionType === questionType.value
-                    );
-                    const bgColor =
-                      difficultyIndex % 2 === 0 ? 'bg-white dark:bg-gray-950' : 'bg-gray-50 dark:bg-gray-900';
-                    return (
-                      <TableCell
-                        key={`${topic.id}-${difficulty.value}-${questionType.value}`}
-                        className={`w-[70px] p-1 ${bgColor}`}
-                      >
-                        {cell ? (
-                          <MatrixCell cell={cell} />
-                        ) : (
-                          <EmptyMatrixCell
-                            topicId={topic.id}
-                            topicName={topic.name}
-                            difficulty={difficulty.value}
-                            questionType={questionType.value}
-                          />
-                        )}
-                      </TableCell>
-                    );
-                  })
-                )}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <MatrixGridEditor
+        topics={topics || []}
+        cells={matrixCells || []}
+        onCellUpdate={updateMatrixCell}
+        onCellCreate={createMatrixCell}
+        onCellRemove={removeMatrixCell}
+        onTopicEdit={(topicId) => setEditingTopicId(topicId)}
+      />
 
       <TopicEditModal
         topicId={editingTopicId}

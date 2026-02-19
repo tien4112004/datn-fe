@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { List, FileText, Grid3x3, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/tooltip';
 import { cn } from '@/shared/lib/utils';
 import { CollapsibleSection } from './CollapsibleSection';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';

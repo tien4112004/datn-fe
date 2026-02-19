@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Button } from '@/components/ui/button';
+import { Label } from '@ui/label';
+import { Separator } from '@ui/separator';
+import { Button } from '@ui/button';
 
 const AppearanceSettings = () => {
   const [selectedTheme, setSelectedTheme] = useState('light');

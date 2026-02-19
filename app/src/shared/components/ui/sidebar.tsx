@@ -3,14 +3,14 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { PanelLeftIcon } from 'lucide-react';
 
-import { useIsMobile } from '@/shared/hooks/use-mobile';
-import { cn } from '@/shared/lib/utils';
-import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
-import { Separator } from '@/shared/components/ui/separator';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/shared/components/ui/sheet';
-import { Skeleton } from '@/shared/components/ui/skeleton';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/shared/components/ui/tooltip';
+import { useIsMobile } from '@ui/hooks/use-mobile';
+import { cn } from '@ui/lib/utils';
+import { Button } from '@ui/button';
+import { Input } from '@ui/input';
+import { Separator } from '@ui/separator';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@ui/sheet';
+import { Skeleton } from '@ui/skeleton';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/tooltip';
 import { useGlobalStore } from '@/store/useGlobalStore';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';

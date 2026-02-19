@@ -1,8 +1,8 @@
 import React from 'react';
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
-import type { ButtonProps } from '@/shared/components/ui/button';
+import type { ButtonProps } from '@ui/button';
 
 interface LoadingButtonProps extends ButtonProps {
   loading?: boolean;

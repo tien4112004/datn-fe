@@ -4,10 +4,10 @@ import { useLoaderData } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { CriticalError } from '@aiprimary/api';
 import { ERROR_TYPE } from '@/shared/constants';
-import { Button } from '@/shared/components/ui/button';
-import { Label } from '@/shared/components/ui/label';
-import { Badge } from '@/shared/components/ui/badge';
-import { Separator } from '@/shared/components/ui/separator';
+import { Button } from '@ui/button';
+import { Label } from '@ui/label';
+import { Badge } from '@ui/badge';
+import { Separator } from '@ui/separator';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,10 +18,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/shared/components/ui/alert-dialog';
+} from '@ui/alert-dialog';
 import { useDeleteQuestions, useDuplicateQuestion } from '@/features/assignment/hooks/useQuestionBankApi';
 import { useContext } from '@/features/assignment/hooks/useContextApi';
-import { MarkdownPreview } from '@/features/question/components/shared/MarkdownPreview';
+import { MarkdownPreview } from '@aiprimary/question/shared';
 import { QuestionRenderer } from '@/features/question';
 import { VIEW_MODE } from '@/features/assignment/types';
 import type { QuestionBankItem, Question } from '@/features/assignment/types';

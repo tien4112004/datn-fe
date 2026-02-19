@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { debounce } from 'lodash';
 import { Search, X } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Input } from '@ui/input';
+import { Button } from '@ui/button';
 
 interface SearchBarProps {
   value: string;

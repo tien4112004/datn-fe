@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@ui/button';
+import { Label } from '@ui/label';
+import { Separator } from '@ui/separator';
 import DOMPurify from 'dompurify';
 import { TreeDeciduous } from 'lucide-react';
 import React, { useState } from 'react';

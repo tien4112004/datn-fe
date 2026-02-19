@@ -1,5 +1,5 @@
 import { Sparkles, ArrowRight } from 'lucide-react';
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 

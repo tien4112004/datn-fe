@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { Popover, PopoverTrigger, PopoverContent } from '@/shared/components/ui/popover';
-import { Button } from '@/shared/components/ui/button';
+import { Popover, PopoverTrigger, PopoverContent } from '@ui/popover';
+import { Button } from '@ui/button';
 import { Check } from 'lucide-react';
 import clsx from 'clsx';
 import { useState } from 'react';

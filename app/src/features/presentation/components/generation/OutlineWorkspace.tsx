@@ -1,4 +1,4 @@
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import OutlineCard from './OutlineCard';
 import {
   DndContext,
@@ -14,8 +14,8 @@ import { useState, useCallback, memo } from 'react';
 import { Download, Loader, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
-import { Card } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card } from '@ui/card';
+import { Skeleton } from '@ui/skeleton';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
 import { getAllGrades, getAllSubjects } from '@aiprimary/core';
 

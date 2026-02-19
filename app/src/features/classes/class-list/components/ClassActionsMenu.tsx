@@ -1,13 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
+} from '@ui/dropdown-menu';
 import { MoreHorizontal, Edit, Users, Trash2, Eye } from 'lucide-react';
 import type { Class } from '../../shared/types';
 

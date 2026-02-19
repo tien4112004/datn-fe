@@ -14,9 +14,9 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { DataTable, TablePagination } from '@/components/table';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
 import type { SlideTemplate } from '@aiprimary/core';
 import { Edit, FileJson, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import * as frontendDataTemplates from '@aiprimary/frontend-data';

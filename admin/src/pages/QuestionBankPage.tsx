@@ -9,16 +9,11 @@ import {
 import type { QuestionBankItem, QuestionBankParams } from '@/types/questionBank';
 import { QuestionBankFilters } from '@/components/question-bank/QuestionBankFilters';
 import { QuestionBankImportDialog } from '@/components/question-bank/QuestionBankImportDialog';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/dropdown-menu';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
+import { Checkbox } from '@ui/checkbox';
+import { Badge } from '@ui/badge';
 import { Plus, Upload, Download, MoreVertical, Trash2, Copy, FileEdit } from 'lucide-react';
 import { getSubjectName, getQuestionTypeName, getDifficultyName } from '@aiprimary/core';
 import { toast } from 'sonner';

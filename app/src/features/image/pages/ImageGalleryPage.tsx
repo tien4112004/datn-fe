@@ -6,7 +6,7 @@ import { useImageManager } from '../hooks';
 import ImageCard from '../components/ImageCard';
 import ImagePreviewDialog from '../components/ImagePreviewDialog';
 import { ImagePreviewProvider, useImagePreview } from '../context/ImagePreviewContext';
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import { Loader2, Minus, Plus } from 'lucide-react';
 import type { ImageData } from '../types/service';
 

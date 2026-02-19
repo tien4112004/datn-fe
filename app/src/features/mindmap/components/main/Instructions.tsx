@@ -1,4 +1,4 @@
-import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/popover';
 import { HelpCircle } from 'lucide-react';
 import { memo } from 'react';
 

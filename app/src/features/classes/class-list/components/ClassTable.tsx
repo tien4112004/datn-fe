@@ -2,7 +2,7 @@ import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/re
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@ui/badge';
 
 import DataTable from '@/components/table/DataTable';
 import { useClasses } from '../../shared/hooks';

@@ -15,8 +15,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/shared/components/ui/dialog';
-import { Button } from '@/shared/components/ui/button';
+} from '@ui/dialog';
+import { Button } from '@ui/button';
 import { FileUploadZone } from './FileUploadZone';
 import { CsvPreviewTable } from './CsvPreviewTable';
 import { ImportProgress } from './ImportProgress';

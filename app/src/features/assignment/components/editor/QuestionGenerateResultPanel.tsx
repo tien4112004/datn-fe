@@ -1,6 +1,6 @@
-import { Badge } from '@/shared/components/ui/badge';
-import { Button } from '@/shared/components/ui/button';
-import { Card, CardContent } from '@/shared/components/ui/card';
+import { Badge } from '@ui/badge';
+import { Button } from '@ui/button';
+import { Card, CardContent } from '@ui/card';
 import { ArrowLeft, CheckCircle2, FileText, Plus, Sparkles, X } from 'lucide-react';
 import type { QuestionBankItem } from '../../types/questionBank';
 import type { MultipleChoiceData } from '@aiprimary/core';

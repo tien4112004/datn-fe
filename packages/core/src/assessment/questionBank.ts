@@ -1,23 +1,61 @@
-import type { SubjectCode } from './constants';
+import type { SubjectCode, BankType } from './constants';
 import type { Question } from './question';
 
 /**
  * QuestionBankItem combines Question with additional metadata for the bank
- *
- * Question bank items extend questions with:
- * - Subject classification (required)
- * - Grade level (optional)
- * - Chapter (optional)
- * - Bank type (personal vs application-wide)
- * - Audit metadata (creation/update timestamps and creator)
- *
- * Uses intersection type to include all type-specific fields from Question
  */
 export type QuestionBankItem = Question & {
-  subject: SubjectCode; // Subject classification (required for bank organization)
-  grade?: string; // Grade level (e.g., "1", "2", "3", "4", "5")
-  chapter?: string; // Chapter name or identifier
-  contextId?: string; // Reference to reading passage context
-  createdAt?: string; // ISO timestamp of creation
-  updatedAt?: string; // ISO timestamp of last update
+  subject: SubjectCode;
+  grade?: string;
+  chapter?: string;
+  contextId?: string;
+  bankType?: BankType;
+  createdBy?: string;
+  points?: number;
+  createdAt?: string;
+  updatedAt?: string;
 };
+
+/**
+ * Paginated response for question bank listing
+ */
+export interface QuestionBankListResponse {
+  questions: QuestionBankItem[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+/**
+ * Request payload for creating a question
+ */
+export interface CreateQuestionRequest {
+  question: Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>;
+}
+
+/**
+ * Request payload for updating a question
+ */
+export interface UpdateQuestionRequest {
+  question: Partial<QuestionBankItem>;
+}
+
+/**
+ * Chapter metadata from backend API
+ */
+export interface ChapterResponse {
+  id: string;
+  name: string;
+  grade: string;
+  subject: string;
+  sortOrder: string;
+}
+
+/**
+ * Result of a CSV/bulk import operation
+ */
+export interface ImportResult {
+  success: number;
+  failed: number;
+  errors?: Array<{ row: number; error: string }>;
+}

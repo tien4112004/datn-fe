@@ -1,15 +1,15 @@
 import { useTranslation } from 'react-i18next';
 import { BookOpen } from 'lucide-react';
-import { Checkbox } from '@/shared/components/ui/checkbox';
-import { Badge } from '@/shared/components/ui/badge';
+import { Checkbox } from '@ui/checkbox';
+import { Badge } from '@ui/badge';
 import { cn } from '@/shared/lib/utils';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import type { QuestionBankItem } from '../../types';
 import { VIEW_MODE } from '../../types';
-import { QuestionTypeIcon, DifficultyBadge } from '@/features/question/components/shared';
+import { QuestionTypeIcon, DifficultyBadge } from '@aiprimary/question/shared';
 import { QuestionRenderer } from '@/features/question/components/QuestionRenderer';
-import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/shared/components/ui/hover-card';
-import { ScrollArea } from '@/shared/components/ui/scroll-area';
+import { HoverCard, HoverCardTrigger, HoverCardContent } from '@ui/hover-card';
+import { ScrollArea } from '@ui/scroll-area';
 import { getGradeName, getSubjectI18nKey, getSubjectBadgeClass } from '@aiprimary/core';
 
 interface QuestionBankCardProps {

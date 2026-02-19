@@ -58,6 +58,9 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: {
+        '@aiprimary/question': path.resolve(__dirname, '../packages/question/src'),
+        '@question': path.resolve(__dirname, '../packages/question/src'),
+        '@ui': path.resolve(__dirname, '../packages/ui/src'),
         '@': path.resolve(__dirname, './src'),
         '@/components': path.resolve(__dirname, './src/components'),
         '@/lib': path.resolve(__dirname, './src/lib'),

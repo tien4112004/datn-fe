@@ -11,7 +11,7 @@ import {
   DirtyTracker,
 } from '@/features/mindmap/components';
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import { useLoaderData } from 'react-router-dom';
 import { useCoreStore, usePresenterModeStore } from '../stores';
 import { useDirtyStore } from '../stores/dirty';

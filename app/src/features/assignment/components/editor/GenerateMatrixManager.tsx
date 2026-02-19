@@ -11,8 +11,8 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
-} from '@/shared/components/ui/alert-dialog';
-import { Button } from '@/shared/components/ui/button';
+} from '@ui/alert-dialog';
+import { Button } from '@ui/button';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 import { createMatrixCellsForTopic } from '../../utils/matrixHelpers';

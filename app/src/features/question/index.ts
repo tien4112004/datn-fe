@@ -1,14 +1,13 @@
 // Main feature barrel export
 export { QuestionRenderer } from './components/QuestionRenderer';
 
-// Question type components
-export * from './components/multiple-choice';
-export * from './components/matching';
-export * from './components/open-ended';
-export * from './components/fill-in-blank';
+// Re-export from shared question package
+export * from '@aiprimary/question';
 
-// Shared components
-export * from './components/shared';
+// App-specific shared components (not in shared package)
+export { ContextSelector } from './components/shared/ContextSelector';
+export { ImageUploader } from './components/shared/ImageUploader';
+export { ImageStorageDialog } from './components/shared/ImageStorageDialog';
 
 // Re-export types for convenience
 export type {

@@ -1,10 +1,10 @@
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import { useTranslation } from 'react-i18next';
 import { Controller } from 'react-hook-form';
 import { Sparkles } from 'lucide-react';
-import { Card, CardContent, CardTitle } from '@/shared/components/ui/card';
-import { AutosizeTextarea } from '@/shared/components/ui/autosize-textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+import { Card, CardContent, CardTitle } from '@ui/card';
+import { AutosizeTextarea } from '@ui/autosize-textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
 import { useSearchParams } from 'react-router-dom';
 import ExamplePrompts from '@/features/projects/components/ExamplePrompts';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';

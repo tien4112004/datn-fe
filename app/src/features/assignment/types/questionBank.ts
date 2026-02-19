@@ -1,9 +1,16 @@
-import type { QuestionBankItem } from '@aiprimary/core';
+import type { QuestionBankItem, ChapterResponse } from '@aiprimary/core';
 import type { ApiResponse } from '@aiprimary/api';
 import type { BankType } from '.';
 
-// Re-export core type
-export type { QuestionBankItem } from '@aiprimary/core';
+// Re-export shared types from core
+export type {
+  QuestionBankItem,
+  QuestionBankListResponse,
+  CreateQuestionRequest,
+  UpdateQuestionRequest,
+  ChapterResponse,
+  ImportResult,
+} from '@aiprimary/core';
 
 /**
  * Filters for querying the question bank
@@ -42,47 +49,6 @@ export interface QuestionBankFilters {
  * Uses standard ApiResponse with QuestionBankItem array
  */
 export type QuestionBankApiResponse = ApiResponse<QuestionBankItem[]>;
-
-/**
- * Response structure returned by useQuestionBankList hook
- * Transforms ApiResponse into a flattened structure for easier use
- */
-export interface QuestionBankListResponse {
-  questions: QuestionBankItem[];
-  /** Total matching questions */
-  total: number;
-  /** Current page */
-  page: number;
-  /** Items per page */
-  limit: number;
-}
-
-/**
- * Request types for question bank operations
- * UI/API-specific types for creating/updating questions
- */
-export interface CreateQuestionRequest {
-  question: Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>;
-}
-
-export interface UpdateQuestionRequest {
-  question: Partial<QuestionBankItem>;
-}
-
-/**
- * API service interface for question bank operations
- * UI/API-specific interface defining the service contract
- */
-/**
- * Response structure for chapter from backend API
- */
-export interface ChapterResponse {
-  id: string;
-  name: string;
-  grade: string;
-  subject: string;
-  sortOrder: string;
-}
 
 /**
  * Request type for generating questions with AI

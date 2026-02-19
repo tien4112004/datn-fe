@@ -1,11 +1,11 @@
 import type { Question } from '@aiprimary/core';
 import { QUESTION_TYPE } from '@/types/questionBank';
 import { cn } from '@/lib/utils';
-import { QuestionNumber } from './shared/QuestionNumber';
-import { MultipleChoiceEditing, MultipleChoiceViewing } from './multiple-choice';
-import { MatchingEditing, MatchingViewing } from './matching';
-import { OpenEndedEditing, OpenEndedViewing } from './open-ended';
-import { FillInBlankEditing, FillInBlankViewing } from './fill-in-blank';
+import { QuestionNumber } from '@aiprimary/question/shared';
+import { MultipleChoiceEditing, MultipleChoiceViewing } from '@aiprimary/question/multiple-choice';
+import { MatchingEditing, MatchingViewing } from '@aiprimary/question/matching';
+import { OpenEndedEditing, OpenEndedViewing } from '@aiprimary/question/open-ended';
+import { FillInBlankEditing, FillInBlankViewing } from '@aiprimary/question/fill-in-blank';
 
 type ViewMode = 'editing' | 'viewing';
 

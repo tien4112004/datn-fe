@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { ResourceCard } from './ResourceCard';
-import { Skeleton } from '@/shared/components/ui/skeleton';
+import { Skeleton } from '@ui/skeleton';
 import type { LinkedResource, LinkedResourceType } from '../../types/resource';
 import { Search } from 'lucide-react';
 

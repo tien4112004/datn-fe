@@ -1,8 +1,8 @@
 import { Phone, MapPin, Calendar, Mail, User, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
-import { Separator } from '@/shared/components/ui/separator';
-import { Badge } from '@/shared/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/card';
+import { Separator } from '@ui/separator';
+import { Badge } from '@ui/badge';
 import { UserAvatar } from '@/shared/components/common/UserAvatar';
 import type { Student } from '../types';
 import { InfoRow } from './InfoRow';

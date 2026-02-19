@@ -1,7 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
-import { Badge } from '@/shared/components/ui/badge';
+import { Badge } from '@ui/badge';
 import { getQuestionTypeName, getDifficultyName } from '@aiprimary/core';
 import type { AssignmentQuestionWithTopic, AssignmentTopic } from '../../types';
 import { cn } from '@/shared/lib/utils';

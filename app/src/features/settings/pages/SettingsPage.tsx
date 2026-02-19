@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import CommonTabs, { type TabItem } from '@/shared/components/common/CommonTabs';
-import { Separator } from '@/shared/components/ui/separator';
+import { Separator } from '@ui/separator';
 import GeneralSettings from '../components/GeneralSettings';
 import AppearanceSettings from '../components/AppearanceSettings';
 import DevToolsSettings from '../components/DevToolsSettings';

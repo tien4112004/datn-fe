@@ -1,11 +1,11 @@
-import { ScrollArea } from '@/shared/components/ui/scroll-area';
+import { ScrollArea } from '@ui/scroll-area';
 import { QuestionRenderer } from '@/features/question/components/QuestionRenderer';
 import { ContextDisplay, type Context } from '@/features/context';
 import { EditableContextDisplay } from './EditableContextDisplay';
 import type { AssignmentQuestionWithTopic, AssignmentContext, ViewMode } from '../../types';
 import type { Answer, Question } from '@aiprimary/core';
 import type { GroupingContext } from '../../utils/questionGrouping';
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@ui/separator';
 
 interface ContextGroupViewProps {
   context: GroupingContext;

@@ -5,15 +5,10 @@ import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/re
 import ReactMarkdown from 'react-markdown';
 import { useDeleteQuestions } from '@/features/assignment/hooks/useQuestionBankApi';
 import type { QuestionBankItem } from '@/features/assignment/types';
-import { Button } from '@/shared/components/ui/button';
-import { Checkbox } from '@/shared/components/ui/checkbox';
-import { Badge } from '@/shared/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu';
+import { Button } from '@ui/button';
+import { Checkbox } from '@ui/checkbox';
+import { Badge } from '@ui/badge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/dropdown-menu';
 import { ArrowLeft, MoreVertical, Trash2, FileEdit, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useComments, useCreateComment } from '../hooks/useApi';
 import { UserAvatar } from '@/components/common/UserAvatar';
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import { useAuth } from '@/shared/context/auth';
 import { CommentListLoading, CommentListError, useCommentDate } from '@/shared/components/comments';
 

@@ -2,22 +2,16 @@ import { ResourceSelectorDialog } from '@/features/projects/components/resource-
 import type { LinkedResource } from '@/features/projects/types/resource';
 import RichTextEditor from '@/shared/components/rte/RichTextEditor';
 import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
-import { Badge } from '@/shared/components/ui/badge';
-import { Button } from '@/shared/components/ui/button';
-import { Checkbox } from '@/shared/components/ui/checkbox';
-import { Switch } from '@/shared/components/ui/switch';
-import { Input } from '@/shared/components/ui/input';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/shared/components/ui/dialog';
-import { Label } from '@/shared/components/ui/label';
-import { Progress } from '@/shared/components/ui/progress';
-import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
-import { Separator } from '@/shared/components/ui/separator';
+import { Badge } from '@ui/badge';
+import { Button } from '@ui/button';
+import { Checkbox } from '@ui/checkbox';
+import { Switch } from '@ui/switch';
+import { Input } from '@ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/dialog';
+import { Label } from '@ui/label';
+import { Progress } from '@ui/progress';
+import { RadioGroup, RadioGroupItem } from '@ui/radio-group';
+import { Separator } from '@ui/separator';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   BrainCircuit,
@@ -40,13 +34,13 @@ import { useAttachmentUpload } from '../hooks/useAttachmentUpload';
 import { PostType, type PostCreateRequest } from '../types';
 import { formatFileSize, getAcceptString } from '../utils/attachmentValidation';
 import { postEditorSchema } from '../validation/postSchema';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/popover';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { cn } from '@/shared/lib/utils';
 import { AssignmentListCommand } from './AssignmentListCommand';
 import { format } from 'date-fns/format';
 import type { Assignment } from '@/features/assignment';
-import { Calendar } from '@/components/ui/calendar';
+import { Calendar } from '@ui/calendar';
 
 interface PostCreatorProps {
   classId: string;

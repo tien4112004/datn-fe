@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePostPermissions } from '../hooks';
 import type { Post } from '../types';
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import { EllipsisVertical } from 'lucide-react';
 
 interface PostActionsProps {

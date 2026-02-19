@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button } from '@/shared/components/ui/button';
-import { Label } from '@/shared/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
-import { Alert, AlertDescription, AlertTitle } from '@/shared/components/ui/alert';
-import { Separator } from '@/shared/components/ui/separator';
-import { Collapsible, CollapsibleContent } from '@/shared/components/ui/collapsible';
+import { Button } from '@ui/button';
+import { Label } from '@ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
+import { Alert, AlertDescription, AlertTitle } from '@ui/alert';
+import { Separator } from '@ui/separator';
+import { Collapsible, CollapsibleContent } from '@ui/collapsible';
 import {
   useCreateQuestion,
   useUpdateQuestion,
@@ -16,7 +16,7 @@ import { CriticalError } from '@aiprimary/api';
 import { ERROR_TYPE } from '@/shared/constants';
 import { useContext } from '@/features/assignment/hooks/useContextApi';
 import { ContextSelector } from '@/features/question/components/shared/ContextSelector';
-import { MarkdownPreview } from '@/features/question/components/shared/MarkdownPreview';
+import { MarkdownPreview } from '@aiprimary/question/shared';
 import type { CreateQuestionRequest, Question, QuestionBankItem } from '@/features/assignment/types';
 import {
   DIFFICULTY,

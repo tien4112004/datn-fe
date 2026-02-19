@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
-import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
-import { Label } from '@/shared/components/ui/label';
+import { Button } from '@ui/button';
+import { Input } from '@ui/input';
+import { Label } from '@ui/label';
 import { uploadImage, isValidImageUrl } from '@/features/assignment/utils';
 import { Upload, X, Images } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';

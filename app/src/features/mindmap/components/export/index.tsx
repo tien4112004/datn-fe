@@ -1,5 +1,5 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/components/ui/dialog';
-import { ColoredTabsTrigger, Tabs, TabsContent, TabsList } from '@/shared/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/dialog';
+import { ColoredTabsTrigger, Tabs, TabsContent, TabsList } from '@ui/tabs';
 import { useTranslation } from 'react-i18next';
 import ExportImageTab from './ExportImageTab';
 import ExportPDFTab from './ExportPDFTab';

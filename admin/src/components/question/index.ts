@@ -1,24 +1,12 @@
 // Question Renderer
 export { QuestionRenderer } from './QuestionRenderer';
 
-// Shared Components
-export {
-  MarkdownEditor,
-  MarkdownPreview,
-  ImageUploader,
-  DifficultyBadge,
-  QuestionNumber,
-  indexToLetter,
-} from './shared';
+// App-specific components (not moved to shared package)
+export { ImageUploader } from './shared/ImageUploader';
 
-// Multiple Choice Components
-export { MultipleChoiceEditing, MultipleChoiceViewing } from './multiple-choice';
-
-// Matching Components
-export { MatchingEditing, MatchingViewing } from './matching';
-
-// Fill In Blank Components
-export { FillInBlankEditing, FillInBlankViewing } from './fill-in-blank';
-
-// Open Ended Components
-export { OpenEndedEditing, OpenEndedViewing } from './open-ended';
+// Re-export from shared package for convenience
+export * from '@aiprimary/question/shared';
+export * from '@aiprimary/question/multiple-choice';
+export * from '@aiprimary/question/matching';
+export * from '@aiprimary/question/fill-in-blank';
+export * from '@aiprimary/question/open-ended';

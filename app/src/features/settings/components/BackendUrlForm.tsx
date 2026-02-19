@@ -1,15 +1,8 @@
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Input } from '@/shared/components/ui/input';
-import { Button } from '@/shared/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from '@/shared/components/ui/form';
+import { Input } from '@ui/input';
+import { Button } from '@ui/button';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@ui/form';
 import { toast } from 'sonner';
 import { getBackendUrl, setBackendUrl } from '@/shared/utils/backend-url';
 

@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import { ArrowLeft, FileQuestion, Loader2 } from 'lucide-react';
 import { useAssignmentPublic } from '../hooks';
 

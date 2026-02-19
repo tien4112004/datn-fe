@@ -1,26 +1,28 @@
 /**
  * Admin Question Bank Type Definitions
  *
- * This module contains admin-specific type definitions for question bank management.
- * Core constants and types are imported from @aiprimary/core for consistency.
+ * Shared types are re-exported from @aiprimary/core for consistency.
+ * Admin-specific types (filters, params, service interface) remain local.
  */
 
-// Import core types and constants
-import type { Question, QuestionType, Difficulty, SubjectCode, BankType } from '@aiprimary/core';
+import type { QuestionType, Difficulty, SubjectCode, BankType } from '@aiprimary/core';
 
-/**
- * QuestionBankItem combines Question with additional metadata for the bank
- */
-export type QuestionBankItem = Question & {
-  subject: SubjectCode;
-  bankType: BankType;
-  grade?: string;
-  chapter?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string; // User ID of creator
-  points?: number; // For scoring
-};
+// Re-export shared types from core
+export type {
+  QuestionBankItem,
+  QuestionBankListResponse,
+  CreateQuestionRequest,
+  UpdateQuestionRequest,
+  ChapterResponse,
+  ImportResult,
+} from '@aiprimary/core';
+
+import type { QuestionBankListResponse, CreateQuestionRequest, UpdateQuestionRequest } from '@aiprimary/core';
+
+// Backward-compatible aliases used throughout admin
+export type QuestionBankResponse = QuestionBankListResponse;
+export type CreateQuestionPayload = CreateQuestionRequest;
+export type UpdateQuestionPayload = UpdateQuestionRequest;
 
 /**
  * Filters for querying the question bank
@@ -55,87 +57,11 @@ export interface QuestionBankParams {
 }
 
 /**
- * Response structure for question bank API
- */
-export interface QuestionBankResponse {
-  questions: QuestionBankItem[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
-/**
- * Request payload for creating a new question
- */
-export interface CreateQuestionPayload {
-  question: Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>;
-}
-
-/**
- * Request payload for updating an existing question
- */
-export interface UpdateQuestionPayload {
-  question: Partial<QuestionBankItem>;
-}
-
-/**
- * Request types for question bank operations
- */
-export interface CreateQuestionRequest {
-  question: Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>;
-}
-
-export interface UpdateQuestionRequest {
-  question: Partial<QuestionBankItem>;
-}
-
-/**
- * Result of CSV import operation
- */
-export interface ImportResult {
-  success: number;
-  failed: number;
-  errors?: Array<{
-    row: number;
-    error: string;
-  }>;
-}
-
-/**
  * Response from bulk delete operation
  */
 export interface BulkDeleteResponse {
   deletedCount: number;
   failedIds?: string[];
-}
-
-/**
- * API service interface for question bank operations
- */
-export interface QuestionBankApiService {
-  getQuestions(filters: QuestionBankFilters): Promise<QuestionBankResponse>;
-  getQuestionById(id: string): Promise<QuestionBankItem>;
-  createQuestion(
-    question: Omit<QuestionBankItem, 'id' | 'createdAt' | 'updatedAt'>
-  ): Promise<QuestionBankItem>;
-  updateQuestion(id: string, question: Partial<QuestionBankItem>): Promise<QuestionBankItem>;
-  deleteQuestion(id: string): Promise<void>;
-  bulkDeleteQuestions(ids: string[]): Promise<void>;
-  duplicateQuestion(id: string): Promise<QuestionBankItem>;
-  copyToPersonal(id: string): Promise<QuestionBankItem>;
-  exportQuestions(filters?: QuestionBankFilters): Promise<Blob>;
-  importQuestions(file: File): Promise<{ success: number; failed: number }>;
-}
-
-/**
- * Response structure for chapter from backend API
- */
-export interface ChapterResponse {
-  id: string;
-  name: string;
-  grade: string;
-  subject: string;
-  sortOrder: string;
 }
 
 // Re-export core types and constants for convenience

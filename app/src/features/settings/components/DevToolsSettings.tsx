@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { Separator } from '@/shared/components/ui/separator';
-import { Button } from '@/shared/components/ui/button';
+import { Separator } from '@ui/separator';
+import { Button } from '@ui/button';
 import { toast } from 'sonner';
 import BackendUrlForm from './BackendUrlForm';
 

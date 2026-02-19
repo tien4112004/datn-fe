@@ -1,4 +1,4 @@
-import { Badge } from '@/shared/components/ui/badge';
+import { Badge } from '@ui/badge';
 import type { AssignmentQuestion } from '@aiprimary/core';
 import { getDifficultyName, getQuestionTypeName } from '@aiprimary/core';
 import type { AssignmentTopic } from '../../types';

@@ -1,4 +1,4 @@
-import { Separator } from '@/shared/components/ui/separator';
+import { Separator } from '@ui/separator';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { CommentItem } from './CommentItem';

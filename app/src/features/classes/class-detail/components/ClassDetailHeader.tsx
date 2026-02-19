@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@ui/badge';
 import { getGradeLabel } from '../../shared/utils/grades';
 import type { Class } from '../../shared/types';
 

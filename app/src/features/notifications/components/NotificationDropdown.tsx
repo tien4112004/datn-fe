@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { Check, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/shared/components/ui/button';
-import { ScrollArea } from '@/shared/components/ui/scroll-area';
-import { Separator } from '@/shared/components/ui/separator';
+import { Button } from '@ui/button';
+import { ScrollArea } from '@ui/scroll-area';
+import { Separator } from '@ui/separator';
 import { useNotifications, useMarkAsRead, useMarkAllAsRead, useUnreadCount } from '../hooks/useApi';
 import { NotificationItem } from './NotificationItem';
 import type { AppNotification } from '../types';

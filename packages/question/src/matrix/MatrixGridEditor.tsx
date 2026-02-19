@@ -1,0 +1,185 @@
+import { useTranslation } from 'react-i18next';
+import { Pencil, BookOpen } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/tooltip';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
+import { Button } from '@ui/button';
+import { Badge } from '@ui/badge';
+import {
+  getAllDifficulties,
+  getAllQuestionTypes,
+  getDifficultyI18nKey,
+  getQuestionTypeI18nKey,
+} from '@aiprimary/core';
+import type { MatrixCell, AssignmentTopic, QuestionType } from '@aiprimary/core';
+import { QuestionTypeIcon } from '../shared';
+import { MatrixCellEditor } from './MatrixCellEditor';
+import { EmptyMatrixCellEditor } from './EmptyMatrixCellEditor';
+
+interface MatrixGridEditorProps {
+  topics: AssignmentTopic[];
+  cells: MatrixCell[];
+  onCellUpdate: (cellId: string, updates: Partial<MatrixCell>) => void;
+  onCellCreate: (cell: Omit<MatrixCell, 'id' | 'currentCount'>) => void;
+  onCellRemove: (cellId: string) => void;
+  onTopicEdit?: (topicId: string) => void;
+  emptyMessage?: string;
+  showCurrentCount?: boolean;
+}
+
+export const MatrixGridEditor = ({
+  topics,
+  cells,
+  onCellUpdate,
+  onCellCreate,
+  onCellRemove,
+  onTopicEdit,
+  emptyMessage,
+  showCurrentCount = true,
+}: MatrixGridEditorProps) => {
+  const { t } = useTranslation('questions', { keyPrefix: 'matrix.editor' });
+  const { t: tDifficulty } = useTranslation('questions');
+  const { t: tQuestionType } = useTranslation('questions');
+
+  if (!topics || topics.length === 0) {
+    return (
+      <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center dark:border-gray-700 dark:bg-gray-900">
+        <p className="text-sm text-gray-500">{emptyMessage || t('emptyMessage')}</p>
+      </div>
+    );
+  }
+
+  const difficulties = getAllDifficulties();
+  const questionTypes = getAllQuestionTypes();
+
+  return (
+    <div className="overflow-x-auto rounded-lg border">
+      <Table className="table-fixed">
+        <TableHeader>
+          {/* First header row: Topic + Difficulties spanning questionTypes */}
+          <TableRow>
+            <TableHead rowSpan={2} className="w-[160px] bg-gray-50 font-semibold dark:bg-gray-900">
+              {t('tableHeaders.topic')}
+            </TableHead>
+            {difficulties.map((difficulty) => (
+              <TableHead
+                key={difficulty.value}
+                colSpan={questionTypes.length}
+                className="bg-gray-50 text-center text-xs font-semibold dark:bg-gray-900"
+              >
+                {tDifficulty(getDifficultyI18nKey(difficulty.value) as any)}
+              </TableHead>
+            ))}
+          </TableRow>
+          {/* Second header row: Question types under each difficulty */}
+          <TableRow>
+            {difficulties.map((difficulty) =>
+              questionTypes.map((questionType) => (
+                <TableHead
+                  key={`${difficulty.value}-${questionType.value}`}
+                  className="w-[70px] bg-gray-100 text-center dark:bg-gray-800"
+                >
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex justify-center">
+                        <QuestionTypeIcon type={questionType.value as QuestionType} className="h-4 w-4" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{tQuestionType(getQuestionTypeI18nKey(questionType.value) as any)}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
+              ))
+            )}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {topics.map((topic) => (
+            <TableRow key={topic.id}>
+              <TableCell className="w-[160px] align-top font-medium">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <div className="whitespace-normal break-words">
+                      {topic.name || t('tableHeaders.topic')}
+                      {topic.hasContext && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <BookOpen className="ml-1 inline-block h-3 w-3 text-blue-600 dark:text-blue-400" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="text-xs">{t('usesContext')}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
+                    {topic.description && (
+                      <div className="whitespace-normal break-words text-xs font-normal text-gray-500">
+                        {topic.description}
+                      </div>
+                    )}
+                    {/* Display chapters as informational chips */}
+                    {topic.chapters && topic.chapters.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {topic.chapters.map((chapter, idx) => (
+                          <Badge key={idx} variant="secondary" className="text-xs">
+                            {chapter}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {onTopicEdit && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => onTopicEdit(topic.id)}
+                      className="h-8 w-8 shrink-0 p-0"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
+                </div>
+              </TableCell>
+              {difficulties.map((difficulty, difficultyIndex) =>
+                questionTypes.map((questionType) => {
+                  const cell = cells?.find(
+                    (c) =>
+                      c.topicId === topic.id &&
+                      c.difficulty === difficulty.value &&
+                      c.questionType === questionType.value
+                  );
+                  const bgColor =
+                    difficultyIndex % 2 === 0 ? 'bg-white dark:bg-gray-950' : 'bg-gray-50 dark:bg-gray-900';
+                  return (
+                    <TableCell
+                      key={`${topic.id}-${difficulty.value}-${questionType.value}`}
+                      className={`w-[70px] p-1 ${bgColor}`}
+                    >
+                      {cell ? (
+                        <MatrixCellEditor
+                          cell={cell}
+                          onUpdate={onCellUpdate}
+                          onRemove={onCellRemove}
+                          showCurrentCount={showCurrentCount}
+                        />
+                      ) : (
+                        <EmptyMatrixCellEditor
+                          topicId={topic.id}
+                          topicName={topic.name}
+                          difficulty={difficulty.value}
+                          questionType={questionType.value}
+                          onCreate={onCellCreate}
+                        />
+                      )}
+                    </TableCell>
+                  );
+                })
+              )}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+};

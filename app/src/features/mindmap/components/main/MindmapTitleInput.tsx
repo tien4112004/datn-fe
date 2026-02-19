@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Input } from '@/shared/components/ui/input';
+import { Input } from '@ui/input';
 import { useUpdateMindmapTitle } from '../../hooks/useApi';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { toast } from 'sonner';
 import { Check, Pencil, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@ui/button';
 import { cn } from '@/shared/lib/utils';
-import { useIsMobile } from '@/shared/hooks/use-mobile';
+import { useIsMobile } from '@ui/hooks/use-mobile';
 import { useMindmapPermissionContext } from '../../contexts/MindmapPermissionContext';
 
 interface MindmapTitleInputProps {

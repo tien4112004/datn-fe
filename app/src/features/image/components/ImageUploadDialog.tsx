@@ -1,12 +1,6 @@
 import { useRef, useState, useCallback } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/shared/components/ui/dialog';
-import { Button } from '@/shared/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@ui/dialog';
+import { Button } from '@ui/button';
 import { useUploadImage } from '../hooks/useApi';
 import { Upload, X, Loader2, ImageIcon } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';

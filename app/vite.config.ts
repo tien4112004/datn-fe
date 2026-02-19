@@ -60,6 +60,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@aiprimary/core': path.resolve(__dirname, '../packages/core/src'),
+        '@aiprimary/question': path.resolve(__dirname, '../packages/question/src'),
         '@/components': path.resolve(__dirname, './src/shared/components'),
         '@/utils': path.resolve(__dirname, './src/shared/lib/utils'),
         '@/hooks': path.resolve(__dirname, './src/shared/hooks'),

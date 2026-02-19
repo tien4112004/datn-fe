@@ -9,9 +9,9 @@
     "jsx": "react-jsx",
     "strict": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
     "paths": {
-      "@question/*": ["./src/*"]
+      "@question/*": ["./src/*"],
+      "@ui/*": ["../ui/src/*"]
     }
   },
   "include": ["src/**/*"]

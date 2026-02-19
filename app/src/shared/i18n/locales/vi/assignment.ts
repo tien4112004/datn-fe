@@ -462,6 +462,11 @@ export default {
         'Khi bật, AI sẽ sử dụng các đoạn văn đọc hiểu khi tạo câu hỏi cho chủ đề này thông qua Điền khoảng trống trong ma trận',
       useContextDescription: 'Cài đặt này được sử dụng khi tạo câu hỏi với Điền khoảng trống trong ma trận',
       usesContext: 'Sử dụng đoạn văn đọc hiểu',
+      chapters: 'Chương (Tùy chọn)',
+      chaptersHint: 'Chọn các chương từ chương trình học. Được sử dụng làm thông tin tham khảo.',
+      chaptersRequireGradeSubject: 'Đặt lớp và môn học để xem các chương có sẵn',
+      chaptersLoading: 'Đang tải các chương...',
+      noChaptersAvailable: 'Không có chương nào cho lớp và môn học này',
     },
 
     // Bảng quản lý đoạn văn

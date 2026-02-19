@@ -2,6 +2,9 @@
 @import 'tw-animate-css';
 @plugin "@tailwindcss/typography";
 
+@source "../../../packages/ui/src";
+@source "../../../packages/question/src";
+
 @custom-variant dark (&:is(.dark *));
 
 :root {

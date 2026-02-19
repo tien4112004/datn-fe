@@ -2,6 +2,7 @@ import { Button } from '@ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
 import { Input } from '@ui/input';
 import { Label } from '@ui/label';
+import { Badge } from '@ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
 import { useMatrixTemplateById, useCreateMatrixTemplate, useUpdateMatrixTemplate } from '@/hooks';
 import {
@@ -17,7 +18,8 @@ import {
 } from '@aiprimary/core';
 import type { MatrixCell, AssignmentTopic, Difficulty, QuestionType } from '@aiprimary/core';
 import { MatrixGridEditor } from '@aiprimary/question/matrix';
-import { ArrowLeft, Save, Plus, Trash2 } from 'lucide-react';
+import { TopicEditModal } from '@/components/matrix/TopicEditModal';
+import { ArrowLeft, Save, Plus, Pencil, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -28,13 +30,21 @@ const SUBJECTS = getAllSubjects();
  * Convert a MatrixTemplate's dimensions + matrix 3D array into flat topics + cells for the editor.
  */
 function templateToEditorData(template: {
-  dimensions?: { topics: { id: string; name: string }[]; difficulties: string[]; questionTypes: string[] };
+  dimensions?: {
+    topics: { id: string; name: string; chapters?: string[] }[];
+    difficulties: string[];
+    questionTypes: string[];
+  };
   matrix?: string[][][];
 }): { topics: AssignmentTopic[]; cells: MatrixCell[] } {
   if (!template.dimensions || !template.matrix) return { topics: [], cells: [] };
 
   const { dimensions, matrix } = template;
-  const topics: AssignmentTopic[] = dimensions.topics.map((t) => ({ id: t.id, name: t.name }));
+  const topics: AssignmentTopic[] = dimensions.topics.map((t) => ({
+    id: t.id,
+    name: t.name,
+    chapters: t.chapters,
+  }));
   const cells: MatrixCell[] = [];
 
   dimensions.topics.forEach((topic, topicIdx) => {
@@ -83,7 +93,11 @@ function editorDataToTemplate(topics: AssignmentTopic[], cells: MatrixCell[]) {
     questionTypesSet.size > 0 ? Array.from(questionTypesSet) : getAllQuestionTypes().map((q) => q.value);
 
   const dimensions = {
-    topics: topics.map((t) => ({ id: t.id, name: t.name })),
+    topics: topics.map((t) => ({
+      id: t.id,
+      name: t.name,
+      ...(t.chapters && t.chapters.length > 0 ? { chapters: t.chapters } : {}),
+    })),
     difficulties: difficulties as string[],
     questionTypes: questionTypes as string[],
   };
@@ -124,6 +138,7 @@ export function MatrixTemplateFormPage() {
   const [subject, setSubject] = useState('');
   const [topics, setTopics] = useState<AssignmentTopic[]>([]);
   const [cells, setCells] = useState<MatrixCell[]>([]);
+  const [editingTopicId, setEditingTopicId] = useState<string | null>(null);
 
   // Populate form when editing
   useEffect(() => {
@@ -156,6 +171,7 @@ export function MatrixTemplateFormPage() {
   const handleAddTopic = useCallback(() => {
     const newTopic: AssignmentTopic = { id: generateId(), name: '' };
     setTopics((prev) => [...prev, newTopic]);
+    setEditingTopicId(newTopic.id);
   }, []);
 
   const handleRemoveTopic = useCallback((topicId: string) => {
@@ -163,9 +179,12 @@ export function MatrixTemplateFormPage() {
     setCells((prev) => prev.filter((c) => c.topicId !== topicId));
   }, []);
 
-  const handleTopicNameChange = useCallback((topicId: string, name: string) => {
-    setTopics((prev) => prev.map((t) => (t.id === topicId ? { ...t, name } : t)));
-    setCells((prev) => prev.map((c) => (c.topicId === topicId ? { ...c, topicName: name } : c)));
+  const handleTopicUpdate = useCallback((topicId: string, updates: { name: string; chapters?: string[] }) => {
+    setTopics((prev) => prev.map((t) => (t.id === topicId ? { ...t, ...updates } : t)));
+    // Sync topic name into cells
+    if (updates.name !== undefined) {
+      setCells((prev) => prev.map((c) => (c.topicId === topicId ? { ...c, topicName: updates.name } : c)));
+    }
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -198,6 +217,7 @@ export function MatrixTemplateFormPage() {
   };
 
   const isPending = createMutation.isPending || updateMutation.isPending;
+  const editingTopic = topics.find((t) => t.id === editingTopicId) || null;
 
   if (isEditing && isLoadingTemplate) {
     return (
@@ -284,27 +304,47 @@ export function MatrixTemplateFormPage() {
             <CardHeader>
               <CardTitle>Topics</CardTitle>
               <CardDescription>
-                Add topics to define the rows of the assessment matrix. Each topic represents a content area.
+                Add topics to define the rows of the assessment matrix. Click edit to set chapters.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               {topics.map((topic) => (
-                <div key={topic.id} className="flex items-center gap-2">
-                  <Input
-                    value={topic.name}
-                    onChange={(e) => handleTopicNameChange(topic.id, e.target.value)}
-                    placeholder="Topic name..."
-                    className="flex-1"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleRemoveTopic(topic.id)}
-                    className="shrink-0 text-red-500 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                <div key={topic.id} className="space-y-1 rounded-lg border p-3">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={topic.name}
+                      onChange={(e) => handleTopicUpdate(topic.id, { ...topic, name: e.target.value })}
+                      placeholder="Topic name..."
+                      className="flex-1"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setEditingTopicId(topic.id)}
+                      className="shrink-0"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveTopic(topic.id)}
+                      className="shrink-0 text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {topic.chapters && topic.chapters.length > 0 && (
+                    <div className="flex flex-wrap gap-1 pl-1">
+                      {topic.chapters.map((chapter, idx) => (
+                        <Badge key={idx} variant="secondary" className="text-xs">
+                          {chapter}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
               <Button type="button" variant="outline" size="sm" onClick={handleAddTopic}>
@@ -331,6 +371,7 @@ export function MatrixTemplateFormPage() {
                   onCellUpdate={handleCellUpdate}
                   onCellCreate={handleCellCreate}
                   onCellRemove={handleCellRemove}
+                  onTopicEdit={(topicId) => setEditingTopicId(topicId)}
                   showCurrentCount={false}
                 />
               </CardContent>
@@ -354,6 +395,17 @@ export function MatrixTemplateFormPage() {
           </div>
         </div>
       </form>
+
+      {/* Topic Edit Modal */}
+      <TopicEditModal
+        topic={editingTopic}
+        open={!!editingTopicId}
+        onOpenChange={(open) => !open && setEditingTopicId(null)}
+        onSave={handleTopicUpdate}
+        onDelete={handleRemoveTopic}
+        subject={subject}
+        grade={grade}
+      />
     </div>
   );
 }

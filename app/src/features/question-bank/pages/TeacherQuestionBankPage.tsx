@@ -1,0 +1,396 @@
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import ReactMarkdown from 'react-markdown';
+import {
+  useQuestionBankList,
+  useDeleteQuestions,
+  useDuplicateQuestion,
+  useExportQuestions,
+} from '../hooks/useQuestionBankApi';
+import useQuestionBankStore from '../stores/questionBankStore';
+import type { QuestionBankItem } from '../types';
+import { Button } from '@ui/button';
+import { Checkbox } from '@ui/checkbox';
+import { Badge } from '@ui/badge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/dropdown-menu';
+import { Plus, Upload, Download, MoreVertical, Trash2, Copy, FileEdit, Sparkles } from 'lucide-react';
+import { toast } from 'sonner';
+import { I18N_NAMESPACES } from '@/shared/i18n/constants';
+import DataTable from '@/shared/components/table/DataTable';
+import { QuestionBankImportDialog, QuestionBankFilters, QuestionBankDialog } from '../components';
+import { QuestionBankGenerateDialog } from '@/features/assignment/components/editor/questions/QuestionGenerateDialog';
+import {
+  getSubjectName,
+  getQuestionTypeName,
+  getDifficultyName,
+  getGradeName,
+  getSubjectBadgeClass,
+  getDifficultyBadgeClass,
+  getQuestionTypeBadgeClass,
+} from '@aiprimary/core';
+
+const columnHelper = createColumnHelper<QuestionBankItem>();
+
+export function TeacherQuestionBankPage() {
+  const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, { keyPrefix: 'teacherQuestionBank' });
+  const { t: tCommon } = useTranslation(I18N_NAMESPACES.ASSIGNMENT);
+
+  const navigate = useNavigate();
+
+  // State
+  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
+  const [isBrowseDialogOpen, setIsBrowseDialogOpen] = useState(false);
+
+  // Store
+  const { filters } = useQuestionBankStore();
+
+  // Hooks
+  const { data, isLoading } = useQuestionBankList({
+    ...filters,
+    page: pagination.pageIndex + 1,
+    pageSize: pagination.pageSize,
+    bankType: 'personal',
+  });
+
+  const deleteQuestionsMutation = useDeleteQuestions();
+  const duplicateMutation = useDuplicateQuestion();
+  const exportMutation = useExportQuestions();
+
+  const questions = data?.questions || [];
+  const totalItems = data?.total || 0;
+
+  // Permission helpers
+  // Note: Permissions are now managed by API/filters, not item properties
+  const canEdit = (_q: QuestionBankItem) => true;
+  const canDelete = (_q: QuestionBankItem) => true;
+
+  // Get selected question IDs
+  const selectedQuestionIds = Object.keys(rowSelection)
+    .filter((key) => rowSelection[key])
+    .map((index) => questions[parseInt(index)]?.id)
+    .filter(Boolean);
+
+  // Handlers
+  const handleBulkDelete = async () => {
+    if (selectedQuestionIds.length === 0) return;
+
+    if (!confirm(t('dialogs.delete.description', { count: selectedQuestionIds.length }))) {
+      return;
+    }
+
+    try {
+      await deleteQuestionsMutation.mutateAsync(selectedQuestionIds);
+      setRowSelection({});
+      toast.success(t('toast.deleteSuccess'));
+    } catch {
+      toast.error(t('toast.deleteError'));
+    }
+  };
+
+  const handleDuplicate = async (id: string) => {
+    try {
+      const newQuestion = await duplicateMutation.mutateAsync(id);
+      toast.success(t('toast.duplicateSuccess'));
+      navigate(`/question-bank/edit/${newQuestion.id}`);
+    } catch {
+      toast.error(t('toast.duplicateError'));
+    }
+  };
+
+  const handleEdit = (question: QuestionBankItem) => {
+    navigate(`/question-bank/edit/${question.id}`);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm(t('dialogs.delete.description', { count: 1 }))) {
+      return;
+    }
+
+    try {
+      await deleteQuestionsMutation.mutateAsync([id]);
+      toast.success(t('toast.deleteSuccess'));
+    } catch (error) {
+      toast.error(t('toast.deleteError'));
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      const blob = await exportMutation.mutateAsync(filters);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `teacher-questions-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success(t('toast.exportSuccess'));
+    } catch {
+      toast.error(t('toast.exportError'));
+    }
+  };
+
+  // Column definitions
+  const columns = useMemo(
+    () => [
+      columnHelper.display({
+        id: 'select',
+        header: ({ table }) => (
+          <div onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              checked={
+                table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')
+              }
+              onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+              aria-label="Select all"
+            />
+          </div>
+        ),
+        cell: ({ row }) => (
+          <div onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              disabled={!canDelete(row.original)}
+              aria-label="Select row"
+            />
+          </div>
+        ),
+        size: 50,
+        enableResizing: false,
+      }),
+      columnHelper.accessor('title', {
+        header: t('table.columns.title'),
+        cell: (info) => (
+          <div className="max-w-md truncate font-medium">
+            <ReactMarkdown>{info.getValue()}</ReactMarkdown>
+          </div>
+        ),
+        minSize: 200,
+        meta: {
+          isGrow: true,
+        },
+      }),
+      columnHelper.accessor('type', {
+        header: t('table.columns.questionType'),
+        cell: (info) => (
+          <Badge variant="outline" className={getQuestionTypeBadgeClass(info.getValue())}>
+            {getQuestionTypeName(info.getValue())}
+          </Badge>
+        ),
+        size: 150,
+      }),
+      columnHelper.accessor('subject', {
+        header: t('table.columns.subject'),
+        cell: (info) => (
+          <Badge variant="outline" className={getSubjectBadgeClass(info.getValue())}>
+            {getSubjectName(info.getValue())}
+          </Badge>
+        ),
+        size: 120,
+      }),
+      columnHelper.accessor('grade', {
+        header: t('table.columns.grade'),
+        cell: (info) => {
+          const grade = info.getValue();
+          return grade ? (
+            <Badge variant="outline">{getGradeName(grade)}</Badge>
+          ) : (
+            <span className="text-muted-foreground text-xs">-</span>
+          );
+        },
+        size: 100,
+      }),
+      columnHelper.accessor('difficulty', {
+        header: t('table.columns.difficulty'),
+        cell: (info) => (
+          <Badge variant="outline" className={getDifficultyBadgeClass(info.getValue())}>
+            {getDifficultyName(info.getValue())}
+          </Badge>
+        ),
+        size: 140,
+      }),
+      columnHelper.display({
+        id: 'actions',
+        header: '',
+        cell: ({ row }) => {
+          const question = row.original;
+          return (
+            <div onClick={(e) => e.stopPropagation()}>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {canEdit(question) && (
+                    <>
+                      <DropdownMenuItem onClick={() => handleEdit(question)}>
+                        <FileEdit className="mr-2 h-4 w-4" />
+                        {t('actions.edit')}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDuplicate(question.id)}>
+                        <Copy className="mr-2 h-4 w-4" />
+                        {t('actions.duplicate')}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        onClick={() => handleDelete(question.id)}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        {t('actions.delete')}
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          );
+        },
+        size: 60,
+        enableResizing: false,
+      }),
+    ],
+    [t, tCommon]
+  );
+
+  // Table configuration
+  const table = useReactTable({
+    data: questions,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+    enableRowSelection: (row) => canDelete(row.original),
+    enableColumnResizing: true,
+    columnResizeMode: 'onChange',
+    columnResizeDirection: 'ltr',
+    state: {
+      rowSelection,
+      pagination,
+    },
+    rowCount: totalItems,
+    onRowSelectionChange: setRowSelection,
+    onPaginationChange: setPagination,
+  });
+
+  return (
+    <div className="flex h-full flex-col overflow-auto">
+      <div className="mx-auto w-full max-w-7xl space-y-6 px-8 py-12">
+        {/* Header */}
+        <div className="mb-8 space-y-1">
+          <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
+        </div>
+
+        {/* Filters */}
+        <QuestionBankFilters
+          orientation="horizontal"
+          RightComponent={
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExport}
+                disabled={exportMutation.isPending}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                {t('actions.export')}
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsImportDialogOpen(true)}
+                className="gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                {t('actions.import')}
+              </Button>
+
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setIsBrowseDialogOpen(true)}
+                className="gap-2"
+              >
+                <Copy className="h-4 w-4" />
+                {t('actions.browsePublic')}
+              </Button>
+
+              <Button
+                size="sm"
+                onClick={() => setIsGenerateDialogOpen(true)}
+                className="gap-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white hover:from-violet-600 hover:to-purple-600"
+              >
+                <Sparkles className="h-4 w-4" />
+                {t('actions.generate')}
+              </Button>
+
+              <Button size="sm" onClick={() => navigate('/question-bank/create')} className="gap-2">
+                <Plus className="h-4 w-4" />
+                {t('actions.create')}
+              </Button>
+            </div>
+          }
+        />
+
+        {/* Action Bar */}
+        <div className="space-y-4">
+          {/* Bulk Actions */}
+          {selectedQuestionIds.length > 0 && (
+            <div className="bg-muted flex items-center justify-between rounded-md p-3">
+              <span className="text-sm font-medium">{selectedQuestionIds.length} question(s) selected</span>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleBulkDelete}
+                disabled={deleteQuestionsMutation.isPending}
+                className="gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+                {t('actions.deleteSelected')}
+              </Button>
+            </div>
+          )}
+
+          {/* DataTable */}
+          <DataTable
+            table={table}
+            isLoading={isLoading}
+            onClickRow={(row) => navigate(`/question-bank/${row.original.id}`)}
+            rowStyle="cursor-pointer"
+            emptyState={
+              <div className="text-muted-foreground py-8 text-center">{t('table.noQuestions')}</div>
+            }
+            showPagination={true}
+          />
+        </div>
+
+        {/* Dialogs */}
+        <QuestionBankImportDialog open={isImportDialogOpen} onClose={() => setIsImportDialogOpen(false)} />
+
+        {/* Generate Questions Dialog */}
+        <QuestionBankGenerateDialog open={isGenerateDialogOpen} onOpenChange={setIsGenerateDialogOpen} />
+
+        {/* Browse Public Questions Dialog */}
+        <QuestionBankDialog
+          open={isBrowseDialogOpen}
+          onOpenChange={setIsBrowseDialogOpen}
+          onAddQuestions={() => {}}
+          mode="copy-to-personal"
+        />
+      </div>
+    </div>
+  );
+}

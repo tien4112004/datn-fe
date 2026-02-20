@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useCreateAssignment, useUpdateAssignment } from './useAssignmentApi';
 import { useAssignmentFormStore } from '../stores/useAssignmentFormStore';
 import { useAssignmentEditorStore } from '../stores/useAssignmentEditorStore';
-import { useValidateQuestion } from './useValidateQuestion';
+import { useValidateQuestion } from '@/features/question-bank/hooks/useValidateQuestion';
 import { transformQuestionsForApi } from '../utils/questionTransform';
 import { cellsToApiMatrix } from '../utils';
 import type { SubjectCode } from '@aiprimary/core';

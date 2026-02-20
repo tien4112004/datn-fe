@@ -1,5 +1,6 @@
 export * from './assignment';
-export * from './questionBank';
+// Re-export from question-bank feature for backward compatibility
+export * from '@/features/question-bank/types';
 export * from './service';
 export * from './validation';
 

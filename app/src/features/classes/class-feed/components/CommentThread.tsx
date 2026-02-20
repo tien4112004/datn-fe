@@ -5,13 +5,16 @@ import { UserAvatar } from '@/components/common/UserAvatar';
 import { Button } from '@ui/button';
 import { useAuth } from '@/shared/context/auth';
 import { CommentListLoading, CommentListError, useCommentDate } from '@/shared/components/comments';
+import { CommentContentRenderer } from './CommentContentRenderer';
+import { PostMentionInput } from './PostMentionInput';
 
 interface CommentThreadProps {
   postId: string;
+  classId: string;
   className?: string;
 }
 
-export const CommentThread = ({ postId, className = '' }: CommentThreadProps) => {
+export const CommentThread = ({ postId, classId, className = '' }: CommentThreadProps) => {
   const { t } = useTranslation('classes');
   const { user } = useAuth();
   const { comments, loading, error } = useComments(postId);
@@ -62,7 +65,7 @@ export const CommentThread = ({ postId, className = '' }: CommentThreadProps) =>
                       <span className="text-sm font-medium">{user.name}</span>
                       <span className="text-xs text-gray-500">{formatRelative(comment.createdAt)}</span>
                     </div>
-                    <p className="whitespace-pre-wrap break-words text-sm text-gray-800">{comment.content}</p>
+                    <CommentContentRenderer content={comment.content} className="text-gray-800" />
                   </div>
                 </div>
               </div>
@@ -85,13 +88,13 @@ export const CommentThread = ({ postId, className = '' }: CommentThreadProps) =>
           size="sm"
         />
         <div className="flex-1">
-          <textarea
+          <PostMentionInput
             value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
+            onChange={setNewComment}
+            onSubmit={handleSubmit}
             placeholder={t('feed.creator.placeholders.comment')}
-            className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
-            rows={1}
             disabled={submitting}
+            classId={classId}
           />
           {newComment.trim() && (
             <div className="mt-2 flex justify-end">

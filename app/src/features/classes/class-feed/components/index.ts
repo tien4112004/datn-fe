@@ -6,6 +6,8 @@ export { AttachmentPreview } from './AttachmentPreview';
 export { PostActions } from './PostActions';
 export { PostCard } from './PostCard';
 export { CommentThread } from './CommentThread';
+export { CommentContentRenderer } from './CommentContentRenderer';
+export { PostMentionInput } from './PostMentionInput';
 export { SubmissionStatistics } from './SubmissionStatistics';
 export { StudentAssignmentActions } from './StudentAssignmentActions';
 export { ClassResourcesTab } from './ClassResourcesTab';

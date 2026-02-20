@@ -1248,6 +1248,13 @@ export default {
       title: 'Comments',
       loading: 'Loading comments...',
       empty: 'No comments yet',
+      postReference: 'Post',
+      postReferenceTooltip: 'Click to view referenced post',
+      loadingPosts: 'Loading posts...',
+      noPostsFound: 'No posts found',
+      unknownAuthor: 'Unknown',
+      mentionHint: 'Type @ to reference a post',
+      mentionPost: 'Reference a post (Press @ key)',
     },
     errors: {
       loadFailed: 'Failed to load posts',

@@ -8,8 +8,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/shared/components/ui/sidebar';
-import SidebarLanguageSwitcher from './SidebarLanguageSwitcher';
+import SidebarCoinBalance from './SidebarCoinBalance';
 import SidebarNotificationBell from './SidebarNotificationBell';
+import { NavLink } from 'react-router-dom';
 
 export function NavSecondary({
   items,
@@ -26,15 +27,15 @@ export function NavSecondary({
       <SidebarGroupContent>
         <SidebarMenu>
           {/* <SidebarApiSwitcher /> */}
-          <SidebarLanguageSwitcher />
+          <SidebarCoinBalance />
           <SidebarNotificationBell />
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild size="sm">
-                <a href={item.url}>
+                <NavLink to={item.url}>
                   <item.icon />
                   <span>{item.title}</span>
-                </a>
+                </NavLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}

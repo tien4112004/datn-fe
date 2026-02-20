@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Ban } from 'lucide-react';
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 
 export function PaymentCancelPage() {
   const { t } = useTranslation('payment');

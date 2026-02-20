@@ -1,7 +1,7 @@
 import { useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { CheckCircle, Loader2, AlertCircle } from 'lucide-react';
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import { useTransaction } from '../hooks/usePayment';
 import { TransactionStatusBadge } from '../components/TransactionStatusBadge';
 import { formatVND } from '../constants';

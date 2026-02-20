@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Coins, History } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@ui/button';
 import { useAuth } from '@/shared/context/auth';
 import { CoinBalanceBadge } from '../components/CoinBalanceBadge';
 import { CoinPackageCard } from '../components/CoinPackageCard';

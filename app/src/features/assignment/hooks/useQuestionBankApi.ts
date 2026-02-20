@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useQuestionBankApiService } from '../api/questionBank.index';
 import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
 import type {
@@ -18,6 +18,9 @@ export const questionBankKeys = {
   all: ['question-bank'] as const,
   lists: () => [...questionBankKeys.all, 'list'] as const,
   list: (filters: QuestionBankFilters) => [...questionBankKeys.lists(), filters] as const,
+  infiniteLists: () => [...questionBankKeys.all, 'infinite-list'] as const,
+  infiniteList: (filters: Omit<QuestionBankFilters, 'page' | 'pageSize'>) =>
+    [...questionBankKeys.infiniteLists(), filters] as const,
   details: () => [...questionBankKeys.all, 'detail'] as const,
   detail: (id: string) => [...questionBankKeys.details(), id] as const,
   metadata: {
@@ -46,6 +49,48 @@ export const useQuestionBankList = (filters: QuestionBankFilters) => {
     staleTime: 30000, // 30 seconds
     gcTime: 300000, // 5 minutes
   });
+};
+
+const QUESTION_BANK_PAGE_SIZE = 20;
+
+// GET all questions with infinite scrolling
+export const useInfiniteQuestionBankList = (filters: Omit<QuestionBankFilters, 'page' | 'pageSize'>) => {
+  const apiService = useQuestionBankApiService();
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = useInfiniteQuery({
+    queryKey: questionBankKeys.infiniteList(filters),
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await apiService.getQuestions({
+        ...filters,
+        page: pageParam,
+        pageSize: QUESTION_BANK_PAGE_SIZE,
+      });
+      return {
+        questions: response.data,
+        pagination: response.pagination,
+      };
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const pagination = lastPage.pagination;
+      if (!pagination) return undefined;
+      if (pagination.currentPage >= pagination.totalPages) return undefined;
+      return pagination.currentPage + 1;
+    },
+    staleTime: 30000,
+    gcTime: 300000,
+  });
+
+  const questions = data?.pages.flatMap((page) => page.questions) || [];
+
+  return {
+    questions,
+    fetchNextPage,
+    hasNextPage: hasNextPage ?? false,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+  };
 };
 
 // GET single question by ID

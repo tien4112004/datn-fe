@@ -20,13 +20,14 @@ interface AssignmentEditorState {
   isQuestionListDialogOpen: boolean;
   currentQuestionId: string | null;
   currentContextId: string | null; // Selected context group (mutually exclusive with currentQuestionId)
-  questionViewModes: Map<string, ViewMode>;
+  questionViewMode: ViewMode;
   isMetadataDialogOpen: boolean;
   isMatrixEditorOpen: boolean;
   isContextCreateFormOpen: boolean;
   isContextLibraryDialogOpen: boolean;
   isMatrixTemplateLibraryDialogOpen: boolean;
   isMatrixTemplateSaveDialogOpen: boolean;
+  isBulkPointsDialogOpen: boolean;
   mainView: MainView;
 
   // Actions
@@ -35,14 +36,15 @@ interface AssignmentEditorState {
   setQuestionListDialogOpen: (open: boolean) => void;
   setCurrentQuestionId: (id: string | null) => void;
   setCurrentContextId: (id: string | null) => void;
-  setQuestionViewMode: (questionId: string, mode: ViewMode) => void;
-  toggleQuestionViewMode: (questionId: string) => void;
+  setQuestionViewMode: (mode: ViewMode) => void;
+  toggleQuestionViewMode: () => void;
   setMetadataDialogOpen: (open: boolean) => void;
   setMatrixEditorOpen: (open: boolean) => void;
   setContextCreateFormOpen: (open: boolean) => void;
   setContextLibraryDialogOpen: (open: boolean) => void;
   setMatrixTemplateLibraryDialogOpen: (open: boolean) => void;
   setMatrixTemplateSaveDialogOpen: (open: boolean) => void;
+  setBulkPointsDialogOpen: (open: boolean) => void;
   setMainView: (view: MainView) => void;
 
   // Question operations (these will be used by components to update form)
@@ -69,13 +71,14 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       isQuestionListDialogOpen: false,
       currentQuestionId: null,
       currentContextId: null,
-      questionViewModes: new Map(),
+      questionViewMode: VIEW_MODE.EDITING,
       isMetadataDialogOpen: false,
       isMatrixEditorOpen: false,
       isContextCreateFormOpen: false,
       isContextLibraryDialogOpen: false,
       isMatrixTemplateLibraryDialogOpen: false,
       isMatrixTemplateSaveDialogOpen: false,
+      isBulkPointsDialogOpen: false,
       mainView: 'info',
 
       // UI actions
@@ -87,17 +90,13 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       // Setting currentContextId clears currentQuestionId (mutually exclusive)
       setCurrentContextId: (id) => set({ currentContextId: id, currentQuestionId: null }),
       setMainView: (view) => set({ mainView: view }),
-      setQuestionViewMode: (questionId, mode) => {
-        const modes = new Map(get().questionViewModes);
-        modes.set(questionId, mode);
-        set({ questionViewModes: modes });
+      setQuestionViewMode: (mode) => {
+        set({ questionViewMode: mode });
       },
-      toggleQuestionViewMode: (questionId) => {
-        const modes = new Map(get().questionViewModes);
-        const current = modes.get(questionId) || VIEW_MODE.EDITING;
+      toggleQuestionViewMode: () => {
+        const current = get().questionViewMode;
         const next = current === VIEW_MODE.EDITING ? VIEW_MODE.VIEWING : VIEW_MODE.EDITING;
-        modes.set(questionId, next);
-        set({ questionViewModes: modes });
+        set({ questionViewMode: next });
       },
       setMetadataDialogOpen: (open) => set({ isMetadataDialogOpen: open }),
       setMatrixEditorOpen: (open) => set({ isMatrixEditorOpen: open }),
@@ -105,6 +104,7 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       setContextLibraryDialogOpen: (open) => set({ isContextLibraryDialogOpen: open }),
       setMatrixTemplateLibraryDialogOpen: (open) => set({ isMatrixTemplateLibraryDialogOpen: open }),
       setMatrixTemplateSaveDialogOpen: (open) => set({ isMatrixTemplateSaveDialogOpen: open }),
+      setBulkPointsDialogOpen: (open) => set({ isBulkPointsDialogOpen: open }),
 
       // Reorder questions (used with drag-drop)
       reorderQuestions: (questions, oldIndex, newIndex) => {

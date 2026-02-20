@@ -46,7 +46,7 @@ export const CurrentQuestionView = () => {
   const currentQuestionId = useAssignmentEditorStore((state) => state.currentQuestionId);
   const currentContextId = useAssignmentEditorStore((state) => state.currentContextId);
   const setCurrentQuestionId = useAssignmentEditorStore((state) => state.setCurrentQuestionId);
-  const questionViewModes = useAssignmentEditorStore((state) => state.questionViewModes);
+  const questionViewMode = useAssignmentEditorStore((state) => state.questionViewMode);
   const toggleQuestionViewMode = useAssignmentEditorStore((state) => state.toggleQuestionViewMode);
 
   const validationErrors = useAssignmentFormStore((state) => state.validationErrors);
@@ -76,7 +76,7 @@ export const CurrentQuestionView = () => {
   const [isContextOpen, setIsContextOpen] = useState(true);
   const [isContextEditing, setIsContextEditing] = useState(false);
 
-  const viewMode = questionViewModes.get(question?.id || '') || VIEW_MODE.EDITING;
+  const viewMode = questionViewMode;
   const isEditing = viewMode === VIEW_MODE.EDITING;
 
   // Get display number for individual question
@@ -235,7 +235,7 @@ export const CurrentQuestionView = () => {
               type="button"
               variant={isEditing ? 'default' : 'ghost'}
               size="sm"
-              onClick={() => !isEditing && toggleQuestionViewMode(question.id)}
+              onClick={() => !isEditing && toggleQuestionViewMode()}
               className="h-7 rounded-r-none px-2"
             >
               <Pencil className="mr-1 h-3 w-3" />
@@ -245,7 +245,7 @@ export const CurrentQuestionView = () => {
               type="button"
               variant={!isEditing ? 'default' : 'ghost'}
               size="sm"
-              onClick={() => isEditing && toggleQuestionViewMode(question.id)}
+              onClick={() => isEditing && toggleQuestionViewMode()}
               className="h-7 rounded-l-none px-2"
             >
               <Eye className="mr-1 h-3 w-3" />

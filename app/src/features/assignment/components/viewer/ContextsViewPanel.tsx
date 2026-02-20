@@ -1,6 +1,8 @@
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BookOpen } from 'lucide-react';
 import { ContextListDisplay } from '../context/ContextListDisplay';
+import { useAssignmentViewerStore } from '../../stores/useAssignmentViewerStore';
 import type { Assignment, AssignmentQuestionWithTopic, AssignmentContext } from '../../types';
 
 interface ContextsViewPanelProps {
@@ -14,6 +16,16 @@ export const ContextsViewPanel = ({ assignment }: ContextsViewPanelProps) => {
 
   const contexts = ((assignment as any).contexts || []) as AssignmentContext[];
   const questions = (assignment.questions || []) as AssignmentQuestionWithTopic[];
+  const setMainView = useAssignmentViewerStore((state) => state.setMainView);
+  const setCurrentContextId = useAssignmentViewerStore((state) => state.setCurrentContextId);
+
+  const handleNavigateToContext = useCallback(
+    (contextId: string) => {
+      setMainView('questions');
+      setCurrentContextId(contextId);
+    },
+    [setMainView, setCurrentContextId]
+  );
 
   return (
     <div className="space-y-6">
@@ -23,7 +35,12 @@ export const ContextsViewPanel = ({ assignment }: ContextsViewPanelProps) => {
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('panelTitle')}</h2>
       </div>
 
-      <ContextListDisplay contexts={contexts} questions={questions} readOnly />
+      <ContextListDisplay
+        contexts={contexts}
+        questions={questions}
+        readOnly
+        onNavigate={handleNavigateToContext}
+      />
     </div>
   );
 };

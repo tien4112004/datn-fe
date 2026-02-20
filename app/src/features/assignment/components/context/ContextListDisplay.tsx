@@ -9,6 +9,7 @@ interface ContextListDisplayProps {
   readOnly?: boolean;
   onUpdate?: (contextId: string, updates: Partial<AssignmentContext>) => void;
   onDelete?: (context: { id: string; title: string }) => void;
+  onNavigate?: (contextId: string) => void;
 }
 
 export const ContextListDisplay = ({
@@ -17,6 +18,7 @@ export const ContextListDisplay = ({
   readOnly = false,
   onUpdate,
   onDelete,
+  onNavigate,
 }: ContextListDisplayProps) => {
   const { t } = useTranslation('assignment', {
     keyPrefix: 'assignmentEditor.contextsPanel',
@@ -46,6 +48,7 @@ export const ContextListDisplay = ({
             readOnly={readOnly}
             onDelete={onDelete ? () => onDelete({ id: context.id, title: context.title }) : undefined}
             onUpdate={onUpdate ? (updates) => onUpdate(context.id, updates) : () => {}}
+            onNavigate={onNavigate ? () => onNavigate(context.id) : undefined}
           />
         );
       })}

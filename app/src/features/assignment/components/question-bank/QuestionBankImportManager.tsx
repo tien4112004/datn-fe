@@ -38,9 +38,11 @@ export const QuestionBankImportManager: React.FC = () => {
   const grade = useAssignmentFormStore((state) => state.grade);
   const setFilters = useQuestionBankStore((state) => state.setFilters);
 
-  // Pre-populate question bank filters with assignment's grade/subject when dialog opens
+  // Pre-populate question bank filters with assignment's grade/subject only the first time
+  const hasInitializedFilters = React.useRef(false);
   React.useEffect(() => {
-    if (isQuestionBankOpen) {
+    if (isQuestionBankOpen && !hasInitializedFilters.current) {
+      hasInitializedFilters.current = true;
       setFilters({
         ...(subject ? { subject: [subject] } : { subject: undefined }),
         ...(grade ? { grade: [grade] } : { grade: undefined }),

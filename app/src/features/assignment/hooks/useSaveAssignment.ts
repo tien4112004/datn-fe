@@ -30,140 +30,151 @@ export function useSaveAssignment({ id, onSaveSuccess, onSaveError }: UseSaveAss
   const validateQuestion = useValidateQuestion();
   const [isSaving, setIsSaving] = useState(false);
 
-  const save = useCallback(async () => {
-    const data = useAssignmentFormStore.getState();
+  const save = useCallback(
+    async (options?: { exitAfterSave?: boolean }) => {
+      const shouldExit = options?.exitAfterSave ?? false;
+      const data = useAssignmentFormStore.getState();
 
-    // Build validation errors
-    const assignmentErrors: AssignmentValidationErrors['assignment'] = {};
-    const questionErrors: AssignmentValidationErrors['questions'] = {};
+      // Build validation errors
+      const assignmentErrors: AssignmentValidationErrors['assignment'] = {};
+      const questionErrors: AssignmentValidationErrors['questions'] = {};
 
-    // Assignment-level validation
-    if (!data.title || data.title.trim() === '') {
-      assignmentErrors.title = t('validation.titleRequired');
-    }
-    if (!data.subject) {
-      assignmentErrors.subject = t('validation.subjectRequired');
-    }
-
-    // Question-level validation
-    data.questions.forEach((aq) => {
-      const result = validateQuestion(aq.question);
-      if (!result.isValid || result.warnings.length > 0) {
-        questionErrors[aq.question.id] = {
-          errors: result.errors,
-          warnings: result.warnings,
-        };
+      // Assignment-level validation
+      if (!data.title || data.title.trim() === '') {
+        assignmentErrors.title = t('validation.titleRequired');
       }
-    });
-
-    // Matrix validation — check cells with requiredCount > 0 that aren't fulfilled
-    let matrixErrors: AssignmentValidationErrors['matrix'];
-    const activeCells = data.matrix.filter((c) => c.requiredCount > 0);
-    if (activeCells.length > 0) {
-      const validationResult = validateMatrix(activeCells);
-      const unfulfilled = validationResult.cellsStatus.filter((c) => !c.isFulfilled);
-      if (unfulfilled.length > 0) {
-        matrixErrors = {
-          errors: [t('validation.matrixNotFulfilled', { count: unfulfilled.length })],
-        };
+      if (!data.subject) {
+        assignmentErrors.subject = t('validation.subjectRequired');
       }
-    }
 
-    const hasAssignmentErrors = Object.keys(assignmentErrors).length > 0;
-    const hasQuestionErrors = Object.values(questionErrors).some((q) => q.errors.length > 0);
-
-    if (hasAssignmentErrors || hasQuestionErrors) {
-      // Store errors for UI display (include matrix warnings for indicator)
-      data.setValidationErrors({
-        assignment: assignmentErrors,
-        questions: questionErrors,
-        matrix: matrixErrors,
+      // Question-level validation
+      data.questions.forEach((aq) => {
+        const result = validateQuestion(aq.question);
+        if (!result.isValid || result.warnings.length > 0) {
+          questionErrors[aq.question.id] = {
+            errors: result.errors,
+            warnings: result.warnings,
+          };
+        }
       });
 
-      // Auto-navigate to first error
-      if (hasAssignmentErrors) {
-        useAssignmentEditorStore.getState().setMainView('info');
-      } else {
-        const firstErrorQuestionId = data.questions.find(
-          (aq) => questionErrors[aq.question.id]?.errors.length > 0
-        )?.question.id;
-        if (firstErrorQuestionId) {
-          useAssignmentEditorStore.getState().setMainView('questions');
-          useAssignmentEditorStore.getState().setCurrentQuestionId(firstErrorQuestionId);
+      // Matrix validation — check cells with requiredCount > 0 that aren't fulfilled
+      let matrixErrors: AssignmentValidationErrors['matrix'];
+      const activeCells = data.matrix.filter((c) => c.requiredCount > 0);
+      if (activeCells.length > 0) {
+        const validationResult = validateMatrix(activeCells);
+        const unfulfilled = validationResult.cellsStatus.filter((c) => !c.isFulfilled);
+        if (unfulfilled.length > 0) {
+          matrixErrors = {
+            errors: [t('validation.matrixNotFulfilled', { count: unfulfilled.length })],
+          };
         }
       }
 
-      // Show summary toast
-      const errorQuestionCount = Object.values(questionErrors).filter((q) => q.errors.length > 0).length;
-      if (hasAssignmentErrors && hasQuestionErrors) {
-        toast.error(t('validation.multipleErrors', { count: errorQuestionCount }));
-      } else if (hasAssignmentErrors) {
-        toast.error(t('validation.assignmentFieldsRequired'));
-      } else {
-        toast.error(t('validation.questionsHaveErrors', { count: errorQuestionCount }));
-      }
-      return;
-    }
+      const hasAssignmentErrors = Object.keys(assignmentErrors).length > 0;
+      const hasQuestionErrors = Object.values(questionErrors).some((q) => q.errors.length > 0);
 
-    // Matrix errors are non-blocking warnings — store them but proceed with save
-    if (matrixErrors) {
-      data.setValidationErrors({
-        assignment: assignmentErrors,
-        questions: questionErrors,
-        matrix: matrixErrors,
-      });
-      toast.warning(matrixErrors.errors[0]);
-    }
+      if (hasAssignmentErrors || hasQuestionErrors) {
+        // Store errors for UI display (include matrix warnings for indicator)
+        data.setValidationErrors({
+          assignment: assignmentErrors,
+          questions: questionErrors,
+          matrix: matrixErrors,
+        });
 
-    // Clear validation errors on successful validation
-    data.setValidationErrors(null);
+        // Auto-navigate to first error
+        if (hasAssignmentErrors) {
+          useAssignmentEditorStore.getState().setMainView('info');
+        } else {
+          const firstErrorQuestionId = data.questions.find(
+            (aq) => questionErrors[aq.question.id]?.errors.length > 0
+          )?.question.id;
+          if (firstErrorQuestionId) {
+            useAssignmentEditorStore.getState().setMainView('questions');
+            useAssignmentEditorStore.getState().setCurrentQuestionId(firstErrorQuestionId);
+          }
+        }
 
-    setIsSaving(true);
-    try {
-      const apiMatrix = cellsToApiMatrix(
-        data.matrix,
-        {
-          grade: (data.grade || '') as Grade,
-          subject: (data.subject || '') as SubjectCode,
-        },
-        data.topics
-      );
-
-      const formData = {
-        title: data.title,
-        description: data.description,
-        subject: data.subject as SubjectCode,
-        grade: data.grade as Grade,
-        questions: transformQuestionsForApi(data.questions),
-        topics: data.topics.map((topic) => ({
-          id: topic.id,
-          name: topic.name,
-          description: topic.description,
-        })),
-        contexts: data.contexts,
-        matrix: apiMatrix,
-      };
-
-      let savedId = id;
-      if (id) {
-        await updateAssignment({ id, data: formData });
-        toast.success(t('toasts.updateSuccess'));
-      } else {
-        const newAssignment = await createAssignment(formData);
-        savedId = newAssignment.id;
-        toast.success(t('toasts.createSuccess'));
+        // Show summary toast
+        const errorQuestionCount = Object.values(questionErrors).filter((q) => q.errors.length > 0).length;
+        if (hasAssignmentErrors && hasQuestionErrors) {
+          toast.error(t('validation.multipleErrors', { count: errorQuestionCount }));
+        } else if (hasAssignmentErrors) {
+          toast.error(t('validation.assignmentFieldsRequired'));
+        } else {
+          toast.error(t('validation.questionsHaveErrors', { count: errorQuestionCount }));
+        }
+        return;
       }
 
-      onSaveSuccess();
-      navigate(`/assignment/${savedId}`);
-    } catch (error) {
-      console.error('Failed to save assignment:', error);
-      toast.error(t('toasts.saveError'));
-      onSaveError();
-    } finally {
-      setIsSaving(false);
-    }
-  }, [id, createAssignment, updateAssignment, navigate, t, onSaveSuccess, onSaveError, validateQuestion]);
+      // Matrix errors are non-blocking warnings — store them but proceed with save
+      if (matrixErrors) {
+        data.setValidationErrors({
+          assignment: assignmentErrors,
+          questions: questionErrors,
+          matrix: matrixErrors,
+        });
+        toast.warning(matrixErrors.errors[0]);
+      }
 
-  return { save, isSaving };
+      // Clear validation errors on successful validation
+      data.setValidationErrors(null);
+
+      setIsSaving(true);
+      try {
+        const apiMatrix = cellsToApiMatrix(
+          data.matrix,
+          {
+            grade: (data.grade || '') as Grade,
+            subject: (data.subject || '') as SubjectCode,
+          },
+          data.topics
+        );
+
+        const formData = {
+          title: data.title,
+          description: data.description,
+          subject: data.subject as SubjectCode,
+          grade: data.grade as Grade,
+          questions: transformQuestionsForApi(data.questions),
+          topics: data.topics.map((topic) => ({
+            id: topic.id,
+            name: topic.name,
+            description: topic.description,
+          })),
+          contexts: data.contexts,
+          matrix: apiMatrix,
+        };
+
+        let savedId = id;
+        if (id) {
+          await updateAssignment({ id, data: formData });
+          toast.success(t('toasts.updateSuccess'));
+        } else {
+          const newAssignment = await createAssignment(formData);
+          savedId = newAssignment.id;
+          toast.success(t('toasts.createSuccess'));
+        }
+
+        onSaveSuccess();
+        if (shouldExit) {
+          navigate(`/assignment/${savedId}`);
+        } else if (!id && savedId) {
+          // After creating, redirect to the edit URL so subsequent saves are updates
+          navigate(`/assignment/${savedId}/edit`, { replace: true });
+        }
+      } catch (error) {
+        console.error('Failed to save assignment:', error);
+        toast.error(t('toasts.saveError'));
+        onSaveError();
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [id, createAssignment, updateAssignment, navigate, t, onSaveSuccess, onSaveError, validateQuestion]
+  );
+
+  const saveAndExit = useCallback(() => save({ exitAfterSave: true }), [save]);
+
+  return { save, saveAndExit, isSaving };
 }

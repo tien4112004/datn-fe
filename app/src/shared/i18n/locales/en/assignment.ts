@@ -282,17 +282,22 @@ export default {
     actions: {
       actions: 'Actions',
       cancel: 'Cancel',
-      save: 'Save Assignment',
+      save: 'Save',
+      saveAndExit: 'Save & Exit',
       fillMatrixGaps: 'Generate Question from Matrix Gap',
       saving: 'Saving...',
       tooltips: {
-        save: 'Save changes',
+        save: 'Save changes and continue editing',
+        saveAndExit: 'Save changes and go to assignment view',
+        cancel: 'Discard changes and go back',
         generate: 'Generate questions using AI',
         generateMatrix: 'Generate assessment matrix using AI',
         fromBank: 'Add from question bank',
         addContext: 'Create a new reading passage',
         fromLibrary: 'Import from context library',
         fillMatrixGaps: 'Detect gaps in the matrix and generate questions to fill them',
+        shuffleQuestions: 'Randomly shuffle question order (keeps context questions together)',
+        bulkPoints: 'Set points for all questions at once',
       },
     },
 
@@ -319,6 +324,7 @@ export default {
       noTopicError: 'Please add at least one topic before adding questions from the bank',
       questionsAdded: '{{count}} question(s) added to the assignment',
       contextFetchError: 'Failed to fetch reading passages for imported questions',
+      questionsShuffled: 'Questions order shuffled successfully',
 
       // Submission-related
       submitSuccess: 'Assignment submitted successfully!',
@@ -340,6 +346,8 @@ export default {
         addQuestion: 'Add Question',
         generate: 'Generate',
         fromBank: 'From Bank',
+        shuffleQuestions: 'Shuffle Questions',
+        bulkPoints: 'Bulk Points',
         previewMode: 'Preview Mode',
         editMode: 'Edit Mode',
         tooltips: {
@@ -356,6 +364,18 @@ export default {
         title: 'No questions added yet',
         description: 'Start building your assignment by adding questions from the question bank',
       },
+    },
+
+    // Bulk points dialog
+    bulkPointsDialog: {
+      title: 'Bulk Edit Points',
+      description: 'Set points for all questions at once or individually',
+      setAllLabel: 'Set all questions to',
+      setAllPlaceholder: 'Enter points...',
+      setAllButton: 'Apply to All',
+      untitledQuestion: 'Untitled question',
+      cancel: 'Cancel',
+      apply: 'Apply Changes',
     },
 
     // Assignment metadata panel
@@ -1241,6 +1261,7 @@ export default {
     done: 'Done',
     disconnect: 'Disconnect reading passage',
     assignmentOnlyHint: 'Changes only apply to this assignment.',
+    viewQuestions: 'View questions',
   },
 
   submissions: {

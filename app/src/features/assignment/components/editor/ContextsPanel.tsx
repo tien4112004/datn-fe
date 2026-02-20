@@ -38,6 +38,8 @@ export const ContextsPanel = () => {
   const setShowCreateForm = useAssignmentEditorStore((state) => state.setContextCreateFormOpen);
   const showLibraryDialog = useAssignmentEditorStore((state) => state.isContextLibraryDialogOpen);
   const setShowLibraryDialog = useAssignmentEditorStore((state) => state.setContextLibraryDialogOpen);
+  const setMainView = useAssignmentEditorStore((state) => state.setMainView);
+  const setCurrentContextId = useAssignmentEditorStore((state) => state.setCurrentContextId);
 
   const [newTitle, setNewTitle] = useState('');
   const [newContent, setNewContent] = useState('');
@@ -81,6 +83,14 @@ export const ContextsPanel = () => {
     setNewAuthor('');
     setShowCreateForm(false);
   };
+
+  const handleNavigateToContext = useCallback(
+    (contextId: string) => {
+      setMainView('questions');
+      setCurrentContextId(contextId);
+    },
+    [setMainView, setCurrentContextId]
+  );
 
   const handleCancelCreate = () => {
     setNewTitle('');
@@ -147,6 +157,7 @@ export const ContextsPanel = () => {
           questions={questions}
           onUpdate={updateContext}
           onDelete={(ctx) => setDeleteTarget(ctx)}
+          onNavigate={handleNavigateToContext}
         />
       )}
 

@@ -1,7 +1,8 @@
+import { useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
-import { useQuestionBankList } from '../../hooks/useQuestionBankApi';
+import { useInfiniteQuestionBankList } from '../../hooks/useQuestionBankApi';
 import useQuestionBankStore from '../../stores/questionBankStore';
 import { QuestionBankCard } from './QuestionBankCard';
 
@@ -9,11 +10,36 @@ export const QuestionBankGrid = () => {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT);
   const { filters, toggleQuestionSelection, isQuestionSelected } = useQuestionBankStore();
 
-  // Fetch questions from API with current filters
-  const { data, isLoading } = useQuestionBankList(filters);
-  const questions = data?.questions || [];
+  const { questions, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuestionBankList(filters);
 
-  // Loading state
+  // IntersectionObserver sentinel for infinite scroll
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
+
+      if (!node) return;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+          }
+        },
+        { threshold: 0.1 }
+      );
+
+      observer.observe(node);
+      observerRef.current = observer;
+    },
+    [fetchNextPage, hasNextPage, isFetchingNextPage]
+  );
+
+  // Initial loading state
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -35,15 +61,27 @@ export const QuestionBankGrid = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {questions.map((question) => (
-        <QuestionBankCard
-          key={question.id}
-          question={question}
-          isSelected={isQuestionSelected(question.id)}
-          onToggleSelection={toggleQuestionSelection}
-        />
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {questions.map((question) => (
+          <QuestionBankCard
+            key={question.id}
+            question={question}
+            isSelected={isQuestionSelected(question.id)}
+            onToggleSelection={toggleQuestionSelection}
+          />
+        ))}
+      </div>
+
+      {/* Infinite scroll sentinel */}
+      <div ref={loadMoreRef} className="h-4" />
+
+      {/* Loading more indicator */}
+      {isFetchingNextPage && (
+        <div className="flex items-center justify-center py-4">
+          <Loader2 className="text-primary h-6 w-6 animate-spin" />
+        </div>
+      )}
+    </>
   );
 };

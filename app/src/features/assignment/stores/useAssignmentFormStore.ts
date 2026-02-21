@@ -83,6 +83,7 @@ interface AssignmentFormStore {
   removeQuestion: (index: number) => void;
   updateQuestion: (index: number, updates: Partial<AssignmentQuestionWithTopic>) => void;
   reorderQuestions: (oldIndex: number, newIndex: number) => void;
+  setQuestions: (questions: AssignmentQuestionWithTopic[]) => void;
 
   // === ACTIONS: Matrix ===
   createMatrixCell: (cell: Omit<MatrixCell, 'id' | 'currentCount'>) => void;
@@ -360,6 +361,22 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
           },
           false,
           'assignment/reorderQuestions'
+        );
+        dispatchDirtyEvent(true);
+      },
+
+      setQuestions: (questions) => {
+        set(
+          (state) => {
+            const updatedCells = syncMatrixCounts(questions, state.matrix);
+            return {
+              questions,
+              matrix: updatedCells,
+              isDirty: true,
+            };
+          },
+          false,
+          'assignment/setQuestions'
         );
         dispatchDirtyEvent(true);
       },

@@ -2,8 +2,8 @@ import * as React from 'react';
 import { useNavigate, useParams, useLoaderData } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AssignmentEditorLayout } from '../components/editor/AssignmentEditorLayout';
-import { MetadataEditDialog } from '../components/editor/MetadataEditDialog';
-import { QuestionBankImportManager } from '../components/question-bank/QuestionBankImportManager';
+import { MetadataEditDialog } from '../components/editor/metadata/MetadataEditDialog';
+import { QuestionBankImportManager } from '../components/editor/questions/QuestionBankImportManager';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
 import { useAssignmentFormStore } from '../stores/useAssignmentFormStore';
 import { useAssignmentDirtyState } from '../hooks/useAssignmentDirtyState';
@@ -33,7 +33,7 @@ export const AssignmentEditorPage = () => {
     useAssignmentDirtyState();
 
   // Save logic
-  const { save, isSaving } = useSaveAssignment({
+  const { save, saveAndExit, isSaving } = useSaveAssignment({
     id,
     onSaveSuccess: () => {
       saveSuccessRef.current = true;
@@ -59,8 +59,11 @@ export const AssignmentEditorPage = () => {
   }, [id, assignmentData, initialize, markClean]);
 
   const handleCancel = () => {
-    // The blocker will automatically intercept navigation if there are unsaved changes
-    navigate('/projects?resource=assignment');
+    if (id) {
+      navigate(`/assignment/${id}`);
+    } else {
+      navigate('/projects?resource=assignment');
+    }
   };
 
   return (
@@ -73,7 +76,12 @@ export const AssignmentEditorPage = () => {
           </h1>
         </div>
 
-        <AssignmentEditorLayout onCancel={handleCancel} onSave={save} isSaving={isSaving} />
+        <AssignmentEditorLayout
+          onCancel={handleCancel}
+          onSave={save}
+          onSaveAndExit={saveAndExit}
+          isSaving={isSaving}
+        />
 
         {/* Dialogs */}
         <MetadataEditDialog />

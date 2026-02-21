@@ -161,21 +161,21 @@ const router = createBrowserRouter([
       {
         path: 'question-bank',
         lazy: async () => ({
-          Component: (await import('@/features/assignment/pages/TeacherQuestionBankPage'))
+          Component: (await import('@/features/question-bank/pages/TeacherQuestionBankPage'))
             .TeacherQuestionBankPage,
         }),
       },
       {
         path: 'question-bank/generated',
         lazy: async () => ({
-          Component: (await import('@/features/assignment/pages/GeneratedQuestionsPage'))
+          Component: (await import('@/features/question-bank/pages/GeneratedQuestionsPage'))
             .GeneratedQuestionsPage,
         }),
       },
       {
         path: 'question-bank/create',
         lazy: async () => ({
-          Component: (await import('@/features/assignment/pages/QuestionBankEditorPage'))
+          Component: (await import('@/features/question-bank/pages/QuestionBankEditorPage'))
             .QuestionBankEditorPage,
         }),
         // Provide a simple loader so the page can consistently use useLoaderData()
@@ -184,17 +184,18 @@ const router = createBrowserRouter([
       {
         path: 'question-bank/edit/:id',
         lazy: async () => ({
-          Component: (await import('@/features/assignment/pages/QuestionBankEditorPage'))
+          Component: (await import('@/features/question-bank/pages/QuestionBankEditorPage'))
             .QuestionBankEditorPage,
         }),
-        loader: (await import('@/features/assignment/hooks/loaders')).getQuestionById,
+        loader: (await import('@/features/question-bank/hooks/loaders')).getQuestionById,
       },
       {
         path: 'question-bank/:id',
         lazy: async () => ({
-          Component: (await import('@/features/assignment/pages/QuestionBankViewPage')).QuestionBankViewPage,
+          Component: (await import('@/features/question-bank/pages/QuestionBankViewPage'))
+            .QuestionBankViewPage,
         }),
-        loader: (await import('@/features/assignment/hooks/loaders')).getQuestionById,
+        loader: (await import('@/features/question-bank/hooks/loaders')).getQuestionById,
       },
       {
         path: 'assignment/create',
@@ -228,7 +229,7 @@ const router = createBrowserRouter([
       {
         path: 'assignments/:id/submissions',
         lazy: async () => ({
-          Component: (await import('@/features/assignment/pages')).AssignmentSubmissionsPage,
+          Component: (await import('@/features/submission/pages')).AssignmentSubmissionsPage,
         }),
       },
       {
@@ -241,7 +242,7 @@ const router = createBrowserRouter([
       {
         path: 'submissions/:id/grade',
         lazy: async () => ({
-          Component: (await import('@/features/assignment/pages')).TeacherGradingPage,
+          Component: (await import('@/features/submission/pages')).TeacherGradingPage,
         }),
       },
       {
@@ -293,19 +294,19 @@ const router = createBrowserRouter([
       {
         path: 'student/assignments/:id/do',
         lazy: async () => ({
-          Component: (await import('@/features/assignment/pages')).AssignmentDoingPage,
+          Component: (await import('@/features/submission/pages')).AssignmentDoingPage,
         }),
       },
       {
         path: 'student/assignments/:id/submissions',
         lazy: async () => ({
-          Component: (await import('@/features/assignment/pages')).StudentSubmissionsPage,
+          Component: (await import('@/features/submission/pages')).StudentSubmissionsPage,
         }),
       },
       {
         path: 'student/submissions/:id/result',
         lazy: async () => ({
-          Component: (await import('@/features/assignment/pages')).SubmissionResultPage,
+          Component: (await import('@/features/submission/pages')).SubmissionResultPage,
         }),
       },
       {

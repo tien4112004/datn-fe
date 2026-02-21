@@ -282,17 +282,22 @@ export default {
     actions: {
       actions: 'Hành động',
       cancel: 'Hủy',
-      save: 'Lưu bài tập',
+      save: 'Lưu',
+      saveAndExit: 'Lưu & Thoát',
       fillMatrixGaps: 'Tạo câu hỏi từ khoảng trống ma trận',
       saving: 'Đang lưu...',
       tooltips: {
-        save: 'Lưu thay đổi',
+        save: 'Lưu thay đổi và tiếp tục chỉnh sửa',
+        saveAndExit: 'Lưu thay đổi và xem bài tập',
+        cancel: 'Hủy thay đổi và quay lại',
         generate: 'Tạo câu hỏi bằng AI',
         generateMatrix: 'Tạo ma trận đánh giá bằng AI',
         fromBank: 'Thêm từ kho câu hỏi',
         addContext: 'Tạo đoạn văn mới',
         fromLibrary: 'Nhập từ thư viện đoạn văn',
         fillMatrixGaps: 'Phát hiện khoảng trống trong ma trận và tạo câu hỏi để lấp đầy',
+        shuffleQuestions: 'Xáo trộn ngẫu nhiên thứ tự câu hỏi (giữ nhóm đọc hiểu cùng nhau)',
+        bulkPoints: 'Đặt điểm cho tất cả câu hỏi cùng lúc',
       },
     },
 
@@ -319,6 +324,7 @@ export default {
       noTopicError: 'Vui lòng thêm ít nhất một chủ đề trước khi thêm câu hỏi từ ngân hàng',
       questionsAdded: 'Đã thêm {{count}} câu hỏi vào bài tập',
       contextFetchError: 'Không thể tải đoạn văn đọc hiểu cho câu hỏi đã nhập',
+      questionsShuffled: 'Đã xáo trộn thứ tự câu hỏi thành công',
 
       // Submission-related
       submitSuccess: 'Nộp bài thành công!',
@@ -340,6 +346,8 @@ export default {
         addQuestion: 'Thêm câu hỏi',
         generate: 'Tạo sinh',
         fromBank: 'Từ kho',
+        shuffleQuestions: 'Xáo trộn câu hỏi',
+        bulkPoints: 'Điểm hàng loạt',
         previewMode: 'Chế độ xem trước',
         editMode: 'Chế độ chỉnh sửa',
         tooltips: {
@@ -356,6 +364,18 @@ export default {
         title: 'Chưa có câu hỏi nào',
         description: 'Bắt đầu xây dựng bài tập bằng cách thêm câu hỏi từ kho câu hỏi',
       },
+    },
+
+    // Hộp thoại chỉnh sửa điểm hàng loạt
+    bulkPointsDialog: {
+      title: 'Chỉnh sửa điểm hàng loạt',
+      description: 'Đặt điểm cho tất cả câu hỏi cùng lúc hoặc từng câu',
+      setAllLabel: 'Đặt tất cả câu hỏi thành',
+      setAllPlaceholder: 'Nhập điểm...',
+      setAllButton: 'Áp dụng cho tất cả',
+      untitledQuestion: 'Câu hỏi chưa đặt tên',
+      cancel: 'Hủy',
+      apply: 'Áp dụng thay đổi',
     },
 
     // Bảng điều khiển thông tin bài tập
@@ -1228,6 +1248,7 @@ export default {
     done: 'Xong',
     disconnect: 'Ngắt kết nối đoạn văn',
     assignmentOnlyHint: 'Thay đổi chỉ áp dụng cho bài tập này.',
+    viewQuestions: 'Xem câu hỏi',
   },
 
   submissions: {

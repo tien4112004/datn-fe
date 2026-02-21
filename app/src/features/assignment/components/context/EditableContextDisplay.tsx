@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BookOpen, ChevronDown, ChevronUp, Pencil, Unlink, Info, Trash2 } from 'lucide-react';
+import { BookOpen, ChevronDown, ChevronUp, Pencil, Unlink, Info, Trash2, ArrowRight } from 'lucide-react';
 import { Button } from '@ui/button';
 import { Input } from '@ui/input';
 import { Textarea } from '@ui/textarea';
@@ -13,6 +13,7 @@ interface EditableContextDisplayProps {
   onUpdate: (updates: Partial<AssignmentContext>) => void;
   onRemove?: () => void;
   onDelete?: () => void;
+  onNavigate?: () => void;
   refCount?: number;
   defaultCollapsed?: boolean;
   readOnly?: boolean;
@@ -24,6 +25,7 @@ export const EditableContextDisplay = ({
   onUpdate,
   onRemove,
   onDelete,
+  onNavigate,
   refCount,
   defaultCollapsed = false,
   readOnly = false,
@@ -148,6 +150,20 @@ export const EditableContextDisplay = ({
                 {context.author && (
                   <p className="text-muted-foreground text-right text-sm italic">— {context.author}</p>
                 )}
+              </div>
+            )}
+            {onNavigate && (
+              <div className="mt-3 border-t pt-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-1 text-xs text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-950 dark:hover:text-blue-300"
+                  onClick={onNavigate}
+                >
+                  {t('viewQuestions')}
+                  <ArrowRight className="h-3 w-3" />
+                </Button>
               </div>
             )}
           </div>

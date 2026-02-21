@@ -1,23 +1,25 @@
 import { useState } from 'react';
-import { Save, Wand2, Database, Plus, Library, Sparkles } from 'lucide-react';
+import { Save, Wand2, Database, Plus, Library, Sparkles, Shuffle, ListChecks, LogOut, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Button } from '@ui/button';
 import LoadingButton from '@/shared/components/common/LoadingButton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/tooltip';
-import { CurrentQuestionView } from './CurrentQuestionView';
-import { AssignmentMetadataPanel } from './AssignmentMetadataPanel';
-import { MatrixBuilderPanel } from './MatrixBuilderPanel';
-import { ContextsPanel } from './ContextsPanel';
-import { QuestionNavigator } from './QuestionNavigator';
-import { AddQuestionButton } from './AddQuestionButton';
-import { QuestionListDialog } from './QuestionListDialog';
+import { CurrentQuestionView } from './questions/CurrentQuestionView';
+import { AssignmentMetadataPanel } from './metadata/AssignmentMetadataPanel';
+import { MatrixBuilderPanel } from './matrix/MatrixBuilderPanel';
+import { ContextsPanel } from './contexts/ContextsPanel';
+import { QuestionNavigator } from './questions/QuestionNavigator';
+import { AddQuestionButton } from './questions/AddQuestionButton';
 import { QuestionsListViewPanel } from '../viewer/QuestionsListViewPanel';
-import { GenerateQuestionsManager } from './GenerateQuestionsManager';
-import { GenerateMatrixManager } from './GenerateMatrixManager';
-import { FillMatrixGapsManager } from './FillMatrixGapsManager';
-import { MatrixTemplateLibraryDialog } from './MatrixTemplateLibraryDialog';
-import { MatrixTemplateSaveDialog } from './MatrixTemplateSaveDialog';
+import { GenerateQuestionsManager } from './questions/GenerateQuestionsManager';
+import { GenerateMatrixManager } from './matrix/GenerateMatrixManager';
+import { FillMatrixGapsManager } from './matrix/FillMatrixGapsManager';
+import { MatrixTemplateLibraryDialog } from './templates/MatrixTemplateLibraryDialog';
+import { MatrixTemplateSaveDialog } from './templates/MatrixTemplateSaveDialog';
+import { BulkPointsDialog } from './metadata/BulkPointsDialog';
+import { groupQuestionsByContext, flattenQuestionGroups } from '../../utils/questionGrouping';
+import type { GroupingContext } from '../../utils/questionGrouping';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
 import { useGenerateExamFromMatrix } from '../../hooks/useAssignmentApi';
@@ -27,10 +29,16 @@ import type { ExamDraftDto } from '../../types/assignment';
 interface AssignmentEditorLayoutProps {
   onCancel: () => void;
   onSave: () => void;
+  onSaveAndExit: () => void;
   isSaving: boolean;
 }
 
-export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLayoutProps) => {
+export const AssignmentEditorLayout = ({
+  onCancel,
+  onSave,
+  onSaveAndExit,
+  isSaving,
+}: AssignmentEditorLayoutProps) => {
   const mainView = useAssignmentEditorStore((state) => state.mainView);
   const setMainView = useAssignmentEditorStore((state) => state.setMainView);
   const setQuestionBankOpen = useAssignmentEditorStore((state) => state.setQuestionBankOpen);
@@ -56,6 +64,9 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
   const contexts = useAssignmentFormStore((state) => state.contexts);
   const topics = useAssignmentFormStore((state) => state.topics);
   const importMatrixTemplate = useAssignmentFormStore((state) => state.importMatrixTemplate);
+  const setQuestions = useAssignmentFormStore((state) => state.setQuestions);
+  const isBulkPointsDialogOpen = useAssignmentEditorStore((state) => state.isBulkPointsDialogOpen);
+  const setBulkPointsDialogOpen = useAssignmentEditorStore((state) => state.setBulkPointsDialogOpen);
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor' });
   const { t: tFillGaps } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.fillMatrixGaps' });
   const { t: tToolbar } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
@@ -103,6 +114,25 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
     } finally {
       setIsFillMatrixLoading(false);
     }
+  };
+
+  const handleShuffleQuestions = () => {
+    if (questions.length < 2) return;
+
+    const contextsMap = new Map<string, GroupingContext>();
+    contexts.forEach((ctx) => contextsMap.set(ctx.id, ctx));
+
+    const groups = groupQuestionsByContext(questions, contextsMap);
+
+    // Fisher-Yates shuffle on groups
+    const shuffled = [...groups];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    setQuestions(flattenQuestionGroups(shuffled));
+    toast.success(String(t('toasts.questionsShuffled')));
   };
 
   return (
@@ -185,6 +215,42 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>{tActions('tooltips.fromBank')}</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={handleShuffleQuestions}
+                      disabled={questions.length < 2}
+                      className="w-full"
+                    >
+                      <Shuffle className="mr-2 h-4 w-4" />
+                      {tToolbar('shuffleQuestions')}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{tActions('tooltips.shuffleQuestions')}</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setBulkPointsDialogOpen(true)}
+                      disabled={questions.length === 0}
+                      className="w-full"
+                    >
+                      <ListChecks className="mr-2 h-4 w-4" />
+                      {tToolbar('bulkPoints')}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{tActions('tooltips.bulkPoints')}</p>
                   </TooltipContent>
                 </Tooltip>
               </div>
@@ -368,12 +434,43 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
                 <p>{tActions('tooltips.save')}</p>
               </TooltipContent>
             </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <LoadingButton
+                  onClick={onSaveAndExit}
+                  loading={isSaving}
+                  loadingText={t('actions.saving')}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  {tActions('saveAndExit')}
+                </LoadingButton>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{tActions('tooltips.saveAndExit')}</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  disabled={isSaving}
+                  className="w-full"
+                  onClick={onCancel}
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  {t('actions.cancel')}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{tActions('tooltips.cancel')}</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
         </div>
       </div>
-
-      {/* Question List Dialog */}
-      <QuestionListDialog />
 
       {/* Matrix Template Library Dialog */}
       <MatrixTemplateLibraryDialog
@@ -393,6 +490,9 @@ export const AssignmentEditorLayout = ({ onSave, isSaving }: AssignmentEditorLay
         subject={subject}
         grade={grade}
       />
+
+      {/* Bulk Points Dialog */}
+      <BulkPointsDialog open={isBulkPointsDialogOpen} onOpenChange={setBulkPointsDialogOpen} />
     </div>
   );
 };

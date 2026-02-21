@@ -1,4 +1,5 @@
-export * from './useQuestionBankApi';
+// Re-export from question-bank feature for backward compatibility
+export * from '@/features/question-bank/hooks/useQuestionBankApi';
 export * from './useDirtyFormTracking';
 export {
   useAssignmentList,
@@ -9,6 +10,7 @@ export {
   useUpdateAssignment,
   useDeleteAssignment,
 } from './useAssignmentApi';
+// Re-export from submission feature for backward compatibility
 export {
   useSubmissionsByPost,
   useSubmissionsByAssignment,
@@ -16,7 +18,7 @@ export {
   useCreateSubmission,
   useGradeSubmission,
   useDeleteSubmission,
-} from './useSubmissionApi';
+} from '@/features/submission/hooks';
 
 // Re-export context hooks from context feature for backward compatibility
 export { useContextList, useContext, contextKeys } from '@/features/context';

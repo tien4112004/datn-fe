@@ -284,7 +284,7 @@ export default {
       cancel: 'Hủy',
       save: 'Lưu',
       saveAndExit: 'Lưu & Thoát',
-      fillMatrixGaps: 'Tạo câu hỏi từ khoảng trống ma trận',
+      fillMatrixGaps: 'Tạo câu hỏi từ ma trận',
       saving: 'Đang lưu...',
       tooltips: {
         save: 'Lưu thay đổi và tiếp tục chỉnh sửa',
@@ -348,9 +348,9 @@ export default {
       addFromBank: 'Thêm từ kho',
       toolbar: {
         addQuestion: 'Thêm câu hỏi',
-        generate: 'Tạo sinh',
+        generate: 'Tạo sinh câu hỏi',
         generateFromContext: 'Tạo từ đoạn văn',
-        fromBank: 'Từ kho',
+        fromBank: 'Thêm từ kho',
         shuffleQuestions: 'Xáo trộn câu hỏi',
         bulkPoints: 'Điểm hàng loạt',
         previewMode: 'Chế độ xem trước',

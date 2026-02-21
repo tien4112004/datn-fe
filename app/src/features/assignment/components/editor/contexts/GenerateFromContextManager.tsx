@@ -334,7 +334,7 @@ export const GenerateFromContextManager = () => {
               </Tooltip>
             </div>
             <div
-              className={`space-y-3 ${validationErrors.difficulty ? 'rounded-md border-2 border-red-500 p-2' : ''}`}
+              className={`grid grid-cols-3 gap-4 ${validationErrors.difficulty ? 'rounded-md border-2 border-red-500 p-2' : ''}`}
             >
               {difficulties.map((difficulty) => (
                 <div key={difficulty.value} className="flex items-center gap-4">

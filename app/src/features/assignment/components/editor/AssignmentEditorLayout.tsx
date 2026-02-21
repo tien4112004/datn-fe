@@ -1,5 +1,17 @@
-import { useState, useMemo } from 'react';
-import { Save, Wand2, Database, Plus, Library, Sparkles, Shuffle, ListChecks, LogOut, X } from 'lucide-react';
+import { useState, useMemo, Fragment, type ReactNode } from 'react';
+import {
+  Save,
+  Wand2,
+  Database,
+  Plus,
+  Library,
+  Sparkles,
+  Shuffle,
+  ListChecks,
+  LogOut,
+  X,
+  type LucideIcon,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Button } from '@ui/button';
@@ -91,17 +103,17 @@ export const AssignmentEditorLayout = ({
   const handleFillMatrixGaps = async () => {
     // Validate matrix exists and has requirements
     if (!matrix || matrix.length === 0) {
-      toast.error(String(tFillGaps('errors.noMatrix')));
+      toast.error(tFillGaps('errors.noMatrix'));
       return;
     }
 
     if (!matrix.some((cell) => cell.requiredCount > 0)) {
-      toast.error(String(tFillGaps('errors.noRequirements')));
+      toast.error(tFillGaps('errors.noRequirements'));
       return;
     }
 
     if (!grade || !subject) {
-      toast.error(String(tFillGaps('errors.missingMetadata')));
+      toast.error(tFillGaps('errors.missingMetadata'));
       return;
     }
 
@@ -118,7 +130,7 @@ export const AssignmentEditorLayout = ({
       setFillMatrixDraft(result);
       setMainView('fillMatrixGaps');
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(tFillGaps('errors.detectionFailed'));
+      const errorMessage = err instanceof Error ? err.message : tFillGaps('errors.detectionFailed');
       toast.error(errorMessage);
     } finally {
       setIsFillMatrixLoading(false);
@@ -141,7 +153,7 @@ export const AssignmentEditorLayout = ({
     }
 
     setQuestions(flattenQuestionGroups(shuffled));
-    toast.success(String(t('toasts.questionsShuffled')));
+    toast.success(t('toasts.questionsShuffled'));
   };
 
   const handleShuffleContextQuestions = () => {
@@ -169,8 +181,114 @@ export const AssignmentEditorLayout = ({
     });
 
     setQuestions(shuffledQuestions);
-    toast.success(String(t('toasts.contextQuestionsShuffled')));
+    toast.success(t('toasts.contextQuestionsShuffled'));
   };
+
+  const isContextGroup = mainView === 'contextGroup';
+
+  const actionRegistry: Record<ActionKey, ActionConfig> = {
+    addQuestion: {
+      icon: Plus,
+      label: '',
+      tooltip: '',
+      onClick: () => {},
+      render: () => (
+        <AddQuestionButton
+          className="w-full"
+          contextId={isContextGroup ? (currentContextId ?? undefined) : undefined}
+        />
+      ),
+    },
+    generate: {
+      icon: Wand2,
+      label: tToolbar('generate'),
+      tooltip: tActions('tooltips.generate'),
+      onClick: () => setMainView('generateQuestions'),
+    },
+    fromBank: {
+      icon: Database,
+      label: tToolbar('fromBank'),
+      tooltip: tActions('tooltips.fromBank'),
+      onClick: () => setQuestionBankOpen(true),
+    },
+    shuffle: {
+      icon: Shuffle,
+      label: tToolbar('shuffleQuestions'),
+      tooltip: isContextGroup
+        ? tActions('tooltips.shuffleContextQuestions')
+        : tActions('tooltips.shuffleQuestions'),
+      onClick: isContextGroup ? handleShuffleContextQuestions : handleShuffleQuestions,
+      disabled: isContextGroup ? contextQuestions.length < 2 : questions.length < 2,
+    },
+    bulkPoints: {
+      icon: ListChecks,
+      label: tToolbar('bulkPoints'),
+      tooltip: isContextGroup ? tActions('tooltips.bulkPointsContext') : tActions('tooltips.bulkPoints'),
+      onClick: () => setBulkPointsDialogOpen(true),
+      disabled: isContextGroup ? contextQuestions.length === 0 : questions.length === 0,
+    },
+    generateFromContext: {
+      icon: Wand2,
+      label: tToolbar('generateFromContext'),
+      tooltip: tActions('tooltips.generateFromContext'),
+      onClick: () => setMainView('generateFromContext'),
+    },
+    addTopic: {
+      icon: Plus,
+      label: t('matrixEditor.addTopic'),
+      tooltip: t('matrixBuilder.tooltips.addTopic'),
+      onClick: () => window.dispatchEvent(new CustomEvent('matrix.addTopic')),
+    },
+    generateMatrix: {
+      icon: Wand2,
+      label: t('matrixBuilder.generateMatrix'),
+      tooltip: tActions('tooltips.generateMatrix'),
+      onClick: () => setMainView('generateMatrix'),
+    },
+    fillMatrixGaps: {
+      icon: Sparkles,
+      label: t('actions.fillMatrixGaps'),
+      tooltip: t('actions.tooltips.fillMatrixGaps'),
+      onClick: handleFillMatrixGaps,
+      disabled: isFillMatrixLoading,
+    },
+    templateLibrary: {
+      icon: Library,
+      label: tMatrixActions('templateLibrary'),
+      tooltip:
+        !subject || !grade
+          ? tMatrixActions('templateLibraryDisabled')
+          : tMatrixActions('templateLibraryTooltip'),
+      onClick: () => setMatrixTemplateLibraryDialogOpen(true),
+      disabled: !subject || !grade,
+    },
+    saveAsTemplate: {
+      icon: Save,
+      label: tMatrixActions('saveAsTemplate'),
+      tooltip:
+        !subject || !grade
+          ? tMatrixActions('saveAsTemplateDisabledMetadata')
+          : !matrix || matrix.length === 0
+            ? tMatrixActions('saveAsTemplateDisabledMatrix')
+            : tMatrixActions('saveAsTemplateTooltip'),
+      onClick: () => setMatrixTemplateSaveDialogOpen(true),
+      disabled: !matrix || matrix.length === 0 || !subject || !grade,
+    },
+    addContext: {
+      icon: Plus,
+      label: tContextsPanel('addContext'),
+      tooltip: tActions('tooltips.addContext'),
+      onClick: () => setContextCreateFormOpen(true),
+    },
+    fromLibrary: {
+      icon: Library,
+      label: tContextsPanel('fromLibrary'),
+      tooltip: tActions('tooltips.fromLibrary'),
+      onClick: () => setContextLibraryDialogOpen(true),
+    },
+  };
+
+  const viewActions = VIEW_ACTIONS[mainView] ?? [];
 
   return (
     <div className="grid grid-cols-1 gap-6 pb-4 lg:h-[calc(100vh-8rem)] lg:grid-cols-4">
@@ -219,326 +337,16 @@ export const AssignmentEditorLayout = ({
             {t('actions.actions')}
           </div>
 
-          {/* Question Actions - Only show when not in matrix/contexts/contextGroup/generateMatrix/generateFromContext view */}
-          {mainView !== 'matrix' &&
-            mainView !== 'contexts' &&
-            mainView !== 'contextGroup' &&
-            mainView !== 'generateMatrix' &&
-            mainView !== 'generateFromContext' && (
-              <>
-                <div className="space-y-2">
-                  <AddQuestionButton className="w-full" />
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setMainView('generateQuestions')}
-                        className="w-full"
-                      >
-                        <Wand2 className="mr-2 h-4 w-4" />
-                        {tToolbar('generate')}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{tActions('tooltips.generate')}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setQuestionBankOpen(true)}
-                        className="w-full"
-                      >
-                        <Database className="mr-2 h-4 w-4" />
-                        {tToolbar('fromBank')}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{tActions('tooltips.fromBank')}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={handleShuffleQuestions}
-                        disabled={questions.length < 2}
-                        className="w-full"
-                      >
-                        <Shuffle className="mr-2 h-4 w-4" />
-                        {tToolbar('shuffleQuestions')}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{tActions('tooltips.shuffleQuestions')}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setBulkPointsDialogOpen(true)}
-                        disabled={questions.length === 0}
-                        className="w-full"
-                      >
-                        <ListChecks className="mr-2 h-4 w-4" />
-                        {tToolbar('bulkPoints')}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{tActions('tooltips.bulkPoints')}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-
-                {/* Divider */}
-                <div className="border-t pt-3" />
-              </>
-            )}
-
-          {/* Context Group Actions - Show in contextGroup view */}
-          {mainView === 'contextGroup' && (
+          {/* View-specific Actions */}
+          {viewActions.length > 0 && (
             <>
               <div className="space-y-2">
-                <AddQuestionButton className="w-full" contextId={currentContextId ?? undefined} />
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setQuestionBankOpen(true)}
-                      className="w-full"
-                    >
-                      <Database className="mr-2 h-4 w-4" />
-                      {tToolbar('fromBank')}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{tActions('tooltips.fromBank')}</p>
-                  </TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setBulkPointsDialogOpen(true)}
-                      disabled={contextQuestions.length === 0}
-                      className="w-full"
-                    >
-                      <ListChecks className="mr-2 h-4 w-4" />
-                      {tToolbar('bulkPoints')}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{tActions('tooltips.bulkPointsContext')}</p>
-                  </TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={handleShuffleContextQuestions}
-                      disabled={contextQuestions.length < 2}
-                      className="w-full"
-                    >
-                      <Shuffle className="mr-2 h-4 w-4" />
-                      {tToolbar('shuffleQuestions')}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{tActions('tooltips.shuffleContextQuestions')}</p>
-                  </TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setMainView('generateFromContext')}
-                      className="w-full"
-                    >
-                      <Wand2 className="mr-2 h-4 w-4" />
-                      {tToolbar('generateFromContext')}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{tActions('tooltips.generateFromContext')}</p>
-                  </TooltipContent>
-                </Tooltip>
+                {viewActions.map((key) => {
+                  const action = actionRegistry[key];
+                  if (action.render) return <Fragment key={key}>{action.render()}</Fragment>;
+                  return <ActionButton key={key} {...action} />;
+                })}
               </div>
-
-              {/* Divider */}
-              <div className="border-t pt-3" />
-            </>
-          )}
-
-          {/* Matrix Actions - Show in matrix and generateMatrix views */}
-          {(mainView === 'matrix' || mainView === 'generateMatrix') && (
-            <>
-              <div className="space-y-2">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        window.dispatchEvent(new CustomEvent('matrix.addTopic'));
-                      }}
-                      className="w-full"
-                    >
-                      <Plus className="mr-2 h-4 w-4" />
-                      {t('matrixEditor.addTopic')}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{t('matrixBuilder.tooltips.addTopic')}</p>
-                  </TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setMainView('generateMatrix')}
-                      className="w-full"
-                    >
-                      <Wand2 className="mr-2 h-4 w-4" />
-                      {t('matrixBuilder.generateMatrix')}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{tActions('tooltips.generateMatrix')}</p>
-                  </TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={handleFillMatrixGaps}
-                      disabled={isFillMatrixLoading}
-                      className="w-full"
-                    >
-                      <Sparkles className="mr-2 h-4 w-4" />
-                      {String(t('actions.fillMatrixGaps'))}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{String(t('actions.tooltips.fillMatrixGaps'))}</p>
-                  </TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setMatrixTemplateLibraryDialogOpen(true)}
-                      disabled={!subject || !grade}
-                      className="w-full"
-                    >
-                      <Library className="mr-2 h-4 w-4" />
-                      {tMatrixActions('templateLibrary')}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>
-                      {!subject || !grade
-                        ? tMatrixActions('templateLibraryDisabled')
-                        : tMatrixActions('templateLibraryTooltip')}
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setMatrixTemplateSaveDialogOpen(true)}
-                      disabled={!matrix || matrix.length === 0 || !subject || !grade}
-                      className="w-full"
-                    >
-                      <Save className="mr-2 h-4 w-4" />
-                      {tMatrixActions('saveAsTemplate')}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>
-                      {!subject || !grade
-                        ? tMatrixActions('saveAsTemplateDisabledMetadata')
-                        : !matrix || matrix.length === 0
-                          ? tMatrixActions('saveAsTemplateDisabledMatrix')
-                          : tMatrixActions('saveAsTemplateTooltip')}
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-
-              {/* Divider */}
-              <div className="border-t pt-3" />
-            </>
-          )}
-
-          {/* Context Actions - Only show in contexts view */}
-          {mainView === 'contexts' && (
-            <>
-              <div className="space-y-2">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setContextCreateFormOpen(true)}
-                      className="w-full"
-                    >
-                      <Plus className="mr-2 h-4 w-4" />
-                      {tContextsPanel('addContext')}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{tActions('tooltips.addContext')}</p>
-                  </TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setContextLibraryDialogOpen(true)}
-                      className="w-full"
-                    >
-                      <Library className="mr-2 h-4 w-4" />
-                      {tContextsPanel('fromLibrary')}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{tActions('tooltips.fromLibrary')}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-
-              {/* Divider */}
               <div className="border-t pt-3" />
             </>
           )}
@@ -627,3 +435,61 @@ export const AssignmentEditorLayout = ({
     </div>
   );
 };
+
+type ActionKey =
+  | 'addQuestion'
+  | 'generate'
+  | 'fromBank'
+  | 'shuffle'
+  | 'bulkPoints'
+  | 'generateFromContext'
+  | 'addTopic'
+  | 'generateMatrix'
+  | 'fillMatrixGaps'
+  | 'templateLibrary'
+  | 'saveAsTemplate'
+  | 'addContext'
+  | 'fromLibrary';
+
+type ActionConfig = {
+  icon: LucideIcon;
+  label: string;
+  tooltip: string;
+  onClick: () => void;
+  disabled?: boolean;
+  render?: () => ReactNode;
+};
+
+const VIEW_ACTIONS: Record<string, ActionKey[]> = {
+  info: ['addQuestion', 'generate', 'fromBank', 'shuffle', 'bulkPoints'],
+  questions: ['addQuestion', 'generate', 'fromBank'],
+  questionsList: ['addQuestion', 'generate', 'fromBank', 'shuffle', 'bulkPoints'],
+  generateQuestions: ['addQuestion', 'generate', 'fromBank', 'shuffle', 'bulkPoints'],
+  fillMatrixGaps: ['addQuestion', 'generate', 'fromBank', 'shuffle', 'bulkPoints'],
+  contextGroup: ['addQuestion', 'fromBank', 'bulkPoints', 'shuffle', 'generateFromContext'],
+  matrix: ['addTopic', 'generateMatrix', 'fillMatrixGaps', 'templateLibrary', 'saveAsTemplate'],
+  generateMatrix: ['addTopic', 'generateMatrix', 'fillMatrixGaps', 'templateLibrary', 'saveAsTemplate'],
+  contexts: ['addContext', 'fromLibrary'],
+  generateFromContext: [],
+};
+
+const ActionButton = ({ icon: Icon, label, tooltip, onClick, disabled }: Omit<ActionConfig, 'render'>) => (
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <Button
+        type="button"
+        size="sm"
+        variant="outline"
+        onClick={onClick}
+        disabled={disabled}
+        className="w-full"
+      >
+        <Icon className="mr-2 h-4 w-4" />
+        {label}
+      </Button>
+    </TooltipTrigger>
+    <TooltipContent>
+      <p>{tooltip}</p>
+    </TooltipContent>
+  </Tooltip>
+);

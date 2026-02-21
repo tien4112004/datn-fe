@@ -367,7 +367,7 @@ export function QuestionBankEditorPage() {
                       }
                       disabled={!questionData.subject || !questionData.grade}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full truncate">
                         <SelectValue
                           placeholder={
                             !questionData.subject || !questionData.grade

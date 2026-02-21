@@ -467,6 +467,13 @@ export default {
     },
   },
 
+  generatedResults: {
+    generationComplete: 'Tạo hoàn tất',
+    successMessage: 'Đã tạo thành công {{count}} câu hỏi',
+    prompt: 'Yêu cầu',
+    noQuestions: 'Không có câu hỏi được tạo',
+  },
+
   submissionsResult: {
     notFound: 'Không tìm thấy bài nộp',
     yourGradedSubmission: 'Bài nộp đã được chấm của bạn',

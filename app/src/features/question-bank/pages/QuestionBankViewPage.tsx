@@ -35,7 +35,7 @@ import {
   getDifficultyBadgeClass,
   getQuestionTypeBadgeClass,
 } from '@aiprimary/core';
-import { Edit3, Copy, Trash2 } from 'lucide-react';
+import { ArrowLeft, Edit3, Copy, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function QuestionBankViewPage() {
@@ -84,6 +84,10 @@ export function QuestionBankViewPage() {
           {/* Header */}
           <div className="mb-8 flex items-center justify-between">
             <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+                <ArrowLeft className="h-5 w-5" />
+                <span className="sr-only">{t('actions.back')}</span>
+              </Button>
               <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">{t('pageTitle')}</h1>
             </div>
 
@@ -219,15 +223,6 @@ export function QuestionBankViewPage() {
 
             <QuestionRenderer question={question as Question} viewMode={VIEW_MODE.VIEWING} />
           </div>
-
-          {/* Explanation Section */}
-          {question.explanation && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">{t('sections.explanation')}</h3>
-              <Separator />
-              <MarkdownPreview content={question.explanation} />
-            </div>
-          )}
 
           {/* Timestamps */}
           {(question.createdAt || question.updatedAt) && (

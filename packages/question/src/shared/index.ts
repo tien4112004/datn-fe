@@ -8,4 +8,5 @@ export { ExplanationSection } from './ExplanationSection';
 export type { ExplanationMode } from './ExplanationSection';
 export { GradeFeedback } from './GradeFeedback';
 export { GradeDisplay } from './GradeDisplay';
+export { GeneratedQuestionsResultList } from './GeneratedQuestionsResultList';
 export { indexToLetter } from './numberingUtils';

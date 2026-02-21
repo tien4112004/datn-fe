@@ -465,6 +465,13 @@ export default {
     },
   },
 
+  generatedResults: {
+    generationComplete: 'Generation Complete',
+    successMessage: 'Successfully generated {{count}} question(s)',
+    prompt: 'Prompt',
+    noQuestions: 'No generated questions',
+  },
+
   submissionsResult: {
     notFound: 'Submission not found',
     yourGradedSubmission: 'Your Graded Submission',

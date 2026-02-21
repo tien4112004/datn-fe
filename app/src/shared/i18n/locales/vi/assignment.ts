@@ -812,12 +812,17 @@ export default {
     noQuestions: 'Không có câu hỏi được tạo để hiển thị',
     backToQuestionBank: 'Quay lại ngân hàng câu hỏi',
     generateMore: 'Tạo thêm',
+    selectAll: 'Chọn tất cả',
     toast: {
       deleteSuccess: 'Xóa câu hỏi thành công',
       deleteError: 'Không thể xóa câu hỏi',
+      updateSuccess: 'Cập nhật câu hỏi thành công',
+      updateError: 'Không thể cập nhật câu hỏi',
     },
     actions: {
       edit: 'Chỉnh sửa',
+      save: 'Lưu',
+      cancel: 'Hủy',
       delete: 'Xóa',
       deleteSelected: 'Xóa đã chọn',
     },
@@ -827,6 +832,15 @@ export default {
       },
     },
     selectedCount: '{{count}} câu hỏi đã chọn',
+
+    // Result panel (assignment editor context)
+    resultPanel: {
+      generationComplete: 'Tạo hoàn tất',
+      successMessage: 'Đã tạo thành công {{count}} câu hỏi',
+      backToForm: 'Quay lại biểu mẫu',
+      newGeneration: 'Tạo mới',
+      addToAssignment: 'Thêm vào bài tập',
+    },
   },
 
   teacherQuestionBank: {
@@ -1010,6 +1024,7 @@ export default {
     },
     actions: {
       title: 'Hành động',
+      back: 'Quay lại',
       edit: 'Chỉnh sửa',
       duplicate: 'Nhân bản',
       delete: 'Xóa câu hỏi',

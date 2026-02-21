@@ -822,12 +822,17 @@ export default {
     noQuestions: 'No generated questions to display',
     backToQuestionBank: 'Back to Question Bank',
     generateMore: 'Generate More',
+    selectAll: 'Select all',
     toast: {
       deleteSuccess: 'Question(s) deleted successfully',
       deleteError: 'Failed to delete question(s)',
+      updateSuccess: 'Question updated successfully',
+      updateError: 'Failed to update question',
     },
     actions: {
       edit: 'Edit',
+      save: 'Save',
+      cancel: 'Cancel',
       delete: 'Delete',
       deleteSelected: 'Delete Selected',
     },
@@ -837,6 +842,15 @@ export default {
       },
     },
     selectedCount: '{{count}} question(s) selected',
+
+    // Result panel (assignment editor context)
+    resultPanel: {
+      generationComplete: 'Generation Complete',
+      successMessage: 'Successfully generated {{count}} question(s)',
+      backToForm: 'Back to Form',
+      newGeneration: 'New Generation',
+      addToAssignment: 'Add to Assignment',
+    },
   },
 
   teacherQuestionBank: {
@@ -1021,6 +1035,7 @@ export default {
     },
     actions: {
       title: 'Actions',
+      back: 'Back',
       edit: 'Edit Question',
       duplicate: 'Duplicate Question',
       delete: 'Delete Question',

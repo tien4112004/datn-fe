@@ -81,7 +81,7 @@ export const SeatingChartConfig = ({
                 min={1}
                 max={20}
                 value={cols}
-                onValueChange={(val: number) => setCols(val)}
+                onValueChange={(val) => val != null && setCols(val)}
                 className="w-full"
               />
             </div>
@@ -95,7 +95,7 @@ export const SeatingChartConfig = ({
                 min={1}
                 max={20}
                 value={rows}
-                onValueChange={(val: number) => setRows(val)}
+                onValueChange={(val) => val != null && setRows(val)}
                 className="w-full"
               />
             </div>
@@ -109,7 +109,7 @@ export const SeatingChartConfig = ({
                 min={1}
                 max={10}
                 value={separatorInterval}
-                onValueChange={(val: number) => setSeparatorInterval(val)}
+                onValueChange={(val) => val != null && setSeparatorInterval(val)}
                 className="w-full"
               />
             </div>

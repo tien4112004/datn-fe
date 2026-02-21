@@ -34,9 +34,17 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onBeforeUnmount, ref, watch, computed, provide, getCurrentInstance } from 'vue';
+import {
+  onMounted,
+  onBeforeUnmount,
+  ref,
+  watch,
+  computed,
+  provide,
+  getCurrentInstance,
+  onUnmounted,
+} from 'vue';
 import { storeToRefs } from 'pinia';
-import { nanoid } from 'nanoid';
 import {
   useScreenStore,
   useMainStore,
@@ -48,7 +56,6 @@ import {
 import { LOCALSTORAGE_KEY_DISCARDED_DB } from '@/configs/storage';
 import { deleteDiscardedDB } from '@/utils/database';
 import { isPC } from '@/utils/common';
-import type { Slide } from '@/types/slides';
 
 import Editor from '../views/Editor/index.vue';
 import Mobile from '../views/Mobile/index.vue';
@@ -59,7 +66,6 @@ import type { PresentationGenerationRequest } from '../types/generation';
 import { usePresentationProcessor } from '@/hooks/usePresentationProcessor';
 import { useGenerationStore } from '@/store/generation';
 import { useSavePresentation } from '@/hooks/useSavePresentation';
-import { getPresentationApi } from '@/services/presentation/api';
 import useGlobalHotkey from '@/hooks/useGlobalHotkey';
 
 const _isPC = isPC();

@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { Button } from '@ui/button';
 import LoadingButton from '@/shared/components/common/LoadingButton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/tooltip';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@ui/sheet';
 import { CurrentQuestionView } from './questions/CurrentQuestionView';
 import { AssignmentMetadataPanel } from './metadata/AssignmentMetadataPanel';
 import { MatrixBuilderPanel } from './matrix/MatrixBuilderPanel';
@@ -45,6 +46,8 @@ interface AssignmentEditorLayoutProps {
   onSave: () => void;
   onSaveAndExit: () => void;
   isSaving: boolean;
+  sidebarOpen: boolean;
+  onSidebarOpenChange: (open: boolean) => void;
 }
 
 export const AssignmentEditorLayout = ({
@@ -52,6 +55,8 @@ export const AssignmentEditorLayout = ({
   onSave,
   onSaveAndExit,
   isSaving,
+  sidebarOpen,
+  onSidebarOpenChange,
 }: AssignmentEditorLayoutProps) => {
   const mainView = useAssignmentEditorStore((state) => state.mainView);
   const setMainView = useAssignmentEditorStore((state) => state.setMainView);
@@ -290,8 +295,82 @@ export const AssignmentEditorLayout = ({
 
   const viewActions = VIEW_ACTIONS[mainView] ?? [];
 
+  const sidebarContent = (
+    <div className="space-y-6">
+      <QuestionNavigator />
+
+      <div className="space-y-3 rounded-lg border bg-white p-4 dark:bg-gray-900">
+        <div className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+          {t('actions.actions')}
+        </div>
+
+        {/* View-specific Actions */}
+        {viewActions.length > 0 && (
+          <>
+            <div className="space-y-2">
+              {viewActions.map((key) => {
+                const action = actionRegistry[key];
+                if (action.render) return <Fragment key={key}>{action.render()}</Fragment>;
+                return <ActionButton key={key} {...action} />;
+              })}
+            </div>
+            <div className="border-t pt-3" />
+          </>
+        )}
+
+        {/* Save/Cancel Actions */}
+        <div className="space-y-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <LoadingButton
+                onClick={onSave}
+                loading={isSaving}
+                loadingText={t('actions.saving')}
+                className="w-full"
+              >
+                <Save className="mr-2 h-4 w-4" />
+                {t('actions.save')}
+              </LoadingButton>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{tActions('tooltips.save')}</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <LoadingButton
+                onClick={onSaveAndExit}
+                loading={isSaving}
+                loadingText={t('actions.saving')}
+                variant="outline"
+                className="w-full"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                {tActions('saveAndExit')}
+              </LoadingButton>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{tActions('tooltips.saveAndExit')}</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button type="button" variant="ghost" disabled={isSaving} className="w-full" onClick={onCancel}>
+                <X className="mr-2 h-4 w-4" />
+                {t('actions.cancel')}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{tActions('tooltips.cancel')}</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="grid grid-cols-1 gap-6 pb-4 lg:h-[calc(100vh-8rem)] lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-6 pb-4 lg:h-full lg:grid-cols-4">
       {/* Left/Main: Content Area (75% width on large screens) */}
       <div className="lg:col-span-3 lg:overflow-y-auto lg:pr-2">
         {mainView === 'info' ? (
@@ -327,85 +406,18 @@ export const AssignmentEditorLayout = ({
         ) : null}
       </div>
 
-      {/* Right: Sidebar (25% width on large screens) */}
-      <div className="space-y-6 lg:overflow-y-auto lg:pr-2">
-        {/* Navigation */}
-        <QuestionNavigator />
+      {/* Right: Sidebar (25% width on large screens, hidden on mobile) */}
+      <div className="hidden space-y-6 lg:block lg:overflow-y-auto lg:pr-2">{sidebarContent}</div>
 
-        <div className="space-y-3 rounded-lg border bg-white p-4 dark:bg-gray-900">
-          <div className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-            {t('actions.actions')}
-          </div>
-
-          {/* View-specific Actions */}
-          {viewActions.length > 0 && (
-            <>
-              <div className="space-y-2">
-                {viewActions.map((key) => {
-                  const action = actionRegistry[key];
-                  if (action.render) return <Fragment key={key}>{action.render()}</Fragment>;
-                  return <ActionButton key={key} {...action} />;
-                })}
-              </div>
-              <div className="border-t pt-3" />
-            </>
-          )}
-
-          {/* Save/Cancel Actions */}
-          <div className="space-y-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <LoadingButton
-                  onClick={onSave}
-                  loading={isSaving}
-                  loadingText={t('actions.saving')}
-                  className="w-full"
-                >
-                  <Save className="mr-2 h-4 w-4" />
-                  {t('actions.save')}
-                </LoadingButton>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{tActions('tooltips.save')}</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <LoadingButton
-                  onClick={onSaveAndExit}
-                  loading={isSaving}
-                  loadingText={t('actions.saving')}
-                  variant="outline"
-                  className="w-full"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  {tActions('saveAndExit')}
-                </LoadingButton>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{tActions('tooltips.saveAndExit')}</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  disabled={isSaving}
-                  className="w-full"
-                  onClick={onCancel}
-                >
-                  <X className="mr-2 h-4 w-4" />
-                  {t('actions.cancel')}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{tActions('tooltips.cancel')}</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        </div>
-      </div>
+      {/* Mobile: Sheet drawer (trigger is in the page header) */}
+      <Sheet open={sidebarOpen} onOpenChange={onSidebarOpenChange}>
+        <SheetContent side="right" className="w-80 overflow-y-auto" aria-describedby={undefined}>
+          <SheetHeader>
+            <SheetTitle>{t('actions.actions')}</SheetTitle>
+          </SheetHeader>
+          <div className="mt-4">{sidebarContent}</div>
+        </SheetContent>
+      </Sheet>
 
       {/* Matrix Template Library Dialog */}
       <MatrixTemplateLibraryDialog

@@ -1253,6 +1253,7 @@ export default {
 
   view: {
     pageTitle: 'View Assignment',
+    sidebar: 'Navigation',
     notFound: 'Assignment not found',
     notFoundDescription: 'The assignment you are looking for does not exist or has been deleted.',
     noDescription: 'No description provided',

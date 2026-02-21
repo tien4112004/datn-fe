@@ -1241,6 +1241,7 @@ export default {
 
   view: {
     pageTitle: 'Xem bài tập',
+    sidebar: 'Điều hướng',
     notFound: 'Không tìm thấy bài tập',
     notFoundDescription: 'Bài tập bạn đang tìm không tồn tại hoặc đã bị xóa.',
     noDescription: 'Chưa có mô tả',

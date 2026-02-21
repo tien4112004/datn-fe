@@ -3,6 +3,7 @@ import type { User, LoginRequest, LoginResponse } from './auth';
 import type {
   ApiResponse,
   PaginationParams,
+  ContextFilterParams,
   UserQueryParams,
   SlideTemplateParams,
   FAQPost,
@@ -100,7 +101,7 @@ export interface AdminApiService extends Service {
   ): Promise<ApiResponse<import('./questionBank').ChapterResponse[]>>;
 
   // Contexts
-  getContexts(params?: PaginationParams): Promise<ApiResponse<Context[]>>;
+  getContexts(params?: ContextFilterParams): Promise<ApiResponse<Context[]>>;
   getContextById(id: string): Promise<ApiResponse<Context>>;
   createContext(data: Omit<Context, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Context>>;
   updateContext(

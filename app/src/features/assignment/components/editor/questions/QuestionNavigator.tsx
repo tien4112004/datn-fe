@@ -139,7 +139,7 @@ export const QuestionNavigator = () => {
   };
 
   const handleContextClick = (contextId: string) => {
-    setMainView('questions');
+    setMainView('contextGroup');
     setCurrentContextId(contextId);
   };
 
@@ -252,7 +252,7 @@ export const QuestionNavigator = () => {
             {groups.map((group) => {
               if (group.type === 'context') {
                 // Context group - show BookOpen icon THEN individual questions
-                const isContextActive = mainView === 'questions' && currentContextId === group.contextId;
+                const isContextActive = mainView === 'contextGroup' && currentContextId === group.contextId;
 
                 return (
                   <React.Fragment key={group.id}>

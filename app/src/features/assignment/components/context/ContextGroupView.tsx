@@ -64,7 +64,10 @@ export const ContextGroupView = ({
             const answer = answers?.get(aq.question.id);
 
             return (
-              <div key={aq.question.id} className="bg-white dark:border-gray-700 dark:bg-gray-900">
+              <div
+                key={aq.question.id}
+                className="border-b-1 bg-white pb-4 dark:border-gray-700 dark:bg-gray-900"
+              >
                 <QuestionRenderer
                   question={aq.question as Question}
                   viewMode={viewMode}

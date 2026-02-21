@@ -15,9 +15,10 @@ import { useAssignmentFormStore } from '../../../stores/useAssignmentFormStore';
 
 interface AddQuestionButtonProps {
   className?: string;
+  contextId?: string;
 }
 
-export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
+export const AddQuestionButton = ({ className, contextId }: AddQuestionButtonProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
 
   // Get data and actions from stores
@@ -74,6 +75,7 @@ export const AddQuestionButton = ({ className }: AddQuestionButtonProps) => {
         topicId: defaultTopicId,
         explanation: '',
         data,
+        ...(contextId && { contextId }),
       } as QuestionWithTopic,
       points: 10,
     };

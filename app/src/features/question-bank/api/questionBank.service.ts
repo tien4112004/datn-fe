@@ -6,6 +6,7 @@ import type {
   QuestionBankApiResponse,
   ChapterResponse,
   GenerateQuestionsRequest,
+  GenerateQuestionsFromContextRequest,
   GenerateQuestionsResponse,
 } from '../types/questionBank';
 import { parseQuestionBankCSV, exportQuestionsToCSV } from '../utils/csvParser';
@@ -203,6 +204,16 @@ export default class QuestionBankService implements QuestionBankApiService {
 
   async generateQuestions(request: GenerateQuestionsRequest): Promise<GenerateQuestionsResponse> {
     const response = await this.apiClient.post(`${this.baseUrl}/api/question-bank/generate`, request);
+    return response.data.data;
+  }
+
+  async generateQuestionsFromContext(
+    request: GenerateQuestionsFromContextRequest
+  ): Promise<GenerateQuestionsResponse> {
+    const response = await this.apiClient.post(
+      `${this.baseUrl}/api/question-bank/generate-from-context`,
+      request
+    );
     return response.data.data;
   }
 }

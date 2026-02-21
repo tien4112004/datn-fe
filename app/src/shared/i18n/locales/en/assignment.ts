@@ -298,6 +298,9 @@ export default {
         fillMatrixGaps: 'Detect gaps in the matrix and generate questions to fill them',
         shuffleQuestions: 'Randomly shuffle question order (keeps context questions together)',
         bulkPoints: 'Set points for all questions at once',
+        generateFromContext: 'Generate questions based on this reading passage using AI',
+        bulkPointsContext: 'Edit points for questions in this context group',
+        shuffleContextQuestions: 'Shuffle question order within this context group',
       },
     },
 
@@ -325,6 +328,7 @@ export default {
       questionsAdded: '{{count}} question(s) added to the assignment',
       contextFetchError: 'Failed to fetch reading passages for imported questions',
       questionsShuffled: 'Questions order shuffled successfully',
+      contextQuestionsShuffled: 'Questions within context shuffled successfully',
 
       // Submission-related
       submitSuccess: 'Assignment submitted successfully!',
@@ -345,6 +349,7 @@ export default {
       toolbar: {
         addQuestion: 'Add Question',
         generate: 'Generate',
+        generateFromContext: 'Generate from Context',
         fromBank: 'From Bank',
         shuffleQuestions: 'Shuffle Questions',
         bulkPoints: 'Bulk Points',
@@ -515,6 +520,47 @@ export default {
       import: 'Import',
       importSelected: 'Import Selected ({{count}})',
       alreadyAdded: 'Already added',
+    },
+
+    // Generate from context panel
+    contextGenerate: {
+      title: 'Generate Questions from Context',
+      noContext: 'No context selected',
+      readingPassage: 'Reading Passage',
+      fields: {
+        prompt: 'Guidelines (Optional)',
+        promptPlaceholder: 'e.g., Focus on comprehension skills...',
+        promptHelp: 'Optional instructions to guide the AI generation',
+        questionTypes: 'Question Types',
+        questionsPerDifficulty: 'Questions per Difficulty',
+        questionsPerDifficultyHelp: 'Set the number of questions and points per difficulty level',
+        count: 'Count',
+        points: 'Points',
+        total: 'Total:',
+        questionSingular: 'question',
+        questionPlural: 'questions',
+        largeGenerationWarning: 'Large number of questions may take longer',
+        model: 'AI Model',
+        modelPlaceholder: 'Select model...',
+      },
+      validation: {
+        noQuestionTypes: 'Please select at least one question type',
+        noQuestionsRequested: 'Please request at least one question',
+      },
+      toast: {
+        success: '{{count}} questions generated successfully',
+        error: 'Failed to generate questions',
+      },
+      footer: {
+        readyToGenerate: 'Ready to generate',
+        typeSingular: 'type',
+        typePlural: 'types',
+      },
+      actions: {
+        cancel: 'Cancel',
+        generate: 'Generate',
+        generating: 'Generating...',
+      },
     },
 
     // Import context dialog (shown when importing questions with bound contexts from bank)
@@ -850,6 +896,18 @@ export default {
       backToForm: 'Back to Form',
       newGeneration: 'New Generation',
       addToAssignment: 'Add to Assignment',
+      backToFormConfirm: {
+        title: 'Go back to form?',
+        description: 'The current generated questions will be discarded. Are you sure you want to go back?',
+      },
+      newGenerationConfirm: {
+        title: 'Start new generation?',
+        description: 'This will discard the current results and start a new generation. Are you sure?',
+      },
+      confirmDialog: {
+        cancel: 'Cancel',
+        confirm: 'Continue',
+      },
     },
   },
 
@@ -1270,6 +1328,7 @@ export default {
     points: 'pts',
     questionsCount: '{{count}} questions',
     contextGroupEditTip: 'Click individual question numbers in the navigator to edit them separately.',
+    noContextSelected: 'No context selected. Click a reading passage group in the navigator.',
     titlePlaceholder: 'Enter reading passage title...',
     contentPlaceholder: 'Enter reading passage content...',
     authorPlaceholder: 'Author (optional)',

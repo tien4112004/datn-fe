@@ -1,12 +1,11 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trash2, Eye, Pencil, FileQuestion, BookOpen, Unlink, ChevronDown, ChevronUp } from 'lucide-react';
+import { Trash2, Eye, Pencil, FileQuestion, Unlink, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@ui/button';
 import { Input } from '@ui/input';
 import { Label } from '@ui/label';
 import { Textarea } from '@ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
-import { Badge } from '@ui/badge';
 import { Collapsible, CollapsibleContent } from '@ui/collapsible';
 import {
   AlertDialog,
@@ -25,7 +24,6 @@ import { useAssignmentFormStore } from '../../../stores/useAssignmentFormStore';
 import { QuestionRenderer } from '@/features/question';
 import { VIEW_MODE, type Question, getQuestionTypeName, getAllDifficulties } from '@aiprimary/core';
 import { ContextSelector } from '../../context/ContextSelector';
-import { ContextGroupView } from '../../context/ContextGroupView';
 import { groupQuestionsByContext, getQuestionDisplayNumber } from '../../../utils/questionGrouping';
 import type { AssignmentContext } from '../../../types';
 
@@ -44,7 +42,6 @@ export const CurrentQuestionView = () => {
   const updateContext = useAssignmentFormStore((state) => state.updateContext);
 
   const currentQuestionId = useAssignmentEditorStore((state) => state.currentQuestionId);
-  const currentContextId = useAssignmentEditorStore((state) => state.currentContextId);
   const setCurrentQuestionId = useAssignmentEditorStore((state) => state.setCurrentQuestionId);
   const questionViewMode = useAssignmentEditorStore((state) => state.questionViewMode);
   const toggleQuestionViewMode = useAssignmentEditorStore((state) => state.toggleQuestionViewMode);
@@ -60,12 +57,6 @@ export const CurrentQuestionView = () => {
 
   // Group questions by context
   const groups = useMemo(() => groupQuestionsByContext(questions, contextsMap), [questions, contextsMap]);
-
-  // Find selected context group
-  const selectedContextGroup = useMemo(() => {
-    if (!currentContextId) return null;
-    return groups.find((g) => g.type === 'context' && g.contextId === currentContextId);
-  }, [groups, currentContextId]);
 
   const currentQuestionIndex = questions.findIndex((q) => q.question.id === currentQuestionId);
   const assignmentQuestion = questions[currentQuestionIndex];
@@ -84,14 +75,6 @@ export const CurrentQuestionView = () => {
     if (!currentQuestionId) return 0;
     return getQuestionDisplayNumber(groups, currentQuestionId);
   }, [groups, currentQuestionId]);
-
-  // Get start number for context group
-  const contextStartNumber = useMemo(() => {
-    if (!selectedContextGroup) return 1;
-    const firstQuestion = selectedContextGroup.questions[0];
-    if (!firstQuestion) return 1;
-    return getQuestionDisplayNumber(groups, firstQuestion.question.id);
-  }, [groups, selectedContextGroup]);
 
   const handleConfirmDelete = () => {
     if (question && currentQuestionIndex !== -1) {
@@ -116,27 +99,6 @@ export const CurrentQuestionView = () => {
     });
   };
 
-  // Handler for question changes within a context group
-  const handleContextQuestionChange = (questionId: string, updatedQuestion: Question) => {
-    const qIndex = questions.findIndex((q) => q.question.id === questionId);
-    if (qIndex !== -1) {
-      updateQuestion(qIndex, {
-        question: {
-          ...questions[qIndex].question,
-          ...updatedQuestion,
-        },
-      });
-    }
-  };
-
-  // Handler for context updates (shared editing)
-  const handleContextUpdate = useCallback(
-    (contextId: string, updates: Partial<AssignmentContext>) => {
-      updateContext(contextId, updates);
-    },
-    [updateContext]
-  );
-
   // Empty state
   if (questions.length === 0) {
     return (
@@ -144,45 +106,6 @@ export const CurrentQuestionView = () => {
         <div className="text-center">
           <p className="text-sm text-gray-600 dark:text-gray-400">{tQuestion('noQuestions')}</p>
           <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">{tQuestion('addQuestionHint')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Context group selected - show ContextGroupView in viewing mode (editing context group is complex)
-  if (selectedContextGroup && selectedContextGroup.context) {
-    return (
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between gap-3 border-b pb-4">
-          <div className="flex w-full items-center gap-3">
-            <BookOpen className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              {selectedContextGroup.context.title || tContext('readingPassage')}
-            </h2>
-            <Badge variant="secondary">
-              {tContext('questionsCount', { count: selectedContextGroup.questions.length })}
-            </Badge>
-          </div>
-        </div>
-
-        {/* Context Group View - Viewing mode for group overview */}
-        <ContextGroupView
-          context={selectedContextGroup.context}
-          questions={selectedContextGroup.questions}
-          viewMode={VIEW_MODE.VIEWING}
-          startNumber={contextStartNumber}
-          onQuestionChange={handleContextQuestionChange}
-          onContextUpdate={
-            selectedContextGroup.contextId
-              ? (updates) => handleContextUpdate(selectedContextGroup.contextId!, updates)
-              : undefined
-          }
-        />
-
-        {/* Tip to edit individual questions */}
-        <div className="rounded-lg bg-blue-50 p-4 text-sm text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-          {tContext('contextGroupEditTip')}
         </div>
       </div>
     );

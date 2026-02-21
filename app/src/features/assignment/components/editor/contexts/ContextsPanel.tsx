@@ -86,7 +86,7 @@ export const ContextsPanel = () => {
 
   const handleNavigateToContext = useCallback(
     (contextId: string) => {
-      setMainView('questions');
+      setMainView('contextGroup');
       setCurrentContextId(contextId);
     },
     [setMainView, setCurrentContextId]

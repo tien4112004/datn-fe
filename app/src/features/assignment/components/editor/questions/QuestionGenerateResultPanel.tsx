@@ -1,7 +1,17 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Badge } from '@ui/badge';
 import { Button } from '@ui/button';
-import { ArrowLeft, CheckCircle2, FileText, Plus, Sparkles, X } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@ui/alert-dialog';
+import { ArrowLeft, CheckCircle2, Plus, Sparkles, X } from 'lucide-react';
 import type { QuestionBankItem } from '@/features/question-bank/types';
 import type { Question } from '@aiprimary/core';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
@@ -27,13 +37,15 @@ interface QuestionGenerateResultPanelProps {
 export function QuestionGenerateResultPanel({
   questions,
   totalGenerated,
-  generationParams,
   onBack,
   onNewGeneration,
   onClose,
   onApply,
 }: QuestionGenerateResultPanelProps) {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, { keyPrefix: 'generatedQuestions' });
+
+  const [showBackConfirm, setShowBackConfirm] = useState(false);
+  const [showNewGenerationConfirm, setShowNewGenerationConfirm] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -57,24 +69,6 @@ export function QuestionGenerateResultPanel({
         )}
       </div>
 
-      {/* Generation Summary */}
-      <div className="bg-muted/50 rounded-lg border p-4">
-        <div className="space-y-2">
-          <div className="flex items-start gap-2">
-            <FileText className="text-muted-foreground mt-0.5 h-4 w-4 flex-shrink-0" />
-            <div className="flex-1">
-              <p className="text-sm font-medium">{t('promptLabel')}</p>
-              <p className="text-muted-foreground text-xs">{generationParams.prompt}</p>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary">{generationParams.grade}</Badge>
-            <Badge variant="secondary">{generationParams.subject}</Badge>
-            {generationParams.chapter && <Badge variant="secondary">{generationParams.chapter}</Badge>}
-          </div>
-        </div>
-      </div>
-
       {/* Questions List */}
       <GeneratedQuestionsResultList
         questions={questions}
@@ -87,12 +81,12 @@ export function QuestionGenerateResultPanel({
       {/* Footer Actions */}
       <div className="border-t px-2 pt-4">
         <div className="flex justify-between gap-2">
-          <Button variant="outline" onClick={onBack} className="gap-2">
+          <Button variant="outline" onClick={() => setShowBackConfirm(true)} className="gap-2">
             <ArrowLeft className="h-4 w-4" />
             {t('resultPanel.backToForm')}
           </Button>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={onNewGeneration} className="gap-2">
+            <Button variant="outline" onClick={() => setShowNewGenerationConfirm(true)} className="gap-2">
               <Sparkles className="h-4 w-4" />
               {t('resultPanel.newGeneration')}
             </Button>
@@ -111,6 +105,38 @@ export function QuestionGenerateResultPanel({
           </div>
         </div>
       </div>
+
+      {/* Back to Form Confirmation */}
+      <AlertDialog open={showBackConfirm} onOpenChange={setShowBackConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('resultPanel.backToFormConfirm.title')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('resultPanel.backToFormConfirm.description')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('resultPanel.confirmDialog.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={onBack}>{t('resultPanel.confirmDialog.confirm')}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* New Generation Confirmation */}
+      <AlertDialog open={showNewGenerationConfirm} onOpenChange={setShowNewGenerationConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('resultPanel.newGenerationConfirm.title')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('resultPanel.newGenerationConfirm.description')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('resultPanel.confirmDialog.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={onNewGeneration}>
+              {t('resultPanel.confirmDialog.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

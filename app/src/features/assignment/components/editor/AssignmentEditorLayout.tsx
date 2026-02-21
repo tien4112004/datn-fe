@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Save, Wand2, Database, Plus, Library, Sparkles, Shuffle, ListChecks, LogOut, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -9,6 +9,8 @@ import { CurrentQuestionView } from './questions/CurrentQuestionView';
 import { AssignmentMetadataPanel } from './metadata/AssignmentMetadataPanel';
 import { MatrixBuilderPanel } from './matrix/MatrixBuilderPanel';
 import { ContextsPanel } from './contexts/ContextsPanel';
+import { ContextGroupPanel } from './contexts/ContextGroupPanel';
+import { GenerateFromContextManager } from './contexts/GenerateFromContextManager';
 import { QuestionNavigator } from './questions/QuestionNavigator';
 import { AddQuestionButton } from './questions/AddQuestionButton';
 import { QuestionsListViewPanel } from '../viewer/QuestionsListViewPanel';
@@ -44,6 +46,7 @@ export const AssignmentEditorLayout = ({
   const setQuestionBankOpen = useAssignmentEditorStore((state) => state.setQuestionBankOpen);
   const setContextCreateFormOpen = useAssignmentEditorStore((state) => state.setContextCreateFormOpen);
   const setContextLibraryDialogOpen = useAssignmentEditorStore((state) => state.setContextLibraryDialogOpen);
+  const currentContextId = useAssignmentEditorStore((state) => state.currentContextId);
   const isMatrixTemplateLibraryDialogOpen = useAssignmentEditorStore(
     (state) => state.isMatrixTemplateLibraryDialogOpen
   );
@@ -78,6 +81,12 @@ export const AssignmentEditorLayout = ({
   const [fillMatrixDraft, setFillMatrixDraft] = useState<ExamDraftDto | null>(null);
   const [isFillMatrixLoading, setIsFillMatrixLoading] = useState(false);
   const detectGapsMutation = useGenerateExamFromMatrix();
+
+  // Context questions for contextGroup view
+  const contextQuestions = useMemo(
+    () => (currentContextId ? questions.filter((q) => q.question.contextId === currentContextId) : []),
+    [questions, currentContextId]
+  );
 
   const handleFillMatrixGaps = async () => {
     // Validate matrix exists and has requirements
@@ -135,6 +144,34 @@ export const AssignmentEditorLayout = ({
     toast.success(String(t('toasts.questionsShuffled')));
   };
 
+  const handleShuffleContextQuestions = () => {
+    if (!currentContextId) return;
+
+    // Get indices of questions in this context
+    const contextEntries = questions
+      .map((q, i) => ({ q, i }))
+      .filter(({ q }) => q.question.contextId === currentContextId);
+
+    if (contextEntries.length < 2) return;
+
+    // Fisher-Yates shuffle on just those items
+    const shuffledQuestions = [...questions];
+    const indices = contextEntries.map(({ i }) => i);
+    const contextQs = indices.map((i) => shuffledQuestions[i]);
+
+    for (let i = contextQs.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [contextQs[i], contextQs[j]] = [contextQs[j], contextQs[i]];
+    }
+
+    indices.forEach((originalIdx, newIdx) => {
+      shuffledQuestions[originalIdx] = contextQs[newIdx];
+    });
+
+    setQuestions(shuffledQuestions);
+    toast.success(String(t('toasts.contextQuestionsShuffled')));
+  };
+
   return (
     <div className="grid grid-cols-1 gap-6 pb-4 lg:h-[calc(100vh-8rem)] lg:grid-cols-4">
       {/* Left/Main: Content Area (75% width on large screens) */}
@@ -147,6 +184,10 @@ export const AssignmentEditorLayout = ({
           <MatrixBuilderPanel />
         ) : mainView === 'contexts' ? (
           <ContextsPanel />
+        ) : mainView === 'contextGroup' ? (
+          <ContextGroupPanel />
+        ) : mainView === 'generateFromContext' ? (
+          <GenerateFromContextManager />
         ) : mainView === 'questionsList' ? (
           <QuestionsListViewPanel assignment={{ questions, contexts, topics } as any} />
         ) : mainView === 'generateQuestions' ? (
@@ -178,28 +219,97 @@ export const AssignmentEditorLayout = ({
             {t('actions.actions')}
           </div>
 
-          {/* Question Actions - Only show when not in matrix/contexts/generateMatrix view */}
-          {mainView !== 'matrix' && mainView !== 'contexts' && mainView !== 'generateMatrix' && (
+          {/* Question Actions - Only show when not in matrix/contexts/contextGroup/generateMatrix/generateFromContext view */}
+          {mainView !== 'matrix' &&
+            mainView !== 'contexts' &&
+            mainView !== 'contextGroup' &&
+            mainView !== 'generateMatrix' &&
+            mainView !== 'generateFromContext' && (
+              <>
+                <div className="space-y-2">
+                  <AddQuestionButton className="w-full" />
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setMainView('generateQuestions')}
+                        className="w-full"
+                      >
+                        <Wand2 className="mr-2 h-4 w-4" />
+                        {tToolbar('generate')}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{tActions('tooltips.generate')}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setQuestionBankOpen(true)}
+                        className="w-full"
+                      >
+                        <Database className="mr-2 h-4 w-4" />
+                        {tToolbar('fromBank')}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{tActions('tooltips.fromBank')}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={handleShuffleQuestions}
+                        disabled={questions.length < 2}
+                        className="w-full"
+                      >
+                        <Shuffle className="mr-2 h-4 w-4" />
+                        {tToolbar('shuffleQuestions')}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{tActions('tooltips.shuffleQuestions')}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setBulkPointsDialogOpen(true)}
+                        disabled={questions.length === 0}
+                        className="w-full"
+                      >
+                        <ListChecks className="mr-2 h-4 w-4" />
+                        {tToolbar('bulkPoints')}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{tActions('tooltips.bulkPoints')}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+
+                {/* Divider */}
+                <div className="border-t pt-3" />
+              </>
+            )}
+
+          {/* Context Group Actions - Show in contextGroup view */}
+          {mainView === 'contextGroup' && (
             <>
               <div className="space-y-2">
-                <AddQuestionButton className="w-full" />
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setMainView('generateQuestions')}
-                      className="w-full"
-                    >
-                      <Wand2 className="mr-2 h-4 w-4" />
-                      {tToolbar('generate')}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{tActions('tooltips.generate')}</p>
-                  </TooltipContent>
-                </Tooltip>
+                <AddQuestionButton className="w-full" contextId={currentContextId ?? undefined} />
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
@@ -223,16 +333,16 @@ export const AssignmentEditorLayout = ({
                       type="button"
                       size="sm"
                       variant="outline"
-                      onClick={handleShuffleQuestions}
-                      disabled={questions.length < 2}
+                      onClick={() => setBulkPointsDialogOpen(true)}
+                      disabled={contextQuestions.length === 0}
                       className="w-full"
                     >
-                      <Shuffle className="mr-2 h-4 w-4" />
-                      {tToolbar('shuffleQuestions')}
+                      <ListChecks className="mr-2 h-4 w-4" />
+                      {tToolbar('bulkPoints')}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{tActions('tooltips.shuffleQuestions')}</p>
+                    <p>{tActions('tooltips.bulkPointsContext')}</p>
                   </TooltipContent>
                 </Tooltip>
                 <Tooltip>
@@ -241,16 +351,33 @@ export const AssignmentEditorLayout = ({
                       type="button"
                       size="sm"
                       variant="outline"
-                      onClick={() => setBulkPointsDialogOpen(true)}
-                      disabled={questions.length === 0}
+                      onClick={handleShuffleContextQuestions}
+                      disabled={contextQuestions.length < 2}
                       className="w-full"
                     >
-                      <ListChecks className="mr-2 h-4 w-4" />
-                      {tToolbar('bulkPoints')}
+                      <Shuffle className="mr-2 h-4 w-4" />
+                      {tToolbar('shuffleQuestions')}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{tActions('tooltips.bulkPoints')}</p>
+                    <p>{tActions('tooltips.shuffleContextQuestions')}</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setMainView('generateFromContext')}
+                      className="w-full"
+                    >
+                      <Wand2 className="mr-2 h-4 w-4" />
+                      {tToolbar('generateFromContext')}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{tActions('tooltips.generateFromContext')}</p>
                   </TooltipContent>
                 </Tooltip>
               </div>
@@ -491,8 +618,12 @@ export const AssignmentEditorLayout = ({
         grade={grade}
       />
 
-      {/* Bulk Points Dialog */}
-      <BulkPointsDialog open={isBulkPointsDialogOpen} onOpenChange={setBulkPointsDialogOpen} />
+      {/* Bulk Points Dialog - passes contextId when in contextGroup view */}
+      <BulkPointsDialog
+        open={isBulkPointsDialogOpen}
+        onOpenChange={setBulkPointsDialogOpen}
+        contextId={mainView === 'contextGroup' ? (currentContextId ?? undefined) : undefined}
+      />
     </div>
   );
 };

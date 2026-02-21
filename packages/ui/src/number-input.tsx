@@ -9,6 +9,7 @@ export interface NumberInputProps {
   min?: number;
   max?: number;
   stepper?: number;
+  decimalScale?: number;
   onValueChange?: (value: number | undefined) => void;
   className?: string;
   disabled?: boolean;
@@ -21,6 +22,7 @@ export const NumberInput = ({
   min,
   max,
   stepper = 1,
+  decimalScale,
   onValueChange,
   className,
   disabled,
@@ -32,6 +34,11 @@ export const NumberInput = ({
       minValue={min}
       maxValue={max}
       step={stepper}
+      formatOptions={
+        decimalScale !== undefined
+          ? { maximumFractionDigits: decimalScale, minimumFractionDigits: decimalScale }
+          : undefined
+      }
       onChange={(val: any) => onValueChange?.(isNaN(val) ? undefined : val)}
       isDisabled={disabled}
       className={`w-full space-y-2 ${className ?? ''}`}

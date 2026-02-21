@@ -476,11 +476,11 @@ const VIEW_ACTIONS: Record<string, ActionKey[]> = {
   info: ['addQuestion', 'generate', 'fromBank', 'shuffle', 'bulkPoints'],
   questions: ['addQuestion', 'generate', 'fromBank'],
   questionsList: ['addQuestion', 'generate', 'fromBank', 'shuffle', 'bulkPoints'],
-  generateQuestions: ['addQuestion', 'generate', 'fromBank', 'shuffle', 'bulkPoints'],
+  generateQuestions: ['addQuestion'],
   fillMatrixGaps: ['addQuestion', 'generate', 'fromBank', 'shuffle', 'bulkPoints'],
   contextGroup: ['addQuestion', 'fromBank', 'bulkPoints', 'shuffle', 'generateFromContext'],
   matrix: ['addTopic', 'generateMatrix', 'fillMatrixGaps', 'templateLibrary', 'saveAsTemplate'],
-  generateMatrix: ['addTopic', 'generateMatrix', 'fillMatrixGaps', 'templateLibrary', 'saveAsTemplate'],
+  generateMatrix: ['addTopic'],
   contexts: ['addContext', 'fromLibrary'],
   generateFromContext: [],
 };

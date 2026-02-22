@@ -8,8 +8,10 @@ type MainView =
   | 'questions'
   | 'matrix'
   | 'contexts'
+  | 'contextGroup'
   | 'questionsList'
   | 'generateQuestions'
+  | 'generateFromContext'
   | 'generateMatrix'
   | 'fillMatrixGaps';
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Dialog,
@@ -18,15 +18,24 @@ import { useAssignmentFormStore } from '../../../stores/useAssignmentFormStore';
 interface BulkPointsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** If provided, only show questions belonging to this context */
+  contextId?: string;
 }
 
-export const BulkPointsDialog = ({ open, onOpenChange }: BulkPointsDialogProps) => {
+export const BulkPointsDialog = ({ open, onOpenChange, contextId }: BulkPointsDialogProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.bulkPointsDialog' });
 
-  const questions = useAssignmentFormStore((state) => state.questions);
+  const allQuestions = useAssignmentFormStore((state) => state.questions);
   const updateQuestion = useAssignmentFormStore((state) => state.updateQuestion);
 
-  // Local state: map of index -> points value
+  // Filter questions by contextId if provided
+  const filteredEntries = useMemo(() => {
+    return allQuestions
+      .map((q, originalIndex) => ({ q, originalIndex }))
+      .filter(({ q }) => (contextId ? q.question.contextId === contextId : true));
+  }, [allQuestions, contextId]);
+
+  // Local state: map of filtered index -> points value
   const [pointsMap, setPointsMap] = useState<Map<number, number>>(new Map());
   const [setAllValue, setSetAllValue] = useState('');
 
@@ -34,17 +43,17 @@ export const BulkPointsDialog = ({ open, onOpenChange }: BulkPointsDialogProps) 
   useEffect(() => {
     if (open) {
       const initial = new Map<number, number>();
-      questions.forEach((q, i) => initial.set(i, q.points || 0));
+      filteredEntries.forEach(({ q }, i) => initial.set(i, q.points || 0));
       setPointsMap(initial);
       setSetAllValue('');
     }
-  }, [open, questions]);
+  }, [open, filteredEntries]);
 
   const handleSetAll = () => {
     const val = parseInt(setAllValue, 10);
     if (isNaN(val) || val < 0) return;
     const newMap = new Map<number, number>();
-    questions.forEach((_, i) => newMap.set(i, val));
+    filteredEntries.forEach((_, i) => newMap.set(i, val));
     setPointsMap(newMap);
   };
 
@@ -54,10 +63,12 @@ export const BulkPointsDialog = ({ open, onOpenChange }: BulkPointsDialogProps) 
   };
 
   const handleApply = () => {
-    pointsMap.forEach((points, index) => {
-      const currentPoints = questions[index]?.points || 0;
+    pointsMap.forEach((points, filteredIndex) => {
+      const entry = filteredEntries[filteredIndex];
+      if (!entry) return;
+      const currentPoints = entry.q.points || 0;
       if (points !== currentPoints) {
-        updateQuestion(index, { points });
+        updateQuestion(entry.originalIndex, { points });
       }
     });
     onOpenChange(false);
@@ -91,7 +102,7 @@ export const BulkPointsDialog = ({ open, onOpenChange }: BulkPointsDialogProps) 
         {/* Questions List */}
         <div className="flex-1 overflow-y-auto pr-2">
           <div className="space-y-2">
-            {questions.map((q, index) => (
+            {filteredEntries.map(({ q }, index) => (
               <div key={q.question.id} className="flex items-center gap-3 rounded-lg border p-3">
                 <div className="bg-primary text-primary-foreground flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold">
                   {index + 1}

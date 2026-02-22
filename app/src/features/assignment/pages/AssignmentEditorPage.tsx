@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { useNavigate, useParams, useLoaderData } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Menu } from 'lucide-react';
+import { Button } from '@ui/button';
 import { AssignmentEditorLayout } from '../components/editor/AssignmentEditorLayout';
 import { MetadataEditDialog } from '../components/editor/metadata/MetadataEditDialog';
 import { QuestionBankImportManager } from '../components/editor/questions/QuestionBankImportManager';
@@ -58,6 +60,8 @@ export const AssignmentEditorPage = () => {
     };
   }, [id, assignmentData, initialize, markClean]);
 
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+
   const handleCancel = () => {
     if (id) {
       navigate(`/assignment/${id}`);
@@ -67,34 +71,39 @@ export const AssignmentEditorPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-white dark:bg-gray-950">
-      <div className="p-8">
+    <div className="flex h-[100dvh] flex-col bg-white dark:bg-gray-950">
+      <div className="flex shrink-0 items-center justify-between px-8 pb-4 pt-8">
         {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">
-            {id ? t('pageTitle.edit') : t('pageTitle.create')}
-          </h1>
-        </div>
+        <h1 className="text-3xl font-bold tracking-tight">
+          {id ? t('pageTitle.edit') : t('pageTitle.create')}
+        </h1>
+        <Button size="icon" variant="outline" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
+          <Menu className="h-5 w-5" />
+        </Button>
+      </div>
 
+      <div className="min-h-0 flex-1 px-8 pb-4">
         <AssignmentEditorLayout
           onCancel={handleCancel}
           onSave={save}
           onSaveAndExit={saveAndExit}
           isSaving={isSaving}
-        />
-
-        {/* Dialogs */}
-        <MetadataEditDialog />
-        <QuestionBankImportManager />
-
-        {/* Unsaved Changes Dialog */}
-        <UnsavedChangesDialog
-          open={showDialog}
-          onOpenChange={setShowDialog}
-          onStay={handleStay}
-          onLeave={handleProceed}
+          sidebarOpen={sidebarOpen}
+          onSidebarOpenChange={setSidebarOpen}
         />
       </div>
+
+      {/* Dialogs */}
+      <MetadataEditDialog />
+      <QuestionBankImportManager />
+
+      {/* Unsaved Changes Dialog */}
+      <UnsavedChangesDialog
+        open={showDialog}
+        onOpenChange={setShowDialog}
+        onStay={handleStay}
+        onLeave={handleProceed}
+      />
     </div>
   );
 };

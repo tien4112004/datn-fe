@@ -1,40 +1,40 @@
 import type {
   ApiResponse,
   ArtStyleRequest,
+  ContextFilterParams,
   FAQPost,
-  Pagination,
-  PaginationParams,
-  UserQueryParams,
-  SlideTemplateParams,
   MatrixTemplate,
   MatrixTemplateParams,
+  Pagination,
+  PaginationParams,
+  SlideTemplateParams,
+  UserQueryParams,
 } from '@/types/api';
-import type { Model, ModelPatchData } from '@aiprimary/core';
 import type { User } from '@/types/auth';
-import type { AdminApiService } from '@/types/service';
-import { API_MODE, type ApiMode, api } from '@aiprimary/api';
-import type { ArtStyle, SlideTemplate, SlideTheme } from '@aiprimary/core';
-import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
-import type {
-  QuestionBankItem,
-  QuestionBankParams,
-  QuestionBankFilters,
-  CreateQuestionPayload,
-  UpdateQuestionPayload,
-  ImportResult,
-  ChapterResponse,
-} from '@/types/questionBank';
-import type { Context } from '@/types/context';
 import type {
   CoinPricing,
   CoinPricingCreateRequest,
-  CoinPricingUpdateRequest,
   CoinPricingQueryParams,
+  CoinPricingUpdateRequest,
   EnumOption,
 } from '@/types/coin';
-import type { TokenUsageStats, TokenUsageFilterRequest } from '@/types/tokenUsage';
-import { parseQuestionBankCSV, exportQuestionsToCSV } from '@/utils/csvParser';
+import type { Context } from '@/types/context';
+import type {
+  ChapterResponse,
+  CreateQuestionPayload,
+  ImportResult,
+  QuestionBankFilters,
+  QuestionBankItem,
+  QuestionBankParams,
+  UpdateQuestionPayload,
+} from '@/types/questionBank';
+import type { AdminApiService } from '@/types/service';
+import type { TokenUsageFilterRequest, TokenUsageStats } from '@/types/tokenUsage';
+import { exportQuestionsToCSV, parseQuestionBankCSV } from '@/utils/csvParser';
 import { validateQuestionBankCSV } from '@/utils/csvValidation';
+import { API_MODE, type ApiMode, api } from '@aiprimary/api';
+import type { ArtStyle, Model, ModelPatchData, SlideTemplate, SlideTheme } from '@aiprimary/core';
+import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
 
 import { generateId } from '@aiprimary/core';
 
@@ -530,12 +530,31 @@ export default class AdminRealApiService implements AdminApiService {
   }
 
   // Contexts
-  async getContexts(params?: PaginationParams): Promise<ApiResponse<Context[]>> {
+  async getContexts(params?: ContextFilterParams): Promise<ApiResponse<Context[]>> {
+    const queryParams: Record<string, any> = {
+      bankType: 'public',
+      page: (params?.page ?? 0) + 1, // Backend is 1-indexed
+      pageSize: params?.pageSize || 10,
+    };
+
+    if (params?.search) {
+      queryParams.search = params.search;
+    }
+    if (params?.subject && params.subject.length > 0) {
+      queryParams.subject = params.subject;
+    }
+    if (params?.grade && params.grade.length > 0) {
+      queryParams.grade = params.grade;
+    }
+    if (params?.sortBy) {
+      queryParams.sortBy = params.sortBy;
+    }
+    if (params?.sortDirection) {
+      queryParams.sortDirection = params.sortDirection;
+    }
+
     const response = await api.get<ApiResponse<Context[]>>(`${this.baseUrl}/api/contexts`, {
-      params: {
-        page: params?.page || 0,
-        size: params?.pageSize || 10,
-      },
+      params: queryParams,
     });
     return response.data;
   }

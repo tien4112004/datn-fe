@@ -284,7 +284,7 @@ export default {
       cancel: 'Hủy',
       save: 'Lưu',
       saveAndExit: 'Lưu & Thoát',
-      fillMatrixGaps: 'Tạo câu hỏi từ khoảng trống ma trận',
+      fillMatrixGaps: 'Tạo câu hỏi từ ma trận',
       saving: 'Đang lưu...',
       tooltips: {
         save: 'Lưu thay đổi và tiếp tục chỉnh sửa',
@@ -298,6 +298,9 @@ export default {
         fillMatrixGaps: 'Phát hiện khoảng trống trong ma trận và tạo câu hỏi để lấp đầy',
         shuffleQuestions: 'Xáo trộn ngẫu nhiên thứ tự câu hỏi (giữ nhóm đọc hiểu cùng nhau)',
         bulkPoints: 'Đặt điểm cho tất cả câu hỏi cùng lúc',
+        generateFromContext: 'Tạo câu hỏi dựa trên đoạn văn đọc hiểu bằng AI',
+        bulkPointsContext: 'Chỉnh sửa điểm cho câu hỏi trong nhóm đọc hiểu này',
+        shuffleContextQuestions: 'Xáo trộn thứ tự câu hỏi trong nhóm đọc hiểu này',
       },
     },
 
@@ -325,6 +328,7 @@ export default {
       questionsAdded: 'Đã thêm {{count}} câu hỏi vào bài tập',
       contextFetchError: 'Không thể tải đoạn văn đọc hiểu cho câu hỏi đã nhập',
       questionsShuffled: 'Đã xáo trộn thứ tự câu hỏi thành công',
+      contextQuestionsShuffled: 'Đã xáo trộn câu hỏi trong nhóm đọc hiểu thành công',
 
       // Submission-related
       submitSuccess: 'Nộp bài thành công!',
@@ -344,8 +348,9 @@ export default {
       addFromBank: 'Thêm từ kho',
       toolbar: {
         addQuestion: 'Thêm câu hỏi',
-        generate: 'Tạo sinh',
-        fromBank: 'Từ kho',
+        generate: 'Tạo sinh câu hỏi',
+        generateFromContext: 'Tạo từ đoạn văn',
+        fromBank: 'Thêm từ kho',
         shuffleQuestions: 'Xáo trộn câu hỏi',
         bulkPoints: 'Điểm hàng loạt',
         previewMode: 'Chế độ xem trước',
@@ -514,6 +519,47 @@ export default {
       import: 'Nhập',
       importSelected: 'Nhập đã chọn ({{count}})',
       alreadyAdded: 'Đã thêm',
+    },
+
+    // Tạo câu hỏi từ đoạn văn
+    contextGenerate: {
+      title: 'Tạo câu hỏi từ đoạn văn',
+      noContext: 'Chưa chọn đoạn văn',
+      readingPassage: 'Đoạn văn đọc hiểu',
+      fields: {
+        prompt: 'Hướng dẫn (Tùy chọn)',
+        promptPlaceholder: 'ví dụ: Tập trung vào kỹ năng đọc hiểu...',
+        promptHelp: 'Hướng dẫn tùy chọn để định hướng AI tạo câu hỏi',
+        questionTypes: 'Loại câu hỏi',
+        questionsPerDifficulty: 'Câu hỏi theo mức độ khó',
+        questionsPerDifficultyHelp: 'Đặt số lượng câu hỏi và điểm cho mỗi mức độ khó',
+        count: 'Số lượng',
+        points: 'Điểm',
+        total: 'Tổng:',
+        questionSingular: 'câu hỏi',
+        questionPlural: 'câu hỏi',
+        largeGenerationWarning: 'Số lượng câu hỏi lớn có thể mất nhiều thời gian hơn',
+        model: 'Mô hình AI',
+        modelPlaceholder: 'Chọn mô hình...',
+      },
+      validation: {
+        noQuestionTypes: 'Vui lòng chọn ít nhất một loại câu hỏi',
+        noQuestionsRequested: 'Vui lòng yêu cầu ít nhất một câu hỏi',
+      },
+      toast: {
+        success: 'Đã tạo {{count}} câu hỏi thành công',
+        error: 'Không thể tạo câu hỏi',
+      },
+      footer: {
+        readyToGenerate: 'Sẵn sàng tạo',
+        typeSingular: 'loại',
+        typePlural: 'loại',
+      },
+      actions: {
+        cancel: 'Hủy',
+        generate: 'Tạo',
+        generating: 'Đang tạo...',
+      },
     },
 
     // Hộp thoại nhập ngữ cảnh (hiển thị khi nhập câu hỏi có ngữ cảnh từ ngân hàng)
@@ -812,12 +858,17 @@ export default {
     noQuestions: 'Không có câu hỏi được tạo để hiển thị',
     backToQuestionBank: 'Quay lại ngân hàng câu hỏi',
     generateMore: 'Tạo thêm',
+    selectAll: 'Chọn tất cả',
     toast: {
       deleteSuccess: 'Xóa câu hỏi thành công',
       deleteError: 'Không thể xóa câu hỏi',
+      updateSuccess: 'Cập nhật câu hỏi thành công',
+      updateError: 'Không thể cập nhật câu hỏi',
     },
     actions: {
       edit: 'Chỉnh sửa',
+      save: 'Lưu',
+      cancel: 'Hủy',
       delete: 'Xóa',
       deleteSelected: 'Xóa đã chọn',
     },
@@ -827,6 +878,27 @@ export default {
       },
     },
     selectedCount: '{{count}} câu hỏi đã chọn',
+
+    // Result panel (assignment editor context)
+    resultPanel: {
+      generationComplete: 'Tạo hoàn tất',
+      successMessage: 'Đã tạo thành công {{count}} câu hỏi',
+      backToForm: 'Quay lại biểu mẫu',
+      newGeneration: 'Tạo mới',
+      addToAssignment: 'Thêm vào bài tập',
+      backToFormConfirm: {
+        title: 'Quay lại biểu mẫu?',
+        description: 'Các câu hỏi đã tạo sẽ bị xóa. Bạn có chắc chắn muốn quay lại không?',
+      },
+      newGenerationConfirm: {
+        title: 'Bắt đầu tạo mới?',
+        description: 'Thao tác này sẽ xóa kết quả hiện tại và bắt đầu tạo mới. Bạn có chắc chắn không?',
+      },
+      confirmDialog: {
+        cancel: 'Hủy',
+        confirm: 'Tiếp tục',
+      },
+    },
   },
 
   teacherQuestionBank: {
@@ -1010,6 +1082,7 @@ export default {
     },
     actions: {
       title: 'Hành động',
+      back: 'Quay lại',
       edit: 'Chỉnh sửa',
       duplicate: 'Nhân bản',
       delete: 'Xóa câu hỏi',
@@ -1168,6 +1241,7 @@ export default {
 
   view: {
     pageTitle: 'Xem bài tập',
+    sidebar: 'Điều hướng',
     notFound: 'Không tìm thấy bài tập',
     notFoundDescription: 'Bài tập bạn đang tìm không tồn tại hoặc đã bị xóa.',
     noDescription: 'Chưa có mô tả',
@@ -1242,6 +1316,7 @@ export default {
     points: 'điểm',
     questionsCount: '{{count}} câu hỏi',
     contextGroupEditTip: 'Nhấn vào số câu hỏi trong thanh điều hướng để chỉnh sửa riêng từng câu.',
+    noContextSelected: 'Chưa chọn đoạn văn. Nhấn vào nhóm đoạn văn trong thanh điều hướng.',
     titlePlaceholder: 'Nhập tiêu đề đoạn văn...',
     contentPlaceholder: 'Nhập nội dung đoạn văn...',
     authorPlaceholder: 'Tác giả (tùy chọn)',

@@ -14,6 +14,8 @@ import type { Assignment } from '@aiprimary/core';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
+import { Menu } from 'lucide-react';
+import { Button } from '@ui/button';
 import { toast } from 'sonner';
 import { AssignmentViewerLayout } from '../components/viewer/AssignmentViewerLayout';
 import { useDeleteAssignment } from '../hooks';
@@ -24,6 +26,7 @@ export const AssignmentViewPage = () => {
   const navigate = useNavigate();
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Get assignment from loader
   const { assignment } = useLoaderData() as { assignment: Assignment | null };
@@ -51,17 +54,22 @@ export const AssignmentViewPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-white dark:bg-gray-950">
-      <div className="p-8">
+    <div className="flex h-[100dvh] flex-col bg-white dark:bg-gray-950">
+      <div className="flex shrink-0 items-center justify-between px-8 pb-4 pt-8">
         {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">{t('pageTitle')}</h1>
-        </div>
+        <h1 className="text-3xl font-bold tracking-tight">{t('pageTitle')}</h1>
+        <Button size="icon" variant="outline" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
+          <Menu className="h-5 w-5" />
+        </Button>
+      </div>
 
+      <div className="min-h-0 flex-1 px-8 pb-4">
         <AssignmentViewerLayout
           assignment={assignment}
           onEdit={handleEdit}
           onDelete={() => setIsDeleteDialogOpen(true)}
+          sidebarOpen={sidebarOpen}
+          onSidebarOpenChange={setSidebarOpen}
         />
       </div>
 

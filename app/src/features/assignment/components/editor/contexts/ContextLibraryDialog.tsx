@@ -42,6 +42,17 @@ export const ContextLibraryDialog = ({
   const [selectedLibraryIds, setSelectedLibraryIds] = useState<Set<string>>(new Set());
 
   const observerRef = useRef<IntersectionObserver | null>(null);
+  // Preserve last active filters so closing the dialog doesn't change the query
+  // key from { subject, grade } → {} and trigger a spurious API call.
+  const filtersRef = useRef<Omit<Parameters<typeof useInfiniteContextList>[0], never>>({});
+
+  if (open) {
+    filtersRef.current = {
+      search: debouncedSearch || undefined,
+      ...(defaultSubject ? { subject: [defaultSubject] } : {}),
+      ...(defaultGrade ? { grade: [defaultGrade] } : {}),
+    };
+  }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSetSearch = useCallback(
@@ -54,13 +65,7 @@ export const ContextLibraryDialog = ({
   }, [debouncedSetSearch]);
 
   const { contexts, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteContextList(
-    open
-      ? {
-          search: debouncedSearch || undefined,
-          ...(defaultSubject ? { subject: [defaultSubject] } : {}),
-          ...(defaultGrade ? { grade: [defaultGrade] } : {}),
-        }
-      : {}
+    filtersRef.current
   );
 
   // Reset state when dialog closes

@@ -80,6 +80,31 @@ export interface GenerateQuestionsRequest {
 }
 
 /**
+ * Request type for generating questions from a context (reading passage).
+ * Matches backend GenerateQuestionsFromContextRequest with inline content support.
+ */
+export interface GenerateQuestionsFromContextRequest {
+  /** Context ID (optional - used when context exists in DB) */
+  contextId?: string;
+  /** Inline context content (used when context may not exist in DB) */
+  contextContent?: string;
+  /** Context title */
+  contextTitle?: string;
+  /** Grade level */
+  grade?: string;
+  /** Subject code */
+  subject?: string;
+  /** difficulty -> questionType -> "count:points" */
+  questionsPerDifficulty: Record<string, Record<string, string>>;
+  /** Optional AI prompt/guidelines */
+  prompt?: string;
+  /** AI provider */
+  provider?: string;
+  /** AI model */
+  model?: string;
+}
+
+/**
  * Response type for generated questions
  * Matches backend GeneratedQuestionsResponse
  */
@@ -115,6 +140,9 @@ export interface QuestionBankApiService {
 
   // AI Generation
   generateQuestions(request: GenerateQuestionsRequest): Promise<GenerateQuestionsResponse>;
+  generateQuestionsFromContext(
+    request: GenerateQuestionsFromContextRequest
+  ): Promise<GenerateQuestionsResponse>;
 
   // Metadata
   getChapters(subject: string, grade: string): Promise<ChapterResponse[]>;

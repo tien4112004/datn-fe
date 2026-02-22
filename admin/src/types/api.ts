@@ -44,6 +44,14 @@ export interface PaginationParams {
   pageSize?: number;
 }
 
+export interface ContextFilterParams extends PaginationParams {
+  search?: string;
+  subject?: string[];
+  grade?: string[];
+  sortBy?: string;
+  sortDirection?: 'ASC' | 'DESC';
+}
+
 export interface UserQueryParams extends PaginationParams {
   search?: string;
 }

@@ -2,6 +2,7 @@ import { getAdminApiService } from '@/api/admin';
 import { getAuthApiService } from '@/api/auth';
 import type {
   ArtStyleRequest,
+  ContextFilterParams,
   FAQPost,
   PaginationParams,
   UserQueryParams,
@@ -78,7 +79,7 @@ export const adminKeys = {
   // Contexts
   contexts: {
     all: ['contexts'] as const,
-    list: (params?: PaginationParams) => [...adminKeys.contexts.all, 'list', params] as const,
+    list: (params?: ContextFilterParams) => [...adminKeys.contexts.all, 'list', params] as const,
     detail: (id: string) => [...adminKeys.contexts.all, 'detail', id] as const,
   },
   // Matrix Templates
@@ -650,7 +651,7 @@ export function useQuestionBankChapters(subject?: string, grade?: string) {
 
 // ============= CONTEXTS =============
 
-export function useContexts(params?: PaginationParams) {
+export function useContexts(params?: ContextFilterParams) {
   return useQuery({
     queryKey: adminKeys.contexts.list(params),
     queryFn: () => getAdminApiService().getContexts(params),

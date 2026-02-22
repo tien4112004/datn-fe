@@ -81,7 +81,7 @@ function transformGeneratedMatrix(response: GenerateMatrixResponse): {
  * - Showing Replace vs Merge confirmation after generation
  * - Applying the generated matrix to the form store
  */
-export const GenerateMatrixManager: React.FC = () => {
+export const GenerateMatrixManager = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor' });
 
   const setMainView = useAssignmentEditorStore((state) => state.setMainView);

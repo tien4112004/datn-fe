@@ -10,8 +10,8 @@ import type {
   AssignmentTopic,
   GenerateMatrixRequest,
   GenerateMatrixResponse,
-  GenerateExamFromMatrixRequest,
-  ExamDraftDto,
+  GenerateAssignmentFromMatrixRequest,
+  AssignmentDraft,
 } from '../types';
 import { createMatrixCellsForTopic } from '../utils/matrixHelpers';
 import { mergeApiMatrixIntoCells } from '../utils/matrixConversion';
@@ -112,7 +112,7 @@ export default class AssignmentService implements AssignmentApiService {
     return response.data.data;
   }
 
-  async generateExamFromMatrix(request: GenerateExamFromMatrixRequest): Promise<ExamDraftDto> {
+  async generateAssignmentFromMatrix(request: GenerateAssignmentFromMatrixRequest): Promise<AssignmentDraft> {
     const response = await this.apiClient.post(
       `${this.baseUrl}/api/assignments/generate-from-matrix`,
       request

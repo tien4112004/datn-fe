@@ -1,13 +1,15 @@
 import * as React from 'react';
 import { useNavigate, useParams, useLoaderData } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Menu } from 'lucide-react';
+import { Menu, HelpCircle } from 'lucide-react';
 import { Button } from '@ui/button';
 import { AssignmentEditorLayout } from '../components/editor/AssignmentEditorLayout';
 import { MetadataEditDialog } from '../components/editor/metadata/MetadataEditDialog';
 import { QuestionBankImportManager } from '../components/editor/questions/QuestionBankImportManager';
 import { UnsavedChangesDialog } from '@/shared/components/modals/UnsavedChangesDialog';
 import { useAssignmentFormStore } from '../stores/useAssignmentFormStore';
+import { useTutorialStore } from '../stores/useTutorialStore';
+import { TutorialOverlay } from '../components/editor/tutorial';
 import { useAssignmentDirtyState } from '../hooks/useAssignmentDirtyState';
 import { useSaveAssignment } from '../hooks/useSaveAssignment';
 import { createEmptyFormData, transformAssignmentToFormData } from '../api/service';
@@ -62,6 +64,19 @@ export const AssignmentEditorPage = () => {
 
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
+  // Auto-trigger tutorial for first-time users on desktop
+  const hasSeenTutorial = useTutorialStore((s) => s.hasSeenTutorial);
+  const startTutorial = useTutorialStore((s) => s.startTutorial);
+
+  React.useEffect(() => {
+    if (!hasSeenTutorial && window.innerWidth >= 1024) {
+      const timer = setTimeout(() => {
+        startTutorial();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [hasSeenTutorial, startTutorial]);
+
   const handleCancel = () => {
     if (id) {
       navigate(`/assignment/${id}`);
@@ -77,9 +92,20 @@ export const AssignmentEditorPage = () => {
         <h1 className="text-3xl font-bold tracking-tight">
           {id ? t('pageTitle.edit') : t('pageTitle.create')}
         </h1>
-        <Button size="icon" variant="outline" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
-          <Menu className="h-5 w-5" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={startTutorial}
+            title={t('tutorial.actions.replay')}
+            className="h-8 w-8"
+          >
+            <HelpCircle className="h-4 w-4" />
+          </Button>
+          <Button size="icon" variant="outline" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
+            <Menu className="h-5 w-5" />
+          </Button>
+        </div>
       </div>
 
       <div className="min-h-0 flex-1 px-8 pb-4">
@@ -96,6 +122,9 @@ export const AssignmentEditorPage = () => {
       {/* Dialogs */}
       <MetadataEditDialog />
       <QuestionBankImportManager />
+
+      {/* Tutorial Overlay */}
+      <TutorialOverlay />
 
       {/* Unsaved Changes Dialog */}
       <UnsavedChangesDialog

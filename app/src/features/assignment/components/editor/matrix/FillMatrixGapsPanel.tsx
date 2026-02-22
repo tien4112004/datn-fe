@@ -8,6 +8,12 @@ import { Badge } from '@ui/badge';
 import { Progress } from '@ui/progress';
 import { Loader2, ArrowLeft, Sparkles, Check, Info } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  getDifficultyName,
+  getQuestionTypeName,
+  getDifficultyBadgeClass,
+  getQuestionTypeBadgeClass,
+} from '@aiprimary/core';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { useAssignmentFormStore } from '@/features/assignment/stores/useAssignmentFormStore';
 import { useGenerateQuestions } from '@/features/question-bank/hooks/useQuestionBankApi';
@@ -162,15 +168,18 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
                   <Badge variant="secondary" className="text-xs">
                     {gap.topic}
                   </Badge>
-                  <Badge variant="secondary" className="text-xs">
-                    {gap.difficulty}
+                  <Badge variant="outline" className={`text-xs ${getDifficultyBadgeClass(gap.difficulty)}`}>
+                    {getDifficultyName(gap.difficulty)}
                   </Badge>
-                  <Badge variant="outline" className="text-xs">
-                    {gap.questionType}
+                  <Badge
+                    variant="outline"
+                    className={`text-xs ${getQuestionTypeBadgeClass(gap.questionType)}`}
+                  >
+                    {getQuestionTypeName(gap.questionType)}
                   </Badge>
                 </div>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {gap.gapCount} needed
+                  {String(t('gapDetails.needed', { count: gap.gapCount }))}
                 </span>
               </div>
             ))}
@@ -224,7 +233,7 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600 dark:text-gray-400">Progress</span>
+                <span className="text-gray-600 dark:text-gray-400">{String(t('progress'))}</span>
                 <span className="font-medium text-gray-900 dark:text-gray-100">
                   {completedCount} / {gaps.length}
                 </span>
@@ -249,7 +258,8 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
                     <Loader2 className="h-4 w-4 animate-spin text-blue-600 dark:text-blue-400" />
                   ) : null}
                   <span>
-                    {gap.topic} - {gap.difficulty} - {gap.questionType} ({gap.gapCount})
+                    {gap.topic} - {getDifficultyName(gap.difficulty)} -{' '}
+                    {getQuestionTypeName(gap.questionType)} ({gap.gapCount})
                   </span>
                 </div>
               ))}

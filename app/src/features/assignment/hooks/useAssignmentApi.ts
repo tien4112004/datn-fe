@@ -5,7 +5,7 @@ import type {
   CreateAssignmentRequest,
   UpdateAssignmentRequest,
   GenerateMatrixRequest,
-  GenerateExamFromMatrixRequest,
+  GenerateAssignmentFromMatrixRequest,
 } from '../types';
 
 /**
@@ -171,12 +171,13 @@ export const useGenerateMatrix = () => {
 
 /**
  * Hook to generate an exam from a matrix (detects gaps)
- * @returns Mutation function and state that returns ExamDraftDto with gaps
+ * @returns Mutation function and state that returns AssignmentDraft with gaps
  */
-export const useGenerateExamFromMatrix = () => {
+export const useGenerateAssignmentFromMatrix = () => {
   const service = getAssignmentApiService();
 
   return useMutation({
-    mutationFn: (request: GenerateExamFromMatrixRequest) => service.generateExamFromMatrix(request),
+    mutationFn: (request: GenerateAssignmentFromMatrixRequest) =>
+      service.generateAssignmentFromMatrix(request),
   });
 };

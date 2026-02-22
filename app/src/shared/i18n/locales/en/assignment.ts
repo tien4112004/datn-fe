@@ -281,7 +281,7 @@ export default {
     // Main action buttons
     actions: {
       actions: 'Actions',
-      cancel: 'Cancel',
+      cancel: 'Exit',
       save: 'Save',
       saveAndExit: 'Save & Exit',
       fillMatrixGaps: 'Generate Question from Matrix Gap',
@@ -693,6 +693,8 @@ export default {
       noGaps: 'No gaps found! Matrix is complete.',
       gapsFound: 'Found {{count}} gap(s) requiring {{total}} questions',
       selectGaps: 'Select which gaps to fill',
+      summary: '{{selected}} of {{total}} gaps selected for generation',
+      progress: 'Progress',
       generatingQuestions: 'Generating questions for {{count}} gap(s)...',
       success: 'Successfully filled {{count}} gap(s)',
       status: {
@@ -781,6 +783,49 @@ export default {
     viewModeToggle: {
       preview: 'Preview',
       edit: 'Edit',
+    },
+
+    // Tutorial
+    tutorial: {
+      steps: {
+        infoIcon: {
+          title: 'Assignment Info',
+          description: 'View and edit the assignment title, subject, grade, and other details.',
+        },
+        matrixIcon: {
+          title: 'Assessment Matrix',
+          description: 'Configure topics and difficulty levels to structure your assignment questions.',
+        },
+        contextsIcon: {
+          title: 'Reading Passages',
+          description: 'Manage reading passages that can be shared across multiple questions.',
+        },
+        questionsListIcon: {
+          title: 'Questions List',
+          description: 'View all questions in a scrollable list format for quick review.',
+        },
+        questionItem: {
+          title: 'Question Item',
+          description: 'Each numbered cell represents a question. Click to edit, drag to reorder.',
+        },
+        contextGroup: {
+          title: 'Context Group',
+          description: 'This icon groups questions that share a reading passage. Click to manage the group.',
+        },
+        dragDrop: {
+          title: 'Drag & Drop',
+          description:
+            'Drag any question number to reorder questions. Context groups stay together when moved.',
+        },
+      },
+      actions: {
+        next: 'Next',
+        back: 'Back',
+        skip: 'Skip',
+        finish: 'Finish',
+        replay: 'Replay Tutorial',
+      },
+      progress: '{{current}} of {{total}}',
     },
 
     // Question Navigator

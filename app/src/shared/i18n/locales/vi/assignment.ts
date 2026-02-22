@@ -281,7 +281,7 @@ export default {
     // Nút hành động chính
     actions: {
       actions: 'Hành động',
-      cancel: 'Hủy',
+      cancel: 'Thoát',
       save: 'Lưu',
       saveAndExit: 'Lưu & Thoát',
       fillMatrixGaps: 'Tạo câu hỏi từ ma trận',
@@ -682,6 +682,8 @@ export default {
       noGaps: 'Không có khoảng trống! Ma trận đã hoàn chỉnh.',
       gapsFound: 'Phát hiện {{count}} khoảng trống cần {{total}} câu hỏi',
       selectGaps: 'Chọn khoảng trống để điền',
+      summary: 'Đã chọn {{selected}} / {{total}} khoảng trống để tạo câu hỏi',
+      progress: 'Tiến trình',
       generatingQuestions: 'Đang tạo câu hỏi cho {{count}} khoảng trống...',
       success: 'Điền thành công {{count}} khoảng trống',
       status: {
@@ -771,6 +773,48 @@ export default {
     viewModeToggle: {
       preview: 'Xem trước',
       edit: 'Chỉnh sửa',
+    },
+
+    // Hướng dẫn sử dụng
+    tutorial: {
+      steps: {
+        infoIcon: {
+          title: 'Thông tin bài tập',
+          description: 'Xem và chỉnh sửa tiêu đề, môn học, khối lớp và các chi tiết khác của bài tập.',
+        },
+        matrixIcon: {
+          title: 'Ma trận đánh giá',
+          description: 'Cấu hình chủ đề và mức độ khó để cấu trúc câu hỏi bài tập.',
+        },
+        contextsIcon: {
+          title: 'Đoạn văn đọc hiểu',
+          description: 'Quản lý các đoạn văn đọc hiểu có thể chia sẻ giữa nhiều câu hỏi.',
+        },
+        questionsListIcon: {
+          title: 'Danh sách câu hỏi',
+          description: 'Xem tất cả câu hỏi dưới dạng danh sách cuộn để xem nhanh.',
+        },
+        questionItem: {
+          title: 'Câu hỏi',
+          description: 'Mỗi ô số đại diện cho một câu hỏi. Nhấp để chỉnh sửa, kéo để sắp xếp lại.',
+        },
+        contextGroup: {
+          title: 'Nhóm đọc hiểu',
+          description: 'Biểu tượng này nhóm các câu hỏi cùng đoạn văn. Nhấp để quản lý nhóm.',
+        },
+        dragDrop: {
+          title: 'Kéo & Thả',
+          description: 'Kéo bất kỳ số câu hỏi nào để sắp xếp lại. Nhóm đọc hiểu sẽ di chuyển cùng nhau.',
+        },
+      },
+      actions: {
+        next: 'Tiếp',
+        back: 'Quay lại',
+        skip: 'Bỏ qua',
+        finish: 'Hoàn tất',
+        replay: 'Xem lại hướng dẫn',
+      },
+      progress: '{{current}} / {{total}}',
     },
 
     // Điều hướng câu hỏi

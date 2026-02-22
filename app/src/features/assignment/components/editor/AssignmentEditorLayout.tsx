@@ -1,4 +1,4 @@
-import { useState, useMemo, Fragment, type ReactNode } from 'react';
+import { useMemo, Fragment, type ReactNode } from 'react';
 import {
   Save,
   Wand2,
@@ -37,9 +37,6 @@ import { groupQuestionsByContext, flattenQuestionGroups } from '../../utils/ques
 import type { GroupingContext } from '../../utils/questionGrouping';
 import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../stores/useAssignmentFormStore';
-import { useGenerateExamFromMatrix } from '../../hooks/useAssignmentApi';
-import { cellsToApiMatrix } from '../../utils/matrixConversion';
-import type { ExamDraftDto } from '../../types/assignment';
 
 interface AssignmentEditorLayoutProps {
   onCancel: () => void;
@@ -76,7 +73,6 @@ export const AssignmentEditorLayout = ({
   const setMatrixTemplateSaveDialogOpen = useAssignmentEditorStore(
     (state) => state.setMatrixTemplateSaveDialogOpen
   );
-  const title = useAssignmentFormStore((state) => state.title);
   const subject = useAssignmentFormStore((state) => state.subject);
   const grade = useAssignmentFormStore((state) => state.grade);
   const matrix = useAssignmentFormStore((state) => state.matrix);
@@ -94,19 +90,13 @@ export const AssignmentEditorLayout = ({
   const { t: tActions } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.actions' });
   const { t: tMatrixActions } = useTranslation('assignment', { keyPrefix: 'matrixActions' });
 
-  // Fill Matrix Gaps state
-  const [fillMatrixDraft, setFillMatrixDraft] = useState<ExamDraftDto | null>(null);
-  const [isFillMatrixLoading, setIsFillMatrixLoading] = useState(false);
-  const detectGapsMutation = useGenerateExamFromMatrix();
-
   // Context questions for contextGroup view
   const contextQuestions = useMemo(
     () => (currentContextId ? questions.filter((q) => q.question.contextId === currentContextId) : []),
     [questions, currentContextId]
   );
 
-  const handleFillMatrixGaps = async () => {
-    // Validate matrix exists and has requirements
+  const handleFillMatrixGaps = () => {
     if (!matrix || matrix.length === 0) {
       toast.error(tFillGaps('errors.noMatrix'));
       return;
@@ -122,24 +112,7 @@ export const AssignmentEditorLayout = ({
       return;
     }
 
-    setIsFillMatrixLoading(true);
-    try {
-      const apiMatrix = cellsToApiMatrix(matrix, { grade, subject }, topics);
-      const result = await detectGapsMutation.mutateAsync({
-        subject: subject || '',
-        title: title || 'Test Matrix',
-        matrix: apiMatrix,
-        missingStrategy: 'REPORT_GAPS',
-      });
-
-      setFillMatrixDraft(result);
-      setMainView('fillMatrixGaps');
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : tFillGaps('errors.detectionFailed');
-      toast.error(errorMessage);
-    } finally {
-      setIsFillMatrixLoading(false);
-    }
+    setMainView('fillMatrixGaps');
   };
 
   const handleShuffleQuestions = () => {
@@ -255,7 +228,6 @@ export const AssignmentEditorLayout = ({
       label: t('actions.fillMatrixGaps'),
       tooltip: t('actions.tooltips.fillMatrixGaps'),
       onClick: handleFillMatrixGaps,
-      disabled: isFillMatrixLoading,
     },
     templateLibrary: {
       icon: Library,
@@ -391,17 +363,10 @@ export const AssignmentEditorLayout = ({
           <GenerateQuestionsManager />
         ) : mainView === 'generateMatrix' ? (
           <GenerateMatrixManager />
-        ) : mainView === 'fillMatrixGaps' && fillMatrixDraft ? (
+        ) : mainView === 'fillMatrixGaps' ? (
           <FillMatrixGapsManager
-            draft={fillMatrixDraft}
-            onClose={() => {
-              setMainView('matrix');
-              setFillMatrixDraft(null);
-            }}
-            onQuestionsAdded={() => {
-              setMainView('matrix');
-              setFillMatrixDraft(null);
-            }}
+            onClose={() => setMainView('matrix')}
+            onQuestionsAdded={() => setMainView('matrix')}
           />
         ) : null}
       </div>

@@ -74,9 +74,37 @@ const DetailPage = () => {
     throw new CriticalError('Presentation data is unavailable', ERROR_TYPE.RESOURCE_NOT_FOUND);
   }
 
-  // Listen for dirty state changes from Vue
-  const { showDialog, setShowDialog, handleStay, handleProceed } = useUnsavedChangesBlocker({
+  // Auto-save bridge: dispatch event to Vue, wait for completion event
+  const triggerVueSave = useCallback((): Promise<void> => {
+    return new Promise<void>((resolve, reject) => {
+      const cleanup = () => {
+        window.removeEventListener('app.presentation.save-completed', onCompleted);
+        window.removeEventListener('app.presentation.save-failed', onFailed);
+      };
+
+      const onCompleted = () => {
+        cleanup();
+        resolve();
+      };
+
+      const onFailed = (event: Event) => {
+        cleanup();
+        const detail = (event as CustomEvent<{ error: string }>).detail;
+        reject(new Error(detail?.error || 'Save failed'));
+      };
+
+      window.addEventListener('app.presentation.save-completed', onCompleted, { once: true });
+      window.addEventListener('app.presentation.save-failed', onFailed, { once: true });
+
+      window.dispatchEvent(new CustomEvent('app.presentation.request-save'));
+    });
+  }, []);
+
+  // Listen for dirty state changes from Vue — auto-save when navigating away
+  const canAutoSave = userPermission === 'edit' && !isGenerating;
+  const { showDialog, setShowDialog, handleStay, handleProceed, isAutoSaving } = useUnsavedChangesBlocker({
     eventName: 'app.presentation.dirty-state-changed',
+    autoSave: canAutoSave ? triggerVueSave : undefined,
   });
 
   // Listen for comment drawer open requests from Vue
@@ -152,9 +180,13 @@ const DetailPage = () => {
         className="vue-remote"
         LoadingComponent={() => <GlobalSpinner text={t('presentation')} />}
       />
-      {isGenerating && <GlobalSpinner text={t('generatingPresentation')} lightBlur />}
-      {!isGenerating && isSaving && <GlobalSpinner text={t('savingPresentation')} />}
-      {isDuplicating && <GlobalSpinner text={tPresentation('duplicate.loading')} />}
+      {(() => {
+        // Priority system: show only one spinner at a time
+        if (isGenerating) return <GlobalSpinner text={t('generatingPresentation')} lightBlur />;
+        if (isDuplicating) return <GlobalSpinner text={tPresentation('duplicate.loading')} />;
+        if (isSaving || isAutoSaving) return <GlobalSpinner text={t('savingPresentation')} />;
+        return null;
+      })()}
 
       {/* Comment Drawer - Triggered by Vue app via 'app.presentation.open-comments' event */}
       {id && (

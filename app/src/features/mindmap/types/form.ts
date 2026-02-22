@@ -11,6 +11,22 @@ export interface CreateMindmapFormData {
   subject?: string;
 }
 
+/**
+ * Request data passed from Flutter to React via localStorage
+ * for mobile mindmap generation flow.
+ */
+export interface MindmapMobileGenerationRequest {
+  mindmapId: string;
+  topic: string;
+  model: string;
+  provider: string;
+  language: 'en' | 'vi';
+  maxDepth: number;
+  maxBranchesPerNode: number;
+  grade?: string;
+  subject?: string;
+}
+
 export const LANGUAGE_OPTIONS = [
   { value: 'en', labelKey: 'english' },
   { value: 'vi', labelKey: 'vietnamese' },

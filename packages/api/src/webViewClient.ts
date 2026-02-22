@@ -22,9 +22,6 @@ interface StreamableAxiosInstance extends AxiosInstance {
 const webViewApi: StreamableAxiosInstance = axios.create({
   allowAbsoluteUrls: true,
   withCredentials: false, // DO NOT send cookies with requests
-  headers: {
-    'Content-Type': 'application/json',
-  },
 }) as StreamableAxiosInstance;
 
 webViewApi.stream = async function (url: string, request: any, signal: AbortSignal) {
@@ -39,6 +36,8 @@ webViewApi.stream = async function (url: string, request: any, signal: AbortSign
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
+
+    console.log('WebViewAPI Request:', { url, request });
 
     const response = await fetch(url, {
       method: 'POST',
@@ -104,6 +103,18 @@ webViewApi.stream = async function (url: string, request: any, signal: AbortSign
     throw new CriticalError('Network or unexpected error occurred', ERROR_TYPE.NETWORK);
   }
 };
+
+// Request interceptor to set Content-Type based on data type
+webViewApi.interceptors.request.use((config) => {
+  // Only set Content-Type for requests with data
+  if (config.data !== undefined) {
+    // Let axios handle Content-Type for FormData (sets multipart/form-data with boundary)
+    if (!(config.data instanceof FormData)) {
+      config.headers['Content-Type'] = 'application/json';
+    }
+  }
+  return config;
+});
 
 // Request interceptor to add Authorization header
 webViewApi.interceptors.request.use(

@@ -442,26 +442,36 @@ export function usePresentationProcessor(
         try {
           // STEP 1: Wait for all slide processing to complete
           if (pendingSlideProcessing.value.size > 0) {
-            await Promise.all(Array.from(pendingSlideProcessing.value));
+            try {
+              await Promise.all(Array.from(pendingSlideProcessing.value));
+            } catch (error) {
+              console.error('Error processing slides:', error);
+              throw error;
+            }
           }
 
           // STEP 2: Wait for all image generations to complete (including all retries)
           if (pendingImageGenerations.value.size > 0) {
-            const promisesToWait = Array.from(pendingImageGenerations.value);
-            await Promise.allSettled(promisesToWait);
+            try {
+              const promisesToWait = Array.from(pendingImageGenerations.value);
+              await Promise.allSettled(promisesToWait);
+            } catch (error) {
+              console.error('Error generating images:', error);
+              throw error;
+            }
           }
 
           // STEP 3: Run finalization logic (ONLY after ALL slides processed and ALL images complete)
 
-          try {
-            // Extract title from outline markdown (first ## heading)
-            const title =
-              presentation?.title ||
-              (generationRequest?.outline
-                ? extractTitleFromOutline(generationRequest.outline)
-                : 'Untitled Presentation');
+          // Extract title from outline markdown (first ## heading)
+          const title =
+            presentation?.title ||
+            (generationRequest?.outline
+              ? extractTitleFromOutline(generationRequest.outline)
+              : 'Untitled Presentation');
 
-            // Save presentation with all data (slides, metadata, thumbnail)
+          // Save presentation with all data (slides, metadata, thumbnail)
+          try {
             await savePresentationFn({
               title,
               slides: slidesStore.slides,
@@ -479,6 +489,9 @@ export function usePresentationProcessor(
         } catch (error) {
           console.error('Error finalizing presentation:', error);
           dispatchMessage('error', 'Failed to finalize presentation');
+        } finally {
+          // Always clear generating state
+          dispatchGeneratingEvent(false);
         }
       }
     }

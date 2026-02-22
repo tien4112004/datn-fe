@@ -3,6 +3,7 @@ import { cn } from '@/shared/lib/utils';
 import type { NodeProps } from '@xyflow/react';
 import { Loader2, Network, Upload, X } from 'lucide-react';
 import { memo, useCallback, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCoreStore, useLayoutStore, useNodeOperationsStore } from '../../stores';
 import type { ImageNode } from '../../types';
 import { DRAGHANDLE } from '../../types/constants';
@@ -18,6 +19,7 @@ import { BaseNodeBlock } from './BaseNode';
 const ImageNodeBlock = memo(
   ({ ...node }: NodeProps<ImageNode>) => {
     const { id, data, selected, width, height } = node;
+    const { t } = useTranslation('mindmap');
 
     // Deprecation warning
     console.warn(
@@ -175,7 +177,7 @@ const ImageNodeBlock = memo(
             {isLoadingImage ? (
               <div className="flex flex-col items-center gap-2">
                 <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
-                <span className="text-muted-foreground text-sm">Loading image...</span>
+                <span className="text-muted-foreground text-sm">{t('node.loadingImage')}</span>
               </div>
             ) : (
               <div

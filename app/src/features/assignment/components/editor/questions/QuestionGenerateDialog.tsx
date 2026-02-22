@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { useQuestionGenerateForm } from './useQuestionGenerateForm';
 import { QuestionGenerateFormFields } from './QuestionGenerateFormFields';
+import { AiDisclaimer } from '@/shared/components/common/AiDisclaimer';
 
 interface QuestionBankGenerateDialogProps {
   open: boolean;
@@ -160,6 +161,8 @@ export function QuestionBankGenerateDialog({
                   )}
                 </div>
               )}
+
+              <AiDisclaimer />
 
               <div className="flex items-center justify-end gap-2">
                 <Button variant="outline" onClick={handleClose} disabled={generateMutation.isPending}>

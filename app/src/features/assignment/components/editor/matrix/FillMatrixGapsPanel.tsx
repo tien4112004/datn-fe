@@ -15,6 +15,7 @@ import {
   getQuestionTypeBadgeClass,
 } from '@aiprimary/core';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
+import { AiDisclaimer } from '@/shared/components/common/AiDisclaimer';
 import { useAssignmentFormStore } from '@/features/assignment/stores/useAssignmentFormStore';
 import { useGenerateQuestions } from '@/features/question-bank/hooks/useQuestionBankApi';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
@@ -267,6 +268,8 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
           </CardContent>
         </Card>
       )}
+
+      <AiDisclaimer />
 
       {/* Actions */}
       <div className="flex gap-2">

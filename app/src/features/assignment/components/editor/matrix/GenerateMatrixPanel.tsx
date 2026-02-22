@@ -14,6 +14,7 @@ import type { GenerateMatrixRequest, GenerateMatrixResponse } from '@/features/a
 import { Wand2, Loader2, Zap, BookOpen, GraduationCap, X, Plus, Check, HelpCircle, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
+import { AiDisclaimer } from '@/shared/components/common/AiDisclaimer';
 import {
   getElementaryGrades,
   getAllSubjects,
@@ -446,7 +447,8 @@ export function GenerateMatrixPanel({
         </div>
 
         {/* Footer */}
-        <div className="px-2 pt-4">
+        <div className="space-y-3 px-2 pt-4">
+          <AiDisclaimer />
           <div className="flex justify-end gap-2">
             {onClose && (
               <Button variant="outline" onClick={onClose}>

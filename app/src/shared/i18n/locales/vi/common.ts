@@ -180,7 +180,5 @@ export default {
   subject: 'Môn học',
   topics: 'Chủ đề',
   characters: 'ký tự',
-  ai: {
-    disclaimer: 'Nội dung được tạo bởi AI có thể chứa lỗi. Vui lòng xem xét và xác minh trước khi sử dụng.',
-  },
+  aiDisclaimer: 'Nội dung do AI tạo có thể không chính xác. Vui lòng kiểm tra kỹ trước khi sử dụng.',
 };

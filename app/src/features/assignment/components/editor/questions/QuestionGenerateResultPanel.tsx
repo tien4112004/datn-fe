@@ -18,6 +18,7 @@ import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { GeneratedQuestionsResultList } from '@aiprimary/question/shared';
 import { QuestionRenderer } from '@/features/question/components/QuestionRenderer';
 import { VIEW_MODE } from '@/features/assignment/types';
+import { AiDisclaimer } from '@/shared/components/common/AiDisclaimer';
 
 interface QuestionGenerateResultPanelProps {
   questions: QuestionBankItem[];
@@ -68,6 +69,8 @@ export function QuestionGenerateResultPanel({
           </Button>
         )}
       </div>
+
+      <AiDisclaimer />
 
       {/* Questions List */}
       <GeneratedQuestionsResultList

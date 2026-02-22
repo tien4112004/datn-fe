@@ -19,6 +19,7 @@ import { useAssignmentEditorStore } from '../../../stores/useAssignmentEditorSto
 import { useAssignmentFormStore } from '../../../stores/useAssignmentFormStore';
 import { generateId } from '@/shared/lib/utils';
 import { QuestionGenerateResultPanel } from '../questions/QuestionGenerateResultPanel';
+import { AiDisclaimer } from '@/shared/components/common/AiDisclaimer';
 
 interface ModelValue {
   name: string;
@@ -405,6 +406,8 @@ export const GenerateFromContextManager = () => {
               </span>
             </div>
           )}
+
+          <AiDisclaimer />
 
           <div className="flex items-center justify-end gap-2">
             <Button variant="outline" onClick={handleClose} disabled={generateMutation.isPending}>

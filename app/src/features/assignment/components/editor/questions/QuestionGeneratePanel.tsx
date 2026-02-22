@@ -9,6 +9,7 @@ import type { QuestionBankItem } from '@/features/question-bank/types';
 import { QuestionGenerateResultPanel } from './QuestionGenerateResultPanel';
 import { useQuestionGenerateForm } from './useQuestionGenerateForm';
 import { QuestionGenerateFormFields } from './QuestionGenerateFormFields';
+import { AiDisclaimer } from '@/shared/components/common/AiDisclaimer';
 
 interface QuestionGeneratePanelProps {
   onClose?: () => void;
@@ -181,6 +182,8 @@ export function QuestionGeneratePanel({
               )}
             </div>
           )}
+
+          <AiDisclaimer />
 
           <div className="flex items-center justify-between gap-2">
             <div className="ml-auto flex gap-2">

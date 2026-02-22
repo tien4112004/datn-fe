@@ -67,7 +67,6 @@ export const AssignmentEditorPage = () => {
   // Auto-trigger tutorial for first-time users on desktop
   const hasSeenTutorial = useTutorialStore((s) => s.hasSeenTutorial);
   const startTutorial = useTutorialStore((s) => s.startTutorial);
-
   React.useEffect(() => {
     if (!hasSeenTutorial && window.innerWidth >= 1024) {
       const timer = setTimeout(() => {
@@ -98,7 +97,7 @@ export const AssignmentEditorPage = () => {
             variant="ghost"
             onClick={startTutorial}
             title={t('tutorial.actions.replay')}
-            className="h-8 w-8"
+            className="hidden h-8 w-8 lg:flex"
           >
             <HelpCircle className="h-4 w-4" />
           </Button>

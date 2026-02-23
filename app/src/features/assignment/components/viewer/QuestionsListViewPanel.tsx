@@ -1,12 +1,14 @@
-import { FileQuestion, BookOpen } from 'lucide-react';
-import { useMemo } from 'react';
+import { FileQuestion, BookOpen, ArrowRight } from 'lucide-react';
+import { useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VIEW_MODE } from '@aiprimary/core';
 import { QuestionRenderer } from '@/features/question/components/QuestionRenderer';
 import { ContextDisplay } from '@/features/context';
 import { Badge } from '@ui/badge';
+import { Button } from '@ui/button';
 import type { Assignment, AssignmentQuestionWithTopic, AssignmentContext } from '../../types';
 import { groupQuestionsByContext, getQuestionDisplayNumber } from '../../utils/questionGrouping';
+import { useAssignmentEditorStore } from '../../stores/useAssignmentEditorStore';
 
 interface QuestionsListViewPanelProps {
   assignment: Assignment;
@@ -16,8 +18,19 @@ export const QuestionsListViewPanel = ({ assignment }: QuestionsListViewPanelPro
   const { t } = useTranslation('assignment', { keyPrefix: 'view.questions' });
   const { t: tContext } = useTranslation('assignment', { keyPrefix: 'context' });
 
+  const setMainView = useAssignmentEditorStore((state) => state.setMainView);
+  const setCurrentQuestionId = useAssignmentEditorStore((state) => state.setCurrentQuestionId);
+
   const questions = (assignment.questions || []) as AssignmentQuestionWithTopic[];
   const assignmentContexts = ((assignment as any).contexts || []) as AssignmentContext[];
+
+  const handleNavigateToQuestion = useCallback(
+    (questionId: string) => {
+      setMainView('questions');
+      setCurrentQuestionId(questionId);
+    },
+    [setMainView, setCurrentQuestionId]
+  );
 
   // Build contexts map
   const contextsMap = useMemo(() => {
@@ -101,9 +114,20 @@ export const QuestionsListViewPanel = ({ assignment }: QuestionsListViewPanelPro
                           <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                             {t('questionNumber', { number: questionNumber })}
                           </span>
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
-                            {t('points', { points: aq.points || 0 })}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                              {t('points', { points: aq.points || 0 })}
+                            </span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 w-6 p-0"
+                              onClick={() => handleNavigateToQuestion(aq.question.id)}
+                            >
+                              <ArrowRight className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
                         </div>
                         <QuestionRenderer
                           question={aq.question as any}
@@ -131,9 +155,20 @@ export const QuestionsListViewPanel = ({ assignment }: QuestionsListViewPanelPro
                 <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                   {t('questionNumber', { number: questionNumber })}
                 </span>
-                <span className="text-sm text-gray-500 dark:text-gray-400">
-                  {t('points', { points: aq.points || 0 })}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {t('points', { points: aq.points || 0 })}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={() => handleNavigateToQuestion(aq.question.id)}
+                  >
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
               </div>
               <QuestionRenderer
                 question={aq.question as any}

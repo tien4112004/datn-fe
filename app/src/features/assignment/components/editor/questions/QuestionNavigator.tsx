@@ -351,7 +351,6 @@ export const QuestionNavigator = () => {
                       hasQuestionError(question.id) &&
                         'bg-destructive/15 text-destructive hover:bg-destructive/25'
                     )}
-                    tooltip={question.title || t('untitled')}
                   >
                     {questionNumber}
                   </SortableItem>

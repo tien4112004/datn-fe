@@ -1,7 +1,7 @@
 import { Button } from '@ui/button';
 import { useTranslation } from 'react-i18next';
 import { Controller } from 'react-hook-form';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Info } from 'lucide-react';
 import { Card, CardContent, CardTitle } from '@ui/card';
 import { AutosizeTextarea } from '@ui/autosize-textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
@@ -21,6 +21,7 @@ interface OutlineCreationViewProps {
 
 const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
+  const { t: tCommon } = useTranslation('common');
   const { control, setValue, watch, trigger } = usePresentationForm();
   const [searchParams, setSearchParams] = useSearchParams();
   const { models } = useModels(MODEL_TYPES.TEXT);
@@ -145,6 +146,12 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
             <AdvancedOptions control={control} isOpen={isAdvancedOpen} onToggle={toggleAdvancedOptions} />
           </CardContent>
         </Card>
+
+        {/* AI Disclaimer */}
+        <div className="mt-4 flex items-start gap-2">
+          <Info className="text-muted-foreground mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+          <p className="text-muted-foreground text-xs italic">{tCommon('ai.disclaimer')}</p>
+        </div>
 
         <Button type="submit" className="mt-4 w-full">
           <Sparkles className="mr-2 h-4 w-4" />

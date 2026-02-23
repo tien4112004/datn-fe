@@ -1,6 +1,7 @@
 export default {
   // AI Features
   ai: {
+    disclaimer: 'AI-generated content may contain errors. Please review and verify before use.',
     dialog: {
       title: 'AIPPT',
       templateSubtitle: 'Select a template to start generating PPT',

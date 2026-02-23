@@ -11,7 +11,7 @@ import { useGenerateMatrix } from '@/features/assignment/hooks/useAssignmentApi'
 import { useModels, MODEL_TYPES } from '@/features/model';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
 import type { GenerateMatrixRequest, GenerateMatrixResponse } from '@/features/assignment/types/assignment';
-import { Wand2, Loader2, Zap, BookOpen, GraduationCap, X, Plus, Check, HelpCircle } from 'lucide-react';
+import { Wand2, Loader2, Zap, BookOpen, GraduationCap, X, Plus, Check, HelpCircle, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import {
@@ -71,6 +71,7 @@ export function GenerateMatrixPanel({
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, {
     keyPrefix: 'assignmentEditor.generateMatrixDialog',
   });
+  const { t: tCommon } = useTranslation(I18N_NAMESPACES.COMMON);
 
   // Form state
   const [grade, setGrade] = useState(initialGrade || '');
@@ -246,6 +247,11 @@ export function GenerateMatrixPanel({
               placeholder={t('fields.promptPlaceholder')}
               className="min-h-20 resize-none"
             />
+            {/* AI Disclaimer */}
+            <div className="flex items-start gap-2">
+              <Info className="text-muted-foreground mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+              <p className="text-muted-foreground text-xs italic">{tCommon('ai.disclaimer')}</p>
+            </div>
           </div>
 
           {/* Language Selection */}

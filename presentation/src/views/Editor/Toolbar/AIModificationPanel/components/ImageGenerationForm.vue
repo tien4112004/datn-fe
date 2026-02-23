@@ -12,6 +12,12 @@
       />
     </InputGroup>
 
+    <!-- AI Disclaimer -->
+    <div class="ai-disclaimer-container">
+      <Info :size="14" class="ai-disclaimer-icon" />
+      <p class="ai-disclaimer">{{ t('ai.ai.disclaimer') }}</p>
+    </div>
+
     <ArtStyleSelector v-model="selectedStyle" :art-style-options="artStyleOptions" :disabled="isProcessing" />
 
     <ModelSelector
@@ -43,7 +49,7 @@ import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import { useModelStore } from '@/stores/modelStore';
 import { useModels } from '@/services/model/queries';
-import { Image as IconImage } from 'lucide-vue-next';
+import { Image as IconImage, Info } from 'lucide-vue-next';
 import Button from '@/components/Button.vue';
 import ImagePreview from './common/ImagePreview.vue';
 import InputGroup from './common/InputGroup.vue';
@@ -127,5 +133,33 @@ const matchSlideTheme = computed({
   width: 14px;
   height: 14px;
   margin-right: 4px;
+}
+
+.ai-disclaimer-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.ai-disclaimer-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--presentation-muted-foreground, rgba(0, 0, 0, 0.45));
+}
+
+:root[data-theme='dark'] .ai-disclaimer-icon {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.ai-disclaimer {
+  font-size: 11px;
+  color: var(--presentation-muted-foreground, rgba(0, 0, 0, 0.45));
+  margin: 0;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+:root[data-theme='dark'] .ai-disclaimer {
+  color: rgba(255, 255, 255, 0.4);
 }
 </style>

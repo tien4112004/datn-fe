@@ -2,7 +2,7 @@ import { Button } from '@ui/button';
 import { Label } from '@ui/label';
 import { Separator } from '@ui/separator';
 import DOMPurify from 'dompurify';
-import { TreeDeciduous } from 'lucide-react';
+import { TreeDeciduous, Info } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -29,6 +29,7 @@ interface Props {
  */
 export function SingleNodePanel({ context, metadata }: Props): React.ReactElement {
   const { t } = useTranslation('mindmap');
+  const { t: tCommon } = useTranslation('common');
   const { isProcessing, error, refineNode, clearError } = useNodeRefinement(metadata);
   const { isExpanding, expandNode } = useNodeExpansion(metadata);
   const quickActions = useMindmapQuickActions();
@@ -123,6 +124,12 @@ export function SingleNodePanel({ context, metadata }: Props): React.ReactElemen
         onSubmit={handleCustomInstruction}
         isLoading={isProcessing}
       />
+
+      {/* AI Disclaimer */}
+      <div className="flex items-start gap-2">
+        <Info className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-gray-500 dark:text-gray-500" />
+        <p className="text-xs italic text-gray-500 dark:text-gray-500">{tCommon('ai.disclaimer')}</p>
+      </div>
 
       {/* Expand Tree Section */}
       <div className="space-y-2">

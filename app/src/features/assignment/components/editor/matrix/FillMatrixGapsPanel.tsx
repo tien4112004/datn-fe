@@ -6,7 +6,7 @@ import { Textarea } from '@ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
 import { Badge } from '@ui/badge';
 import { Progress } from '@ui/progress';
-import { Loader2, ArrowLeft, Sparkles, Check } from 'lucide-react';
+import { Loader2, ArrowLeft, Sparkles, Check, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { useAssignmentFormStore } from '@/features/assignment/stores/useAssignmentFormStore';
@@ -28,6 +28,7 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, {
     keyPrefix: 'assignmentEditor.fillMatrixGaps',
   });
+  const { t: tCommon } = useTranslation(I18N_NAMESPACES.COMMON);
 
   // Get assignment data and actions
   const subject = useAssignmentFormStore((state) => state.subject);
@@ -203,6 +204,11 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
               className="min-h-20 resize-none"
             />
             <p className="text-xs text-gray-500 dark:text-gray-400">{String(t('fields.promptHint'))}</p>
+            {/* AI Disclaimer */}
+            <div className="flex items-start gap-2">
+              <Info className="text-muted-foreground mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+              <p className="text-muted-foreground text-xs italic">{tCommon('ai.disclaimer')}</p>
+            </div>
           </div>
         </div>
       )}

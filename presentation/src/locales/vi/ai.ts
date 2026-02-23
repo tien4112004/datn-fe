@@ -1,6 +1,7 @@
 export default {
   // Tính năng AI
   ai: {
+    disclaimer: 'Nội dung được tạo bởi AI có thể chứa lỗi. Vui lòng xem xét và xác minh trước khi sử dụng.',
     dialog: {
       title: 'AIPPT',
       templateSubtitle: 'Chọn một mẫu phù hợp bên dưới để bắt đầu tạo bài thuyết trình',

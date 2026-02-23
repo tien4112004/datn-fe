@@ -180,4 +180,7 @@ export default {
   subject: 'Subject',
   topics: 'Topics',
   characters: 'characters',
+  ai: {
+    disclaimer: 'AI-generated content may contain errors. Please review and verify before use.',
+  },
 };

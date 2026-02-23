@@ -181,7 +181,7 @@ const CreateMindmapPage = () => {
         {/* AI Disclaimer */}
         <div className="mt-4 flex items-start gap-2">
           <Info className="text-muted-foreground mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
-          <p className="text-muted-foreground text-xs italic">{tCommon('ai.disclaimer')}</p>
+          <p className="text-muted-foreground text-xs italic">{tCommon('aiDisclaimer')}</p>
         </div>
 
         <Button type="submit" className="mt-4 w-full" disabled={isFlowGenerating}>

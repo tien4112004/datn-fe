@@ -217,7 +217,7 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
             {/* AI Disclaimer */}
             <div className="flex items-start gap-2">
               <Info className="text-muted-foreground mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
-              <p className="text-muted-foreground text-xs italic">{tCommon('ai.disclaimer')}</p>
+              <p className="text-muted-foreground text-xs italic">{tCommon('aiDisclaimer')}</p>
             </div>
           </div>
         </div>

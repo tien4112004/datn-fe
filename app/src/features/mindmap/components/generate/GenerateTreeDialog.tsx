@@ -361,7 +361,7 @@ function GenerateTreeDialog({ isOpen, onOpenChange }: GenerateTreeDialogProps) {
           {/* AI Disclaimer */}
           <div className="flex items-start gap-2 px-6 pb-4">
             <Info className="text-muted-foreground mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
-            <p className="text-muted-foreground text-xs italic">{tCommon('ai.disclaimer')}</p>
+            <p className="text-muted-foreground text-xs italic">{tCommon('aiDisclaimer')}</p>
           </div>
 
           <DialogFooter className="border-t px-6 py-4">

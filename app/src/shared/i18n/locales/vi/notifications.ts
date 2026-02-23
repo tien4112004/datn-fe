@@ -3,6 +3,7 @@
  */
 export default {
   title: 'Thông báo',
+  description: 'Cập nhật thông báo, bài tập và hoạt động mới nhất từ các lớp học của bạn.',
   status: {
     title: 'Trạng thái thông báo',
     description: 'Quản lý cách bạn nhận thông báo về hoạt động lớp học và bài tập.',
@@ -32,7 +33,6 @@ export default {
     },
   },
   list: {
-    title: 'Thông báo gần đây',
     totalNotifications: '{{count}} thông báo',
     unreadCount: '({{count}} chưa đọc)',
     markAllAsRead: 'Đánh dấu tất cả đã đọc',

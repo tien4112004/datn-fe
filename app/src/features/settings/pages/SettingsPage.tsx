@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import CommonTabs, { type TabItem } from '@/shared/components/common/CommonTabs';
+import { PageHeader } from '@/shared/components/common/PageHeader';
+import { PageContainer } from '@/shared/components/common/PageContainer';
 import { Separator } from '@ui/separator';
 import GeneralSettings from '../components/GeneralSettings';
 import AppearanceSettings from '../components/AppearanceSettings';
@@ -66,11 +68,8 @@ function SettingsPage() {
   return (
     <div className="flex h-full flex-col">
       <div className="flex flex-1 flex-col overflow-auto">
-        <div className="mx-auto w-full max-w-7xl space-y-6 px-8 py-12">
-          <div className="mb-8 space-y-1">
-            <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">{t('title')}</h1>
-            <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
-          </div>
+        <PageContainer>
+          <PageHeader title={t('title')} description={t('subtitle')} />
 
           <div className="flex w-full flex-col gap-6">
             <CommonTabs
@@ -81,7 +80,7 @@ function SettingsPage() {
               tabsClassName="w-full"
             />
           </div>
-        </div>
+        </PageContainer>
       </div>
     </div>
   );

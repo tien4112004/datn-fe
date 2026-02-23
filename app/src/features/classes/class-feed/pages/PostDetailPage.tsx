@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@ui/button';
 import { Skeleton } from '@ui/skeleton';
+import { PageContainer } from '@/shared/components/common/PageContainer';
 import { usePost, useDeletePost, usePinPost } from '../hooks/useApi';
 import { PostCard } from '../components/PostCard';
 import { CommentThread } from '../components/CommentThread';
@@ -54,19 +55,19 @@ export const PostDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto max-w-4xl p-4 md:p-8">
+      <PageContainer>
         <div className="space-y-6">
           <Skeleton className="h-10 w-32" />
           <Skeleton className="h-48 w-full" />
           <Skeleton className="h-64 w-full" />
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto max-w-4xl p-4 md:p-8">
+      <PageContainer>
         <Button onClick={handleBack} variant="ghost" size="sm" className="mb-6 gap-2">
           <ArrowLeft className="h-4 w-4" />
           {t('navigation.goBack')}
@@ -77,13 +78,13 @@ export const PostDetailPage = () => {
             <p className="text-muted-foreground">{t('feed.errors.loadFailed')}</p>
           </div>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   if (!post) {
     return (
-      <div className="container mx-auto max-w-4xl p-4 md:p-8">
+      <PageContainer>
         <Button onClick={handleBack} variant="ghost" size="sm" className="mb-6 gap-2">
           <ArrowLeft className="h-4 w-4" />
           {t('navigation.goBack')}
@@ -94,12 +95,12 @@ export const PostDetailPage = () => {
             <p className="text-muted-foreground">{t('feed.list.empty.all.description')}</p>
           </div>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="container mx-auto max-w-4xl p-4 md:p-8">
+    <PageContainer>
       {/* Back Button */}
       <Button onClick={handleBack} variant="ghost" size="sm" className="mb-6 gap-2">
         <ArrowLeft className="h-4 w-4" />
@@ -132,6 +133,6 @@ export const PostDetailPage = () => {
           <CommentThread postId={postId!} />
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 };

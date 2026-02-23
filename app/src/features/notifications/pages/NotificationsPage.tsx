@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
-import { Bell, Lock, Settings, Loader2, Check } from 'lucide-react';
+import { Lock, Loader2, Check } from 'lucide-react';
+import { PageHeader } from '@/shared/components/common/PageHeader';
+import { PageContainer } from '@/shared/components/common/PageContainer';
 import { Button } from '@ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@ui/alert';
 import { useFCM } from '../hooks/useFCM';
 import { useNotifications, useMarkAsRead, useMarkAllAsRead, useUnreadCount } from '../hooks/useApi';
@@ -62,21 +63,17 @@ export function NotificationsPage() {
     markAllAsRead.mutate();
   };
 
+  const showStatus = !isSupported || isBlocked || (!isGranted && isSupported);
+
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-8">
-      <div className="mb-8 flex items-center gap-3">
-        <Bell className="text-primary h-8 w-8" />
-        <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
-      </div>
+    <PageContainer>
+      <PageHeader title={t('title')} />
+      <p className="text-muted-foreground -mt-4 mb-6 text-sm">{t('description')}</p>
 
       <div className="space-y-6">
-        {/* Status Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('status.title')}</CardTitle>
-            <CardDescription>{t('status.description')}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        {/* Status Section — only shown when action or attention is needed */}
+        {showStatus && (
+          <div>
             {!isSupported ? (
               <Alert variant="destructive">
                 <AlertTitle>{t('status.notSupported.title')}</AlertTitle>
@@ -105,12 +102,6 @@ export function NotificationsPage() {
                   </div>
                 </AlertDescription>
               </Alert>
-            ) : isGranted ? (
-              <Alert className="border-green-500 bg-green-50 text-green-900 dark:bg-green-900/20 dark:text-green-300">
-                <Settings className="h-4 w-4" />
-                <AlertTitle>{t('status.active.title')}</AlertTitle>
-                <AlertDescription>{t('status.active.description')}</AlertDescription>
-              </Alert>
             ) : (
               <div className="bg-muted flex flex-col items-center justify-between gap-4 rounded-lg p-4 sm:flex-row">
                 <div>
@@ -120,18 +111,17 @@ export function NotificationsPage() {
                 <Button onClick={() => initialize()}>{t('status.enable.button')}</Button>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        )}
 
         {/* Notification List */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <div className="mb-4 flex items-center justify-between">
             <div>
-              <CardTitle>{t('list.title')}</CardTitle>
-              <CardDescription>
+              <p className="text-muted-foreground text-sm">
                 {t('list.totalNotifications', { count: pagination?.totalItems ?? 0 })}
                 {unreadCount > 0 && ` ${t('list.unreadCount', { count: unreadCount })}`}
-              </CardDescription>
+              </p>
             </div>
             {unreadCount > 0 && (
               <Button
@@ -148,49 +138,48 @@ export function NotificationsPage() {
                 {t('list.markAllAsRead')}
               </Button>
             )}
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="text-muted-foreground flex h-[200px] items-center justify-center">
-                <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-                {t('list.loading')}
-              </div>
-            ) : notifications.length === 0 ? (
-              <div className="text-muted-foreground py-8 text-center">{t('list.empty')}</div>
-            ) : (
-              <div className="space-y-2">
-                {notifications.map((notification) => (
-                  <NotificationItem
-                    key={notification.id}
-                    notification={notification}
-                    onClick={handleNotificationClick}
-                  />
-                ))}
-              </div>
-            )}
+          </div>
 
-            {/* Pagination */}
-            {pagination && pagination.totalPages > 1 && (
-              <div className="mt-4 flex items-center justify-between">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPage((p) => Math.max(0, p - 1))}
-                  disabled={!hasPrevious}
-                >
-                  {t('pagination.previous')}
-                </Button>
-                <span className="text-muted-foreground text-sm">
-                  {t('pagination.pageOf', { current: page + 1, total: pagination.totalPages })}
-                </span>
-                <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)} disabled={!hasMore}>
-                  {t('pagination.next')}
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          {isLoading ? (
+            <div className="text-muted-foreground flex h-[200px] items-center justify-center">
+              <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+              {t('list.loading')}
+            </div>
+          ) : notifications.length === 0 ? (
+            <div className="text-muted-foreground py-8 text-center">{t('list.empty')}</div>
+          ) : (
+            <div className="space-y-2">
+              {notifications.map((notification) => (
+                <NotificationItem
+                  key={notification.id}
+                  notification={notification}
+                  onClick={handleNotificationClick}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {pagination && pagination.totalPages > 1 && (
+            <div className="mt-4 flex items-center justify-between">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                disabled={!hasPrevious}
+              >
+                {t('pagination.previous')}
+              </Button>
+              <span className="text-muted-foreground text-sm">
+                {t('pagination.pageOf', { current: page + 1, total: pagination.totalPages })}
+              </span>
+              <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)} disabled={!hasMore}>
+                {t('pagination.next')}
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

@@ -2,23 +2,14 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@ui/button';
-import {
-  ArrowLeft,
-  CheckCircle2,
-  Clock,
-  Eye,
-  FileCheck,
-  Loader2,
-  Trophy,
-  Users,
-  TrendingUp,
-  Edit,
-} from 'lucide-react';
+import { CheckCircle2, Clock, Eye, FileCheck, Loader2, Trophy, Users, TrendingUp, Edit } from 'lucide-react';
 import { useSubmissionsByPost } from '../hooks';
 import { useAssignmentPublic } from '@/features/assignment/hooks/useAssignmentApi';
 import { useFormattedDistance } from '@/shared/lib/date-utils';
 import type { Submission } from '@aiprimary/core';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
+import { PageHeader } from '@/shared/components/common/PageHeader';
+import { PageContainer } from '@/shared/components/common/PageContainer';
 
 export const AssignmentSubmissionsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -149,18 +140,10 @@ export const AssignmentSubmissionsPage = () => {
   ];
 
   return (
-    <div className="container mx-auto max-w-7xl p-4 md:p-8">
+    <PageContainer>
       {/* Header */}
       <div className="mb-6">
-        <Button onClick={() => navigate(-1)} variant="ghost" size="sm" className="mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          {tActions('back')}
-        </Button>
-
-        <div>
-          <h1 className="text-3xl font-bold">{t('title')}</h1>
-          <p className="text-muted-foreground mt-2">{assignment.title}</p>
-        </div>
+        <PageHeader title={t('title')} description={assignment.title} onBack={() => navigate(-1)} />
       </div>
 
       {/* Statistics Cards */}
@@ -294,6 +277,6 @@ export const AssignmentSubmissionsPage = () => {
           {t('previewMode')}
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 };

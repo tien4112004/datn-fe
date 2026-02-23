@@ -3,6 +3,7 @@
  */
 export default {
   title: 'Notifications',
+  description: 'Stay up to date with announcements, assignments, and activity from your classes.',
   status: {
     title: 'Notification Status',
     description: 'Manage how you receive updates about class activities and assignments.',
@@ -31,7 +32,6 @@ export default {
     },
   },
   list: {
-    title: 'Recent Notifications',
     totalNotifications: '{{count}} total notifications',
     unreadCount: '({{count}} unread)',
     markAllAsRead: 'Mark all as read',

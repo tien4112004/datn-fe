@@ -1,6 +1,8 @@
 import { Button } from '@ui/button';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
+import { PageHeader } from '@/shared/components/common/PageHeader';
+import { PageContainer } from '@/shared/components/common/PageContainer';
 import { useEffect, useRef } from 'react';
 import { useClassStore } from '../shared/stores';
 import { AddClassModal } from './components/controls/AddClassModal';
@@ -35,18 +37,18 @@ export const ClassListPage = () => {
   const classForModals = selectedClass || lastSelectedClassRef.current;
 
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-6 px-6 py-8">
+    <PageContainer>
       {/* Page Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-semibold tracking-tight">{t('title')}</h1>
-          <p className="text-muted-foreground text-sm">{t('description')}</p>
-        </div>
-        <Button onClick={openCreateModal} className="gap-2">
-          <Plus className="h-4 w-4" />
-          {t('createClass')}
-        </Button>
-      </div>
+      <PageHeader
+        title={t('title')}
+        description={t('description')}
+        actions={
+          <Button onClick={openCreateModal} className="gap-2">
+            <Plus className="h-4 w-4" />
+            {t('createClass')}
+          </Button>
+        }
+      />
 
       {/* Modals */}
       <AddClassModal isOpen={isCreateModalOpen} onClose={closeCreateModal} />
@@ -70,6 +72,6 @@ export const ClassListPage = () => {
       </div>
 
       <ClassTable />
-    </div>
+    </PageContainer>
   );
 };

@@ -1,5 +1,3 @@
-'use client';
-
 import { type LucideIcon } from 'lucide-react';
 
 import { Collapsible } from '@ui/collapsible';
@@ -21,15 +19,12 @@ export function NavMain({
     url: string;
   }[];
 }) {
-  // const { t } = useTranslation('navSidebar');
-
   if (items.length === 0) {
     return null;
   }
 
   return (
     <SidebarGroup>
-      {/* <SidebarGroupLabel>{t('features')}</SidebarGroupLabel> */}
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isExpanded}>
@@ -43,33 +38,6 @@ export function NavMain({
                 )}
               </NavLink>
             </SidebarMenuItem>
-            {/* <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
-                  <SidebarMenuButton 
-                    tooltip={item.title} 
-                    className="group">
-                    <item.icon />
-                    <span>{item.title}</span>
-                    <SidebarMenuAction>
-                      <ChevronRight className="transition-transform group-data-[state=open]:rotate-90" />
-                      <span className="sr-only">Toggle</span>
-                    </SidebarMenuAction>
-                  </SidebarMenuButton>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    {item.items?.map((subItem) => (
-                      <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton asChild>
-                          <NavLink to={subItem.url}>
-                            <span>{subItem.title}</span>
-                          </NavLink>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              </SidebarMenuItem> */}
           </Collapsible>
         ))}
       </SidebarMenu>

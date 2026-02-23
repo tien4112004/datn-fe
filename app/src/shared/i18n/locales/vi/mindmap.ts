@@ -246,6 +246,7 @@ export default {
   },
   share: {
     title: 'Chia sẻ sơ đồ tư duy',
+    description: 'Quản lý quyền truy cập vào sơ đồ tư duy này.',
     searchPlaceholder: 'Tìm kiếm người dùng theo email hoặc tên',
     peopleWithAccess: 'Người có quyền truy cập',
     generalAccess: 'Quyền truy cập chung',

@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@ui/card';
 import { Button } from '@ui/button';
 import { useTranslation } from 'react-i18next';
 import { useUpdateClass, useDeleteClass } from '../../shared/hooks/useApi';
@@ -55,58 +54,53 @@ export const ClassSettings = ({ classData }: ClassSettingsProps) => {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('settings.title')}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <h4 className="font-medium">{t('settings.status')}</h4>
-            <p className="text-muted-foreground text-sm">
-              {t('settings.currentStatus')}: {classData.isActive ? t('status.active') : t('status.inactive')}
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleToggleClassStatus}
-              disabled={updateClassMutation.isPending}
-            >
-              {updateClassMutation.isPending
-                ? t('settings.updating')
-                : classData.isActive
-                  ? t('settings.deactivateClass')
-                  : t('settings.activateClass')}
-            </Button>
-          </div>
+      <h2 className="text-xl font-semibold">{t('settings.title')}</h2>
 
-          <div className="space-y-2 border-t pt-4">
-            <h4 className="text-destructive font-medium">{t('settings.dangerZone')}</h4>
-            <p className="text-muted-foreground text-sm">{t('settings.deleteWarning')}</p>
-            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="sm" disabled={deleteClassMutation.isPending}>
-                  {deleteClassMutation.isPending ? t('settings.deleting') : t('settings.deleteClass')}
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>{t('settings.deleteClass')}</AlertDialogTitle>
-                  <AlertDialogDescription>{t('settings.deleteWarning')}</AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={handleDeleteClass}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  >
-                    {deleteClassMutation.isPending ? t('settings.deleting') : t('settings.deleteClass')}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="space-y-2">
+        <h4 className="font-medium">{t('settings.status')}</h4>
+        <p className="text-muted-foreground text-sm">
+          {t('settings.currentStatus')}: {classData.isActive ? t('status.active') : t('status.inactive')}
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleToggleClassStatus}
+          disabled={updateClassMutation.isPending}
+        >
+          {updateClassMutation.isPending
+            ? t('settings.updating')
+            : classData.isActive
+              ? t('settings.deactivateClass')
+              : t('settings.activateClass')}
+        </Button>
+      </div>
+
+      <div className="space-y-2 border-t pt-4">
+        <h4 className="text-destructive font-medium">{t('settings.dangerZone')}</h4>
+        <p className="text-muted-foreground text-sm">{t('settings.deleteWarning')}</p>
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive" size="sm" disabled={deleteClassMutation.isPending}>
+              {deleteClassMutation.isPending ? t('settings.deleting') : t('settings.deleteClass')}
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>{t('settings.deleteClass')}</AlertDialogTitle>
+              <AlertDialogDescription>{t('settings.deleteWarning')}</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteClass}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {deleteClassMutation.isPending ? t('settings.deleting') : t('settings.deleteClass')}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     </div>
   );
 };

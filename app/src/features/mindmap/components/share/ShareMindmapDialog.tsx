@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search, ChevronDown, Loader2, Eye, MessageSquare, Lock, Globe, Check, X } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@ui/dialog';
 import { Button } from '@ui/button';
 import { Input } from '@ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/dropdown-menu';
@@ -291,9 +291,10 @@ export default function ShareMindmapDialog({ isOpen, onOpenChange, mindmapId }: 
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="!max-w-[540px]" aria-describedby={undefined}>
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{t('share.title')}</DialogTitle>
+          <DialogDescription>{t('share.description')}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -433,7 +434,7 @@ export default function ShareMindmapDialog({ isOpen, onOpenChange, mindmapId }: 
           ) : null}
 
           {/* General Access Section */}
-          <div className="border-t border-gray-200 pt-4">
+          <div className="pt-4">
             <h4 className="mb-3 text-sm font-medium">{t('share.generalAccess')}</h4>
 
             <div className="flex items-start gap-3">

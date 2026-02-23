@@ -58,7 +58,9 @@ export default {
 
   modals: {
     addTitle: 'Add New Class',
+    addDescription: 'Fill in the required information to add a new class.',
     editTitle: 'Update Class',
+    editDescription: 'Update the class information below. Required fields are marked with *.',
     addClass: {
       loading: 'Adding class...',
       success: 'Class "{{name}}" added successfully',

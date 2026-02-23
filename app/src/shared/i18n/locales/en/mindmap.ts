@@ -246,6 +246,7 @@ export default {
   },
   share: {
     title: 'Share mindmap',
+    description: 'Manage who has access to this mindmap.',
     searchPlaceholder: 'Search users by email or name',
     peopleWithAccess: 'People with access',
     generalAccess: 'General access',

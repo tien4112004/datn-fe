@@ -58,7 +58,9 @@ export default {
 
   modals: {
     addTitle: 'Thêm lớp học mới',
+    addDescription: 'Điền thông tin cần thiết để thêm lớp học mới.',
     editTitle: 'Cập nhật lớp học',
+    editDescription: 'Cập nhật thông tin lớp học bên dưới. Các trường bắt buộc được đánh dấu với *.',
     addClass: {
       loading: 'Đang thêm lớp...',
       success: 'Lớp "{{name}}" đã được thêm thành công',

@@ -57,7 +57,7 @@ export function SavePresetDialog({ open, onOpenChange, onSave }: SavePresetDialo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>{t('savePreset.title')}</DialogTitle>
           <DialogDescription>{t('savePreset.description')}</DialogDescription>

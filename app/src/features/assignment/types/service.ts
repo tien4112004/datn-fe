@@ -6,8 +6,8 @@ import type {
   UpdateAssignmentRequest,
   GenerateMatrixRequest,
   GenerateMatrixResponse,
-  GenerateExamFromMatrixRequest,
-  ExamDraftDto,
+  GenerateAssignmentFromMatrixRequest,
+  AssignmentDraft,
 } from './assignment';
 
 export interface AssignmentCollectionRequest {
@@ -33,5 +33,5 @@ export interface AssignmentApiService {
 
   // Generation operations
   generateMatrix(request: GenerateMatrixRequest): Promise<GenerateMatrixResponse>;
-  generateExamFromMatrix(request: GenerateExamFromMatrixRequest): Promise<ExamDraftDto>;
+  generateAssignmentFromMatrix(request: GenerateAssignmentFromMatrixRequest): Promise<AssignmentDraft>;
 }

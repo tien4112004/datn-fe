@@ -14,6 +14,7 @@ import { ScrollArea } from '@ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
 import { Separator } from '@ui/separator';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
+import { AiDisclaimer } from '@/shared/components/common/AiDisclaimer';
 import { getAllGrades, getAllSubjects } from '@aiprimary/core';
 import { useGenerateMindmap } from '../../hooks/useApi';
 import { convertAiDataToMindMapNodes, getTreeLayoutType } from '../../services/utils';
@@ -360,10 +361,13 @@ function GenerateTreeDialog({ isOpen, onOpenChange }: GenerateTreeDialogProps) {
           {/* AI Disclaimer */}
           <div className="flex items-start gap-2 px-6 pb-4">
             <Info className="text-muted-foreground mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
-            <p className="text-muted-foreground text-xs italic">{tCommon('ai.disclaimer')}</p>
+            <p className="text-muted-foreground text-xs italic">{tCommon('aiDisclaimer')}</p>
           </div>
 
           <DialogFooter className="border-t px-6 py-4">
+            <div className="mr-auto">
+              <AiDisclaimer />
+            </div>
             <Button type="button" variant="outline" onClick={handleCancel} disabled={isGenerating}>
               {t('generate.actions.cancel')}
             </Button>

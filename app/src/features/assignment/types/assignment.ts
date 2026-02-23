@@ -1,4 +1,4 @@
-import type { SubjectCode } from '@aiprimary/core';
+import type { ApiMatrix, SubjectCode } from '@aiprimary/core';
 import type { Grade } from '@aiprimary/core/assessment/grades.js';
 
 // Re-export domain types from core
@@ -21,7 +21,7 @@ export type {
   MatrixDimensionTopic,
   MatrixCellStatus,
   MatrixValidationResult,
-  ExamDraft as ExamDraftDto,
+  AssignmentDraft,
   MatrixGapDto,
 } from '@aiprimary/core';
 
@@ -135,9 +135,9 @@ export interface GenerateMatrixResponse {
 }
 
 // Generate exam from matrix - Request
-export interface GenerateExamFromMatrixRequest {
+export interface GenerateAssignmentFromMatrixRequest {
   matrixId?: string;
-  matrix?: import('@aiprimary/core').ApiMatrix;
+  matrix?: ApiMatrix;
   subject: string;
   title: string;
   description?: string;

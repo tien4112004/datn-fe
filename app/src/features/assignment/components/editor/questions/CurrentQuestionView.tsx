@@ -1,23 +1,12 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trash2, Eye, Pencil, FileQuestion, Unlink, ChevronDown, ChevronUp } from 'lucide-react';
+import { Trash2, Eye, Pencil, FileQuestion, Unlink, ChevronDown, ChevronUp, Check } from 'lucide-react';
 import { Button } from '@ui/button';
 import { Input } from '@ui/input';
 import { Label } from '@ui/label';
 import { Textarea } from '@ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
 import { Collapsible, CollapsibleContent } from '@ui/collapsible';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@ui/alert-dialog';
 import { MarkdownPreview } from '@aiprimary/question/shared';
 import { useAssignmentEditorStore } from '../../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../../stores/useAssignmentFormStore';
@@ -66,9 +55,15 @@ export const CurrentQuestionView = () => {
   // State for context editing UI
   const [isContextOpen, setIsContextOpen] = useState(true);
   const [isContextEditing, setIsContextEditing] = useState(false);
+  const [isDeleteConfirming, setIsDeleteConfirming] = useState(false);
 
   const viewMode = questionViewMode;
   const isEditing = viewMode === VIEW_MODE.EDITING;
+
+  // Reset delete confirmation state when question changes
+  useEffect(() => {
+    setIsDeleteConfirming(false);
+  }, [currentQuestionId]);
 
   // Get display number for individual question
   const questionDisplayNumber = useMemo(() => {
@@ -162,7 +157,7 @@ export const CurrentQuestionView = () => {
               className="h-7 rounded-r-none px-2"
             >
               <Pencil className="mr-1 h-3 w-3" />
-              <span className="text-xs">{tQuestion('edit')}</span>
+              <span className="hidden text-xs sm:inline">{tQuestion('edit')}</span>
             </Button>
             <Button
               type="button"
@@ -172,38 +167,33 @@ export const CurrentQuestionView = () => {
               className="h-7 rounded-l-none px-2"
             >
               <Eye className="mr-1 h-3 w-3" />
-              <span className="text-xs">{tQuestion('preview')}</span>
+              <span className="hidden text-xs sm:inline">{tQuestion('preview')}</span>
             </Button>
           </div>
 
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0 text-gray-400 hover:text-red-600"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>{t('collection.item.deleteConfirm.title')}</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {t('collection.item.removeQuestionConfirm', {
-                    type: getQuestionTypeName(question.type?.toUpperCase() as any),
-                  })}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>{t('collection.item.deleteConfirm.cancel')}</AlertDialogCancel>
-                <AlertDialogAction onClick={handleConfirmDelete} className="bg-red-600 hover:bg-red-700">
-                  {t('collection.item.deleteConfirm.confirm')}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          {!isDeleteConfirming ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-gray-400 hover:text-red-600"
+              onClick={() => setIsDeleteConfirming(true)}
+              title={t('collection.item.deleteConfirm.title')}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+              onClick={handleConfirmDelete}
+              title={t('collection.item.deleteConfirm.confirm')}
+            >
+              <Check className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
 

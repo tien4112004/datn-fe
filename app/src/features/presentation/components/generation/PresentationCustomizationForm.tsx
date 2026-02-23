@@ -16,6 +16,7 @@ import { ThemePreviewCard } from './ThemePreviewCard';
 import ThemeGalleryDialog from './ThemeGalleryDialog';
 import type { SlideTheme } from '../../types/slide';
 import { cn } from '@/shared/lib/utils';
+import { AiDisclaimer } from '@/shared/components/common/AiDisclaimer';
 
 interface ThemeSectionProps {
   selectedTheme?: SlideTheme;
@@ -310,10 +311,13 @@ const CustomizationSection = ({
           />
         </CardContent>
       </Card>
-      <Button className="mt-5" type="button" onClick={onGeneratePresentation} disabled={isFormDisabled}>
-        {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles />}
-        {isGenerating ? t('workspace.generatingPresentation') : t('workspace.generatePresentation')}
-      </Button>
+      <div className="mt-5 space-y-2">
+        <AiDisclaimer />
+        <Button className="w-full" type="button" onClick={onGeneratePresentation} disabled={isFormDisabled}>
+          {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles />}
+          {isGenerating ? t('workspace.generatingPresentation') : t('workspace.generatePresentation')}
+        </Button>
+      </div>
     </div>
   );
 };

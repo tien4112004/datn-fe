@@ -32,9 +32,18 @@ interface SortableItemProps {
   children: React.ReactNode;
   className?: string;
   tooltip?: string;
+  dataTutorial?: string;
 }
 
-const SortableItem = ({ id, isActive, onClick, children, className, tooltip }: SortableItemProps) => {
+const SortableItem = ({
+  id,
+  isActive,
+  onClick,
+  children,
+  className,
+  tooltip,
+  dataTutorial,
+}: SortableItemProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
   const style = {
@@ -54,6 +63,7 @@ const SortableItem = ({ id, isActive, onClick, children, className, tooltip }: S
         isActive ? 'bg-primary text-primary-foreground' : className,
         isDragging ? 'cursor-grabbing' : 'cursor-grab'
       )}
+      {...(dataTutorial ? { 'data-tutorial': dataTutorial } : {})}
       {...attributes}
       {...listeners}
     >
@@ -143,8 +153,9 @@ export const QuestionNavigator = () => {
     setCurrentContextId(contextId);
   };
 
-  // Track question numbers
+  // Track question numbers and context group index for tutorial
   let questionNumber = 0;
+  let contextGroupIndex = 0;
 
   return (
     <CollapsibleSection
@@ -153,12 +164,13 @@ export const QuestionNavigator = () => {
       defaultOpen={true}
     >
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <div className="grid grid-cols-5 gap-1.5 overflow-hidden">
+        <div className="grid grid-cols-5 gap-1.5 overflow-hidden" data-tutorial="nav-grid">
           {/* Assignment Info Icon */}
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 type="button"
+                data-tutorial="nav-info"
                 onClick={() => setMainView('info')}
                 className={cn(
                   'flex h-8 w-full items-center justify-center rounded text-xs transition-colors',
@@ -183,6 +195,7 @@ export const QuestionNavigator = () => {
             <TooltipTrigger asChild>
               <button
                 type="button"
+                data-tutorial="nav-matrix"
                 onClick={() => setMainView('matrix')}
                 className={cn(
                   'flex h-8 w-full items-center justify-center rounded text-xs transition-colors',
@@ -207,6 +220,7 @@ export const QuestionNavigator = () => {
             <TooltipTrigger asChild>
               <button
                 type="button"
+                data-tutorial="nav-contexts"
                 onClick={() => setMainView('contexts')}
                 className={cn(
                   'flex h-8 w-full items-center justify-center rounded text-xs transition-colors',
@@ -228,6 +242,7 @@ export const QuestionNavigator = () => {
             <TooltipTrigger asChild>
               <button
                 type="button"
+                data-tutorial="nav-questions-list"
                 onClick={() => setMainView('questionsList')}
                 className={cn(
                   'flex h-8 w-full items-center justify-center rounded text-xs transition-colors',
@@ -253,6 +268,8 @@ export const QuestionNavigator = () => {
               if (group.type === 'context') {
                 // Context group - show BookOpen icon THEN individual questions
                 const isContextActive = mainView === 'contextGroup' && currentContextId === group.contextId;
+                const isFirstContextGroup = contextGroupIndex === 0;
+                contextGroupIndex++;
 
                 return (
                   <React.Fragment key={group.id}>
@@ -261,6 +278,7 @@ export const QuestionNavigator = () => {
                       <TooltipTrigger asChild>
                         <button
                           type="button"
+                          {...(isFirstContextGroup ? { 'data-tutorial': 'nav-context-group' } : {})}
                           onClick={() => handleContextClick(group.contextId!)}
                           className={cn(
                             'flex h-8 w-full items-center justify-center rounded text-xs font-medium transition-colors',
@@ -294,6 +312,7 @@ export const QuestionNavigator = () => {
                           id={question.id}
                           isActive={isQuestionActive}
                           onClick={() => handleQuestionClick(question.id)}
+                          dataTutorial={questionNumber === 1 ? 'nav-question-item' : undefined}
                           className={cn(
                             hasTitle
                               ? 'bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900'
@@ -324,6 +343,7 @@ export const QuestionNavigator = () => {
                     id={question.id}
                     isActive={isActive}
                     onClick={() => handleQuestionClick(question.id)}
+                    dataTutorial={questionNumber === 1 ? 'nav-question-item' : undefined}
                     className={cn(
                       hasTitle
                         ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
@@ -331,7 +351,6 @@ export const QuestionNavigator = () => {
                       hasQuestionError(question.id) &&
                         'bg-destructive/15 text-destructive hover:bg-destructive/25'
                     )}
-                    tooltip={question.title || t('untitled')}
                   >
                     {questionNumber}
                   </SortableItem>

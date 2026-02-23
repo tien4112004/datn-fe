@@ -128,7 +128,7 @@ export function SingleNodePanel({ context, metadata }: Props): React.ReactElemen
       {/* AI Disclaimer */}
       <div className="flex items-start gap-2">
         <Info className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-gray-500 dark:text-gray-500" />
-        <p className="text-xs italic text-gray-500 dark:text-gray-500">{tCommon('ai.disclaimer')}</p>
+        <p className="text-xs italic text-gray-500 dark:text-gray-500">{tCommon('aiDisclaimer')}</p>
       </div>
 
       {/* Expand Tree Section */}

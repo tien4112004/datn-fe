@@ -1,12 +1,13 @@
 import type { AssignmentQuestion } from './question';
+import type { Difficulty, QuestionType, SubjectCode } from './constants';
 
 /**
  * Matrix gap - describes unfilled requirements in an exam draft
  */
 export interface MatrixGapDto {
   topic: string;
-  difficulty: string;
-  questionType: string;
+  difficulty: Difficulty;
+  questionType: QuestionType;
   requiredCount: number;
   availableCount: number;
   gapCount: number;
@@ -15,12 +16,12 @@ export interface MatrixGapDto {
 /**
  * Exam draft generated from an assessment matrix
  */
-export interface ExamDraft {
+export interface AssignmentDraft {
   id: string;
   title: string;
   description?: string;
   ownerId: string;
-  subject: string;
+  subject: SubjectCode;
   grade: string;
   questions: AssignmentQuestion[];
   missingQuestions: MatrixGapDto[];

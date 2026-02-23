@@ -1,37 +1,65 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { MatrixGapsSummary } from './MatrixGapsSummary';
 import { FillMatrixGapsPanel } from './FillMatrixGapsPanel';
-import type { ExamDraftDto } from '@/features/assignment/types/assignment';
+import { useAssignmentFormStore } from '../../../stores/useAssignmentFormStore';
+import type { MatrixGapDto } from '../../../types/assignment';
+
+type Step = 'review' | 'generate';
 
 interface FillMatrixGapsManagerProps {
-  draft: ExamDraftDto;
   onClose: () => void;
   onQuestionsAdded?: () => void;
 }
 
-export function FillMatrixGapsManager({ draft, onClose, onQuestionsAdded }: FillMatrixGapsManagerProps) {
+export function FillMatrixGapsManager({ onClose, onQuestionsAdded }: FillMatrixGapsManagerProps) {
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, {
     keyPrefix: 'assignmentEditor.fillMatrixGaps',
   });
 
-  // Auto-select all gaps on mount
-  const [selectedGaps, setSelectedGaps] = useState<Set<string>>(
-    () => new Set(draft.missingQuestions.map((_, idx) => idx.toString()))
+  const matrix = useAssignmentFormStore((state) => state.matrix);
+
+  const missingQuestions = useMemo(
+    (): MatrixGapDto[] =>
+      (matrix ?? [])
+        .filter((cell) => cell.requiredCount > cell.currentCount)
+        .map((cell) => ({
+          topic: cell.topicName,
+          difficulty: cell.difficulty,
+          questionType: cell.questionType,
+          requiredCount: cell.requiredCount,
+          availableCount: cell.currentCount,
+          gapCount: cell.requiredCount - cell.currentCount,
+        })),
+    [matrix]
   );
 
-  // If gaps selected, show the generation panel
-  if (selectedGaps.size > 0) {
+  const isComplete = missingQuestions.length === 0;
+
+  const [step, setStep] = useState<Step>('review');
+  const [selectedGaps, setSelectedGaps] = useState<Set<string>>(
+    () => new Set(missingQuestions.map((_, idx) => idx.toString()))
+  );
+
+  const handleProceed = () => {
+    if (selectedGaps.size === 0) {
+      toast.error(String(t('errors.noGapsSelected')));
+      return;
+    }
+    setStep('generate');
+  };
+
+  if (step === 'generate') {
     return (
       <FillMatrixGapsPanel
         gaps={Array.from(selectedGaps)
           .map((id) => parseInt(id))
-          .map((idx) => draft.missingQuestions[idx])}
-        onBack={() => setSelectedGaps(new Set())}
+          .map((idx) => missingQuestions[idx])}
+        onBack={() => setStep('review')}
         onSuccess={() => {
           toast.success(String(t('success', { count: selectedGaps.size })));
           onQuestionsAdded?.();
@@ -41,14 +69,13 @@ export function FillMatrixGapsManager({ draft, onClose, onQuestionsAdded }: Fill
     );
   }
 
-  // Show gaps summary
   return (
     <div className="space-y-4">
       <MatrixGapsSummary
-        gaps={draft.missingQuestions}
-        isComplete={draft.isComplete}
+        gaps={missingQuestions}
+        isComplete={isComplete}
         onSelectedGapsChange={setSelectedGaps}
-        totalMissingQuestions={draft.missingQuestions.reduce((sum, gap) => sum + gap.gapCount, 0)}
+        totalMissingQuestions={missingQuestions.reduce((sum, gap) => sum + gap.gapCount, 0)}
       />
 
       <div className="flex gap-2">
@@ -56,6 +83,12 @@ export function FillMatrixGapsManager({ draft, onClose, onQuestionsAdded }: Fill
           <ArrowLeft className="mr-2 h-4 w-4" />
           {String(t('actions.backToMatrix'))}
         </Button>
+        {!isComplete && (
+          <Button onClick={handleProceed} className="flex-1" disabled={selectedGaps.size === 0}>
+            <Sparkles className="mr-2 h-4 w-4" />
+            {String(t('actions.generateQuestions'))}
+          </Button>
+        )}
       </div>
     </div>
   );

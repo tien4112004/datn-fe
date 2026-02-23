@@ -180,7 +180,5 @@ export default {
   subject: 'Subject',
   topics: 'Topics',
   characters: 'characters',
-  ai: {
-    disclaimer: 'AI-generated content may contain errors. Please review and verify before use.',
-  },
+  aiDisclaimer: 'AI-generated content may be inaccurate. Please review carefully before use.',
 };

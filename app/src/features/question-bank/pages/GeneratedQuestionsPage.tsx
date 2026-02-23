@@ -12,6 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { ArrowLeft, MoreVertical, Trash2, FileEdit, Sparkles, FileText, Save, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
+import { AiDisclaimer } from '@/shared/components/common/AiDisclaimer';
 import { GeneratedQuestionsResultList } from '@aiprimary/question/shared';
 import { QuestionRenderer } from '@/features/question/components/QuestionRenderer';
 import { VIEW_MODE } from '@/features/assignment/types';
@@ -194,6 +195,8 @@ export function GeneratedQuestionsPage() {
             </div>
           </div>
         </div>
+
+        <AiDisclaimer />
 
         {/* Select All + Bulk Actions */}
         <div className="flex items-center justify-between">

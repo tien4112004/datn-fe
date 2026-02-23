@@ -53,7 +53,7 @@ export const MatrixGridEditor = ({
 
   return (
     <div className="overflow-x-auto rounded-lg border">
-      <Table className="table-fixed">
+      <Table className="table-fixed min-w-[1000px]">
         <TableHeader>
           {/* First header row: Topic + Difficulties spanning questionTypes */}
           <TableRow>

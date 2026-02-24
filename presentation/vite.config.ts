@@ -17,13 +17,14 @@ export default defineConfig(({ mode }) => {
       ? 'https://api.huy-devops.site'
       : env.VITE_API_URL || 'http://localhost:3000';
 
-  // Dynamic base URL: use relative path for production, absolute for development
+  // Dynamic base URL: absolute URL for development, root path for production
   const getBaseUrl = () => {
     if (mode === 'development') {
       return `http://localhost:${port}/`;
     }
-    // For production/preview builds, use relative path so it works on any domain
-    return './';
+    // For production/preview builds, use absolute root path so assets resolve
+    // correctly regardless of the current route (e.g. /generation/:id)
+    return '/';
   };
 
   return {

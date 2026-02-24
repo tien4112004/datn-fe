@@ -125,8 +125,8 @@ const initialState = {
   grade: '',
   topics: [],
   questions: [],
-  matrixCells: [],
-  contexts: [] as AssignmentContext[],
+  matrix: [],
+  contexts: [],
   isDirty: false,
   validationErrors: null,
 };

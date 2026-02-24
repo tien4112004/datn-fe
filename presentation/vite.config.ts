@@ -24,7 +24,7 @@ export default defineConfig(({ mode }) => {
     }
     // For production/preview builds, use absolute root path so assets resolve
     // correctly regardless of the current route (e.g. /generation/:id)
-    return './';
+    return '/';
   };
 
   return {

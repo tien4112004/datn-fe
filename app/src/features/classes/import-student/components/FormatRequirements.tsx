@@ -7,6 +7,8 @@
 
 import { ChevronDown, X, Check, Lightbulb } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 
 interface FormatRequirementsProps {
   className?: string;
@@ -29,6 +31,30 @@ interface FormatRequirementsProps {
  */
 export function FormatRequirements({ className = '' }: FormatRequirementsProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { t } = useTranslation(I18N_NAMESPACES.CLASSES, {
+    keyPrefix: 'csvImport.requirements',
+  });
+
+  const optionalColumns: Array<[string, string]> = [
+    ['columnDateOfBirth', 'columnDateOfBirthDescription'],
+    ['columnGender', 'columnGenderDescription'],
+    ['columnAddress', 'columnAddressDescription'],
+    ['columnParentName', 'columnParentNameDescription'],
+    ['columnParentPhone', 'columnParentPhoneDescription'],
+    ['columnParentEmail', 'columnParentEmailDescription'],
+    ['columnAdditionalNotes', 'columnAdditionalNotesDescription'],
+  ];
+
+  const headerVariations: string[] = [
+    'fullNameVariations',
+    'dateOfBirthVariations',
+    'genderVariations',
+    'addressVariations',
+    'parentNameVariations',
+    'parentPhoneVariations',
+    'parentEmailVariations',
+    'additionalNotesVariations',
+  ];
 
   return (
     <div className={className}>
@@ -37,7 +63,7 @@ export function FormatRequirements({ className = '' }: FormatRequirementsProps) 
         onClick={() => setIsExpanded(!isExpanded)}
         className="flex w-full items-center justify-between rounded-lg border border-blue-200 bg-blue-50 p-4 transition-colors hover:bg-blue-100"
       >
-        <h3 className="text-sm font-semibold text-blue-900">Format Requirements</h3>
+        <h3 className="text-sm font-semibold text-blue-900">{t('title')}</h3>
         <ChevronDown
           className={`h-5 w-5 text-blue-600 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
         />
@@ -49,58 +75,28 @@ export function FormatRequirements({ className = '' }: FormatRequirementsProps) 
           {/* File Constraints */}
           <div>
             <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-blue-900">
-              File Constraints
+              {t('fileConstraints')}
             </h4>
             <ul className="list-inside list-disc space-y-1 text-xs text-blue-800">
-              <li>
-                <span className="font-medium">Maximum file size:</span> 5 MB
-              </li>
-              <li>
-                <span className="font-medium">File format:</span> CSV (.csv)
-              </li>
-              <li>
-                <span className="font-medium">Maximum rows:</span> 1,000 students per import
-              </li>
-              <li>
-                <span className="font-medium">Encoding:</span> UTF-8 (recommended)
-              </li>
+              <li>{t('maxFileSize')}</li>
+              <li>{t('fileFormat')}</li>
+              <li>{t('maxRows')}</li>
+              <li>{t('encoding')}</li>
             </ul>
           </div>
 
           {/* Required Columns */}
           <div>
             <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-blue-900">
-              Required Columns
+              {t('requiredColumns')}
             </h4>
             <div className="space-y-2">
               <div className="rounded border border-blue-100 bg-white p-2">
                 <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-red-700">
                   <X className="h-3.5 w-3.5" />
-                  First Name
+                  {t('columnFullName')}
                 </p>
-                <p className="text-xs text-blue-700">
-                  Student's first name. Cannot be empty. Accepts spaces and special characters (e.g.,
-                  "Mary-Jane", "José").
-                </p>
-              </div>
-              <div className="rounded border border-blue-100 bg-white p-2">
-                <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-red-700">
-                  <X className="h-3.5 w-3.5" />
-                  Last Name
-                </p>
-                <p className="text-xs text-blue-700">
-                  Student's last name. Cannot be empty. Accepts spaces and special characters (e.g.,
-                  "O'Brien", "von Neumann").
-                </p>
-              </div>
-              <div className="rounded border border-blue-100 bg-white p-2">
-                <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-red-700">
-                  <X className="h-3.5 w-3.5" />
-                  Email
-                </p>
-                <p className="text-xs text-blue-700">
-                  Student's email address. Must be unique in the class. Format: name@domain.com
-                </p>
+                <p className="text-xs text-blue-700">{t('columnFullNameDescription')}</p>
               </div>
             </div>
           </div>
@@ -108,86 +104,47 @@ export function FormatRequirements({ className = '' }: FormatRequirementsProps) 
           {/* Optional Columns */}
           <div>
             <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-blue-900">
-              Optional Columns
+              {t('optionalColumns')}
             </h4>
             <div className="space-y-2">
-              <div className="rounded border border-blue-100 bg-white p-2">
-                <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-green-700">
-                  <Check className="h-3.5 w-3.5" />
-                  Date of Birth
-                </p>
-                <p className="text-xs text-blue-700">
-                  Format: YYYY-MM-DD (e.g., 2008-03-15). Supports: dob, birthdate, birth_date
-                </p>
-              </div>
-              <div className="rounded border border-blue-100 bg-white p-2">
-                <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-green-700">
-                  <Check className="h-3.5 w-3.5" />
-                  Phone Number
-                </p>
-                <p className="text-xs text-blue-700">
-                  Student's phone number. Any format accepted (e.g., 555-0101, +1-555-0101). Supports: phone,
-                  mobile, cell
-                </p>
-              </div>
-              <div className="rounded border border-blue-100 bg-white p-2">
-                <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-green-700">
-                  <Check className="h-3.5 w-3.5" />
-                  Parent/Guardian Name
-                </p>
-                <p className="text-xs text-blue-700">
-                  Name of parent or guardian. Supports: parent_name, guardian_name, parent/guardian name
-                </p>
-              </div>
-              <div className="rounded border border-blue-100 bg-white p-2">
-                <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-green-700">
-                  <Check className="h-3.5 w-3.5" />
-                  Parent/Guardian Email
-                </p>
-                <p className="text-xs text-blue-700">
-                  Email address of parent or guardian. Format: name@domain.com
-                </p>
-              </div>
-              <div className="rounded border border-blue-100 bg-white p-2">
-                <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-green-700">
-                  <Check className="h-3.5 w-3.5" />
-                  Additional Notes
-                </p>
-                <p className="text-xs text-blue-700">
-                  Any additional information about the student. Supports: notes, comments, remarks
-                </p>
-              </div>
+              {optionalColumns.map(([labelKey, descKey]) => (
+                <div key={labelKey} className="rounded border border-blue-100 bg-white p-2">
+                  <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-green-700">
+                    <Check className="h-3.5 w-3.5" />
+                    {t(labelKey as never)}
+                  </p>
+                  <p className="text-xs text-blue-700">{t(descKey as never)}</p>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Header Naming */}
+          {/* Column Header Variations */}
           <div>
             <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-blue-900">
-              Column Header Variations
+              {t('columnHeaderVariations')}
             </h4>
-            <p className="mb-2 text-xs text-blue-700">
-              Column headers are case-insensitive and flexible. The system recognizes common variations:
-            </p>
+            <p className="mb-2 text-xs text-blue-700">{t('headerVariationsDescription')}</p>
             <div className="rounded border border-blue-100 bg-white p-2">
-              <p className="space-y-1 font-mono text-xs text-blue-800">
-                <div>First Name: "First Name", "firstname", "first_name", "fname", "FIRST NAME"</div>
-                <div>Last Name: "Last Name", "lastname", "last_name", "lname", "surname"</div>
-                <div>Email: "Email", "e-mail", "emailaddress", "mail"</div>
-              </p>
+              <div className="space-y-1 font-mono text-xs text-blue-800">
+                {headerVariations.map((key) => (
+                  <div key={key}>{t(key as never)}</div>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* CSV Example */}
           <div>
             <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-blue-900">
-              Example CSV Format
+              {t('csvExample')}
             </h4>
+            <p className="mb-2 text-xs text-blue-700">{t('exampleDescription')}</p>
             <div className="overflow-x-auto rounded border border-blue-100 bg-gray-900 p-3">
               <pre className="whitespace-pre-wrap break-words font-mono text-xs text-gray-100">
-                {`First Name,Last Name,Email,Date of Birth,Phone Number
-John,Smith,john@example.com,2008-03-15,555-0101
-Sarah,Johnson,sarah@example.com,2009-07-22,555-0102
-Michael,Williams,michael@example.com,2008-11-08,555-0103`}
+                {`fullName,dateOfBirth,gender,address,parentName,parentPhone,parentContactEmail
+Nguyen Van A,2008-03-15,male,123 Main St,Nguyen Thi B,555-0101,nguyen.b@example.com
+Tran Thi C,2009-07-22,female,456 Oak Ave,Tran Van D,555-0102,tran.d@example.com`}
               </pre>
             </div>
           </div>
@@ -196,14 +153,15 @@ Michael,Williams,michael@example.com,2008-11-08,555-0103`}
           <div className="rounded border border-yellow-200 bg-yellow-50 p-3">
             <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-yellow-900">
               <Lightbulb className="h-4 w-4" />
-              Tips for successful import:
+              {t('tips')}
             </p>
             <ul className="list-inside list-disc space-y-1 text-xs text-yellow-800">
-              <li>Ensure all emails are unique within your class</li>
-              <li>Use consistent date format (YYYY-MM-DD) for dates</li>
-              <li>Empty optional fields are allowed</li>
-              <li>Remove extra spaces before/after cell values</li>
-              <li>Save your file as CSV format (.csv)</li>
+              <li>{t('tip1')}</li>
+              <li>{t('tip2')}</li>
+              <li>{t('tip3')}</li>
+              <li>{t('tip4')}</li>
+              <li>{t('tip5')}</li>
+              <li>{t('tip6')}</li>
             </ul>
           </div>
         </div>

@@ -2,7 +2,7 @@ import { AutosizeTextarea } from '@ui/autosize-textarea';
 import { Card, CardContent, CardTitle } from '@ui/card';
 import ExamplePrompts from '@/features/projects/components/ExamplePrompts';
 import ResourceTypeSwitcher from '@/features/projects/components/ResourceTypeSwitcher';
-import { Sparkles, Info } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { Button } from '@ui/button';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
@@ -16,12 +16,12 @@ import { getLocalStorageData } from '@/shared/lib/utils';
 import { MODEL_TYPES, useModels } from '@/features/model';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { EXAMPLE_PROMPT_TYPE } from '@/features/projects/types/examplePrompt';
+import { AiDisclaimer } from '@/shared/components/common/AiDisclaimer';
 
 const MINDMAP_FORM_PERSIST = 'create-mindmap-form';
 
 const CreateMindmapPage = () => {
   const { t } = useTranslation('mindmap');
-  const { t: tCommon } = useTranslation('common');
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { generateMindmap, isGenerating: isFlowGenerating } = useGenerateMindmapFlow();
@@ -178,10 +178,8 @@ const CreateMindmapPage = () => {
 
         {error && <div className="mt-2 rounded-md bg-red-50 p-3 text-sm text-red-600">{error}</div>}
 
-        {/* AI Disclaimer */}
-        <div className="mt-4 flex items-start gap-2">
-          <Info className="text-muted-foreground mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
-          <p className="text-muted-foreground text-xs italic">{tCommon('aiDisclaimer')}</p>
+        <div className="mt-4">
+          <AiDisclaimer />
         </div>
 
         <Button type="submit" className="mt-4 w-full" disabled={isFlowGenerating}>

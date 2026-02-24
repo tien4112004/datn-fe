@@ -50,7 +50,6 @@ export function QuestionGenerateFormFields({
   const { t } = useTranslation(I18N_NAMESPACES.ASSIGNMENT, {
     keyPrefix: 'teacherQuestionBank.generate',
   });
-  const { t: tCommon } = useTranslation(I18N_NAMESPACES.COMMON);
 
   const total = getTotalQuestions();
 
@@ -82,11 +81,6 @@ export function QuestionGenerateFormFields({
         <div className="flex items-center justify-between">
           <p className="text-muted-foreground text-xs">{t('fields.promptHelp')}</p>
           <p className="text-muted-foreground text-xs">{prompt.length} / 1000</p>
-        </div>
-        {/* AI Disclaimer */}
-        <div className="flex items-start gap-2">
-          <Info className="text-muted-foreground mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
-          <p className="text-muted-foreground text-xs italic">{tCommon('aiDisclaimer')}</p>
         </div>
       </div>
 

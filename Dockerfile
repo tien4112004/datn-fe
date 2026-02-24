@@ -52,7 +52,7 @@ ENV VITE_FIREBASE_APP_ID=$VITE_FIREBASE_APP_ID
 ENV VITE_FIREBASE_VAPID_KEY=$VITE_FIREBASE_VAPID_KEY
 ENV NODE_ENV=$NODE_ENV
 
-RUN pnpm build
+RUN pnpm build --concurrency=1
 
 # Production stage for app
 FROM nginx:alpine AS app-production

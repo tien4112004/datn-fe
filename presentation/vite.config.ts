@@ -17,11 +17,11 @@ export default defineConfig(({ mode }) => {
       ? 'https://api.huy-devops.site'
       : env.VITE_API_URL || 'http://localhost:3000';
 
+  const presentationUrl =
+    env.NODE_ENV === 'production' ? 'https://presentation.huy-devops.site/' : `http://localhost:${port}/`;
+
   const getBaseUrl = () => {
-    if (mode === 'development') {
-      return `http://localhost:${port}/`;
-    }
-    return './';
+    return presentationUrl;
   };
 
   return {

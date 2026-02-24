@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   useQuestionBank,
   useBulkDeleteQuestionBankItems,
   useDuplicateQuestionBankItem,
-  useExportQuestionBank,
 } from '@/hooks/useApi';
 import type { QuestionBankItem, QuestionBankParams } from '@/types/questionBank';
 import { QuestionBankFilters } from '@/components/question-bank/QuestionBankFilters';
 import { QuestionBankImportDialog } from '@/components/question-bank/QuestionBankImportDialog';
+import { QuestionBankExportDialog } from '@/components/question-bank/QuestionBankExportDialog';
 import { Button } from '@ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/dropdown-menu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
@@ -64,6 +65,7 @@ const getQuestionTypeBadgeClass = (type: string) => {
 
 export function QuestionBankPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation('admin', { keyPrefix: 'questionBank' });
 
   // State
   const [page, setPage] = useState(1);
@@ -72,17 +74,17 @@ export function QuestionBankPage() {
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [filters, setFilters] = useState<QuestionBankParams>({});
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
   // Hooks
   const { data, isLoading } = useQuestionBank({ page, pageSize, searchText: searchQuery, ...filters });
   const bulkDeleteMutation = useBulkDeleteQuestionBankItems();
   const duplicateMutation = useDuplicateQuestionBankItem();
-  const exportMutation = useExportQuestionBank();
 
   // Handlers
   const handleSearch = (value: string) => {
     setSearchQuery(value);
-    setPage(1); // Reset to first page on search
+    setPage(1);
   };
 
   const handleSelectAll = (checked: boolean | 'indeterminate') => {
@@ -104,25 +106,25 @@ export function QuestionBankPage() {
   const handleBulkDelete = async () => {
     if (selectedQuestions.length === 0) return;
 
-    if (!confirm(`Are you sure you want to delete ${selectedQuestions.length} question(s)?`)) {
+    if (!confirm(t('confirm.bulkDelete', { count: selectedQuestions.length }))) {
       return;
     }
 
     try {
       await bulkDeleteMutation.mutateAsync(selectedQuestions);
       setSelectedQuestions([]);
-      toast.success('Questions deleted successfully');
+      toast.success(t('toast.deleteSuccess'));
     } catch {
-      toast.error('Failed to delete questions');
+      toast.error(t('toast.deleteError'));
     }
   };
 
   const handleDuplicate = async (id: string) => {
     try {
       await duplicateMutation.mutateAsync(id);
-      toast.success('Question duplicated successfully');
+      toast.success(t('toast.duplicateSuccess'));
     } catch {
-      toast.error('Failed to duplicate question');
+      toast.error(t('toast.duplicateError'));
     }
   };
 
@@ -131,38 +133,37 @@ export function QuestionBankPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this question?')) {
+    if (!confirm(t('confirm.delete'))) {
       return;
     }
 
     try {
       await bulkDeleteMutation.mutateAsync([id]);
-      toast.success('Question deleted successfully');
+      toast.success(t('toast.deleteSuccess'));
     } catch {
-      toast.error('Failed to delete question');
+      toast.error(t('toast.deleteError'));
     }
   };
 
-  const handleExport = async () => {
-    try {
-      await exportMutation.mutateAsync(filters);
-      toast.success('Export started');
-    } catch {
-      toast.error('Failed to export questions');
-    }
+  const handleExport = () => {
+    setIsExportDialogOpen(true);
   };
 
   const questions = data?.data || [];
   const totalItems = data?.pagination?.totalItems || 0;
   const totalPages = data?.pagination?.totalPages || 0;
 
+  // Questions to show in export dialog: selected or all loaded
+  const selectedQuestionItems = questions.filter((q) => selectedQuestions.includes(q.id));
+  const exportQuestions = selectedQuestionItems.length > 0 ? selectedQuestionItems : questions;
+
   return (
     <div className="flex h-full flex-col overflow-auto">
       <div className="mx-auto w-full max-w-7xl space-y-6 px-8 py-12">
         {/* Header */}
         <div className="mb-8 space-y-1">
-          <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">Application Question Bank</h1>
-          <p className="text-muted-foreground text-sm">Manage shared questions for all teachers</p>
+          <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
         </div>
 
         {/* Filters with Search Bar and Actions */}
@@ -174,15 +175,9 @@ export function QuestionBankPage() {
           orientation="horizontal"
           RightComponent={
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExport}
-                disabled={exportMutation.isPending}
-                className="gap-2"
-              >
+              <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
                 <Download className="h-4 w-4" />
-                Export
+                {t('actions.export')}
               </Button>
 
               <Button
@@ -192,12 +187,12 @@ export function QuestionBankPage() {
                 className="gap-2"
               >
                 <Upload className="h-4 w-4" />
-                Import
+                {t('actions.import')}
               </Button>
 
               <Button size="sm" onClick={() => navigate('/question-bank/create')} className="gap-2">
                 <Plus className="h-4 w-4" />
-                Create Question
+                {t('actions.create')}
               </Button>
             </div>
           }
@@ -208,17 +203,25 @@ export function QuestionBankPage() {
           {/* Bulk Actions */}
           {selectedQuestions.length > 0 && (
             <div className="bg-muted flex items-center justify-between rounded-md p-3">
-              <span className="text-sm font-medium">{selectedQuestions.length} question(s) selected</span>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleBulkDelete}
-                disabled={bulkDeleteMutation.isPending}
-                className="gap-2"
-              >
-                <Trash2 className="h-4 w-4" />
-                Delete Selected
-              </Button>
+              <span className="text-sm font-medium">
+                {t('selectedCount', { count: selectedQuestions.length })}
+              </span>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
+                  <Download className="h-4 w-4" />
+                  {t('actions.export')}
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleBulkDelete}
+                  disabled={bulkDeleteMutation.isPending}
+                  className="gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  {t('actions.deleteSelected')}
+                </Button>
+              </div>
             </div>
           )}
 
@@ -233,11 +236,11 @@ export function QuestionBankPage() {
                       onCheckedChange={handleSelectAll}
                     />
                   </TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Subject</TableHead>
-                  <TableHead>Difficulty</TableHead>
-                  <TableHead>Created</TableHead>
+                  <TableHead>{t('table.columns.title')}</TableHead>
+                  <TableHead>{t('table.columns.type')}</TableHead>
+                  <TableHead>{t('table.columns.subject')}</TableHead>
+                  <TableHead>{t('table.columns.difficulty')}</TableHead>
+                  <TableHead>{t('table.columns.created')}</TableHead>
                   <TableHead className="w-12"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -245,13 +248,13 @@ export function QuestionBankPage() {
                 {isLoading ? (
                   <TableRow>
                     <TableCell colSpan={7} className="text-muted-foreground text-center">
-                      Loading questions...
+                      {t('table.loading')}
                     </TableCell>
                   </TableRow>
                 ) : questions.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} className="text-muted-foreground text-center">
-                      No questions found. Create your first question to get started.
+                      {t('table.empty')}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -264,7 +267,9 @@ export function QuestionBankPage() {
                         />
                       </TableCell>
                       <TableCell className="max-w-md truncate font-medium">
-                        {question.title || <span className="text-muted-foreground italic">No title</span>}
+                        {question.title || (
+                          <span className="text-muted-foreground italic">{t('table.noTitle')}</span>
+                        )}
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline" className={getQuestionTypeBadgeClass(question.type)}>
@@ -294,18 +299,18 @@ export function QuestionBankPage() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => handleEdit(question)}>
                               <FileEdit className="mr-2 h-4 w-4" />
-                              Edit
+                              {t('actions.edit')}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleDuplicate(question.id)}>
                               <Copy className="mr-2 h-4 w-4" />
-                              Duplicate
+                              {t('actions.duplicate')}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-destructive"
                               onClick={() => handleDelete(question.id)}
                             >
                               <Trash2 className="mr-2 h-4 w-4" />
-                              Delete
+                              {t('actions.delete')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -321,23 +326,24 @@ export function QuestionBankPage() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between">
               <div className="text-muted-foreground text-sm">
-                Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, totalItems)} of {totalItems}{' '}
-                questions
+                {t('pagination.showing', {
+                  from: (page - 1) * pageSize + 1,
+                  to: Math.min(page * pageSize, totalItems),
+                  total: totalItems,
+                })}
               </div>
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" onClick={() => setPage(page - 1)} disabled={page === 1}>
-                  Previous
+                  {t('pagination.previous')}
                 </Button>
-                <span className="text-sm">
-                  Page {page} of {totalPages}
-                </span>
+                <span className="text-sm">{t('pagination.page', { current: page, total: totalPages })}</span>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setPage(page + 1)}
                   disabled={page === totalPages}
                 >
-                  Next
+                  {t('pagination.next')}
                 </Button>
               </div>
             </div>
@@ -345,6 +351,11 @@ export function QuestionBankPage() {
         </div>
 
         {/* Dialogs */}
+        <QuestionBankExportDialog
+          open={isExportDialogOpen}
+          onClose={() => setIsExportDialogOpen(false)}
+          questions={exportQuestions}
+        />
         <QuestionBankImportDialog open={isImportDialogOpen} onClose={() => setIsImportDialogOpen(false)} />
       </div>
     </div>

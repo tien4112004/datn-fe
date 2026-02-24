@@ -164,7 +164,7 @@ export default class QuestionBankService implements QuestionBankApiService {
     } catch (error) {
       return {
         success: 0,
-        failed: 0,
+        failed: 1,
         errors: [{ row: 0, error: error instanceof Error ? error.message : 'Failed to parse CSV' }],
       };
     }

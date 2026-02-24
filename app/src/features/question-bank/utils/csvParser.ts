@@ -15,11 +15,17 @@ export function parseQuestionBankCSV(csvContent: string): QuestionBankItem[] {
   }
 
   const questions: QuestionBankItem[] = [];
-  const header = parseCSVLine(lines[0]);
+  let header = parseCSVLine(lines[0]);
 
   for (let i = 1; i < lines.length; i++) {
+    const values = parseCSVLine(lines[i]);
+    // Detect header rows (from combined multi-section templates) and switch header
+    if (values[0] === 'title') {
+      header = values;
+      continue;
+    }
+
     try {
-      const values = parseCSVLine(lines[i]);
       const row = Object.fromEntries(header.map((key, idx) => [key, values[idx]]));
       const question = parseQuestionRow(row, i + 1);
       questions.push(question);
@@ -83,7 +89,7 @@ function parseQuestionRow(row: Record<string, string>, rowNumber: number): Quest
   if (!subject) throw new Error('Missing required field: subject');
 
   const baseQuestion = {
-    id: `csv-import-${Date.now()}-${rowNumber}`,
+    id: '',
     title: row.title,
     difficulty,
     subject,
@@ -115,21 +121,28 @@ function parseQuestionRow(row: Record<string, string>, rowNumber: number): Quest
  */
 function parseMultipleChoiceQuestion(base: any, row: Record<string, string>): QuestionBankItem {
   const options = [];
-  const correctOption = parseInt(row.correctOption);
 
-  if (!correctOption || correctOption < 1 || correctOption > 4) {
-    throw new Error('correctOption must be 1, 2, 3, or 4');
-  }
-
-  for (let i = 1; i <= 4; i++) {
-    const text = row[`option${i}`];
-    if (!text) throw new Error(`Missing option${i}`);
+  // Dynamically find all optionN columns (support 2-6 options)
+  let i = 1;
+  while (row[`option${i}`] !== undefined && row[`option${i}`] !== '') {
     options.push({
       id: `opt-${i}`,
-      text,
-      isCorrect: i === correctOption,
+      text: row[`option${i}`],
+      isCorrect: false,
     });
+    i++;
   }
+
+  if (options.length < 2) {
+    throw new Error('At least 2 options are required');
+  }
+
+  const correctOption = parseInt(row.correctOption);
+  if (!correctOption || correctOption < 1 || correctOption > options.length) {
+    throw new Error(`correctOption must be between 1 and ${options.length}`);
+  }
+
+  options[correctOption - 1].isCorrect = true;
 
   return {
     ...base,
@@ -242,64 +255,95 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
     return '';
   }
 
-  // Group by type for better organization
+  const escapeCSV = (value: string | undefined | null): string => {
+    const str = value || '';
+    return `"${str.replace(/"/g, '""')}"`;
+  };
+
+  // Filter questions with valid data for each type
   const byType = {
-    [QUESTION_TYPE.MULTIPLE_CHOICE]: questions.filter((q) => q.type === QUESTION_TYPE.MULTIPLE_CHOICE),
-    [QUESTION_TYPE.MATCHING]: questions.filter((q) => q.type === QUESTION_TYPE.MATCHING),
-    [QUESTION_TYPE.OPEN_ENDED]: questions.filter((q) => q.type === QUESTION_TYPE.OPEN_ENDED),
-    [QUESTION_TYPE.FILL_IN_BLANK]: questions.filter((q) => q.type === QUESTION_TYPE.FILL_IN_BLANK),
+    [QUESTION_TYPE.MULTIPLE_CHOICE]: questions.filter(
+      (q) => q.type === QUESTION_TYPE.MULTIPLE_CHOICE && q.data?.options?.length > 0
+    ),
+    [QUESTION_TYPE.MATCHING]: questions.filter(
+      (q) => q.type === QUESTION_TYPE.MATCHING && q.data?.pairs?.length > 0
+    ),
+    [QUESTION_TYPE.OPEN_ENDED]: questions.filter(
+      (q) => q.type === QUESTION_TYPE.OPEN_ENDED && q.data != null
+    ),
+    [QUESTION_TYPE.FILL_IN_BLANK]: questions.filter(
+      (q) => q.type === QUESTION_TYPE.FILL_IN_BLANK && q.data?.segments?.length > 0
+    ),
   };
 
   const csvSections: string[] = [];
 
   // Multiple Choice
   if (byType[QUESTION_TYPE.MULTIPLE_CHOICE].length > 0) {
+    const mcQuestions = byType[QUESTION_TYPE.MULTIPLE_CHOICE];
+    const maxOptions = Math.max(...mcQuestions.map((q: any) => q.data.options?.length || 0));
+    const optionHeaders = Array.from({ length: maxOptions }, (_, i) => `option${i + 1}`).join(',');
+
     csvSections.push('# Multiple Choice Questions');
     csvSections.push(
-      'title,type,difficulty,subject,option1,option2,option3,option4,correctOption,explanation'
+      `title,type,difficulty,subject,grade,chapter,${optionHeaders},correctOption,explanation`
     );
-    byType[QUESTION_TYPE.MULTIPLE_CHOICE].forEach((q) => {
-      if (q.type === QUESTION_TYPE.MULTIPLE_CHOICE) {
-        const correctIndex = q.data.options.findIndex((o: any) => o.isCorrect) + 1;
-        csvSections.push(
-          [
-            `"${q.title.replace(/"/g, '""')}"`,
-            q.type,
-            q.difficulty,
-            q.subject,
-            ...q.data.options.map((o: any) => `"${o.text.replace(/"/g, '""')}"`),
-            correctIndex,
-            `"${(q.explanation || '').replace(/"/g, '""')}"`,
-          ].join(',')
-        );
-      }
+    mcQuestions.forEach((q: any) => {
+      const options = q.data.options || [];
+      const correctIndex = options.findIndex((o: any) => o.isCorrect) + 1;
+      const optionValues = Array.from({ length: maxOptions }, (_, i) => {
+        const opt = options[i];
+        return opt ? escapeCSV(opt.text) : '';
+      });
+      csvSections.push(
+        [
+          escapeCSV(q.title),
+          q.type,
+          q.difficulty,
+          q.subject,
+          escapeCSV(q.grade),
+          escapeCSV(q.chapter),
+          ...optionValues,
+          correctIndex,
+          escapeCSV(q.explanation),
+        ].join(',')
+      );
     });
     csvSections.push('');
   }
 
   // Matching
   if (byType[QUESTION_TYPE.MATCHING].length > 0) {
+    const matchQuestions = byType[QUESTION_TYPE.MATCHING];
+    const maxPairs = Math.max(...matchQuestions.map((q: any) => q.data.pairs?.length || 0));
+    const pairHeaders = Array.from(
+      { length: maxPairs },
+      (_, i) => `pair${i + 1}_left,pair${i + 1}_right`
+    ).join(',');
+
     csvSections.push('# Matching Questions');
-    csvSections.push(
-      'title,type,difficulty,subject,pair1_left,pair1_right,pair2_left,pair2_right,pair3_left,pair3_right,explanation'
-    );
-    byType[QUESTION_TYPE.MATCHING].forEach((q) => {
-      if (q.type === QUESTION_TYPE.MATCHING) {
-        const pairValues = q.data.pairs.flatMap((p: any) => [
-          `"${p.left.replace(/"/g, '""')}"`,
-          `"${p.right.replace(/"/g, '""')}"`,
-        ]);
-        csvSections.push(
-          [
-            `"${q.title.replace(/"/g, '""')}"`,
-            q.type,
-            q.difficulty,
-            q.subject,
-            ...pairValues,
-            `"${(q.explanation || '').replace(/"/g, '""')}"`,
-          ].join(',')
-        );
-      }
+    csvSections.push(`title,type,difficulty,subject,grade,chapter,${pairHeaders},explanation`);
+    matchQuestions.forEach((q: any) => {
+      const pairs = q.data.pairs || [];
+      const pairValues = Array.from({ length: maxPairs }, (_, i) => {
+        const pair = pairs[i];
+        if (pair) {
+          return [escapeCSV(pair.left), escapeCSV(pair.right)];
+        }
+        return ['', ''];
+      }).flat();
+      csvSections.push(
+        [
+          escapeCSV(q.title),
+          q.type,
+          q.difficulty,
+          q.subject,
+          escapeCSV(q.grade),
+          escapeCSV(q.chapter),
+          ...pairValues,
+          escapeCSV(q.explanation),
+        ].join(',')
+      );
     });
     csvSections.push('');
   }
@@ -307,21 +351,21 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
   // Open-ended
   if (byType[QUESTION_TYPE.OPEN_ENDED].length > 0) {
     csvSections.push('# Open-ended Questions');
-    csvSections.push('title,type,difficulty,subject,expectedAnswer,maxLength,explanation');
-    byType[QUESTION_TYPE.OPEN_ENDED].forEach((q) => {
-      if (q.type === QUESTION_TYPE.OPEN_ENDED) {
-        csvSections.push(
-          [
-            `"${q.title.replace(/"/g, '""')}"`,
-            q.type,
-            q.difficulty,
-            q.subject,
-            `"${(q.data.expectedAnswer || '').replace(/"/g, '""')}"`,
-            q.data.maxLength || 500,
-            `"${(q.explanation || '').replace(/"/g, '""')}"`,
-          ].join(',')
-        );
-      }
+    csvSections.push('title,type,difficulty,subject,grade,chapter,expectedAnswer,maxLength,explanation');
+    byType[QUESTION_TYPE.OPEN_ENDED].forEach((q: any) => {
+      csvSections.push(
+        [
+          escapeCSV(q.title),
+          q.type,
+          q.difficulty,
+          q.subject,
+          escapeCSV(q.grade),
+          escapeCSV(q.chapter),
+          escapeCSV(q.data?.expectedAnswer),
+          q.data?.maxLength || 500,
+          escapeCSV(q.explanation),
+        ].join(',')
+      );
     });
     csvSections.push('');
   }
@@ -329,27 +373,28 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
   // Fill in Blank
   if (byType[QUESTION_TYPE.FILL_IN_BLANK].length > 0) {
     csvSections.push('# Fill in Blank Questions');
-    csvSections.push('title,type,difficulty,subject,text,blanks,caseSensitive,explanation');
-    byType[QUESTION_TYPE.FILL_IN_BLANK].forEach((q) => {
-      if (q.type === QUESTION_TYPE.FILL_IN_BLANK) {
-        const text = q.data.segments.map((s: any) => (s.type === 'blank' ? '{blank}' : s.content)).join('');
-        const blanks = q.data.segments
-          .filter((s: any) => s.type === 'blank')
-          .map((s: any) => s.content)
-          .join('|');
-        csvSections.push(
-          [
-            `"${q.title.replace(/"/g, '""')}"`,
-            q.type,
-            q.difficulty,
-            q.subject,
-            `"${text.replace(/"/g, '""')}"`,
-            `"${blanks}"`,
-            q.data.caseSensitive || false,
-            `"${(q.explanation || '').replace(/"/g, '""')}"`,
-          ].join(',')
-        );
-      }
+    csvSections.push('title,type,difficulty,subject,grade,chapter,text,blanks,caseSensitive,explanation');
+    byType[QUESTION_TYPE.FILL_IN_BLANK].forEach((q: any) => {
+      const segments = q.data.segments || [];
+      const text = segments.map((s: any) => (s.type === 'blank' ? '{blank}' : s.content)).join('');
+      const blanks = segments
+        .filter((s: any) => s.type === 'blank')
+        .map((s: any) => s.content)
+        .join('|');
+      csvSections.push(
+        [
+          escapeCSV(q.title),
+          q.type,
+          q.difficulty,
+          q.subject,
+          escapeCSV(q.grade),
+          escapeCSV(q.chapter),
+          escapeCSV(text),
+          escapeCSV(blanks),
+          q.data?.caseSensitive || false,
+          escapeCSV(q.explanation),
+        ].join(',')
+      );
     });
   }
 

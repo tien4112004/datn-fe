@@ -3,12 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import ReactMarkdown from 'react-markdown';
-import {
-  useQuestionBankList,
-  useDeleteQuestions,
-  useDuplicateQuestion,
-  useExportQuestions,
-} from '../hooks/useQuestionBankApi';
+import { useQuestionBankList, useDeleteQuestions, useDuplicateQuestion } from '../hooks/useQuestionBankApi';
 import useQuestionBankStore from '../stores/questionBankStore';
 import type { QuestionBankItem } from '../types';
 import { Button } from '@ui/button';
@@ -21,7 +16,12 @@ import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import DataTable from '@/shared/components/table/DataTable';
 import { PageHeader } from '@/shared/components/common/PageHeader';
 import { PageContainer } from '@/shared/components/common/PageContainer';
-import { QuestionBankImportDialog, QuestionBankFilters, QuestionBankDialog } from '../components';
+import {
+  QuestionBankImportDialog,
+  QuestionBankExportDialog,
+  QuestionBankFilters,
+  QuestionBankDialog,
+} from '../components';
 import { QuestionBankGenerateDialog } from '@/features/assignment/components/editor/questions/QuestionGenerateDialog';
 import {
   getSubjectName,
@@ -48,6 +48,7 @@ export function TeacherQuestionBankPage() {
     pageSize: 10,
   });
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
   const [isBrowseDialogOpen, setIsBrowseDialogOpen] = useState(false);
 
@@ -64,7 +65,6 @@ export function TeacherQuestionBankPage() {
 
   const deleteQuestionsMutation = useDeleteQuestions();
   const duplicateMutation = useDuplicateQuestion();
-  const exportMutation = useExportQuestions();
 
   const questions = data?.questions || [];
   const totalItems = data?.total || 0;
@@ -74,11 +74,15 @@ export function TeacherQuestionBankPage() {
   const canEdit = (_q: QuestionBankItem) => true;
   const canDelete = (_q: QuestionBankItem) => true;
 
-  // Get selected question IDs
-  const selectedQuestionIds = Object.keys(rowSelection)
+  // Get selected questions
+  const selectedQuestions = Object.keys(rowSelection)
     .filter((key) => rowSelection[key])
-    .map((index) => questions[parseInt(index)]?.id)
+    .map((index) => questions[parseInt(index)])
     .filter(Boolean);
+  const selectedQuestionIds = selectedQuestions.map((q) => q.id);
+
+  // Questions to show in export dialog: selected rows, or all loaded if none selected
+  const exportQuestions = selectedQuestions.length > 0 ? selectedQuestions : questions;
 
   // Handlers
   const handleBulkDelete = async () => {
@@ -124,21 +128,8 @@ export function TeacherQuestionBankPage() {
     }
   };
 
-  const handleExport = async () => {
-    try {
-      const blob = await exportMutation.mutateAsync(filters);
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `teacher-questions-${new Date().toISOString().split('T')[0]}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      toast.success(t('toast.exportSuccess'));
-    } catch {
-      toast.error(t('toast.exportError'));
-    }
+  const handleExport = () => {
+    setIsExportDialogOpen(true);
   };
 
   // Column definitions
@@ -299,17 +290,6 @@ export function TeacherQuestionBankPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleExport}
-                disabled={exportMutation.isPending}
-                className="gap-2"
-              >
-                <Download className="h-4 w-4" />
-                {t('actions.export')}
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
                 onClick={() => setIsImportDialogOpen(true)}
                 className="gap-2"
               >
@@ -349,17 +329,25 @@ export function TeacherQuestionBankPage() {
           {/* Bulk Actions */}
           {selectedQuestionIds.length > 0 && (
             <div className="bg-muted flex items-center justify-between rounded-md p-3">
-              <span className="text-sm font-medium">{selectedQuestionIds.length} question(s) selected</span>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleBulkDelete}
-                disabled={deleteQuestionsMutation.isPending}
-                className="gap-2"
-              >
-                <Trash2 className="h-4 w-4" />
-                {t('actions.deleteSelected')}
-              </Button>
+              <span className="text-sm font-medium">
+                {t('selectedCount', { count: selectedQuestionIds.length })}
+              </span>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
+                  <Download className="h-4 w-4" />
+                  {t('actions.export')}
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleBulkDelete}
+                  disabled={deleteQuestionsMutation.isPending}
+                  className="gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  {t('actions.deleteSelected')}
+                </Button>
+              </div>
             </div>
           )}
 
@@ -377,6 +365,11 @@ export function TeacherQuestionBankPage() {
         </div>
 
         {/* Dialogs */}
+        <QuestionBankExportDialog
+          open={isExportDialogOpen}
+          onClose={() => setIsExportDialogOpen(false)}
+          questions={exportQuestions}
+        />
         <QuestionBankImportDialog open={isImportDialogOpen} onClose={() => setIsImportDialogOpen(false)} />
 
         {/* Generate Questions Dialog */}

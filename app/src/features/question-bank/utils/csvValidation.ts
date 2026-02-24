@@ -1,5 +1,5 @@
 import type { QuestionBankItem } from '@aiprimary/core';
-import { QUESTION_TYPE, DIFFICULTY, SUBJECT_CODE } from '@aiprimary/core';
+import { QUESTION_TYPE, DIFFICULTY, SUBJECT_CODE, isElementaryGrade } from '@aiprimary/core';
 
 export interface ValidationError {
   row: number;
@@ -64,6 +64,14 @@ export function validateQuestionBankCSV(questions: QuestionBankItem[]): Validati
         row: rowNumber,
         field: 'subject',
         message: `Invalid subject: ${question.subject}`,
+      });
+    }
+
+    if (question.grade && !isElementaryGrade(question.grade)) {
+      warnings.push({
+        row: rowNumber,
+        field: 'grade',
+        message: `Unknown grade: ${question.grade}. Expected 1-5.`,
       });
     }
 

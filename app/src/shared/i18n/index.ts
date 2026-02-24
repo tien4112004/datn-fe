@@ -39,7 +39,7 @@ i18n
       en: enTranslation,
       vi: viTranslation,
     },
-    fallbackLng: 'en',
+    fallbackLng: 'vi',
     // Default namespace if none specified
     defaultNS: 'common',
     // Namespaces to load by default

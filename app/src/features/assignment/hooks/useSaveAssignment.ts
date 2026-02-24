@@ -161,7 +161,7 @@ export function useSaveAssignment({ id, onSaveSuccess, onSaveError }: UseSaveAss
           navigate(`/assignment/${savedId}`);
         } else if (!id && savedId) {
           // After creating, redirect to the edit URL so subsequent saves are updates
-          navigate(`/assignment/${savedId}/edit`, { replace: true });
+          navigate(`/assignment/edit/${savedId}`, { replace: true });
         }
       } catch (error) {
         console.error('Failed to save assignment:', error);

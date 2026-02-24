@@ -32,7 +32,7 @@ import { useI18n } from 'vue-i18n';
 const slidesStore = useSlidesStore();
 const { slides, currentSlide } = storeToRefs(slidesStore);
 
-const currentTurningMode = computed(() => currentSlide.value.turningMode || 'slideY');
+const currentTurningMode = computed(() => currentSlide.value?.turningMode || 'slideY');
 
 const animations = getSlideAnimations();
 
@@ -41,6 +41,7 @@ const { t } = useI18n();
 
 // Modify the page transition mode during playback
 const updateTurningMode = (mode: TurningMode) => {
+  if (!currentSlide.value) return;
   if (mode === currentTurningMode.value) return;
   slidesStore.updateSlide({ turningMode: mode });
   addHistorySnapshot();
@@ -48,6 +49,7 @@ const updateTurningMode = (mode: TurningMode) => {
 
 // Apply the current page's transition mode to all pages
 const applyAllSlide = () => {
+  if (!currentSlide.value) return;
   const newSlides = slides.value.map((slide) => {
     return {
       ...slide,

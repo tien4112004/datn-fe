@@ -49,7 +49,7 @@
                   type="primary"
                   size="small"
                   :loading="uploadingImageId === props.id"
-                  :disabled="uploadingImageId !== null"
+                  :disabled="uploadingImageId !== null || !hasSlide"
                   @click="uploadAndInsertPexelsImage(props.src, props.id)"
                 >
                   {{
@@ -85,7 +85,12 @@
             <div class="img-item">
               <img :src="props.src" />
               <div class="mask">
-                <Button type="primary" size="small" @click="createImageElement(props.src)">
+                <Button
+                  type="primary"
+                  size="small"
+                  :disabled="!hasSlide"
+                  @click="hasSlide && createImageElement(props.src)"
+                >
                   {{ t('panels.imageLibrary.insert') }}
                 </Button>
               </div>
@@ -107,6 +112,8 @@
 import { onMounted, ref, computed, watch } from 'vue';
 import { refDebounced } from '@vueuse/core';
 import { useI18n } from 'vue-i18n';
+import { storeToRefs } from 'pinia';
+import { useSlidesStore } from '@/store';
 import { useImageSearch, useMyImages, useGenerateImage, useUploadImage } from '@/services/queries';
 import useCreateElement from '@/hooks/useCreateElement';
 import message from '@/utils/message';
@@ -137,6 +144,8 @@ type Orientation = 'landscape' | 'portrait' | 'square' | 'all';
 type TabKey = 'pexels' | 'myImages';
 
 const { createImageElement } = useCreateElement();
+const { currentSlide } = storeToRefs(useSlidesStore());
+const hasSlide = computed(() => !!currentSlide.value);
 
 // Tab Management
 const activeTab = ref<TabKey>('pexels');

@@ -79,11 +79,7 @@
 
     <div class="add-element-handler">
       <div class="group-btn" v-tooltip="$t('toolbar.tools.insertText')">
-        <div
-          class="handler-item"
-          :class="{ disable: isCurrentSlideLocked }"
-          @click="!isCurrentSlideLocked && drawText()"
-        >
+        <div class="handler-item" :class="{ disable: isEditDisabled }" @click="!isEditDisabled && drawText()">
           <IconFontSize class="icon" :class="{ active: creatingElement?.type === 'text' }" />
         </div>
 
@@ -92,7 +88,7 @@
           v-model:value="textTypeSelectVisible"
           style="height: 100%"
           :offset="10"
-          :disabled="isCurrentSlideLocked"
+          :disabled="isEditDisabled"
         >
           <template #content>
             <PopoverMenuItem
@@ -120,7 +116,7 @@
               {{ $t('toolbar.tools.verticalTextBox') }}
             </PopoverMenuItem>
           </template>
-          <div class="handler-item" :class="{ disable: isCurrentSlideLocked }">
+          <div class="handler-item" :class="{ disable: isEditDisabled }">
             <IconDown class="arrow" />
           </div>
         </Popover>
@@ -131,12 +127,12 @@
           style="height: 100%"
           v-model:value="shapePoolVisible"
           :offset="10"
-          :disabled="isCurrentSlideLocked"
+          :disabled="isEditDisabled"
         >
           <template #content>
             <ShapePool @select="(shape) => drawShape(shape)" />
           </template>
-          <div class="handler-item" :class="{ disable: isCurrentSlideLocked }">
+          <div class="handler-item" :class="{ disable: isEditDisabled }">
             <IconGraphicDesign
               class="icon"
               :class="{ active: creatingCustomShape || creatingElement?.type === 'shape' }"
@@ -149,7 +145,7 @@
           v-model:value="shapeMenuVisible"
           style="height: 100%"
           :offset="10"
-          :disabled="isCurrentSlideLocked"
+          :disabled="isEditDisabled"
         >
           <template #content>
             <PopoverMenuItem
@@ -171,7 +167,7 @@
               ><IconWritingFluently class="icon" /> {{ $t('toolbar.tools.freehandDrawing') }}</PopoverMenuItem
             >
           </template>
-          <div class="handler-item" :class="{ disable: isCurrentSlideLocked }">
+          <div class="handler-item" :class="{ disable: isEditDisabled }">
             <IconDown class="arrow" />
           </div>
         </Popover>
@@ -180,9 +176,9 @@
         <FileInput
           style="height: 100%"
           @change="(files) => insertImageElement(files)"
-          :disabled="imageUploading || isCurrentSlideLocked"
+          :disabled="imageUploading || isEditDisabled"
         >
-          <div class="handler-item" :class="{ uploading: imageUploading, disable: isCurrentSlideLocked }">
+          <div class="handler-item" :class="{ uploading: imageUploading, disable: isEditDisabled }">
             <IconPicture v-if="!imageUploading" class="icon" />
             <div v-else class="icon spinner-icon"></div>
           </div>
@@ -193,11 +189,11 @@
           v-model:value="imageMenuVisible"
           style="height: 100%"
           :offset="10"
-          :disabled="isCurrentSlideLocked"
+          :disabled="isEditDisabled"
         >
           <template #content>
             <FileInput
-              :disabled="imageUploading || isCurrentSlideLocked"
+              :disabled="imageUploading || isEditDisabled"
               @change="
                 (files) => {
                   insertImageElement(files);
@@ -210,24 +206,24 @@
               >
             </FileInput>
           </template>
-          <div class="handler-item" :class="{ disable: isCurrentSlideLocked }">
+          <div class="handler-item" :class="{ disable: isEditDisabled }">
             <IconDown class="arrow" />
           </div>
         </Popover>
       </div>
-      <Popover trigger="click" v-model:value="linePoolVisible" :offset="10" :disabled="isCurrentSlideLocked">
+      <Popover trigger="click" v-model:value="linePoolVisible" :offset="10" :disabled="isEditDisabled">
         <template #content>
           <LinePool @select="(line) => drawLine(line)" />
         </template>
         <div
           class="handler-item"
-          :class="{ active: creatingElement?.type === 'line', disable: isCurrentSlideLocked }"
+          :class="{ active: creatingElement?.type === 'line', disable: isEditDisabled }"
           v-tooltip="$t('toolbar.tools.insertLine')"
         >
           <IconConnection />
         </div>
       </Popover>
-      <Popover trigger="click" v-model:value="chartPoolVisible" :offset="10" :disabled="isCurrentSlideLocked">
+      <Popover trigger="click" v-model:value="chartPoolVisible" :offset="10" :disabled="isEditDisabled">
         <template #content>
           <ChartPool
             @select="
@@ -240,18 +236,13 @@
         </template>
         <div
           class="handler-item"
-          :class="{ disable: isCurrentSlideLocked }"
+          :class="{ disable: isEditDisabled }"
           v-tooltip="$t('toolbar.tools.insertChart')"
         >
           <IconChartProportion />
         </div>
       </Popover>
-      <Popover
-        trigger="click"
-        v-model:value="tableGeneratorVisible"
-        :offset="10"
-        :disabled="isCurrentSlideLocked"
-      >
+      <Popover trigger="click" v-model:value="tableGeneratorVisible" :offset="10" :disabled="isEditDisabled">
         <template #content>
           <TableGenerator
             @close="tableGeneratorVisible = false"
@@ -265,7 +256,7 @@
         </template>
         <div
           class="handler-item"
-          :class="{ disable: isCurrentSlideLocked }"
+          :class="{ disable: isEditDisabled }"
           v-tooltip="$t('toolbar.tools.insertTable')"
         >
           <IconInsertTable />
@@ -273,18 +264,13 @@
       </Popover>
       <div
         class="handler-item"
-        :class="{ disable: isCurrentSlideLocked }"
+        :class="{ disable: isEditDisabled }"
         v-tooltip="$t('toolbar.tools.insertFormula')"
-        @click="!isCurrentSlideLocked && (latexEditorVisible = true)"
+        @click="!isEditDisabled && (latexEditorVisible = true)"
       >
         <IconFormula />
       </div>
-      <Popover
-        trigger="click"
-        v-model:value="mediaInputVisible"
-        :offset="10"
-        :disabled="isCurrentSlideLocked"
-      >
+      <Popover trigger="click" v-model:value="mediaInputVisible" :offset="10" :disabled="isEditDisabled">
         <template #content>
           <MediaInput
             @close="mediaInputVisible = false"
@@ -304,7 +290,7 @@
         </template>
         <div
           class="handler-item"
-          :class="{ disable: isCurrentSlideLocked }"
+          :class="{ disable: isEditDisabled }"
           v-tooltip="$t('toolbar.tools.insertAudioVideo')"
         >
           <IconVideoTwo />
@@ -371,9 +357,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useMainStore, useSnapshotStore } from '@/store';
+import { useMainStore, useSnapshotStore, useSlidesStore } from '@/store';
 import { ToolbarStates } from '@/types/toolbar';
 import { getImageDataURL } from '@/utils/image';
 import type { ShapePoolItem } from '@/configs/shapes';
@@ -408,7 +394,9 @@ const {
   showSymbolPanel,
 } = storeToRefs(mainStore);
 const { canUndo, canRedo } = storeToRefs(useSnapshotStore());
+const { slides } = storeToRefs(useSlidesStore());
 const { isCurrentSlideLocked } = useSlideEditLock();
+const isEditDisabled = computed(() => isCurrentSlideLocked.value || !slides.value.length);
 
 const uploadImageMutation = useUploadImage();
 

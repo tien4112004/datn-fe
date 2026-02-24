@@ -179,10 +179,12 @@ export function TransactionHistoryPage() {
                               tx.type === 'add' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                             )}
                           >
-                            {t(getCoinTypeLabelKey(tx.type))}
+                            {t(getCoinTypeLabelKey(tx.type) as never)}
                           </span>
                         </TableCell>
-                        <TableCell className="text-sm">{t(getCoinSourceLabelKey(tx.source))}</TableCell>
+                        <TableCell className="text-sm">
+                          {t(getCoinSourceLabelKey(tx.source) as never)}
+                        </TableCell>
                         <TableCell
                           className={cn(
                             'text-sm font-medium',

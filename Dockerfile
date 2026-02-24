@@ -74,6 +74,9 @@ RUN printf 'server {\n\
     listen 5174;\n\
     root /usr/share/nginx/html;\n\
     location / {\n\
+        add_header Access-Control-Allow-Origin *;\n\
+        add_header Access-Control-Allow-Methods "GET, OPTIONS";\n\
+        add_header Access-Control-Allow-Headers "Content-Type";\n\
         try_files $uri $uri/ /index.html;\n\
     }\n\
 }\n' > /etc/nginx/conf.d/default.conf

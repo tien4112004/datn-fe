@@ -72,16 +72,16 @@ const fillInBlankQuestion: FillInBlankQuestion = {
   explanation: 'These are basic facts about Vietnam.',
   data: {
     segments: [
-      { id: 'seg-1', type: 'text', content: 'Vietnam is located in ' },
+      { id: 'seg-1', type: 'TEXT', content: 'Vietnam is located in ' },
       {
         id: 'seg-2',
-        type: 'blank',
+        type: 'BLANK',
         content: 'Southeast Asia',
         acceptableAnswers: ['southeast asia', 'South East Asia'],
       },
-      { id: 'seg-3', type: 'text', content: ' and its currency is the ' },
-      { id: 'seg-4', type: 'blank', content: 'dong', acceptableAnswers: ['Dong', 'VND'] },
-      { id: 'seg-5', type: 'text', content: '.' },
+      { id: 'seg-3', type: 'TEXT', content: ' and its currency is the ' },
+      { id: 'seg-4', type: 'BLANK', content: 'dong', acceptableAnswers: ['Dong', 'VND'] },
+      { id: 'seg-5', type: 'TEXT', content: '.' },
     ],
     caseSensitive: false,
   },

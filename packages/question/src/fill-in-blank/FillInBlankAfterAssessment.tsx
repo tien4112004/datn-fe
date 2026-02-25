@@ -22,7 +22,7 @@ export const FillInBlankAfterAssessment = ({
   hideHeader = false,
 }: FillInBlankAfterAssessmentProps) => {
   const { t } = useTranslation('questions');
-  const blankSegments = question.data.segments.filter((s) => s.type === 'blank');
+  const blankSegments = question.data.segments.filter((s) => s.type === 'BLANK');
   const answerMap = new Map(answer?.blanks.map((b) => [b.segmentId, b.value]) || []);
 
   // Check correctness
@@ -69,7 +69,7 @@ export const FillInBlankAfterAssessment = ({
       {/* Question with results */}
       <div className="bg-muted/50 rounded-md p-4 text-sm leading-relaxed">
         {question.data.segments.map((segment) => {
-          if (segment.type === 'text') {
+          if (segment.type === 'TEXT') {
             return (
               <span key={segment.id} className="font-mono">
                 {segment.content}
@@ -105,7 +105,7 @@ export const FillInBlankAfterAssessment = ({
           <div className="font-mono text-sm leading-relaxed">
             {question.data.segments.map((segment) => (
               <span key={segment.id}>
-                {segment.type === 'text' ? (
+                {segment.type === 'TEXT' ? (
                   segment.content
                 ) : (
                   <span className="mx-1 inline-block rounded bg-green-200 px-2 py-1 font-semibold dark:bg-green-800">

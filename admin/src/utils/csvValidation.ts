@@ -211,7 +211,7 @@ function validateFillInBlank(
     return;
   }
 
-  const blankCount = question.data.segments.filter((s) => s.type === 'blank').length;
+  const blankCount = question.data.segments.filter((s) => s.type === 'BLANK').length;
 
   if (blankCount === 0) {
     errors.push({ row, field: 'text', message: 'At least one {blank} placeholder is required' });
@@ -222,7 +222,7 @@ function validateFillInBlank(
   }
 
   question.data.segments.forEach((segment, idx) => {
-    if (segment.type === 'blank') {
+    if (segment.type === 'BLANK') {
       if (!segment.content || segment.content.trim().length === 0) {
         errors.push({
           row,

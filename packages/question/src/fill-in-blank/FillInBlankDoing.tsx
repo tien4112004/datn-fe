@@ -13,7 +13,7 @@ interface FillInBlankDoingProps {
 
 export const FillInBlankDoing = ({ question, answer, onAnswerChange }: FillInBlankDoingProps) => {
   const { t } = useTranslation('questions');
-  const blankSegments = question.data.segments.filter((s) => s.type === 'blank');
+  const blankSegments = question.data.segments.filter((s) => s.type === 'BLANK');
   const [blanks, setBlanks] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {};
     answer?.blanks.forEach((b) => {
@@ -60,7 +60,7 @@ export const FillInBlankDoing = ({ question, answer, onAnswerChange }: FillInBla
       <div className="border-muted bg-background rounded-md border p-4 text-sm leading-relaxed">
         {question.data.segments.map((segment) => (
           <span key={segment.id}>
-            {segment.type === 'text' ? (
+            {segment.type === 'TEXT' ? (
               <span className="font-mono">{segment.content}</span>
             ) : (
               <Input

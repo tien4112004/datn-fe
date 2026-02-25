@@ -52,9 +52,9 @@ export function QuestionContentPreview({ question }: QuestionContentPreviewProps
 
       case QUESTION_TYPE.FILL_IN_BLANK: {
         const segments = question.data.segments || [];
-        const blankCount = segments.filter((s) => s.type === 'blank').length;
-        const hasPlaceholder = segments.some((s) => s.type === 'text' && /^Fill in the /.test(s.content));
-        const hasEmptyBlanks = segments.some((s) => s.type === 'blank' && !s.content?.trim());
+        const blankCount = segments.filter((s) => s.type === 'BLANK').length;
+        const hasPlaceholder = segments.some((s) => s.type === 'TEXT' && /^Fill in the /.test(s.content));
+        const hasEmptyBlanks = segments.some((s) => s.type === 'BLANK' && !s.content?.trim());
 
         return (
           <div className="flex items-center gap-2">

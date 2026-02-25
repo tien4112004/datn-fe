@@ -37,7 +37,7 @@ export const FillInBlankViewing = ({ question, compact }: FillInBlankViewingProp
       >
         {question.data.segments.map((segment) => (
           <span key={segment.id}>
-            {segment.type === 'text' ? (
+            {segment.type === 'TEXT' ? (
               segment.content
             ) : (
               <span
@@ -65,7 +65,7 @@ export const FillInBlankViewing = ({ question, compact }: FillInBlankViewingProp
         </Label>
         <div className="space-y-1">
           {question.data.segments
-            .filter((segment) => segment.type === 'blank')
+            .filter((segment) => segment.type === 'BLANK')
             .map((segment, index) => (
               <div key={segment.id} className={cn('flex items-center', compact ? 'gap-1' : 'gap-2')}>
                 <Badge variant="outline" className={compact ? 'py-0 text-xs' : undefined}>

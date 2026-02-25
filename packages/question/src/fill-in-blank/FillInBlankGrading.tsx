@@ -29,12 +29,12 @@ export const FillInBlankGrading = ({
   const [feedback, setFeedback] = useState<string>(grade?.feedback || '');
 
   // Calculate score: each correct blank gets equal points
-  const blankSegments = question.data.segments.filter((s) => s.type === 'blank');
+  const blankSegments = question.data.segments.filter((s) => s.type === 'BLANK');
   const pointsPerBlank = points / blankSegments.length;
 
   const isBlankCorrect = (segmentId: string, studentAnswer: string): boolean => {
     const segment = question.data.segments.find((s) => s.id === segmentId);
-    if (!segment || segment.type !== 'blank') return false;
+    if (!segment || segment.type !== 'BLANK') return false;
 
     const correctAnswer = segment.content;
     const caseSensitive = question.data.caseSensitive || false;
@@ -93,7 +93,7 @@ export const FillInBlankGrading = ({
         <Label className="text-sm font-semibold">{t('fillInBlank.grading.studentAnswer')}</Label>
         <div className="bg-muted/50 rounded-md p-4 text-sm leading-relaxed">
           {question.data.segments.map((segment) => {
-            if (segment.type === 'text') {
+            if (segment.type === 'TEXT') {
               return (
                 <span key={segment.id} className="font-mono">
                   {segment.content}

@@ -77,8 +77,8 @@ function createDefaultQuestion(type: QuestionType): QuestionBankItem {
         type: 'FILL_IN_BLANK',
         data: {
           segments: [
-            { id: generateId(), type: 'text', content: '' },
-            { id: generateId(), type: 'blank', content: '' },
+            { id: generateId(), type: 'TEXT', content: '' },
+            { id: generateId(), type: 'BLANK', content: '' },
           ],
           caseSensitive: false,
         },

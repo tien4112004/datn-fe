@@ -223,14 +223,14 @@ function parseFillInBlankQuestion(base: any, row: Record<string, string>): Quest
     if (parts[i]) {
       segments.push({
         id: `seg-${segmentId++}`,
-        type: 'text' as const,
+        type: 'TEXT' as const,
         content: parts[i],
       });
     }
     if (i < parts.length - 1) {
       segments.push({
         id: `seg-${segmentId++}`,
-        type: 'blank' as const,
+        type: 'BLANK' as const,
         content: blanks[i],
         acceptableAnswers: [blanks[i]],
       });
@@ -376,9 +376,9 @@ export function exportQuestionsToCSV(questions: QuestionBankItem[]): string {
     csvSections.push('title,type,difficulty,subject,grade,chapter,text,blanks,caseSensitive,explanation');
     byType[QUESTION_TYPE.FILL_IN_BLANK].forEach((q: any) => {
       const segments = q.data.segments || [];
-      const text = segments.map((s: any) => (s.type === 'blank' ? '{blank}' : s.content)).join('');
+      const text = segments.map((s: any) => (s.type === 'BLANK' ? '{blank}' : s.content)).join('');
       const blanks = segments
-        .filter((s: any) => s.type === 'blank')
+        .filter((s: any) => s.type === 'BLANK')
         .map((s: any) => s.content)
         .join('|');
       csvSections.push(

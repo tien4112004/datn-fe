@@ -213,7 +213,7 @@ function validateFillInBlank(
     return;
   }
 
-  const blankCount = question.data.segments.filter((s: any) => s.type === 'blank').length;
+  const blankCount = question.data.segments.filter((s: any) => s.type === 'BLANK').length;
 
   if (blankCount === 0) {
     errors.push({ row, field: 'text', messageKey: 'blankPlaceholderRequired' });
@@ -224,7 +224,7 @@ function validateFillInBlank(
   }
 
   question.data.segments.forEach((segment: any, idx: number) => {
-    if (segment.type === 'blank') {
+    if (segment.type === 'BLANK') {
       if (!segment.content || segment.content.trim().length === 0) {
         errors.push({
           row,

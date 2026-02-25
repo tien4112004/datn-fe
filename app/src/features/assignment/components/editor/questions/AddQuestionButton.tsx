@@ -57,9 +57,9 @@ export const AddQuestionButton = ({ className, contextId }: AddQuestionButtonPro
       case QUESTION_TYPE.FILL_IN_BLANK:
         data = {
           segments: [
-            { id: generateId(), type: 'text', content: '' },
-            { id: generateId(), type: 'blank', content: '' },
-            { id: generateId(), type: 'text', content: '' },
+            { id: generateId(), type: 'TEXT', content: '' },
+            { id: generateId(), type: 'BLANK', content: '' },
+            { id: generateId(), type: 'TEXT', content: '' },
           ],
           caseSensitive: false,
         };

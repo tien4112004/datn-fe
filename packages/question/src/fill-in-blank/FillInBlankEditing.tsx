@@ -32,7 +32,7 @@ const parseQuestionText = (text: string): BlankSegment[] => {
       if (textContent) {
         segments.push({
           id: generateId(),
-          type: 'text',
+          type: 'TEXT',
           content: textContent,
         });
       }
@@ -52,7 +52,7 @@ const parseQuestionText = (text: string): BlankSegment[] => {
     // Add blank segment
     segments.push({
       id: generateId(),
-      type: 'blank',
+      type: 'BLANK',
       content: primaryAnswer,
       acceptableAnswers: acceptableAnswers,
     });
@@ -66,13 +66,13 @@ const parseQuestionText = (text: string): BlankSegment[] => {
     if (textContent) {
       segments.push({
         id: generateId(),
-        type: 'text',
+        type: 'TEXT',
         content: textContent,
       });
     }
   }
 
-  return segments.length > 0 ? segments : [{ id: generateId(), type: 'text', content: text }];
+  return segments.length > 0 ? segments : [{ id: generateId(), type: 'TEXT', content: text }];
 };
 
 // Convert segments back to text with {{}} syntax
@@ -80,7 +80,7 @@ const parseQuestionText = (text: string): BlankSegment[] => {
 const segmentsToText = (segments: BlankSegment[]): string => {
   return segments
     .map((seg) => {
-      if (seg.type === 'text') {
+      if (seg.type === 'TEXT') {
         return seg.content;
       } else {
         // Include acceptable answers in the syntax if they exist
@@ -111,7 +111,7 @@ export const FillInBlankEditing = ({ question, onChange, validationErrors }: Fil
   };
 
   // Get only blank segments for alternative answers section
-  const blankSegments = question.data.segments.filter((s) => s.type === 'blank');
+  const blankSegments = question.data.segments.filter((s) => s.type === 'BLANK');
 
   // Validation field flags
   const hasErrors = (validationErrors?.errors.length ?? 0) > 0;
@@ -206,7 +206,7 @@ export const FillInBlankEditing = ({ question, onChange, validationErrors }: Fil
           <div className="text-sm">
             {question.data.segments.map((segment) => (
               <span key={segment.id}>
-                {segment.type === 'text' ? (
+                {segment.type === 'TEXT' ? (
                   segment.content
                 ) : (
                   <span className="mx-1 inline-block min-w-[100px] border-b-2 border-dashed border-blue-400 px-2 text-transparent">

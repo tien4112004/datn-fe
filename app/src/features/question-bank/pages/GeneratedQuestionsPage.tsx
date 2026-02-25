@@ -13,6 +13,8 @@ import { ArrowLeft, MoreVertical, Trash2, FileEdit, Sparkles, FileText, Save, X 
 import { toast } from 'sonner';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { AiDisclaimer } from '@/shared/components/common/AiDisclaimer';
+import { PageHeader } from '@/shared/components/common/PageHeader';
+import { PageContainer } from '@/shared/components/common/PageContainer';
 import { GeneratedQuestionsResultList } from '@aiprimary/question/shared';
 import { QuestionRenderer } from '@/features/question/components/QuestionRenderer';
 import { VIEW_MODE } from '@/features/assignment/types';
@@ -149,15 +151,9 @@ export function GeneratedQuestionsPage() {
 
   return (
     <div className="flex h-full flex-col overflow-auto">
-      <div className="mx-auto w-full max-w-7xl space-y-6 px-8 py-12">
+      <PageContainer>
         {/* Header */}
-        <div className="mb-8 space-y-1">
-          <h1 className="flex items-center gap-2 text-3xl font-semibold tracking-tight">
-            <Sparkles className="h-7 w-7 text-violet-500" />
-            {t('title')}
-          </h1>
-          <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
-        </div>
+        <PageHeader title={t('title')} description={t('subtitle')} />
 
         {/* Summary Card */}
         <div className="rounded-lg border bg-gradient-to-r from-violet-50 to-purple-50 p-4 dark:from-violet-950/30 dark:to-purple-950/30">
@@ -292,7 +288,7 @@ export function GeneratedQuestionsPage() {
             return <QuestionRenderer question={question as Question} viewMode={VIEW_MODE.VIEWING} />;
           }}
         />
-      </div>
+      </PageContainer>
     </div>
   );
 }

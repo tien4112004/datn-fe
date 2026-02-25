@@ -19,6 +19,8 @@ import { Plus, Upload, Download, MoreVertical, Trash2, Copy, FileEdit, Sparkles 
 import { toast } from 'sonner';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import DataTable from '@/shared/components/table/DataTable';
+import { PageHeader } from '@/shared/components/common/PageHeader';
+import { PageContainer } from '@/shared/components/common/PageContainer';
 import { QuestionBankImportDialog, QuestionBankFilters, QuestionBankDialog } from '../components';
 import { QuestionBankGenerateDialog } from '@/features/assignment/components/editor/questions/QuestionGenerateDialog';
 import {
@@ -285,12 +287,9 @@ export function TeacherQuestionBankPage() {
 
   return (
     <div className="flex h-full flex-col overflow-auto">
-      <div className="mx-auto w-full max-w-7xl space-y-6 px-8 py-12">
+      <PageContainer>
         {/* Header */}
-        <div className="mb-8 space-y-1">
-          <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">{t('title')}</h1>
-          <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
-        </div>
+        <PageHeader title={t('title')} description={t('subtitle')} />
 
         {/* Filters */}
         <QuestionBankFilters
@@ -390,7 +389,7 @@ export function TeacherQuestionBankPage() {
           onAddQuestions={() => {}}
           mode="copy-to-personal"
         />
-      </div>
+      </PageContainer>
     </div>
   );
 }

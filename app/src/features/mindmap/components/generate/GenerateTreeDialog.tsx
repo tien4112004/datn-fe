@@ -1,5 +1,5 @@
 import { useReactFlow } from '@xyflow/react';
-import { Settings2, Sparkles, Info } from 'lucide-react';
+import { Settings2, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -32,7 +32,6 @@ interface GenerateTreeDialogProps {
 
 function GenerateTreeDialog({ isOpen, onOpenChange }: GenerateTreeDialogProps) {
   const { t, i18n } = useTranslation(I18N_NAMESPACES.MINDMAP);
-  const { t: tCommon } = useTranslation(I18N_NAMESPACES.COMMON);
   const reactFlowInstance = useReactFlow();
   const grades = getAllGrades();
   const subjects = getAllSubjects();
@@ -357,12 +356,6 @@ function GenerateTreeDialog({ isOpen, onOpenChange }: GenerateTreeDialogProps) {
               <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
-
-          {/* AI Disclaimer */}
-          <div className="flex items-start gap-2 px-6 pb-4">
-            <Info className="text-muted-foreground mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
-            <p className="text-muted-foreground text-xs italic">{tCommon('aiDisclaimer')}</p>
-          </div>
 
           <DialogFooter className="border-t px-6 py-4">
             <div className="mr-auto">

@@ -74,9 +74,7 @@ export const PostCard = ({
   };
 
   return (
-    <article
-      className={`hover:bg-muted/30 border-b px-3 py-3 transition-colors md:px-6 md:py-4 ${className}`}
-    >
+    <article className={`hover:bg-muted/30 px-3 py-3 transition-colors md:px-6 md:py-4 ${className}`}>
       {/* Header */}
       <div className="mb-2 flex items-start gap-2 md:mb-3 md:gap-3">
         {/* Small avatar on mobile */}

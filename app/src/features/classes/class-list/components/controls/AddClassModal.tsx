@@ -1,5 +1,5 @@
 import { ClassForm } from './ClassForm';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@ui/dialog';
 import { useCreateClass } from '@/features/classes/shared/hooks';
 import useClassStore from '@/features/classes/shared/stores/classStore';
 import { useTranslation } from 'react-i18next';
@@ -53,6 +53,7 @@ export const AddClassModal = ({ isOpen, onClose }: AddClassModalProps) => {
       <DialogContent className="!max-w-3xl">
         <DialogHeader>
           <DialogTitle>{t('addTitle')}</DialogTitle>
+          <DialogDescription>{t('addDescription')}</DialogDescription>
         </DialogHeader>
         <div className="py-4">
           <ClassForm onSubmit={handleSubmit} />

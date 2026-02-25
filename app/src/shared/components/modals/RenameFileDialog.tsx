@@ -1,15 +1,22 @@
 import * as React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@ui/dialog';
 import { Input } from '@ui/input';
 import { Button } from '@ui/button';
 import { useTranslation } from 'react-i18next';
-import { Description } from '@radix-ui/react-dialog';
 
 interface RenameFileDialogProps<TData = { id: string; filename: string; projectType: string } | null> {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   project: TData | null;
   renameDialogTitle?: string;
+  renameDialogDescription?: string;
   renameDuplicatedMessage?: string;
   placeholder?: string;
   onRename?: (id: string, name: string) => Promise<void>;
@@ -21,6 +28,7 @@ export const RenameFileDialog = ({
   onOpenChange,
   project,
   renameDialogTitle = 'Rename File',
+  renameDialogDescription,
   renameDuplicatedMessage = 'A file with this name already exists',
   placeholder = 'Enter new filename',
   onRename,
@@ -110,10 +118,10 @@ export const RenameFileDialog = ({
 
   return (
     <Dialog modal open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%] sm:max-w-[425px]">
-        <Description></Description>
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>{renameDialogTitle}</DialogTitle>
+          {renameDialogDescription && <DialogDescription>{renameDialogDescription}</DialogDescription>}
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -131,7 +139,7 @@ export const RenameFileDialog = ({
               <p className="text-sm text-red-500">{errorMessage || renameDuplicatedMessage}</p>
             )}
           </div>
-          <div className="flex justify-end gap-2">
+          <DialogFooter>
             <Button type="button" variant="outline" onClick={handleCancel} disabled={isLoading}>
               {t('glossary:actions.cancel')}
             </Button>
@@ -142,7 +150,7 @@ export const RenameFileDialog = ({
             >
               {isLoading ? `${t('glossary:states.loading')}...` : t('glossary:actions.confirm')}
             </Button>
-          </div>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

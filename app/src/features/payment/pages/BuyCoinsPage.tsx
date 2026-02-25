@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@ui/button';
 import { useAuth } from '@/shared/context/auth';
+import { PageHeader } from '@/shared/components/common/PageHeader';
+import { PageContainer } from '@/shared/components/common/PageContainer';
 import { CoinBalanceBadge } from '../components/CoinBalanceBadge';
 import { CoinPackageCard } from '../components/CoinPackageCard';
 import { GatewaySelector } from '../components/GatewaySelector';
@@ -69,24 +71,24 @@ export function BuyCoinsPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-4xl p-4 md:p-8">
+    <PageContainer>
       <div className="space-y-8">
         {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">{t('buyCoins.title')}</h1>
-            <p className="text-muted-foreground mt-1">{t('buyCoins.subtitle')}</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <CoinBalanceBadge />
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/payment/history">
-                <History className="mr-1.5 size-4" />
-                {t('buyCoins.history')}
-              </Link>
-            </Button>
-          </div>
-        </div>
+        <PageHeader
+          title={t('buyCoins.title')}
+          description={t('buyCoins.subtitle')}
+          actions={
+            <div className="flex flex-wrap items-center gap-3">
+              <CoinBalanceBadge />
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/payment/history">
+                  <History className="mr-1.5 size-4" />
+                  {t('buyCoins.history')}
+                </Link>
+              </Button>
+            </div>
+          }
+        />
 
         {/* Coin Packages Grid */}
         <div>
@@ -138,6 +140,6 @@ export function BuyCoinsPage() {
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

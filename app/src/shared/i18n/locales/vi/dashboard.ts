@@ -1,46 +1,46 @@
 export default {
   header: {
-    title: 'Bảng Điều Khiển',
+    title: 'Bảng điều khiển',
     welcome: 'Chào mừng trở lại! Đây là những gì đang diễn ra hôm nay.',
   },
   quickNav: {
-    title: 'Thao Tác Nhanh',
-    assignment: 'Tạo Bài Tập',
-    image: 'Tạo Hình Ảnh',
-    mindmap: 'Tạo Sơ Đồ Tư Duy',
-    presentation: 'Tạo Bài Thuyết Trình',
-    questionsBank: 'Ngân Hàng Câu Hỏi',
+    title: 'Thao tác nhanh',
+    assignment: 'Tạo bài tập',
+    image: 'Tạo hình ảnh',
+    mindmap: 'Tạo sơ đồ tư duy',
+    presentation: 'Tạo bài thuyết trình',
+    questionsBank: 'Ngân hàng câu hỏi',
   },
   recentDocuments: {
-    title: 'Tài Liệu Gần Đây',
+    title: 'Tài liệu gần đây',
     empty: 'Không có tài liệu gần đây',
     edited: 'Đã chỉnh sửa',
     noPreview: 'Không có xem trước',
   },
   myClasses: {
-    title: 'Lớp Học Của Tôi',
-    addClass: 'Thêm Lớp Học',
+    title: 'Lớp học của tôi',
+    addClass: 'Thêm lớp học',
     table: {
       columns: {
-        className: 'Tên Lớp',
-        status: 'Trạng Thái',
-        createdAt: 'Ngày Tạo',
+        className: 'Tên lớp',
+        status: 'Trạng thái',
+        createdAt: 'Ngày tạo',
       },
       actions: {
-        manageStudents: 'Quản Lý Học Sinh',
+        manageStudents: 'Quản lý học sinh',
       },
       empty: 'Không tìm thấy lớp học',
       status: {
-        active: 'Hoạt Động',
-        inactive: 'Không Hoạt Động',
+        active: 'Hoạt động',
+        inactive: 'Không hoạt động',
       },
     },
     loading: 'Đang tải...',
   },
   calendar: {
     title: 'Lịch',
-    nextUp: 'Sắp Tới',
-    today: 'Hôm Nay',
+    nextUp: 'Sắp tới',
+    today: 'Hôm nay',
     weekdays: {
       sunday: 'CN',
       monday: 'T2',
@@ -68,10 +68,10 @@ export default {
     loading: 'Đang tải sự kiện...',
   },
   pendingGrading: {
-    title: 'Chấm Điểm Đang Chờ',
+    title: 'Chấm điểm đang chờ',
     description: 'Xem xét và chấm điểm bài làm của học sinh',
     empty: {
-      title: 'Đã Hoàn Thành! 🎉',
+      title: 'Đã hoàn thành! 🎉',
       description: 'Không có bài nộp nào cần chấm',
     },
     urgency: {
@@ -83,39 +83,39 @@ export default {
     autoGraded: 'Tự động chấm: {{score}}/{{max}}',
   },
   classesOverview: {
-    title: 'Tổng Quan Lớp Học',
+    title: 'Tổng quan lớp học',
     description: {
       atRisk: '{{count}} học sinh cần chú ý trong các lớp học của bạn',
       allGood: 'Tất cả học sinh đều đang học tốt',
     },
     empty: {
-      title: 'Chưa Có Lớp Học',
+      title: 'Chưa có lớp học',
       description: 'Tạo lớp học đầu tiên của bạn để bắt đầu',
     },
     students: '{{count}} học sinh',
     atRisk: '{{count}} có nguy cơ',
-    atRiskStudents: 'Học Sinh Có Nguy Cơ:',
+    atRiskStudents: 'Học sinh có nguy cơ:',
     missedLate: '{{missed}} bỏ lỡ, {{late}} muộn',
   },
   banner: {
-    title: 'Tạo Tài Liệu Giảng Dạy Bằng AI',
+    title: 'Tạo tài liệu giảng dạy bằng AI',
     description: 'Tạo câu đố, bảng tính và giáo án ngay lập tức bằng AI',
     action: 'Tạo Ngay',
   },
   metrics: {
     totalClasses: {
-      title: 'Tổng Số Lớp',
+      title: 'Tổng số lớp',
       subtitle: 'Tổng cộng {{count}} học sinh',
     },
     pendingGrading: {
-      title: 'Chấm Điểm Đang Chờ',
+      title: 'Chấm điểm đang chờ',
       subtitle: {
         urgent: '{{count}} cần chú ý',
         allGood: 'Đã hoàn thành',
       },
     },
     totalStudents: {
-      title: 'Tổng Số Học Sinh',
+      title: 'Tổng số học sinh',
       subtitle: 'Trong {{count}} lớp',
     },
   },

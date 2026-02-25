@@ -58,7 +58,9 @@ export default {
 
   modals: {
     addTitle: 'Thêm lớp học mới',
+    addDescription: 'Điền thông tin cần thiết để thêm lớp học mới.',
     editTitle: 'Cập nhật lớp học',
+    editDescription: 'Cập nhật thông tin lớp học bên dưới. Các trường bắt buộc được đánh dấu với *.',
     addClass: {
       loading: 'Đang thêm lớp...',
       success: 'Lớp "{{name}}" đã được thêm thành công',
@@ -922,12 +924,29 @@ export default {
       columnDateOfBirthDescription: 'Định dạng ngày: YYYY-MM-DD (ví dụ: "2010-03-15")',
       columnParentName: 'Tên phụ huynh/Người giám hộ',
       columnParentNameDescription: 'Tên của phụ huynh hoặc người giám hộ.',
-      columnParentPhone: 'Số điện thoại phụ huynh/Người giám hộ',
+      columnParentPhone: 'Số điện thoại phụ huynh/người giám hộ',
       columnParentPhoneDescription: 'Số điện thoại của phụ huynh hoặc người giám hộ.',
+      columnGender: 'Giới tính',
+      columnGenderDescription: 'Giới tính của học sinh. Giá trị được chấp nhận: male, female, other.',
+      columnAddress: 'Địa chỉ',
+      columnAddressDescription: 'Địa chỉ nhà của học sinh.',
+      columnParentEmail: 'Email phụ huynh/người giám hộ',
+      columnParentEmailDescription:
+        'Địa chỉ email của phụ huynh hoặc người giám hộ. Định dạng: ten@domain.com',
+      columnAdditionalNotes: 'Ghi chú thêm',
+      columnAdditionalNotesDescription:
+        'Bất kỳ thông tin bổ sung nào về học sinh. Hỗ trợ: notes, comments, remarks.',
       columnHeaderVariations: 'Biến thể tiêu đề',
       headerVariationsDescription:
         'Các cột CSV của bạn có thể sử dụng các biến thể khác nhau của những tên này (không phân biệt chữ hoa chữ thường):',
-      fullNameVariations: 'Biến thể họ và tên: Full Name, FullName, Full, Name, HoVaTen, Ho Va Ten',
+      fullNameVariations: 'Họ và tên: fullName, full_name, name, studentName',
+      dateOfBirthVariations: 'Ngày sinh: dateOfBirth, date_of_birth, dob, birthdate',
+      genderVariations: 'Giới tính: gender, sex',
+      addressVariations: 'Địa chỉ: address, homeaddress, home_address',
+      parentNameVariations: 'Tên phụ huynh: parentName, parent_name, guardianName, parentGuardianName',
+      parentPhoneVariations: 'Điện thoại phụ huynh: parentPhone, parent_phone, parentContactPhone',
+      parentEmailVariations: 'Email phụ huynh: parentContactEmail, parentEmail, parent_email, guardianEmail',
+      additionalNotesVariations: 'Ghi chú: additionalNotes, notes, comments, remarks',
       csvExample: 'Ví dụ CSV',
       exampleDescription: 'Dưới đây là ví dụ về tệp CSV được định dạng đúng:',
       tips: 'Mẹo để thành công',

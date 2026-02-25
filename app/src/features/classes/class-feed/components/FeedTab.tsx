@@ -32,7 +32,7 @@ export const FeedTab = ({ classId }: FeedPageProps) => {
   return (
     <div className="flex h-full flex-col">
       {/* Sticky Top Bar */}
-      <div className="bg-background/95 supports-[backdrop-filter]:bg-background/80 sticky top-0 z-10 border-b backdrop-blur">
+      <div className="bg-background/95 supports-[backdrop-filter]:bg-background/80 sticky top-0 z-10 backdrop-blur">
         <div className="container mx-auto max-w-4xl px-4 py-3 md:px-6 md:py-4">
           <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             {/* Filter Tabs */}
@@ -66,7 +66,7 @@ export const FeedTab = ({ classId }: FeedPageProps) => {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto bg-white">
           <div className="container mx-auto max-w-4xl">
             {/* Error State */}
             {error && (

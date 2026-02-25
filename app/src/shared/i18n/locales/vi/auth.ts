@@ -26,6 +26,17 @@ export default {
     success: 'Đăng xuất thành công',
     error: 'Đăng xuất thất bại',
   },
+  nav: {
+    account: 'Tài khoản',
+    payment: 'Thanh toán',
+    settings: 'Cài đặt',
+    language: 'Ngôn ngữ',
+    logout: 'Đăng xuất',
+    languages: {
+      en: 'English',
+      vi: 'Tiếng Việt',
+    },
+  },
   googleCallback: {
     completingSignIn: 'Đang hoàn tất đăng nhập...',
     redirecting: 'Đang chuyển hướng...',

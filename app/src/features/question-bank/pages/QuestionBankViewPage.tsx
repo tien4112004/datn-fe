@@ -35,7 +35,9 @@ import {
   getDifficultyBadgeClass,
   getQuestionTypeBadgeClass,
 } from '@aiprimary/core';
-import { ArrowLeft, Edit3, Copy, Trash2 } from 'lucide-react';
+import { Edit3, Copy, Trash2 } from 'lucide-react';
+import { PageHeader } from '@/shared/components/common/PageHeader';
+import { PageContainer } from '@/shared/components/common/PageContainer';
 import { toast } from 'sonner';
 
 export function QuestionBankViewPage() {
@@ -80,56 +82,52 @@ export function QuestionBankViewPage() {
   return (
     <div className="flex h-full flex-col">
       <div className="flex flex-1 flex-col overflow-auto">
-        <div className="mx-auto w-full max-w-7xl space-y-6 px-8 py-12">
+        <PageContainer>
           {/* Header */}
-          <div className="mb-8 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-                <ArrowLeft className="h-5 w-5" />
-                <span className="sr-only">{t('actions.back')}</span>
-              </Button>
-              <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">{t('pageTitle')}</h1>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={handleEdit} className="gap-2">
-                <Edit3 className="h-4 w-4" />
-                {t('actions.edit')}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleDuplicate}
-                disabled={duplicateMutation.isPending}
-                className="gap-2"
-              >
-                <Copy className="h-4 w-4" />
-                {t('actions.duplicate')}
-              </Button>
-              <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline" className="text-destructive gap-2">
-                    <Trash2 className="h-4 w-4" />
-                    {t('actions.delete')}
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>{t('deleteDialog.title')}</AlertDialogTitle>
-                    <AlertDialogDescription>{t('deleteDialog.description')}</AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>{t('deleteDialog.cancel')}</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleDelete}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      {t('deleteDialog.delete')}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-          </div>
+          <PageHeader
+            title={t('pageTitle')}
+            onBack={() => navigate(-1)}
+            actions={
+              <div className="flex items-center gap-2">
+                <Button variant="outline" onClick={handleEdit} className="gap-2">
+                  <Edit3 className="h-4 w-4" />
+                  {t('actions.edit')}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleDuplicate}
+                  disabled={duplicateMutation.isPending}
+                  className="gap-2"
+                >
+                  <Copy className="h-4 w-4" />
+                  {t('actions.duplicate')}
+                </Button>
+                <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" className="text-destructive gap-2">
+                      <Trash2 className="h-4 w-4" />
+                      {t('actions.delete')}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>{t('deleteDialog.title')}</AlertDialogTitle>
+                      <AlertDialogDescription>{t('deleteDialog.description')}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>{t('deleteDialog.cancel')}</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleDelete}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        {t('deleteDialog.delete')}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            }
+          />
 
           {/* Metadata Section */}
           <div className="space-y-4">
@@ -239,7 +237,7 @@ export function QuestionBankViewPage() {
               )}
             </div>
           )}
-        </div>
+        </PageContainer>
       </div>
     </div>
   );

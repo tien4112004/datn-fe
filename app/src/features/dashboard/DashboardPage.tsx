@@ -9,6 +9,7 @@ import { useAuth } from '@/shared/context/auth';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { PageHeader } from '@/shared/components/common/PageHeader';
 
 export const DashboardPage = () => {
   const { user } = useAuth();
@@ -34,10 +35,7 @@ export const DashboardPage = () => {
         {/* Left Main Content */}
         <div className="flex-1 space-y-6 p-4 sm:space-y-8 sm:p-6 lg:overflow-y-auto lg:p-8">
           {/* Dashboard Header */}
-          <div>
-            <h1 className="text-2xl font-bold sm:text-3xl">{t('header.title')}</h1>
-            <p className="text-muted-foreground">{t('header.welcome')}</p>
-          </div>
+          <PageHeader title={t('header.title')} description={t('header.welcome')} />
 
           {/* Summary Metrics */}
           <SummaryMetrics />

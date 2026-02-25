@@ -1,5 +1,12 @@
 import { useRef, useState, useCallback } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@ui/dialog';
 import { Button } from '@ui/button';
 import { useUploadImage } from '../hooks/useApi';
 import { Upload, X, Loader2, ImageIcon } from 'lucide-react';
@@ -193,7 +200,7 @@ export const ImageUploadDialog = ({ open, onClose, onSuccess }: ImageUploadDialo
           {error && <p className="text-destructive text-sm">{error}</p>}
 
           {/* Actions */}
-          <div className="flex justify-end gap-2">
+          <DialogFooter>
             <Button variant="outline" onClick={handleClose} disabled={uploadMutation.isPending}>
               {t('upload.cancel')}
             </Button>
@@ -210,7 +217,7 @@ export const ImageUploadDialog = ({ open, onClose, onSuccess }: ImageUploadDialo
                 </>
               )}
             </Button>
-          </div>
+          </DialogFooter>
         </div>
       </DialogContent>
     </Dialog>

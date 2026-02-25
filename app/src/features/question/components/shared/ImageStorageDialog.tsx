@@ -1,5 +1,12 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@ui/dialog';
 import { Button } from '@ui/button';
 import { useImages } from '@/features/image/hooks/useApi';
 import { Loader2, ImageIcon, Check } from 'lucide-react';
@@ -102,14 +109,14 @@ export const ImageStorageDialog = ({ open, onClose, onSelect }: ImageStorageDial
         </div>
 
         {/* Footer Actions */}
-        <div className="flex justify-end gap-2 border-t pt-4">
+        <DialogFooter>
           <Button variant="outline" onClick={handleCancel}>
             {t('cancel')}
           </Button>
           <Button onClick={handleSelect} disabled={!selectedImage}>
             {t('select')}
           </Button>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

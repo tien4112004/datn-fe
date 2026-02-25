@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@ui/button';
+import { PageContainer } from '@/shared/components/common/PageContainer';
+import { PageHeader } from '@/shared/components/common/PageHeader';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
 import { TransactionStatusBadge } from '../components/TransactionStatusBadge';
 import { CoinBalanceBadge } from '../components/CoinBalanceBadge';
@@ -12,6 +13,7 @@ import type { TransactionStatus } from '../types';
 
 export function TransactionHistoryPage() {
   const { t } = useTranslation('payment');
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const { data, isLoading } = useTransactions(page, pageSize);
@@ -25,23 +27,15 @@ export function TransactionHistoryPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-5xl p-4 md:p-8">
+    <PageContainer>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" asChild>
-              <Link to="/payment">
-                <ArrowLeft className="size-4" />
-              </Link>
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold">{t('history.title')}</h1>
-              <p className="text-muted-foreground mt-1">{t('history.subtitle')}</p>
-            </div>
-          </div>
-          <CoinBalanceBadge />
-        </div>
+        <PageHeader
+          title={t('history.title')}
+          description={t('history.subtitle')}
+          onBack={() => navigate('/payment')}
+          actions={<CoinBalanceBadge />}
+        />
 
         {/* Transactions Table */}
         <div className="overflow-hidden rounded-lg border">
@@ -105,6 +99,6 @@ export function TransactionHistoryPage() {
           </div>
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

@@ -1,5 +1,5 @@
 import { ClassForm } from './ClassForm';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@ui/dialog';
 import { useUpdateClass, type ClassSchema } from '@/features/classes/shared/hooks';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -63,6 +63,7 @@ export const UpdateClassModal = ({ isOpen, onClose, initialData }: UpdateClassMo
       <DialogContent className="!max-w-3xl">
         <DialogHeader>
           <DialogTitle>{t('editTitle')}</DialogTitle>
+          <DialogDescription>{t('editDescription')}</DialogDescription>
         </DialogHeader>
         <div className="py-4">
           <ClassForm initialData={formInitialData} onSubmit={handleSubmit} isEditMode={true} />

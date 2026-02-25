@@ -2,6 +2,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@ui/button';
 import { ArrowLeft, FileQuestion, Loader2 } from 'lucide-react';
 import { useAssignmentPublic } from '../hooks';
+import { PageHeader } from '@/shared/components/common/PageHeader';
+import { PageContainer } from '@/shared/components/common/PageContainer';
 
 export const AssignmentPublicViewPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -35,18 +37,15 @@ export const AssignmentPublicViewPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <div className="mx-auto max-w-4xl p-6 md:p-8">
+      <PageContainer>
         {/* Header */}
         <div className="mb-6">
-          <Button onClick={() => navigate(-1)} variant="ghost" size="sm" className="mb-4">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Button>
-
           <div className="rounded-lg border bg-white p-6 shadow-sm dark:bg-gray-900">
-            <h1 className="text-3xl font-bold">{assignment.title}</h1>
-
-            {assignment.description && <p className="text-muted-foreground mt-3">{assignment.description}</p>}
+            <PageHeader
+              title={assignment.title}
+              description={assignment.description}
+              onBack={() => navigate(-1)}
+            />
 
             <div className="mt-4 flex flex-wrap gap-4 text-sm">
               {assignment.questions && assignment.questions.length > 0 && (
@@ -98,7 +97,7 @@ export const AssignmentPublicViewPage = () => {
             No questions in this assignment
           </div>
         )}
-      </div>
+      </PageContainer>
     </div>
   );
 };

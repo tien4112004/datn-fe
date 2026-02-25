@@ -5,6 +5,7 @@ import { useAuth } from '@/shared/context/auth';
 import { LoginForm } from '../components/LoginForm';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
+import { PageHeader } from '@/shared/components/common/PageHeader';
 
 export function LoginPage() {
   const { t } = useTranslation(I18N_NAMESPACES.AUTH);
@@ -37,19 +38,16 @@ export function LoginPage() {
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="from-background/80 via-background/50 to-background/30 absolute inset-0 bg-gradient-to-t" />
-        <div className="absolute bottom-0 left-0 right-0 p-12 text-white">
+        <div className="absolute bottom-0 left-0 right-0 p-12 text-black">
           <h2 className="mb-4 text-4xl font-bold">{t('login.heroTitle')}</h2>
-          <p className="text-lg text-white/90">{t('login.heroSubtitle')}</p>
+          <p className="text-lg text-black/80">{t('login.heroSubtitle')}</p>
         </div>
       </div>
 
       {/* Right side - Form */}
       <div className="flex w-full items-center justify-center p-8 lg:w-1/3">
         <div className="w-full max-w-md space-y-8">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">{t('login.title')}</h1>
-            <p className="text-muted-foreground">{t('login.subtitle')}</p>
-          </div>
+          <PageHeader title={t('login.title')} description={t('login.subtitle')} />
 
           <LoginForm />
 

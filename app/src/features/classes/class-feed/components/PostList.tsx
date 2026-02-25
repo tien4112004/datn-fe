@@ -108,7 +108,7 @@ export const PostList = ({
 
   return (
     <div className={className}>
-      {posts.map((post) => (
+      {posts.map((post, index) => (
         <div key={post.id}>
           <PostCard
             post={post}
@@ -116,6 +116,7 @@ export const PostList = ({
             onPin={(pinned) => handlePinPost(post.id, pinned)}
             onDelete={() => handleDeletePost(post.id)}
             onComment={() => toggleComments(post.id)}
+            className={index === 0 ? '' : 'border-t'}
           />
 
           <AnimatePresence>

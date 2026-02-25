@@ -1,15 +1,6 @@
 'use client';
 
-import {
-  BadgeCheck,
-  Check,
-  ChevronsUpDown,
-  CreditCard,
-  Languages,
-  LogOut,
-  Settings,
-  Sparkles,
-} from 'lucide-react';
+import { BadgeCheck, Check, ChevronsUpDown, CreditCard, Languages, LogOut, Settings } from 'lucide-react';
 
 import {
   DropdownMenu,
@@ -32,11 +23,6 @@ import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { UserAvatar } from '../common/UserAvatar';
 
-const LANGUAGES = [
-  { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
-];
-
 export function NavUser({
   user,
 }: {
@@ -50,6 +36,11 @@ export function NavUser({
   const navigate = useNavigate();
   const { mutate: logout } = useLogout();
   const { t, i18n } = useTranslation(I18N_NAMESPACES.AUTH);
+
+  const languages = [
+    { code: 'en', flag: '🇬🇧', label: t('nav.languages.en') },
+    { code: 'vi', flag: '🇻🇳', label: t('nav.languages.vi') },
+  ];
 
   const changeLanguage = (code: string) => {
     if (code !== i18n.language) i18n.changeLanguage(code);
@@ -105,29 +96,22 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
               <DropdownMenuItem asChild>
                 <NavLink to="/profile">
                   <BadgeCheck />
-                  Account
+                  {t('nav.account')}
                 </NavLink>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <NavLink to="/payment">
                   <CreditCard />
-                  Billing
+                  {t('nav.payment')}
                 </NavLink>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <NavLink to="/settings">
                   <Settings />
-                  Settings
+                  {t('nav.settings')}
                 </NavLink>
               </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -136,14 +120,14 @@ export function NavUser({
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
                   <Languages />
-                  Language
+                  {t('nav.language')}
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent>
-                    {LANGUAGES.map((lang) => (
+                    {languages.map((lang) => (
                       <DropdownMenuItem key={lang.code} onClick={() => changeLanguage(lang.code)}>
-                        <span className="text-lg leading-none">{lang.flag}</span>
-                        <span>{lang.name}</span>
+                        <span className="text-base leading-none">{lang.flag}</span>
+                        <span>{lang.label}</span>
                         {i18n.language === lang.code && <Check className="ml-auto size-4" />}
                       </DropdownMenuItem>
                     ))}
@@ -154,7 +138,7 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
-              Log out
+              {t('nav.logout')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

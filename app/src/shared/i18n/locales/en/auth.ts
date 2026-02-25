@@ -26,6 +26,17 @@ export default {
     success: 'Logged out successfully',
     error: 'Failed to logout',
   },
+  nav: {
+    account: 'Account',
+    payment: 'Payment',
+    settings: 'Settings',
+    language: 'Language',
+    logout: 'Log out',
+    languages: {
+      en: 'English',
+      vi: 'Tiếng Việt',
+    },
+  },
   googleCallback: {
     completingSignIn: 'Completing sign in...',
     redirecting: 'Redirecting...',

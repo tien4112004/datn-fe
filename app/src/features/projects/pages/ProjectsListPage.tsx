@@ -14,6 +14,8 @@ import AssignmentGrid from '@/features/assignment/components/table/AssignmentGri
 import { SharedResourcesTable, SharedResourcesGrid } from '@/features/shared-resources';
 import { useGlobalStore } from '@/store/useGlobalStore';
 import { Spinner } from '@/shared/components/common/GlobalSpinner';
+import { PageHeader } from '@/shared/components/common/PageHeader';
+import { PageContainer } from '@/shared/components/common/PageContainer';
 
 const ProjectListPage = () => {
   const { t } = useTranslation('projects');
@@ -97,11 +99,8 @@ const ProjectListPage = () => {
   }
 
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-6 px-6 py-8">
-      <div className="mb-8 space-y-1">
-        <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight">{t('title')}</h1>
-        <p className="text-muted-foreground text-sm">{t('description')}</p>
-      </div>
+    <PageContainer>
+      <PageHeader title={t('title')} description={t('description')} />
 
       <ProjectControls currentResourceType={resourceType as ResourceType} />
       <CommonTabs
@@ -112,7 +111,7 @@ const ProjectListPage = () => {
         tabsClassName="w-full"
         tabsContentClassName="flex flex-col gap-2"
       />
-    </div>
+    </PageContainer>
   );
 };
 

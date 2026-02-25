@@ -1,7 +1,13 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import {
+  createColumnHelper,
+  getCoreRowModel,
+  useReactTable,
+  type SortingState,
+  type Updater,
+} from '@tanstack/react-table';
 import ReactMarkdown from 'react-markdown';
 import { useQuestionBankList, useDeleteQuestions, useDuplicateQuestion } from '../hooks/useQuestionBankApi';
 import useQuestionBankStore from '../stores/questionBankStore';
@@ -55,12 +61,21 @@ export function TeacherQuestionBankPage() {
   // Store
   const { filters } = useQuestionBankStore();
 
+  // Sorting state (local, drives API query directly)
+  const [sorting, setSorting] = useState<SortingState>([]);
+
+  // Derive sortBy/sortDirection from TanStack sorting state for the API
+  const sortBy = sorting.length > 0 ? sorting[0].id : undefined;
+  const sortDirection = sorting.length > 0 ? (sorting[0].desc ? 'DESC' : 'ASC') : undefined;
+
   // Hooks
   const { data, isLoading } = useQuestionBankList({
     ...filters,
     page: pagination.pageIndex + 1,
     pageSize: pagination.pageSize,
     bankType: 'personal',
+    sortBy,
+    sortDirection,
   });
 
   const deleteQuestionsMutation = useDeleteQuestions();
@@ -160,6 +175,7 @@ export function TeacherQuestionBankPage() {
         ),
         size: 50,
         enableResizing: false,
+        enableSorting: false,
       }),
       columnHelper.accessor('title', {
         header: t('table.columns.title'),
@@ -172,6 +188,7 @@ export function TeacherQuestionBankPage() {
         meta: {
           isGrow: true,
         },
+        enableSorting: false,
       }),
       columnHelper.accessor('type', {
         header: t('table.columns.questionType'),
@@ -181,6 +198,7 @@ export function TeacherQuestionBankPage() {
           </Badge>
         ),
         size: 150,
+        enableSorting: true,
       }),
       columnHelper.accessor('subject', {
         header: t('table.columns.subject'),
@@ -190,6 +208,7 @@ export function TeacherQuestionBankPage() {
           </Badge>
         ),
         size: 120,
+        enableSorting: true,
       }),
       columnHelper.accessor('grade', {
         header: t('table.columns.grade'),
@@ -202,6 +221,7 @@ export function TeacherQuestionBankPage() {
           );
         },
         size: 100,
+        enableSorting: true,
       }),
       columnHelper.accessor('difficulty', {
         header: t('table.columns.difficulty'),
@@ -211,6 +231,7 @@ export function TeacherQuestionBankPage() {
           </Badge>
         ),
         size: 140,
+        enableSorting: true,
       }),
       columnHelper.display({
         id: 'actions',
@@ -252,6 +273,7 @@ export function TeacherQuestionBankPage() {
         },
         size: 60,
         enableResizing: false,
+        enableSorting: false,
       }),
     ],
     [t, tCommon]
@@ -263,6 +285,7 @@ export function TeacherQuestionBankPage() {
     columns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
+    manualSorting: true,
     enableRowSelection: (row) => canDelete(row.original),
     enableColumnResizing: true,
     columnResizeMode: 'onChange',
@@ -270,10 +293,12 @@ export function TeacherQuestionBankPage() {
     state: {
       rowSelection,
       pagination,
+      sorting,
     },
     rowCount: totalItems,
     onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
+    onSortingChange: setSorting as any as (updaterOrValue: Updater<SortingState>) => void,
   });
 
   return (

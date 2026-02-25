@@ -82,7 +82,7 @@
           <div v-if="!hideStudentOptions" class="tw-h-px tw-bg-gray-200"></div>
 
           <!-- Slide Creation -->
-          <PopoverMenuItem
+          <!-- <PopoverMenuItem
             @click="
               slideCreationDialogVisible = true;
               mainMenuVisible = false;
@@ -95,7 +95,7 @@
           </PopoverMenuItem>
 
           <!-- Import Operations -->
-          <FileInput
+          <!-- <FileInput
             accept="application/vnd.openxmlformats-officedocument.presentationml.presentation"
             @change="
               (files) => {
@@ -128,7 +128,7 @@
             </PopoverMenuItem>
           </FileInput>
 
-          <div class="tw-h-px tw-bg-gray-200"></div>
+          <div class="tw-h-px tw-bg-gray-200"></div> -->
 
           <!-- Tools -->
           <PopoverMenuItem

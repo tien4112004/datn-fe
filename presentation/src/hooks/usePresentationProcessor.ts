@@ -224,9 +224,11 @@ export function usePresentationProcessor(
         // Don't dispatch error message for 404
         // Slides remain empty, EmptyCanvas will show
       } else {
-        // For 500 errors and other failures, dispatch error event
-        dispatchMessage('error', 'Failed to process presentation');
-        dispatchProcessingError(error);
+        // For 500 errors and other failures, silently handle and fallback to normal parsed presentation
+        console.warn(
+          '[usePresentationProcessor] AI result fetch failed, falling back to normal parsed presentation',
+          error
+        );
       }
     } finally {
       isProcessing.value = false;

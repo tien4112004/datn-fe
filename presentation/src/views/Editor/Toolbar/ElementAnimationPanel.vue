@@ -210,6 +210,7 @@ const { addHistorySnapshot } = useHistorySnapshot();
 
 // Animation list for current page
 const animationSequence = computed(() => {
+  if (!currentSlide.value) return [];
   const animationSequence = [];
   for (let i = 0; i < formatedAnimations.value.length; i++) {
     const item = formatedAnimations.value[i];

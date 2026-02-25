@@ -5,7 +5,8 @@
         v-for="tab in visibleTabs"
         :key="tab.key"
         class="sidebar-tab"
-        :class="{ active: isActive(tab.key) }"
+        :class="{ active: isActive(tab.key), disabled: noSlides }"
+        :disabled="noSlides"
         @click="handleTabClick(tab.key)"
         :title="tab.tooltip"
         :aria-label="tab.tooltip"
@@ -63,6 +64,7 @@ const {
 } = storeToRefs(mainStore);
 const { currentSlide } = storeToRefs(slidesStore);
 const { isCurrentSlideLocked } = useSlideEditLock();
+const noSlides = computed(() => !currentSlide.value);
 
 // Helper to filter tabs based on slide lock state
 const filterTabsByLockState = (tabs: TabConfig[], isLocked: boolean): TabConfig[] => {
@@ -217,6 +219,7 @@ const isActive = (tabKey: ToolbarStates) => {
 
 // Handle tab click - toggle behavior
 const handleTabClick = (tabKey: ToolbarStates) => {
+  if (noSlides.value) return;
   if (toolbarState.value === tabKey && sidebarExpanded.value) {
     // Clicking same tab closes the panel
     mainStore.setSidebarExpanded(false);
@@ -300,6 +303,13 @@ watch(
     .tab-icon {
       opacity: 1;
     }
+  }
+
+  &.disabled,
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
   }
 
   .tab-icon {

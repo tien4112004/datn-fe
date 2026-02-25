@@ -7,7 +7,12 @@
     padding="normal"
   >
     <div class="tw-w-full tw-flex tw-justify-center tw-items-center tw-mb-1" v-if="mode === 'edit'">
-      <ButtonGroup
+      <Button @click="createSlide()">
+        <IconPlus class="tw-h-3.5 tw-w-3.5" /><span class="button-text">{{
+          $t('thumbnails.slides.addSlide')
+        }}</span>
+      </Button>
+      <!-- <ButtonGroup
         class="tw-flex tw-gap-[1px] tw-h-10 tw-cursor-pointer tw-rounded-md tw-text-sm tw-transition-all tw-duration-200 tw-ease-in-out"
       >
         <Button @click="createSlide()">
@@ -34,7 +39,7 @@
           </template>
           <Button><IconDown class="tw-h-3.5 tw-w-3.5" /></Button>
         </Popover>
-      </ButtonGroup>
+      </ButtonGroup> -->
     </div>
 
     <template v-if="slides.length > 0">

@@ -28,6 +28,8 @@ export default {
       paste: 'Dán',
       selectAll: 'Chọn tất cả',
       fromCurrentShow: 'Từ trình chiếu hiện tại',
+      layouts: 'Bố cục',
+      templates: 'Mẫu',
     },
 
     sections: {

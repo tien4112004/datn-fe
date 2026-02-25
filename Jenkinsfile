@@ -129,80 +129,92 @@ pipeline {
                 script {
                     echo "========== Building Docker Images =========="
 
-                    sh '''
-                        # Get short commit SHA for tagging
-                        COMMIT_SHA=$(git rev-parse --short HEAD)
+                    withCredentials([string(credentialsId: 'TurboToken', variable: 'TURBO_TOKEN'), string(credentialsId: 'TurboTeam', variable: 'TURBO_TEAM')]) {
+                        sh '''
+                            # Get short commit SHA for tagging
+                            COMMIT_SHA=$(git rev-parse --short HEAD)
+                            CACHE_BUST=$(date +%s)
 
-                        # Load environment variables from .env file
-                        if [ -f "${ENV_FILE}" ]; then
-                            echo "Loading environment variables from ${ENV_FILE}..."
-                            export $(grep -v '^#' ${ENV_FILE} | xargs)
-                            echo "✓ Environment variables loaded"
-                            echo "VITE_API_URL: ${VITE_API_URL}"
-                            echo "VITE_PRESENTATION_URL: ${VITE_PRESENTATION_URL}"
-                        else
-                            echo "WARNING: Environment file not found at ${ENV_FILE}"
-                            echo "Building without environment variables..."
-                        fi
+                            # Load environment variables from .env file
+                            if [ -f "${ENV_FILE}" ]; then
+                                echo "Loading environment variables from ${ENV_FILE}..."
+                                export $(grep -v '^#' ${ENV_FILE} | xargs)
+                                echo "✓ Environment variables loaded"
+                                echo "VITE_API_URL: ${VITE_API_URL}"
+                                echo "VITE_PRESENTATION_URL: ${VITE_PRESENTATION_URL}"
+                            else
+                                echo "WARNING: Environment file not found at ${ENV_FILE}"
+                                echo "Building without environment variables..."
+                            fi
 
-                        # Build app image
-                        echo "Building App image..."
-                        docker build  \
-                            --build-arg VITE_API_URL="${VITE_API_URL}" \
-                            --build-arg VITE_PRESENTATION_URL="${VITE_PRESENTATION_URL}" \
-                            --build-arg VITE_FIREBASE_API_KEY="${VITE_FIREBASE_API_KEY}" \
-                            --build-arg VITE_FIREBASE_AUTH_DOMAIN="${VITE_FIREBASE_AUTH_DOMAIN}" \
-                            --build-arg VITE_FIREBASE_PROJECT_ID="${VITE_FIREBASE_PROJECT_ID}" \
-                            --build-arg VITE_FIREBASE_STORAGE_BUCKET="${VITE_FIREBASE_STORAGE_BUCKET}" \
-                            --build-arg VITE_FIREBASE_MESSAGING_SENDER_ID="${VITE_FIREBASE_MESSAGING_SENDER_ID}" \
-                            --build-arg VITE_FIREBASE_APP_ID="${VITE_FIREBASE_APP_ID}" \
-                            --build-arg VITE_FIREBASE_VAPID_KEY="${VITE_FIREBASE_VAPID_KEY}" \
-                            --build-arg NODE_ENV=production \
-                            --target app-production \
-                            --tag ${IMAGE_NAME}:app-latest \
-                            --tag ${IMAGE_NAME}:app-${COMMIT_SHA} \
-                            .
+                            # Build app image
+                            echo "Building App image..."
+                            docker build  \
+                                --build-arg VITE_API_URL="${VITE_API_URL}" \
+                                --build-arg VITE_PRESENTATION_URL="${VITE_PRESENTATION_URL}" \
+                                --build-arg VITE_FIREBASE_API_KEY="${VITE_FIREBASE_API_KEY}" \
+                                --build-arg VITE_FIREBASE_AUTH_DOMAIN="${VITE_FIREBASE_AUTH_DOMAIN}" \
+                                --build-arg VITE_FIREBASE_PROJECT_ID="${VITE_FIREBASE_PROJECT_ID}" \
+                                --build-arg VITE_FIREBASE_STORAGE_BUCKET="${VITE_FIREBASE_STORAGE_BUCKET}" \
+                                --build-arg VITE_FIREBASE_MESSAGING_SENDER_ID="${VITE_FIREBASE_MESSAGING_SENDER_ID}" \
+                                --build-arg VITE_FIREBASE_APP_ID="${VITE_FIREBASE_APP_ID}" \
+                                --build-arg VITE_FIREBASE_VAPID_KEY="${VITE_FIREBASE_VAPID_KEY}" \
+                                --build-arg NODE_ENV=production \
+                                --build-arg TURBO_TOKEN="${TURBO_TOKEN}" \
+                                --build-arg TURBO_TEAM="${TURBO_TEAM}" \
+                                --build-arg CACHE_BUST="${CACHE_BUST}" \
+                                --target app-production \
+                                --tag ${IMAGE_NAME}:app-latest \
+                                --tag ${IMAGE_NAME}:app-${COMMIT_SHA} \
+                                .
 
-                        # Build presentation image
-                        echo "Building Presentation image..."
-                        docker build  \
-                            --build-arg VITE_API_URL="${VITE_API_URL}" \
-                            --build-arg VITE_PRESENTATION_URL="${VITE_PRESENTATION_URL}" \
-                            --build-arg VITE_FIREBASE_API_KEY="${VITE_FIREBASE_API_KEY}" \
-                            --build-arg VITE_FIREBASE_AUTH_DOMAIN="${VITE_FIREBASE_AUTH_DOMAIN}" \
-                            --build-arg VITE_FIREBASE_PROJECT_ID="${VITE_FIREBASE_PROJECT_ID}" \
-                            --build-arg VITE_FIREBASE_STORAGE_BUCKET="${VITE_FIREBASE_STORAGE_BUCKET}" \
-                            --build-arg VITE_FIREBASE_MESSAGING_SENDER_ID="${VITE_FIREBASE_MESSAGING_SENDER_ID}" \
-                            --build-arg VITE_FIREBASE_APP_ID="${VITE_FIREBASE_APP_ID}" \
-                            --build-arg VITE_FIREBASE_VAPID_KEY="${VITE_FIREBASE_VAPID_KEY}" \
-                            --build-arg NODE_ENV=production \
-                            --target presentation-production \
-                            --tag ${IMAGE_NAME}:presentation-latest \
-                            --tag ${IMAGE_NAME}:presentation-${COMMIT_SHA} \
-                            .
+                            # Build presentation image
+                            echo "Building Presentation image..."
+                            docker build  \
+                                --build-arg VITE_API_URL="${VITE_API_URL}" \
+                                --build-arg VITE_PRESENTATION_URL="${VITE_PRESENTATION_URL}" \
+                                --build-arg VITE_FIREBASE_API_KEY="${VITE_FIREBASE_API_KEY}" \
+                                --build-arg VITE_FIREBASE_AUTH_DOMAIN="${VITE_FIREBASE_AUTH_DOMAIN}" \
+                                --build-arg VITE_FIREBASE_PROJECT_ID="${VITE_FIREBASE_PROJECT_ID}" \
+                                --build-arg VITE_FIREBASE_STORAGE_BUCKET="${VITE_FIREBASE_STORAGE_BUCKET}" \
+                                --build-arg VITE_FIREBASE_MESSAGING_SENDER_ID="${VITE_FIREBASE_MESSAGING_SENDER_ID}" \
+                                --build-arg VITE_FIREBASE_APP_ID="${VITE_FIREBASE_APP_ID}" \
+                                --build-arg VITE_FIREBASE_VAPID_KEY="${VITE_FIREBASE_VAPID_KEY}" \
+                                --build-arg NODE_ENV=production \
+                                --build-arg TURBO_TOKEN="${TURBO_TOKEN}" \
+                                --build-arg TURBO_TEAM="${TURBO_TEAM}" \
+                                --build-arg CACHE_BUST="${CACHE_BUST}" \
+                                --target presentation-production \
+                                --tag ${IMAGE_NAME}:presentation-latest \
+                                --tag ${IMAGE_NAME}:presentation-${COMMIT_SHA} \
+                                .
 
-                        # Build admin image
-                        echo "Building Admin image..."
-                        docker build  \
-                            --build-arg VITE_API_URL="${VITE_API_URL}" \
-                            --build-arg VITE_PRESENTATION_URL="${VITE_PRESENTATION_URL}" \
-                            --build-arg VITE_FIREBASE_API_KEY="${VITE_FIREBASE_API_KEY}" \
-                            --build-arg VITE_FIREBASE_AUTH_DOMAIN="${VITE_FIREBASE_AUTH_DOMAIN}" \
-                            --build-arg VITE_FIREBASE_PROJECT_ID="${VITE_FIREBASE_PROJECT_ID}" \
-                            --build-arg VITE_FIREBASE_STORAGE_BUCKET="${VITE_FIREBASE_STORAGE_BUCKET}" \
-                            --build-arg VITE_FIREBASE_MESSAGING_SENDER_ID="${VITE_FIREBASE_MESSAGING_SENDER_ID}" \
-                            --build-arg VITE_FIREBASE_APP_ID="${VITE_FIREBASE_APP_ID}" \
-                            --build-arg VITE_FIREBASE_VAPID_KEY="${VITE_FIREBASE_VAPID_KEY}" \
-                            --build-arg NODE_ENV=production \
-                            --target admin-production \
-                            --tag ${IMAGE_NAME}:admin-latest \
-                            --tag ${IMAGE_NAME}:admin-${COMMIT_SHA} \
-                            .
+                            # Build admin image
+                            echo "Building Admin image..."
+                            docker build  \
+                                --build-arg VITE_API_URL="${VITE_API_URL}" \
+                                --build-arg VITE_PRESENTATION_URL="${VITE_PRESENTATION_URL}" \
+                                --build-arg VITE_FIREBASE_API_KEY="${VITE_FIREBASE_API_KEY}" \
+                                --build-arg VITE_FIREBASE_AUTH_DOMAIN="${VITE_FIREBASE_AUTH_DOMAIN}" \
+                                --build-arg VITE_FIREBASE_PROJECT_ID="${VITE_FIREBASE_PROJECT_ID}" \
+                                --build-arg VITE_FIREBASE_STORAGE_BUCKET="${VITE_FIREBASE_STORAGE_BUCKET}" \
+                                --build-arg VITE_FIREBASE_MESSAGING_SENDER_ID="${VITE_FIREBASE_MESSAGING_SENDER_ID}" \
+                                --build-arg VITE_FIREBASE_APP_ID="${VITE_FIREBASE_APP_ID}" \
+                                --build-arg VITE_FIREBASE_VAPID_KEY="${VITE_FIREBASE_VAPID_KEY}" \
+                                --build-arg NODE_ENV=production \
+                                --build-arg TURBO_TOKEN="${TURBO_TOKEN}" \
+                                --build-arg TURBO_TEAM="${TURBO_TEAM}" \
+                                --build-arg CACHE_BUST="${CACHE_BUST}" \
+                                --target admin-production \
+                                --tag ${IMAGE_NAME}:admin-latest \
+                                --tag ${IMAGE_NAME}:admin-${COMMIT_SHA} \
+                                .
 
-                        # Show built images
-                        echo "========== Built Images =========="
-                        docker images | grep ${GITHUB_REPO}
-                    '''
+                            # Show built images
+                            echo "========== Built Images =========="
+                            docker images | grep ${GITHUB_REPO}
+                        '''
+                    }
                 }
             }
         }

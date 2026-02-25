@@ -15,6 +15,8 @@ services:
         - VITE_FIREBASE_APP_ID=${VITE_FIREBASE_APP_ID}
         - VITE_FIREBASE_VAPID_KEY=${VITE_FIREBASE_VAPID_KEY}
         - NODE_ENV=production
+        - TURBO_TOKEN=${TURBO_TOKEN}
+        - TURBO_TEAM=${TURBO_TEAM}
     image: ghcr.io/tien4112004/datn-fe:app-latest
     container_name: frontend-app-aiprimary
     restart: unless-stopped
@@ -43,6 +45,8 @@ services:
         - VITE_FIREBASE_APP_ID=${VITE_FIREBASE_APP_ID}
         - VITE_FIREBASE_VAPID_KEY=${VITE_FIREBASE_VAPID_KEY}
         - NODE_ENV=production
+        - TURBO_TOKEN=${TURBO_TOKEN}
+        - TURBO_TEAM=${TURBO_TEAM}
     image: ghcr.io/tien4112004/datn-fe:presentation-latest
     container_name: frontend-presentation-aiprimary
     restart: unless-stopped
@@ -71,6 +75,8 @@ services:
         - VITE_FIREBASE_APP_ID=${VITE_FIREBASE_APP_ID}
         - VITE_FIREBASE_VAPID_KEY=${VITE_FIREBASE_VAPID_KEY}
         - NODE_ENV=production
+        - TURBO_TOKEN=${TURBO_TOKEN}
+        - TURBO_TEAM=${TURBO_TEAM}
     image: ghcr.io/tien4112004/datn-fe:admin-latest
     container_name: frontend-admin-aiprimary
     restart: unless-stopped

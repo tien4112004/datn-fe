@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -20,6 +21,8 @@ interface QuestionBankImportDialogProps {
 }
 
 export function QuestionBankImportDialog({ open, onClose }: QuestionBankImportDialogProps) {
+  const { t } = useTranslation('admin', { keyPrefix: 'questionBank.dialogs.import' });
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [importResult, setImportResult] = useState<{
     success: number;
@@ -63,10 +66,8 @@ export function QuestionBankImportDialog({ open, onClose }: QuestionBankImportDi
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Import Questions from CSV</DialogTitle>
-          <DialogDescription>
-            Upload a CSV file containing questions to import into the application question bank.
-          </DialogDescription>
+          <DialogTitle>{t('title')}</DialogTitle>
+          <DialogDescription>{t('description')}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -74,7 +75,7 @@ export function QuestionBankImportDialog({ open, onClose }: QuestionBankImportDi
           <div className="flex justify-end">
             <Button variant="outline" size="sm" onClick={() => downloadCSVTemplate()} className="gap-2">
               <Download className="h-4 w-4" />
-              Download CSV Template
+              {t('downloadTemplate')}
             </Button>
           </div>
 
@@ -97,8 +98,8 @@ export function QuestionBankImportDialog({ open, onClose }: QuestionBankImportDi
                   ) : (
                     <>
                       <Upload className="text-muted-foreground mb-2 h-8 w-8" />
-                      <p className="text-muted-foreground text-sm">Click to upload or drag and drop</p>
-                      <p className="text-muted-foreground text-xs">CSV files only</p>
+                      <p className="text-muted-foreground text-sm">{t('uploadText')}</p>
+                      <p className="text-muted-foreground text-xs">{t('uploadHint')}</p>
                     </>
                   )}
                 </div>
@@ -120,7 +121,7 @@ export function QuestionBankImportDialog({ open, onClose }: QuestionBankImportDi
                 <Alert className="border-green-200 bg-green-50">
                   <CheckCircle className="h-4 w-4 text-green-600" />
                   <AlertDescription className="text-green-800">
-                    Successfully imported {importResult.success} question(s)
+                    {t('successMessage', { count: importResult.success })}
                   </AlertDescription>
                 </Alert>
               ) : (
@@ -128,15 +129,17 @@ export function QuestionBankImportDialog({ open, onClose }: QuestionBankImportDi
                   <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>
-                      Import completed with errors: {importResult.success} succeeded, {importResult.failed}{' '}
-                      failed
+                      {t('errorMessage', {
+                        success: importResult.success,
+                        failed: importResult.failed,
+                      })}
                     </AlertDescription>
                   </Alert>
 
                   {/* Error Details */}
                   {importResult.errors && importResult.errors.length > 0 && (
                     <div className="bg-muted/30 max-h-48 overflow-y-auto rounded-md border p-3">
-                      <p className="mb-2 text-xs font-medium">Error Details:</p>
+                      <p className="mb-2 text-xs font-medium">{t('errorDetails')}</p>
                       <ul className="text-muted-foreground space-y-1 text-xs">
                         {importResult.errors.slice(0, 5).map((error, index) => (
                           <li key={index}>
@@ -145,7 +148,7 @@ export function QuestionBankImportDialog({ open, onClose }: QuestionBankImportDi
                         ))}
                         {importResult.errors.length > 5 && (
                           <li className="font-medium">
-                            ... and {importResult.errors.length - 5} more errors
+                            {t('moreErrors', { count: importResult.errors.length - 5 })}
                           </li>
                         )}
                       </ul>
@@ -160,12 +163,12 @@ export function QuestionBankImportDialog({ open, onClose }: QuestionBankImportDi
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription className="text-sm">
-              <p className="mb-1 font-medium">CSV Format Requirements:</p>
+              <p className="mb-1 font-medium">{t('formatTitle')}</p>
               <ul className="list-inside list-disc space-y-1 text-xs">
-                <li>First row must contain column headers</li>
-                <li>Required fields: title, type, difficulty, subject, points</li>
-                <li>Type-specific fields vary (options for multiple choice, pairs for matching, etc.)</li>
-                <li>Use "Download Template" button to get examples for each question type</li>
+                <li>{t('formatRules.headers')}</li>
+                <li>{t('formatRules.required')}</li>
+                <li>{t('formatRules.typeSpecific')}</li>
+                <li>{t('formatRules.templateHint')}</li>
               </ul>
             </AlertDescription>
           </Alert>
@@ -173,7 +176,7 @@ export function QuestionBankImportDialog({ open, onClose }: QuestionBankImportDi
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose}>
-            {importResult ? 'Close' : 'Cancel'}
+            {importResult ? t('close') : t('cancel')}
           </Button>
           {!importResult && (
             <Button
@@ -182,7 +185,7 @@ export function QuestionBankImportDialog({ open, onClose }: QuestionBankImportDi
               className="gap-2"
             >
               <Upload className="h-4 w-4" />
-              {importMutation.isPending ? 'Importing...' : 'Import Questions'}
+              {importMutation.isPending ? t('importing') : t('importButton')}
             </Button>
           )}
         </DialogFooter>

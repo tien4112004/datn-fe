@@ -44,8 +44,8 @@ export interface OpenEndedData {
  */
 export interface BlankSegment {
   id: string; // Unique identifier for this segment
-  type: 'text' | 'blank'; // Type of segment: 'text' for static text, 'blank' for fillable field
-  content: string; // For 'text' type: the text to display; for 'blank': the correct answer
+  type: 'TEXT' | 'BLANK'; // Type of segment: 'TEXT' for static text, 'BLANK' for fillable field
+  content: string; // For 'TEXT' type: the text to display; for 'BLANK': the correct answer
   acceptableAnswers?: string[]; // Alternative correct answers for a blank segment
 }
 
@@ -57,11 +57,7 @@ export interface FillInBlankData {
 /**
  * Union type for all question data types
  */
-export type QuestionData =
-  | MultipleChoiceData
-  | MatchingData
-  | OpenEndedData
-  | FillInBlankData;
+export type QuestionData = MultipleChoiceData | MatchingData | OpenEndedData | FillInBlankData;
 
 /**
  * Base interface for all questions
@@ -117,11 +113,7 @@ export interface FillInBlankQuestion extends BaseQuestion {
  * Union type for all question types
  * Use type guards to narrow to specific question type
  */
-export type Question =
-  | MultipleChoiceQuestion
-  | MatchingQuestion
-  | OpenEndedQuestion
-  | FillInBlankQuestion;
+export type Question = MultipleChoiceQuestion | MatchingQuestion | OpenEndedQuestion | FillInBlankQuestion;
 
 /**
  * Type guards for runtime type checking

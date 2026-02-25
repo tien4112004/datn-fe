@@ -3,6 +3,7 @@ export { QuestionBankCard } from './QuestionBankCard';
 export { QuestionBankDialog } from './QuestionBankDialog';
 export { QuestionBankFilters } from './QuestionBankFilters';
 export { QuestionBankGrid } from './QuestionBankGrid';
+export { QuestionBankExportDialog } from './QuestionBankExportDialog';
 export { QuestionBankImportDialog } from './QuestionBankImportDialog';
 export { QuestionContentPreview } from './QuestionContentPreview';
 // Re-export from assignment for backward compatibility

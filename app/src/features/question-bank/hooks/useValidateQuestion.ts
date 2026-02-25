@@ -84,7 +84,7 @@ export function useValidateQuestion() {
 
       case QUESTION_TYPE.FILL_IN_BLANK: {
         const segments = question.data.segments || [];
-        const blanks = segments.filter((s) => s.type === 'blank');
+        const blanks = segments.filter((s) => s.type === 'BLANK');
 
         if (blanks.length === 0) {
           errors.push(t('validation.minSegments'));
@@ -97,7 +97,7 @@ export function useValidateQuestion() {
 
         // Detect placeholder content
         const placeholderSegments = segments.filter(
-          (s) => s.type === 'text' && /^Fill in the /.test(s.content)
+          (s) => s.type === 'TEXT' && /^Fill in the /.test(s.content)
         );
         if (placeholderSegments.length > 0) {
           warnings.push(t('validation.placeholderSegments'));

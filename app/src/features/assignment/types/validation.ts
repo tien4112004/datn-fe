@@ -70,7 +70,7 @@ export const openEndedQuestionSchema = baseQuestionSchema.extend({
 // Fill in blank schema
 export const blankSegmentSchema = z.object({
   id: z.string(),
-  type: z.enum(['text', 'blank']),
+  type: z.enum(['TEXT', 'BLANK']),
   content: z.string(),
   acceptableAnswers: z.array(z.string()).optional(),
 });

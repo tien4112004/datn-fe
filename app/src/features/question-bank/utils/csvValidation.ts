@@ -1,10 +1,13 @@
 import type { QuestionBankItem } from '@aiprimary/core';
-import { QUESTION_TYPE, DIFFICULTY, SUBJECT_CODE } from '@aiprimary/core';
+import { QUESTION_TYPE, DIFFICULTY, SUBJECT_CODE, isElementaryGrade } from '@aiprimary/core';
 
 export interface ValidationError {
   row: number;
   field?: string;
-  message: string;
+  /** i18n message key (resolved in UI via t()) */
+  messageKey: string;
+  /** Interpolation params for the message key */
+  messageParams?: Record<string, string | number>;
 }
 
 export interface ValidationResult {
@@ -21,7 +24,7 @@ export function validateQuestionBankCSV(questions: QuestionBankItem[]): Validati
   const warnings: ValidationError[] = [];
 
   if (questions.length === 0) {
-    errors.push({ row: 0, message: 'No valid questions found in CSV' });
+    errors.push({ row: 0, messageKey: 'noQuestions' });
     return { isValid: false, errors, warnings };
   }
 
@@ -30,40 +33,52 @@ export function validateQuestionBankCSV(questions: QuestionBankItem[]): Validati
 
     // Validate basic fields
     if (!question.title || question.title.trim().length === 0) {
-      errors.push({ row: rowNumber, field: 'title', message: 'Title is required' });
+      errors.push({ row: rowNumber, field: 'title', messageKey: 'titleRequired' });
     }
 
     if (question.title && question.title.length > 500) {
-      warnings.push({ row: rowNumber, field: 'title', message: 'Title is very long (>500 chars)' });
+      warnings.push({ row: rowNumber, field: 'title', messageKey: 'titleTooLong' });
     }
 
     if (!question.type) {
-      errors.push({ row: rowNumber, field: 'type', message: 'Question type is required' });
+      errors.push({ row: rowNumber, field: 'type', messageKey: 'typeRequired' });
     } else if (!Object.values(QUESTION_TYPE).includes(question.type as any)) {
       errors.push({
         row: rowNumber,
         field: 'type',
-        message: `Invalid question type: ${question.type}`,
+        messageKey: 'invalidType',
+        messageParams: { value: question.type },
       });
     }
 
     if (!question.difficulty) {
-      errors.push({ row: rowNumber, field: 'difficulty', message: 'Difficulty is required' });
+      errors.push({ row: rowNumber, field: 'difficulty', messageKey: 'difficultyRequired' });
     } else if (!Object.values(DIFFICULTY).includes(question.difficulty as any)) {
       errors.push({
         row: rowNumber,
         field: 'difficulty',
-        message: `Invalid difficulty: ${question.difficulty}`,
+        messageKey: 'invalidDifficulty',
+        messageParams: { value: question.difficulty },
       });
     }
 
     if (!question.subject) {
-      errors.push({ row: rowNumber, field: 'subject', message: 'Subject is required' });
+      errors.push({ row: rowNumber, field: 'subject', messageKey: 'subjectRequired' });
     } else if (!Object.values(SUBJECT_CODE).includes(question.subject as any)) {
       errors.push({
         row: rowNumber,
         field: 'subject',
-        message: `Invalid subject: ${question.subject}`,
+        messageKey: 'invalidSubject',
+        messageParams: { value: question.subject },
+      });
+    }
+
+    if (question.grade && !isElementaryGrade(question.grade)) {
+      warnings.push({
+        row: rowNumber,
+        field: 'grade',
+        messageKey: 'unknownGrade',
+        messageParams: { value: question.grade },
       });
     }
 
@@ -100,23 +115,19 @@ function validateMultipleChoice(
   if (question.type !== QUESTION_TYPE.MULTIPLE_CHOICE) return;
 
   if (!question.data.options || question.data.options.length < 2) {
-    errors.push({ row, field: 'options', message: 'At least 2 options are required' });
+    errors.push({ row, field: 'options', messageKey: 'minOptions' });
     return;
   }
 
   if (question.data.options.length > 6) {
-    warnings.push({ row, field: 'options', message: 'More than 6 options may be confusing' });
+    warnings.push({ row, field: 'options', messageKey: 'tooManyOptions' });
   }
 
   const correctCount = question.data.options.filter((o: any) => o.isCorrect).length;
   if (correctCount === 0) {
-    errors.push({ row, field: 'correctOption', message: 'At least one correct option is required' });
+    errors.push({ row, field: 'correctOption', messageKey: 'noCorrectOption' });
   } else if (correctCount > 1) {
-    warnings.push({
-      row,
-      field: 'correctOption',
-      message: 'Multiple correct options found (multi-select)',
-    });
+    warnings.push({ row, field: 'correctOption', messageKey: 'multipleCorrectOptions' });
   }
 
   question.data.options.forEach((option: any, idx: number) => {
@@ -124,7 +135,8 @@ function validateMultipleChoice(
       errors.push({
         row,
         field: `option${idx + 1}`,
-        message: `Option ${idx + 1} text is required`,
+        messageKey: 'optionTextRequired',
+        messageParams: { index: idx + 1 },
       });
     }
   });
@@ -139,12 +151,12 @@ function validateMatching(
   if (question.type !== QUESTION_TYPE.MATCHING) return;
 
   if (!question.data.pairs || question.data.pairs.length < 2) {
-    errors.push({ row, field: 'pairs', message: 'At least 2 matching pairs are required' });
+    errors.push({ row, field: 'pairs', messageKey: 'minPairs' });
     return;
   }
 
   if (question.data.pairs.length > 10) {
-    warnings.push({ row, field: 'pairs', message: 'More than 10 pairs may be difficult to match' });
+    warnings.push({ row, field: 'pairs', messageKey: 'tooManyPairs' });
   }
 
   question.data.pairs.forEach((pair: any, idx: number) => {
@@ -152,14 +164,16 @@ function validateMatching(
       errors.push({
         row,
         field: `pair${idx + 1}_left`,
-        message: `Pair ${idx + 1} left side is required`,
+        messageKey: 'pairLeftRequired',
+        messageParams: { index: idx + 1 },
       });
     }
     if (!pair.right || pair.right.trim().length === 0) {
       errors.push({
         row,
         field: `pair${idx + 1}_right`,
-        message: `Pair ${idx + 1} right side is required`,
+        messageKey: 'pairRightRequired',
+        messageParams: { index: idx + 1 },
       });
     }
   });
@@ -174,19 +188,15 @@ function validateOpenEnded(
   if (question.type !== QUESTION_TYPE.OPEN_ENDED) return;
 
   if (question.data.maxLength && question.data.maxLength < 10) {
-    warnings.push({ row, field: 'maxLength', message: 'Max length is very short (<10 chars)' });
+    warnings.push({ row, field: 'maxLength', messageKey: 'maxLengthTooShort' });
   }
 
   if (question.data.maxLength && question.data.maxLength > 5000) {
-    warnings.push({ row, field: 'maxLength', message: 'Max length is very long (>5000 chars)' });
+    warnings.push({ row, field: 'maxLength', messageKey: 'maxLengthTooLong' });
   }
 
   if (!question.data.expectedAnswer || question.data.expectedAnswer.trim().length === 0) {
-    warnings.push({
-      row,
-      field: 'expectedAnswer',
-      message: 'Expected answer is recommended for grading reference',
-    });
+    warnings.push({ row, field: 'expectedAnswer', messageKey: 'expectedAnswerRecommended' });
   }
 }
 
@@ -199,27 +209,28 @@ function validateFillInBlank(
   if (question.type !== QUESTION_TYPE.FILL_IN_BLANK) return;
 
   if (!question.data.segments || question.data.segments.length === 0) {
-    errors.push({ row, field: 'segments', message: 'Question segments are required' });
+    errors.push({ row, field: 'segments', messageKey: 'segmentsRequired' });
     return;
   }
 
-  const blankCount = question.data.segments.filter((s: any) => s.type === 'blank').length;
+  const blankCount = question.data.segments.filter((s: any) => s.type === 'BLANK').length;
 
   if (blankCount === 0) {
-    errors.push({ row, field: 'text', message: 'At least one {blank} placeholder is required' });
+    errors.push({ row, field: 'text', messageKey: 'blankPlaceholderRequired' });
   }
 
   if (blankCount > 10) {
-    warnings.push({ row, field: 'text', message: 'More than 10 blanks may be confusing' });
+    warnings.push({ row, field: 'text', messageKey: 'tooManyBlanks' });
   }
 
   question.data.segments.forEach((segment: any, idx: number) => {
-    if (segment.type === 'blank') {
+    if (segment.type === 'BLANK') {
       if (!segment.content || segment.content.trim().length === 0) {
         errors.push({
           row,
           field: 'blanks',
-          message: `Blank ${idx + 1} answer is required`,
+          messageKey: 'blankAnswerRequired',
+          messageParams: { index: idx + 1 },
         });
       }
     }

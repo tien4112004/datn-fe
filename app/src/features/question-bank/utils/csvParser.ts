@@ -89,7 +89,7 @@ function parseQuestionRow(row: Record<string, string>, rowNumber: number): Quest
   if (!subject) throw new Error('Missing required field: subject');
 
   const baseQuestion = {
-    id: '',
+    id: `csv-${rowNumber}`,
     title: row.title,
     difficulty,
     subject,

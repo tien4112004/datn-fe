@@ -67,17 +67,22 @@ export function QuestionBankImportDialog({ open, onClose }: QuestionBankImportDi
   const hasErrors = validation ? validation.errors.length > 0 : false;
   const hasWarnings = validation ? validation.warnings.length > 0 : false;
 
+  // Translate a validation error's messageKey
+  const tv = (err: { messageKey: string; messageParams?: Record<string, string | number> }) =>
+    t(`validation.${err.messageKey}`, err.messageParams as any);
+
   // Map validation errors/warnings by row number for per-question indicators
   const errorsByRow = useMemo(() => {
     if (!validation) return new Map<number, string[]>();
     const map = new Map<number, string[]>();
     for (const err of [...validation.errors, ...validation.warnings]) {
       const existing = map.get(err.row) || [];
-      existing.push(err.message);
+      existing.push(t(`validation.${err.messageKey}`, err.messageParams as any));
       map.set(err.row, existing);
     }
     return map;
-  }, [validation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [validation, t]);
 
   // Parse file immediately on selection
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -202,9 +207,7 @@ export function QuestionBankImportDialog({ open, onClose }: QuestionBankImportDi
                     <p className="mb-2 text-xs font-medium">{t('errorDetails')}</p>
                     <ul className="text-muted-foreground space-y-1 text-xs">
                       {importResult.errors.slice(0, 5).map((error, index) => (
-                        <li key={index}>
-                          Row {error.row}: {error.error}
-                        </li>
+                        <li key={index}>{t('errorItem', { index: error.row, message: error.error })}</li>
                       ))}
                       {importResult.errors.length > 5 && (
                         <li className="font-medium">
@@ -310,8 +313,11 @@ export function QuestionBankImportDialog({ open, onClose }: QuestionBankImportDi
                       <ul className="list-inside list-disc space-y-0.5 text-xs">
                         {validation!.errors.slice(0, 5).map((err, i) => (
                           <li key={i}>
-                            Row {err.row}
-                            {err.field ? ` (${err.field})` : ''}: {err.message}
+                            {t('validationItem', {
+                              index: err.row - 1,
+                              field: err.field ? ` (${err.field})` : '',
+                              message: tv(err),
+                            })}
                           </li>
                         ))}
                         {validation!.errors.length > 5 && (
@@ -334,8 +340,11 @@ export function QuestionBankImportDialog({ open, onClose }: QuestionBankImportDi
                       <ul className="list-inside list-disc space-y-0.5 text-xs">
                         {validation!.warnings.slice(0, 3).map((warn, i) => (
                           <li key={i}>
-                            Row {warn.row}
-                            {warn.field ? ` (${warn.field})` : ''}: {warn.message}
+                            {t('validationItem', {
+                              index: warn.row - 1,
+                              field: warn.field ? ` (${warn.field})` : '',
+                              message: tv(warn),
+                            })}
                           </li>
                         ))}
                         {validation!.warnings.length > 3 && (

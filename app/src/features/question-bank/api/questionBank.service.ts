@@ -175,7 +175,7 @@ export default class QuestionBankService implements QuestionBankApiService {
       return {
         success: 0,
         failed: questions.length,
-        errors: validation.errors.map((e) => ({ row: e.row, error: e.message })),
+        errors: validation.errors.map((e) => ({ row: e.row, error: e.messageKey })),
       };
     }
 

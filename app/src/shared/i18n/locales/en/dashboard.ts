@@ -13,7 +13,10 @@ export default {
   },
   recentDocuments: {
     title: 'Recent Documents',
-    empty: 'No recent documents',
+    empty: {
+      title: 'No documents yet',
+      subtitle: 'Your recently edited documents will appear here',
+    },
     edited: 'Edited',
     noPreview: 'No preview',
   },

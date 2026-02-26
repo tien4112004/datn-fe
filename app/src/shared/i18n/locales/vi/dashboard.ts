@@ -13,7 +13,10 @@ export default {
   },
   recentDocuments: {
     title: 'Tài liệu gần đây',
-    empty: 'Không có tài liệu gần đây',
+    empty: {
+      title: 'Chưa có tài liệu nào',
+      subtitle: 'Các tài liệu bạn chỉnh sửa gần đây sẽ xuất hiện ở đây',
+    },
     edited: 'Đã chỉnh sửa',
     noPreview: 'Không có xem trước',
   },

@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { Alert, AlertDescription, AlertTitle } from '@ui/alert';
 import { Badge } from '@ui/badge';
 import { Button } from '@ui/button';
-import { Card, CardContent } from '@ui/card';
 import { Checkbox } from '@ui/checkbox';
 import { Label } from '@ui/label';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
@@ -110,66 +109,61 @@ export function MatrixGapsSummary({
                 : 'border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950';
 
           return (
-            <Card
+            <div
               key={gapId}
-              className={`${severityColor} cursor-pointer border transition-shadow hover:shadow-md`}
+              className={`${severityColor} cursor-pointer rounded-lg border p-3 transition-shadow hover:shadow-sm`}
               onClick={() => handleGapToggle(gapId)}
             >
-              <CardContent>
-                <div className="flex items-start gap-3">
-                  <Checkbox
-                    id={`gap-${gapId}`}
-                    checked={isSelected}
-                    onCheckedChange={() => handleGapToggle(gapId)}
-                    onClick={(e) => e.stopPropagation()}
-                    className="mt-1"
-                  />
-                  <div className="min-w-0 flex-1">
-                    <div className="mb-2 flex flex-wrap gap-2">
-                      <Badge variant="secondary" className="text-xs">
-                        {gap.topic}
-                      </Badge>
-                      <Badge
-                        variant="outline"
-                        className={`text-xs ${getDifficultyBadgeClass(gap.difficulty)}`}
-                      >
-                        {getDifficultyName(gap.difficulty)}
-                      </Badge>
-                      <Badge
-                        variant="outline"
-                        className={`text-xs ${getQuestionTypeBadgeClass(gap.questionType)}`}
-                      >
-                        {getQuestionTypeName(gap.questionType)}
-                      </Badge>
-                    </div>
-                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {t('gapDetails.needed', { count: gap.gapCount })}
-                    </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">
-                      {t('gapDetails.available', {
-                        available: gap.availableCount,
-                        required: gap.requiredCount,
-                      })}
-                    </div>
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id={`gap-${gapId}`}
+                  checked={isSelected}
+                  onCheckedChange={() => handleGapToggle(gapId)}
+                  onClick={(e) => e.stopPropagation()}
+                  className="mt-1"
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="mb-2 flex flex-wrap gap-2">
+                    <Badge variant="secondary" className="text-xs">
+                      {gap.topic}
+                    </Badge>
+                    <Badge variant="outline" className={`text-xs ${getDifficultyBadgeClass(gap.difficulty)}`}>
+                      {getDifficultyName(gap.difficulty)}
+                    </Badge>
+                    <Badge
+                      variant="outline"
+                      className={`text-xs ${getQuestionTypeBadgeClass(gap.questionType)}`}
+                    >
+                      {getQuestionTypeName(gap.questionType)}
+                    </Badge>
                   </div>
-                  <Label
-                    htmlFor={`gap-${gapId}`}
-                    className="cursor-pointer whitespace-nowrap text-xs font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    {isSelected ? t('gapDetails.selected') : t('gapDetails.select')}
-                  </Label>
+                  <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {t('gapDetails.needed', { count: gap.gapCount })}
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                    {t('gapDetails.available', {
+                      available: gap.availableCount,
+                      required: gap.requiredCount,
+                    })}
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+                <Label
+                  htmlFor={`gap-${gapId}`}
+                  className="cursor-pointer whitespace-nowrap text-xs font-medium text-gray-700 dark:text-gray-300"
+                >
+                  {isSelected ? t('gapDetails.selected') : t('gapDetails.select')}
+                </Label>
+              </div>
+            </div>
           );
         })}
       </div>
 
       {/* Summary */}
-      <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-900">
-        <div className="text-sm text-gray-700 dark:text-gray-300">
+      <div className="border-t pt-3">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           {t('summary', { selected: selectedGaps.size, total: totalGaps })}
-        </div>
+        </p>
       </div>
     </div>
   );

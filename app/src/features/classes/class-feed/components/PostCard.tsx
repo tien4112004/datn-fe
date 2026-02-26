@@ -5,7 +5,8 @@ import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { parseDateSafe } from '@/shared/utils/date';
 import { format, formatDistanceToNow } from 'date-fns';
 import { ClipboardList, Clock, FileText, MessageCircleMore, Pin } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { ImageLightbox } from './ImageLightbox';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
@@ -39,6 +40,10 @@ export const PostCard = ({
   const { t } = useTranslation('classes');
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+
+  const openLightbox = useCallback((src: string) => setLightboxSrc(src), []);
+  const closeLightbox = useCallback(() => setLightboxSrc(null), []);
 
   // Edit helpers
   const handleStartEdit = () => {
@@ -167,11 +172,31 @@ export const PostCard = ({
           onSave={handleSave}
         />
       ) : (
-        <Link to={getPostDetailPath()} className="mb-2 ml-9 block md:mb-3 md:ml-[52px]">
-          <article className="prose prose-sm !max-w-none">
-            <ReactMarkdown>{post.content}</ReactMarkdown>
-          </article>
-        </Link>
+        <>
+          <Link to={getPostDetailPath()} className="mb-2 ml-9 block md:mb-3 md:ml-[52px]">
+            <article className="prose prose-sm !max-w-none">
+              <ReactMarkdown
+                components={{
+                  img: ({ src, alt }) =>
+                    src ? (
+                      <img
+                        src={src}
+                        alt={alt ?? ''}
+                        className="cursor-zoom-in rounded"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          openLightbox(src);
+                        }}
+                      />
+                    ) : null,
+                }}
+              >
+                {post.content}
+              </ReactMarkdown>
+            </article>
+          </Link>
+          {lightboxSrc && <ImageLightbox src={lightboxSrc} open={!!lightboxSrc} onClose={closeLightbox} />}
+        </>
       )}
 
       {/* Attachments */}

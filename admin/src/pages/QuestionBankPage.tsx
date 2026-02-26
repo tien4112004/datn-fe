@@ -73,11 +73,20 @@ export function QuestionBankPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [filters, setFilters] = useState<QuestionBankParams>({});
+  const [sortBy, setSortBy] = useState<string | undefined>(undefined);
+  const [sortDirection, setSortDirection] = useState<'ASC' | 'DESC'>('DESC');
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
   // Hooks
-  const { data, isLoading } = useQuestionBank({ page, pageSize, searchText: searchQuery, ...filters });
+  const { data, isLoading } = useQuestionBank({
+    page,
+    pageSize,
+    searchText: searchQuery,
+    sortBy,
+    sortDirection,
+    ...filters,
+  });
   const bulkDeleteMutation = useBulkDeleteQuestionBankItems();
   const duplicateMutation = useDuplicateQuestionBankItem();
 
@@ -147,6 +156,28 @@ export function QuestionBankPage() {
 
   const handleExport = () => {
     setIsExportDialogOpen(true);
+  };
+
+  const handleSort = (key: string) => {
+    if (sortBy === key) {
+      // Toggle direction, then clear
+      if (sortDirection === 'ASC') {
+        setSortDirection('DESC');
+      } else {
+        // Clear sorting
+        setSortBy(undefined);
+        setSortDirection('DESC');
+      }
+    } else {
+      setSortBy(key);
+      setSortDirection('ASC');
+    }
+    setPage(1);
+  };
+
+  const getSortState = (key: string): 'asc' | 'desc' | false => {
+    if (sortBy !== key) return false;
+    return sortDirection === 'ASC' ? 'asc' : 'desc';
   };
 
   const questions = data?.data || [];
@@ -237,9 +268,25 @@ export function QuestionBankPage() {
                     />
                   </TableHead>
                   <TableHead>{t('table.columns.title')}</TableHead>
-                  <TableHead>{t('table.columns.type')}</TableHead>
-                  <TableHead>{t('table.columns.subject')}</TableHead>
-                  <TableHead>{t('table.columns.difficulty')}</TableHead>
+                  <TableHead sortable sortKey="type" onSort={handleSort} isSorting={getSortState('type')}>
+                    {t('table.columns.type')}
+                  </TableHead>
+                  <TableHead
+                    sortable
+                    sortKey="subject"
+                    onSort={handleSort}
+                    isSorting={getSortState('subject')}
+                  >
+                    {t('table.columns.subject')}
+                  </TableHead>
+                  <TableHead
+                    sortable
+                    sortKey="difficulty"
+                    onSort={handleSort}
+                    isSorting={getSortState('difficulty')}
+                  >
+                    {t('table.columns.difficulty')}
+                  </TableHead>
                   <TableHead>{t('table.columns.created')}</TableHead>
                   <TableHead className="w-12"></TableHead>
                 </TableRow>

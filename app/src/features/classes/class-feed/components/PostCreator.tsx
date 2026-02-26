@@ -346,7 +346,12 @@ export const PostCreator = ({
                           {t('feed.creator.assignmentSettings.displaySettings.shuffleQuestionsDescription')}
                         </p>
                       </div>
-                      <Switch id="shuffle" checked={shuffleQuestions} onCheckedChange={setShuffleQuestions} />
+                      <Switch
+                        id="shuffle"
+                        checked={shuffleQuestions}
+                        onCheckedChange={setShuffleQuestions}
+                        className="cursor-pointer"
+                      />
                     </div>
 
                     <div className="flex items-center justify-between">
@@ -362,6 +367,7 @@ export const PostCreator = ({
                         id="showAnswers"
                         checked={showCorrectAnswers}
                         onCheckedChange={setShowCorrectAnswers}
+                        className="cursor-pointer"
                       />
                     </div>
 
@@ -380,6 +386,7 @@ export const PostCreator = ({
                         id="showScore"
                         checked={showScoreImmediately}
                         onCheckedChange={setShowScoreImmediately}
+                        className="cursor-pointer"
                       />
                     </div>
                   </div>
@@ -397,7 +404,12 @@ export const PostCreator = ({
                           {t('feed.creator.assignmentSettings.submissionSettings.allowRetakesDescription')}
                         </p>
                       </div>
-                      <Switch id="allowRetake" checked={allowRetake} onCheckedChange={setAllowRetake} />
+                      <Switch
+                        id="allowRetake"
+                        checked={allowRetake}
+                        onCheckedChange={setAllowRetake}
+                        className="cursor-pointer"
+                      />
                     </div>
 
                     {allowRetake && (

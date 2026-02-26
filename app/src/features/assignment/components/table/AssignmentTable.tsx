@@ -19,6 +19,8 @@ import { toast } from 'sonner';
 import { ActionContent } from '@/features/presentation/components';
 import { format } from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
+import { Badge } from '@ui/badge';
+import { getSubjectName, getGradeName, getSubjectBadgeClass } from '@aiprimary/core';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 
 const columnHelper = createColumnHelper<Assignment>();
@@ -64,6 +66,35 @@ const AssignmentTable = () => {
         cell: (info) => <div className="font-medium">{info.getValue()}</div>,
         minSize: 200,
         meta: { isGrow: true },
+        enableSorting: true,
+      }),
+
+      columnHelper.accessor('subject', {
+        header: t('assignment.subject'),
+        cell: (info) => {
+          const subject = info.getValue();
+          return subject ? (
+            <Badge variant="outline" className={getSubjectBadgeClass(subject)}>
+              {getSubjectName(subject)}
+            </Badge>
+          ) : (
+            <span className="text-muted-foreground text-xs">-</span>
+          );
+        },
+        size: 120,
+        enableSorting: true,
+      }),
+      columnHelper.accessor('grade', {
+        header: t('assignment.grade'),
+        cell: (info) => {
+          const grade = info.getValue();
+          return grade ? (
+            <Badge variant="outline">{getGradeName(grade)}</Badge>
+          ) : (
+            <span className="text-muted-foreground text-xs">-</span>
+          );
+        },
+        size: 100,
         enableSorting: true,
       }),
 

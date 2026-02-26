@@ -110,6 +110,8 @@ export default {
       statusPublished: 'Đã xuất bản',
       statusArchived: 'Đã lưu trữ',
       due: 'Hạn',
+      subject: 'Môn học',
+      grade: 'Khối lớp',
     },
     sharedResources: {
       thumbnail: 'Hình',

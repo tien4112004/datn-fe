@@ -17,6 +17,8 @@ import { toast } from 'sonner';
 
 import { format } from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
+import { Badge } from '@ui/badge';
+import { getSubjectName, getGradeName, getSubjectBadgeClass } from '@aiprimary/core';
 
 const AssignmentGrid = () => {
   const { t } = useTranslation('common', { keyPrefix: 'table' });
@@ -163,6 +165,21 @@ const AssignmentGrid = () => {
         >
           {assignment.title || t('assignment.untitled')}
         </h3>
+        <div className="flex items-center gap-1.5">
+          {assignment.subject && (
+            <Badge
+              variant="outline"
+              className={`px-1.5 py-0 text-[10px] ${getSubjectBadgeClass(assignment.subject)}`}
+            >
+              {getSubjectName(assignment.subject)}
+            </Badge>
+          )}
+          {assignment.grade && (
+            <Badge variant="outline" className="px-1.5 py-0 text-[10px]">
+              {getGradeName(assignment.grade)}
+            </Badge>
+          )}
+        </div>
         <p className="text-xs text-gray-500">
           {t('assignment.lastModified')}: {formatDate(assignment.updatedAt)}
         </p>

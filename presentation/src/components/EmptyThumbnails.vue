@@ -15,8 +15,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--presentation-background);
-  border-right: 1px solid var(--presentation-border);
   padding: 16px;
 }
 

@@ -301,7 +301,7 @@ export const useSlidesStore = defineStore('slides', {
         if (slide.sectionTag) delete slide.sectionTag;
       }
 
-      const addIndex = this.slideIndex + 1;
+      const addIndex = this.slides.length === 0 ? 0 : this.slideIndex + 1;
       this.slides.splice(addIndex, 0, ...slides);
       this.slideIndex = addIndex;
     },

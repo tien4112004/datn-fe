@@ -334,7 +334,7 @@ export const listTemplates: SlideTemplate[] = [
       {
         key: 'MAX_ITEMS_PER_LINE',
         label: 'Max Items Per Line',
-        defaultValue: 4,
+        defaultValue: 1,
         min: 1,
         max: 6,
         step: 1,
@@ -432,7 +432,7 @@ export const listTemplates: SlideTemplate[] = [
       {
         key: 'MAX_ITEMS_PER_LINE',
         label: 'Max Items Per Line',
-        defaultValue: 4,
+        defaultValue: 1,
         min: 1,
         max: 6,
         step: 1,

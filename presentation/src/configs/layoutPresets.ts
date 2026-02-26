@@ -28,18 +28,7 @@ export const LAYOUT_PRESETS: LayoutPreset[] = [
     },
   },
 
-  // List (2–6 items)
-  {
-    id: 'list-2',
-    nameKey: 'layoutPresets.list-2',
-    layoutType: SLIDE_LAYOUT_TYPE.LIST,
-    preferredTemplateId: LIST_TEMPLATE_ID,
-    schema: {
-      type: 'list',
-      title: 'Slide Title',
-      data: { items: ['First item', 'Second item'] },
-    },
-  },
+  // List (3–6 items)
   {
     id: 'list-3',
     nameKey: 'layoutPresets.list-3',

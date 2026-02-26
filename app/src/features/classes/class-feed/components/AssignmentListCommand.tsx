@@ -1,12 +1,12 @@
-import { Button } from '@ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/popover';
+import type { Assignment } from '@/features/assignment';
+import { useAssignmentList } from '@/features/assignment/hooks';
 import { cn } from '@/shared/lib/utils';
+import { Button } from '@ui/button';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/popover';
 import { Check, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, Command } from '@ui/command';
-import { useAssignmentList } from '@/features/assignment/hooks';
-import type { Assignment } from '@/features/assignment';
 
 interface AssignmentListCommandProps {
   classId?: string;
@@ -25,13 +25,7 @@ export const AssignmentListCommand = ({
 
   // Fetch assignments from API
   const { data, isLoading } = useAssignmentList({ classId });
-
-  // Map API response to Assignment interface
-  const availableAssignments: Assignment[] =
-    data?.assignments?.map((a) => ({
-      id: a.id,
-      title: a.title,
-    })) ?? [];
+  const availableAssignments: Assignment[] = data?.assignments || [];
 
   // If selectedAssignmentId is provided and no local selection, find and set it
   const effectiveSelection =
@@ -45,7 +39,7 @@ export const AssignmentListCommand = ({
   };
 
   return (
-    <Popover open={assignmentSearchOpen} onOpenChange={setAssignmentSearchOpen}>
+    <Popover open={assignmentSearchOpen} onOpenChange={setAssignmentSearchOpen} modal={true}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -79,7 +73,7 @@ export const AssignmentListCommand = ({
               {availableAssignments.map((assignment) => (
                 <CommandItem
                   key={assignment.id}
-                  value={assignment.title}
+                  value={assignment.id}
                   onSelect={() => handleSelectAssignment(assignment)}
                 >
                   <Check

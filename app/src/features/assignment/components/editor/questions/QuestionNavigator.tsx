@@ -33,6 +33,7 @@ interface SortableItemProps {
   className?: string;
   tooltip?: string;
   dataTutorial?: string;
+  disabled?: boolean;
 }
 
 const SortableItem = ({
@@ -43,8 +44,12 @@ const SortableItem = ({
   className,
   tooltip,
   dataTutorial,
+  disabled,
 }: SortableItemProps) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+    disabled,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -58,10 +63,11 @@ const SortableItem = ({
       style={style}
       type="button"
       onClick={onClick}
+      disabled={disabled}
       className={cn(
         'flex h-8 w-full items-center justify-center rounded text-xs font-medium transition-colors',
         isActive ? 'bg-primary text-primary-foreground' : className,
-        isDragging ? 'cursor-grabbing' : 'cursor-grab'
+        isDragging ? 'cursor-grabbing' : disabled ? 'cursor-not-allowed opacity-50' : 'cursor-grab'
       )}
       {...(dataTutorial ? { 'data-tutorial': dataTutorial } : {})}
       {...attributes}
@@ -103,6 +109,7 @@ export const QuestionNavigator = () => {
   const currentContextId = useAssignmentEditorStore((state) => state.currentContextId);
   const setCurrentQuestionId = useAssignmentEditorStore((state) => state.setCurrentQuestionId);
   const setCurrentContextId = useAssignmentEditorStore((state) => state.setCurrentContextId);
+  const isGeneratingQuestions = useAssignmentEditorStore((state) => state.isGeneratingQuestions);
 
   const hasQuestionError = (questionId: string): boolean =>
     (validationErrors?.questions[questionId]?.errors.length ?? 0) > 0;
@@ -131,6 +138,7 @@ export const QuestionNavigator = () => {
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
+    if (isGeneratingQuestions) return;
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
@@ -172,6 +180,7 @@ export const QuestionNavigator = () => {
                 type="button"
                 data-tutorial="nav-info"
                 onClick={() => setMainView('info')}
+                disabled={isGeneratingQuestions}
                 className={cn(
                   'flex h-8 w-full items-center justify-center rounded text-xs transition-colors',
                   mainView === 'info'
@@ -179,7 +188,8 @@ export const QuestionNavigator = () => {
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
                   hasAssignmentError &&
                     mainView !== 'info' &&
-                    'bg-destructive/15 text-destructive hover:bg-destructive/25'
+                    'bg-destructive/15 text-destructive hover:bg-destructive/25',
+                  isGeneratingQuestions && 'cursor-not-allowed opacity-50'
                 )}
               >
                 <FileText className="h-3 w-3" />
@@ -197,6 +207,7 @@ export const QuestionNavigator = () => {
                 type="button"
                 data-tutorial="nav-matrix"
                 onClick={() => setMainView('matrix')}
+                disabled={isGeneratingQuestions}
                 className={cn(
                   'flex h-8 w-full items-center justify-center rounded text-xs transition-colors',
                   mainView === 'matrix'
@@ -204,7 +215,8 @@ export const QuestionNavigator = () => {
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
                   hasMatrixWarning &&
                     mainView !== 'matrix' &&
-                    'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:hover:bg-yellow-900/50'
+                    'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:hover:bg-yellow-900/50',
+                  isGeneratingQuestions && 'cursor-not-allowed opacity-50'
                 )}
               >
                 <Grid3x3 className="h-3 w-3" />
@@ -222,11 +234,13 @@ export const QuestionNavigator = () => {
                 type="button"
                 data-tutorial="nav-contexts"
                 onClick={() => setMainView('contexts')}
+                disabled={isGeneratingQuestions}
                 className={cn(
                   'flex h-8 w-full items-center justify-center rounded text-xs transition-colors',
                   mainView === 'contexts'
                     ? 'bg-primary text-primary-foreground'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
+                  isGeneratingQuestions && 'cursor-not-allowed opacity-50'
                 )}
               >
                 <BookOpen className="h-3 w-3" />
@@ -244,11 +258,13 @@ export const QuestionNavigator = () => {
                 type="button"
                 data-tutorial="nav-questions-list"
                 onClick={() => setMainView('questionsList')}
+                disabled={isGeneratingQuestions}
                 className={cn(
                   'flex h-8 w-full items-center justify-center rounded text-xs transition-colors',
                   mainView === 'questionsList'
                     ? 'bg-primary text-primary-foreground'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
+                  isGeneratingQuestions && 'cursor-not-allowed opacity-50'
                 )}
               >
                 <List className="h-3 w-3" />
@@ -280,11 +296,13 @@ export const QuestionNavigator = () => {
                           type="button"
                           {...(isFirstContextGroup ? { 'data-tutorial': 'nav-context-group' } : {})}
                           onClick={() => handleContextClick(group.contextId!)}
+                          disabled={isGeneratingQuestions}
                           className={cn(
                             'flex h-8 w-full items-center justify-center rounded text-xs font-medium transition-colors',
                             isContextActive
                               ? 'bg-primary text-primary-foreground'
-                              : 'bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800'
+                              : 'bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800',
+                            isGeneratingQuestions && 'cursor-not-allowed opacity-50'
                           )}
                         >
                           <BookOpen className="h-3 w-3" />
@@ -312,6 +330,7 @@ export const QuestionNavigator = () => {
                           id={question.id}
                           isActive={isQuestionActive}
                           onClick={() => handleQuestionClick(question.id)}
+                          disabled={isGeneratingQuestions}
                           dataTutorial={questionNumber === 1 ? 'nav-question-item' : undefined}
                           className={cn(
                             hasTitle
@@ -343,6 +362,7 @@ export const QuestionNavigator = () => {
                     id={question.id}
                     isActive={isActive}
                     onClick={() => handleQuestionClick(question.id)}
+                    disabled={isGeneratingQuestions}
                     dataTutorial={questionNumber === 1 ? 'nav-question-item' : undefined}
                     className={cn(
                       hasTitle

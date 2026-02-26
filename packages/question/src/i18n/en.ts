@@ -291,7 +291,7 @@ export default {
   fillInBlank: {
     editing: {
       title: 'Question Title',
-      titlePlaceholder: 'Enter question title (optional)',
+      titlePlaceholder: 'Enter question title',
       questionImage: 'Question Image',
       questionText: 'Question Text',
       questionTextPlaceholder: 'Use {{answer}} to mark blanks. Example: I {{am}} a {{student}}.',
@@ -419,7 +419,7 @@ export default {
       title: 'Edit Fill In Blank Question',
       alerts: { minSegments: 'Must have at least 1 segment' },
       labels: {
-        title: 'Title (optional)',
+        title: 'Title',
         caseSensitive: 'Case sensitive',
         titleImage: 'Title Image (optional)',
         questionSegments: 'Question Segments',

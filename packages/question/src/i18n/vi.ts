@@ -291,7 +291,7 @@ export default {
   fillInBlank: {
     editing: {
       title: 'Tiêu đề câu hỏi',
-      titlePlaceholder: 'Nhập tiêu đề câu hỏi (tùy chọn)',
+      titlePlaceholder: 'Nhập tiêu đề câu hỏi',
       questionImage: 'Hình ảnh câu hỏi',
       questionText: 'Văn bản câu hỏi',
       questionTextPlaceholder:
@@ -421,7 +421,7 @@ export default {
       title: 'Chỉnh sửa câu hỏi điền vào chỗ trống',
       alerts: { minSegments: 'Phải có ít nhất 1 đoạn' },
       labels: {
-        title: 'Tiêu đề (tùy chọn)',
+        title: 'Tiêu đề',
         caseSensitive: 'Phân biệt hoa thường',
         titleImage: 'Hình ảnh tiêu đề (tùy chọn)',
         questionSegments: 'Các đoạn câu hỏi',

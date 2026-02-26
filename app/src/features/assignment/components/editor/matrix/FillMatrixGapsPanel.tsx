@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@ui/button';
 import { Label } from '@ui/label';
 import { Textarea } from '@ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
 import { Badge } from '@ui/badge';
 import { Progress } from '@ui/progress';
 import { Loader2, ArrowLeft, Sparkles, Check } from 'lucide-react';
@@ -17,6 +16,7 @@ import {
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { AiDisclaimer } from '@/shared/components/common/AiDisclaimer';
 import { useAssignmentFormStore } from '@/features/assignment/stores/useAssignmentFormStore';
+import { useAssignmentEditorStore } from '@/features/assignment/stores/useAssignmentEditorStore';
 import { useGenerateQuestions } from '@/features/question-bank/hooks/useQuestionBankApi';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { useModels, MODEL_TYPES } from '@/features/model';
@@ -40,6 +40,7 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
   const subject = useAssignmentFormStore((state) => state.subject);
   const topics = useAssignmentFormStore((state) => state.topics);
   const addQuestion = useAssignmentFormStore((state) => state.addQuestion);
+  const setIsGeneratingQuestions = useAssignmentEditorStore((state) => state.setIsGeneratingQuestions);
 
   // State
   const [isGenerating, setIsGenerating] = useState(false);
@@ -71,6 +72,7 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
     }
 
     setIsGenerating(true);
+    setIsGeneratingQuestions(true);
     setProgress(0);
     setCompletedCount(0);
 
@@ -136,11 +138,12 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
       toast.error(errorMessage);
     } finally {
       setIsGenerating(false);
+      setIsGeneratingQuestions(false);
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-2">
       {/* Header */}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{String(t('title'))}</h2>
@@ -152,40 +155,39 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
       </div>
 
       {/* Selected Gaps Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">{String(t('gapDetails.title'))}</CardTitle>
-          <CardDescription>{String(t('selectGaps'))}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {gaps.map((gap, idx) => (
-              <div
-                key={idx}
-                className="flex items-center justify-between rounded-lg bg-gray-50 p-3 dark:bg-gray-900"
-              >
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary" className="text-xs">
-                    {gap.topic}
-                  </Badge>
-                  <Badge variant="outline" className={`text-xs ${getDifficultyBadgeClass(gap.difficulty)}`}>
-                    {getDifficultyName(gap.difficulty)}
-                  </Badge>
-                  <Badge
-                    variant="outline"
-                    className={`text-xs ${getQuestionTypeBadgeClass(gap.questionType)}`}
-                  >
-                    {getQuestionTypeName(gap.questionType)}
-                  </Badge>
-                </div>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {String(t('gapDetails.needed', { count: gap.gapCount }))}
-                </span>
-              </div>
-            ))}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between border-b pb-3">
+          <div>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              {String(t('gapDetails.title'))}
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{String(t('selectGaps'))}</p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="space-y-2">
+          {gaps.map((gap, idx) => (
+            <div
+              key={idx}
+              className="flex items-center justify-between rounded-lg border bg-gray-50 p-3 dark:bg-gray-900"
+            >
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="secondary" className="text-xs">
+                  {gap.topic}
+                </Badge>
+                <Badge variant="outline" className={`text-xs ${getDifficultyBadgeClass(gap.difficulty)}`}>
+                  {getDifficultyName(gap.difficulty)}
+                </Badge>
+                <Badge variant="outline" className={`text-xs ${getQuestionTypeBadgeClass(gap.questionType)}`}>
+                  {getQuestionTypeName(gap.questionType)}
+                </Badge>
+              </div>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {String(t('gapDetails.needed', { count: gap.gapCount }))}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Generation Config */}
       {!isGenerating && (
@@ -219,48 +221,47 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
 
       {/* Progress */}
       {isGenerating && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">
+        <div className="space-y-4 rounded-lg border p-4">
+          <div className="flex items-center justify-between border-b pb-3">
+            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
               {String(t('generatingQuestions', { count: gaps.length }))}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600 dark:text-gray-400">{String(t('progress'))}</span>
-                <span className="font-medium text-gray-900 dark:text-gray-100">
-                  {completedCount} / {gaps.length}
+            </p>
+            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              {completedCount} / {gaps.length}
+            </span>
+          </div>
+          <div className="space-y-1">
+            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+              <span>{String(t('progress'))}</span>
+              <span>{Math.round(progress)}%</span>
+            </div>
+            <Progress value={progress} className="h-2" />
+          </div>
+          <div className="space-y-2">
+            {gaps.map((gap, idx) => (
+              <div
+                key={idx}
+                className={`flex items-center gap-2 text-sm ${
+                  idx < completedCount
+                    ? 'text-green-700 dark:text-green-400'
+                    : idx === completedCount
+                      ? 'text-blue-700 dark:text-blue-400'
+                      : 'text-gray-600 dark:text-gray-400'
+                }`}
+              >
+                {idx < completedCount ? (
+                  <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
+                ) : idx === completedCount ? (
+                  <Loader2 className="h-4 w-4 animate-spin text-blue-600 dark:text-blue-400" />
+                ) : null}
+                <span>
+                  {gap.topic} - {getDifficultyName(gap.difficulty)} - {getQuestionTypeName(gap.questionType)}{' '}
+                  ({gap.gapCount})
                 </span>
               </div>
-              <Progress value={progress} className="h-2" />
-            </div>
-            <div className="space-y-2">
-              {gaps.map((gap, idx) => (
-                <div
-                  key={idx}
-                  className={`flex items-center gap-2 text-sm ${
-                    idx < completedCount
-                      ? 'text-green-700 dark:text-green-400'
-                      : idx === completedCount
-                        ? 'text-blue-700 dark:text-blue-400'
-                        : 'text-gray-600 dark:text-gray-400'
-                  }`}
-                >
-                  {idx < completedCount ? (
-                    <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
-                  ) : idx === completedCount ? (
-                    <Loader2 className="h-4 w-4 animate-spin text-blue-600 dark:text-blue-400" />
-                  ) : null}
-                  <span>
-                    {gap.topic} - {getDifficultyName(gap.difficulty)} -{' '}
-                    {getQuestionTypeName(gap.questionType)} ({gap.gapCount})
-                  </span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+            ))}
+          </div>
+        </div>
       )}
 
       <AiDisclaimer />

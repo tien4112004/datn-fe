@@ -89,7 +89,8 @@ ${colorConfig
   );
 };
 
-const ChartTooltip = RechartsPrimitive.Tooltip;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ChartTooltip = RechartsPrimitive.Tooltip as any as React.FC<RechartsPrimitive.TooltipProps<any, any>>;
 
 function ChartTooltipContent({
   active,
@@ -224,8 +225,6 @@ function ChartTooltipContent({
   );
 }
 
-const ChartLegend = RechartsPrimitive.Legend;
-
 function ChartLegendContent({
   className,
   hideIcon = false,
@@ -251,7 +250,7 @@ function ChartLegendContent({
         className
       )}
     >
-      {payload.map((item) => {
+      {payload.map((item: RechartsPrimitive.LegendPayload) => {
         const key = `${nameKey || item.dataKey || 'value'}`;
         const itemConfig = getPayloadConfigFromPayload(config, item, key);
 
@@ -305,3 +304,24 @@ function getPayloadConfigFromPayload(config: ChartConfig, payload: unknown, key:
 }
 
 export { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, ChartStyle };
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// Recharts class components are not compatible with React 19's stricter JSX types.
+// Cast them to functional component types to fix "does not support attributes" errors.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ChartLegend = RechartsPrimitive.Legend as any as React.FC<RechartsPrimitive.LegendProps>;
+
+export const BarChart: React.FC<any> = RechartsPrimitive.BarChart as any;
+export const Bar: React.FC<any> = RechartsPrimitive.Bar as any;
+export const LineChart: React.FC<any> = RechartsPrimitive.LineChart as any;
+export const Line: React.FC<any> = RechartsPrimitive.Line as any;
+export const AreaChart: React.FC<any> = RechartsPrimitive.AreaChart as any;
+export const Area: React.FC<any> = RechartsPrimitive.Area as any;
+export const XAxis: React.FC<any> = RechartsPrimitive.XAxis as any;
+export const YAxis: React.FC<any> = RechartsPrimitive.YAxis as any;
+export const CartesianGrid: React.FC<any> = RechartsPrimitive.CartesianGrid as any;
+export const PieChart: React.FC<any> = RechartsPrimitive.PieChart as any;
+export const Pie: React.FC<any> = RechartsPrimitive.Pie as any;
+export const Cell: React.FC<any> = RechartsPrimitive.Cell as any;
+/* eslint-enable @typescript-eslint/no-explicit-any */
+export type { TooltipContentProps } from 'recharts';

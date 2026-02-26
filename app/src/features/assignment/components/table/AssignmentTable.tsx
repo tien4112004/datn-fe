@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import DataTable from '@/components/table/DataTable';
 import { SearchBar } from '@/shared/components/common/SearchBar';
-import { useAssignmentList } from '@/features/assignment/hooks/useAssignmentApi';
+import { useAssignmentList, useDeleteAssignment } from '@/features/assignment/hooks/useAssignmentApi';
 import type { Assignment } from '../../types';
 import { RenameFileDialog } from '@/shared/components/modals/RenameFileDialog';
 import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfirmationDialog';
@@ -52,6 +52,7 @@ const AssignmentTable = () => {
   const { data: assignmentsResponse, isLoading } = useAssignmentList({
     searchText: search,
   });
+  const deleteAssignment = useDeleteAssignment();
 
   const data = useMemo(() => assignmentsResponse?.assignments || [], [assignmentsResponse]);
   const totalItems = assignmentsResponse?.total || 0;
@@ -136,7 +137,7 @@ const AssignmentTable = () => {
     if (!selectedAssignment) return;
 
     try {
-      // TODO: Implement delete assignment mutation
+      await deleteAssignment.mutateAsync(selectedAssignment.id);
       toast.success(t('assignment.deleteSuccess', { name: selectedAssignment.title }));
       setIsDeleteOpen(false);
       setSelectedAssignment(null);

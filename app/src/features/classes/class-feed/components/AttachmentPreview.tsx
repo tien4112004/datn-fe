@@ -1,4 +1,6 @@
 import { Archive, FileDown, FileSpreadsheet, FileText, Paperclip, Presentation } from 'lucide-react';
+import { useState } from 'react';
+import { ImageLightbox } from './ImageLightbox';
 
 interface AttachmentPreviewProps {
   url: string;
@@ -61,24 +63,34 @@ export const AttachmentPreview = ({ url, className = '' }: AttachmentPreviewProp
     }
   };
 
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
   const fileName = getFileName(url);
   const fileType = getFileType(url);
   const isImage = fileType.startsWith('image/');
 
   if (isImage) {
     return (
-      <div className={`relative overflow-hidden rounded-lg border ${className}`}>
-        <div className="group relative aspect-video w-full max-w-md">
-          <img src={url} alt={fileName} className="h-full w-full object-cover" />
-          <button
-            onClick={handleDownload}
-            className="absolute right-2 top-2 flex cursor-pointer items-center rounded-lg bg-black/60 p-2 text-white transition-all hover:bg-black/80"
-            title={fileName}
-          >
-            <FileDown className="h-4 w-4" />
-          </button>
+      <>
+        <div className={`relative overflow-hidden rounded-lg border ${className}`}>
+          <div className="group relative aspect-video w-full max-w-md">
+            <img
+              src={url}
+              alt={fileName}
+              className="h-full w-full cursor-zoom-in object-cover"
+              onClick={() => setLightboxOpen(true)}
+            />
+            <button
+              onClick={handleDownload}
+              className="absolute right-2 top-2 flex cursor-pointer items-center rounded-lg bg-black/60 p-2 text-white transition-all hover:bg-black/80"
+              title={fileName}
+            >
+              <FileDown className="h-4 w-4" />
+            </button>
+          </div>
         </div>
-      </div>
+        <ImageLightbox src={url} alt={fileName} open={lightboxOpen} onClose={() => setLightboxOpen(false)} />
+      </>
     );
   }
 

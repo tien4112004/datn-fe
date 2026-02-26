@@ -44,21 +44,25 @@ export function FillMatrixGapsManager({ onClose, onQuestionsAdded }: FillMatrixG
   const [selectedGaps, setSelectedGaps] = useState<Set<string>>(
     () => new Set(missingQuestions.map((_, idx) => idx.toString()))
   );
+  const [frozenGaps, setFrozenGaps] = useState<MatrixGapDto[]>([]);
 
   const handleProceed = () => {
     if (selectedGaps.size === 0) {
       toast.error(String(t('errors.noGapsSelected')));
       return;
     }
+    const selected = Array.from(selectedGaps)
+      .map((id) => parseInt(id))
+      .map((idx) => missingQuestions[idx])
+      .filter(Boolean);
+    setFrozenGaps(selected);
     setStep('generate');
   };
 
   if (step === 'generate') {
     return (
       <FillMatrixGapsPanel
-        gaps={Array.from(selectedGaps)
-          .map((id) => parseInt(id))
-          .map((idx) => missingQuestions[idx])}
+        gaps={frozenGaps}
         onBack={() => setStep('review')}
         onSuccess={() => {
           toast.success(String(t('success', { count: selectedGaps.size })));

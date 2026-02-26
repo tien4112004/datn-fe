@@ -83,6 +83,7 @@ export const AssignmentEditorLayout = ({
   const setQuestions = useAssignmentFormStore((state) => state.setQuestions);
   const isBulkPointsDialogOpen = useAssignmentEditorStore((state) => state.isBulkPointsDialogOpen);
   const setBulkPointsDialogOpen = useAssignmentEditorStore((state) => state.setBulkPointsDialogOpen);
+  const isGeneratingQuestions = useAssignmentEditorStore((state) => state.isGeneratingQuestions);
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor' });
   const { t: tFillGaps } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.fillMatrixGaps' });
   const { t: tToolbar } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
@@ -170,10 +171,12 @@ export const AssignmentEditorLayout = ({
       label: '',
       tooltip: '',
       onClick: () => {},
+      disabled: isGeneratingQuestions,
       render: () => (
         <AddQuestionButton
           className="w-full"
           contextId={isContextGroup ? (currentContextId ?? undefined) : undefined}
+          disabled={isGeneratingQuestions}
         />
       ),
     },
@@ -182,12 +185,14 @@ export const AssignmentEditorLayout = ({
       label: tToolbar('generate'),
       tooltip: tActions('tooltips.generate'),
       onClick: () => setMainView('generateQuestions'),
+      disabled: isGeneratingQuestions,
     },
     fromBank: {
       icon: Database,
       label: tToolbar('fromBank'),
       tooltip: tActions('tooltips.fromBank'),
       onClick: () => setQuestionBankOpen(true),
+      disabled: isGeneratingQuestions,
     },
     shuffle: {
       icon: Shuffle,
@@ -196,38 +201,44 @@ export const AssignmentEditorLayout = ({
         ? tActions('tooltips.shuffleContextQuestions')
         : tActions('tooltips.shuffleQuestions'),
       onClick: isContextGroup ? handleShuffleContextQuestions : handleShuffleQuestions,
-      disabled: isContextGroup ? contextQuestions.length < 2 : questions.length < 2,
+      disabled:
+        isGeneratingQuestions || (isContextGroup ? contextQuestions.length < 2 : questions.length < 2),
     },
     bulkPoints: {
       icon: ListChecks,
       label: tToolbar('bulkPoints'),
       tooltip: isContextGroup ? tActions('tooltips.bulkPointsContext') : tActions('tooltips.bulkPoints'),
       onClick: () => setBulkPointsDialogOpen(true),
-      disabled: isContextGroup ? contextQuestions.length === 0 : questions.length === 0,
+      disabled:
+        isGeneratingQuestions || (isContextGroup ? contextQuestions.length === 0 : questions.length === 0),
     },
     generateFromContext: {
       icon: Wand2,
       label: tToolbar('generateFromContext'),
       tooltip: tActions('tooltips.generateFromContext'),
       onClick: () => setMainView('generateFromContext'),
+      disabled: isGeneratingQuestions,
     },
     addTopic: {
       icon: Plus,
       label: t('matrixEditor.addTopic'),
       tooltip: t('matrixBuilder.tooltips.addTopic'),
       onClick: () => window.dispatchEvent(new CustomEvent('matrix.addTopic')),
+      disabled: isGeneratingQuestions,
     },
     generateMatrix: {
       icon: Wand2,
       label: t('matrixBuilder.generateMatrix'),
       tooltip: tActions('tooltips.generateMatrix'),
       onClick: () => setMainView('generateMatrix'),
+      disabled: isGeneratingQuestions,
     },
     fillMatrixGaps: {
       icon: Sparkles,
       label: t('actions.fillMatrixGaps'),
       tooltip: t('actions.tooltips.fillMatrixGaps'),
       onClick: handleFillMatrixGaps,
+      disabled: isGeneratingQuestions,
     },
     templateLibrary: {
       icon: Library,
@@ -237,7 +248,7 @@ export const AssignmentEditorLayout = ({
           ? tMatrixActions('templateLibraryDisabled')
           : tMatrixActions('templateLibraryTooltip'),
       onClick: () => setMatrixTemplateLibraryDialogOpen(true),
-      disabled: !subject || !grade,
+      disabled: isGeneratingQuestions || !subject || !grade,
     },
     saveAsTemplate: {
       icon: Save,
@@ -249,19 +260,21 @@ export const AssignmentEditorLayout = ({
             ? tMatrixActions('saveAsTemplateDisabledMatrix')
             : tMatrixActions('saveAsTemplateTooltip'),
       onClick: () => setMatrixTemplateSaveDialogOpen(true),
-      disabled: !matrix || matrix.length === 0 || !subject || !grade,
+      disabled: isGeneratingQuestions || !matrix || matrix.length === 0 || !subject || !grade,
     },
     addContext: {
       icon: Plus,
       label: tContextsPanel('addContext'),
       tooltip: tActions('tooltips.addContext'),
       onClick: () => setContextCreateFormOpen(true),
+      disabled: isGeneratingQuestions,
     },
     fromLibrary: {
       icon: Library,
       label: tContextsPanel('fromLibrary'),
       tooltip: tActions('tooltips.fromLibrary'),
       onClick: () => setContextLibraryDialogOpen(true),
+      disabled: isGeneratingQuestions,
     },
   };
 
@@ -297,6 +310,7 @@ export const AssignmentEditorLayout = ({
               <LoadingButton
                 onClick={onSave}
                 loading={isSaving}
+                disabled={isSaving || isGeneratingQuestions}
                 loadingText={t('actions.saving')}
                 className="w-full"
               >
@@ -313,6 +327,7 @@ export const AssignmentEditorLayout = ({
               <LoadingButton
                 onClick={onSaveAndExit}
                 loading={isSaving}
+                disabled={isSaving || isGeneratingQuestions}
                 loadingText={t('actions.saving')}
                 variant="outline"
                 className="w-full"
@@ -327,7 +342,13 @@ export const AssignmentEditorLayout = ({
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button type="button" variant="ghost" disabled={isSaving} className="w-full" onClick={onCancel}>
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={isSaving || isGeneratingQuestions}
+                className="w-full"
+                onClick={onCancel}
+              >
                 <X className="mr-2 h-4 w-4" />
                 {t('actions.cancel')}
               </Button>

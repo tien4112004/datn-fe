@@ -16,9 +16,10 @@ import { useAssignmentFormStore } from '../../../stores/useAssignmentFormStore';
 interface AddQuestionButtonProps {
   className?: string;
   contextId?: string;
+  disabled?: boolean;
 }
 
-export const AddQuestionButton = ({ className, contextId }: AddQuestionButtonProps) => {
+export const AddQuestionButton = ({ className, contextId, disabled }: AddQuestionButtonProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
 
   // Get data and actions from stores
@@ -90,7 +91,7 @@ export const AddQuestionButton = ({ className, contextId }: AddQuestionButtonPro
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="button" size="sm" className={className}>
+        <Button type="button" size="sm" className={className} disabled={disabled}>
           <Plus className="mr-2 h-4 w-4" />
           {t('addQuestion')}
         </Button>

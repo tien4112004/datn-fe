@@ -16,6 +16,7 @@ import {
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { AiDisclaimer } from '@/shared/components/common/AiDisclaimer';
 import { useAssignmentFormStore } from '@/features/assignment/stores/useAssignmentFormStore';
+import { useAssignmentEditorStore } from '@/features/assignment/stores/useAssignmentEditorStore';
 import { useGenerateQuestions } from '@/features/question-bank/hooks/useQuestionBankApi';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { useModels, MODEL_TYPES } from '@/features/model';
@@ -39,6 +40,7 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
   const subject = useAssignmentFormStore((state) => state.subject);
   const topics = useAssignmentFormStore((state) => state.topics);
   const addQuestion = useAssignmentFormStore((state) => state.addQuestion);
+  const setIsGeneratingQuestions = useAssignmentEditorStore((state) => state.setIsGeneratingQuestions);
 
   // State
   const [isGenerating, setIsGenerating] = useState(false);
@@ -70,6 +72,7 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
     }
 
     setIsGenerating(true);
+    setIsGeneratingQuestions(true);
     setProgress(0);
     setCompletedCount(0);
 
@@ -135,6 +138,7 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
       toast.error(errorMessage);
     } finally {
       setIsGenerating(false);
+      setIsGeneratingQuestions(false);
     }
   };
 

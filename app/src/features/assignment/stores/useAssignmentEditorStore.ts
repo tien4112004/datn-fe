@@ -31,6 +31,7 @@ interface AssignmentEditorState {
   isMatrixTemplateSaveDialogOpen: boolean;
   isBulkPointsDialogOpen: boolean;
   mainView: MainView;
+  isGeneratingQuestions: boolean;
 
   // Actions
   setSelectedQuestion: (id: string | null) => void;
@@ -48,6 +49,7 @@ interface AssignmentEditorState {
   setMatrixTemplateSaveDialogOpen: (open: boolean) => void;
   setBulkPointsDialogOpen: (open: boolean) => void;
   setMainView: (view: MainView) => void;
+  setIsGeneratingQuestions: (generating: boolean) => void;
 
   // Question operations (these will be used by components to update form)
   reorderQuestions: (
@@ -82,6 +84,7 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       isMatrixTemplateSaveDialogOpen: false,
       isBulkPointsDialogOpen: false,
       mainView: 'info',
+      isGeneratingQuestions: false,
 
       // UI actions
       setSelectedQuestion: (id) => set({ selectedQuestionId: id }),
@@ -107,6 +110,7 @@ export const useAssignmentEditorStore = create<AssignmentEditorState>()(
       setMatrixTemplateLibraryDialogOpen: (open) => set({ isMatrixTemplateLibraryDialogOpen: open }),
       setMatrixTemplateSaveDialogOpen: (open) => set({ isMatrixTemplateSaveDialogOpen: open }),
       setBulkPointsDialogOpen: (open) => set({ isBulkPointsDialogOpen: open }),
+      setIsGeneratingQuestions: (generating) => set({ isGeneratingQuestions: generating }),
 
       // Reorder questions (used with drag-drop)
       reorderQuestions: (questions, oldIndex, newIndex) => {

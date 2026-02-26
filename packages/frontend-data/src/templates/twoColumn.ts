@@ -15,6 +15,15 @@ export const twoColumnTemplates: SlideTemplate[] = [
         step: 1,
         description: 'Left/right slide padding',
       },
+      {
+        key: 'ITEMS_SPACING',
+        label: 'Items Spacing',
+        defaultValue: 25,
+        min: 0,
+        max: 60,
+        step: 1,
+        description: 'Spacing between items',
+      },
     ],
     containers: {
       title: {
@@ -60,7 +69,7 @@ export const twoColumnTemplates: SlideTemplate[] = [
             maxItemsPerLine: 5,
             lineCount: 'auto',
             wrapDistribution: 'balanced',
-            lineSpacing: 25,
+            lineSpacing: 'ITEMS_SPACING',
           },
           structure: {
             type: 'block',
@@ -103,6 +112,15 @@ export const twoColumnTemplates: SlideTemplate[] = [
         max: 50,
         step: 1,
         description: 'Left/right content padding',
+      },
+      {
+        key: 'ITEMS_SPACING',
+        label: 'Items Spacing',
+        defaultValue: 25,
+        min: 0,
+        max: 60,
+        step: 1,
+        description: 'Spacing between items',
       },
     ],
     containers: {
@@ -154,7 +172,7 @@ export const twoColumnTemplates: SlideTemplate[] = [
             maxItemsPerLine: 5,
             lineCount: 'auto',
             wrapDistribution: 'balanced',
-            lineSpacing: 25,
+            lineSpacing: 'ITEMS_SPACING',
           },
           structure: {
             type: 'block',

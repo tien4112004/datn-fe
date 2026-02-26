@@ -11,4 +11,9 @@ export interface ITemplateApi extends ApiService {
    * Get slide templates filtered by layout type
    */
   getSlideTemplatesByLayout(layoutType: string): Promise<SlideTemplate[]>;
+
+  /**
+   * Get template file data from public mocks folder
+   */
+  getFileData(filename: string): Promise<any>;
 }

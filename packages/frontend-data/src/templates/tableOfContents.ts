@@ -18,7 +18,7 @@ export const tableOfContentsTemplates: SlideTemplate[] = [
       {
         key: 'MAX_ITEMS_PER_LINE',
         label: 'Items Per Line',
-        defaultValue: 2,
+        defaultValue: 4,
         min: 1,
         max: 6,
         step: 1,

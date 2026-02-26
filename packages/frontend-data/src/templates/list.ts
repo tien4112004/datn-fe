@@ -340,6 +340,15 @@ export const listTemplates: SlideTemplate[] = [
         step: 1,
         description: 'Maximum number of items per row',
       },
+      {
+        key: 'ITEMS_SPACING',
+        label: 'Items Spacing',
+        defaultValue: 15,
+        min: 0,
+        max: 60,
+        step: 1,
+        description: 'Spacing between items',
+      },
     ],
     containers: {
       title: {
@@ -438,6 +447,15 @@ export const listTemplates: SlideTemplate[] = [
         step: 1,
         description: 'Maximum number of items per row',
       },
+      {
+        key: 'ITEMS_SPACING',
+        label: 'Items Spacing',
+        defaultValue: 15,
+        min: 0,
+        max: 60,
+        step: 1,
+        description: 'Spacing between items',
+      },
     ],
     containers: {
       title: {
@@ -474,7 +492,7 @@ export const listTemplates: SlideTemplate[] = [
         },
         layout: {
           distribution: 'space-around',
-          gap: 25,
+          gap: { expr: 'ITEMS_SPACING' },
           horizontalAlignment: 'center',
           verticalAlignment: 'center',
           orientation: 'horizontal',
@@ -486,7 +504,7 @@ export const listTemplates: SlideTemplate[] = [
             maxItemsPerLine: 'MAX_ITEMS_PER_LINE',
             lineCount: 2,
             wrapDistribution: 'balanced',
-            lineSpacing: 15,
+            lineSpacing: { expr: 'ITEMS_SPACING' },
           },
           structure: {
             type: 'block',

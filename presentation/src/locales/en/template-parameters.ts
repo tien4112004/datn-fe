@@ -44,5 +44,9 @@ export default {
       label: 'Max Items Per Line',
       description: 'Maximum number of items per row',
     },
+    ITEMS_SPACING: {
+      label: 'Items Spacing',
+      description: 'Spacing between items',
+    },
   },
 };

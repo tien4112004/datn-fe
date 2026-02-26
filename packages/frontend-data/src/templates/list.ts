@@ -487,7 +487,6 @@ export const listTemplates: SlideTemplate[] = [
             lineCount: 2,
             wrapDistribution: 'balanced',
             lineSpacing: 15,
-            alternating: { start: 20, end: 20 },
           },
           structure: {
             type: 'block',

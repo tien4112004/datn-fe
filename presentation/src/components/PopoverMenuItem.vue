@@ -25,7 +25,7 @@ const emit = defineEmits<{
 
 const computedClass = computed(() =>
   cn(
-    'tw-min-w-[80px] tw-cursor-pointer tw-rounded tw-px-2.5 tw-py-1.5 [&+&]:tw-mt-0.5 hover:tw-text-accent tw-flex tw-items-center tw-gap-2',
+    'tw-min-w-[80px] tw-cursor-pointer tw-rounded tw-px-2.5 tw-py-1.5 [&+&]:tw-mt-0.5 hover:tw-text-accent tw-flex tw-items-center tw-gap-2 tw-text-sm [&>svg]:tw-w-4 [&>svg]:tw-h-4 [&>svg]:tw-flex-shrink-0',
     props.center ? 'tw-text-center' : 'tw-text-left',
     props.class
   )

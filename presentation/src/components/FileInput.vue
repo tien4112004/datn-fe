@@ -15,12 +15,14 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     accept?: string;
+    disabled?: boolean;
   }>(),
   {
     accept: 'image/*',
+    disabled: false,
   }
 );
 
@@ -31,7 +33,7 @@ const emit = defineEmits<{
 const inputRef = ref<HTMLInputElement>();
 
 const handleClick = () => {
-  if (!inputRef.value) return;
+  if (!inputRef.value || props.disabled) return;
   inputRef.value.value = '';
   inputRef.value.click();
 };

@@ -9,7 +9,7 @@ export interface LayoutPreset {
   schema: SlideLayoutSchema;
 }
 
-const LIST_TEMPLATE_ID = 'list-flexible';
+const LIST_TEMPLATE_ID = 'list-flexible-numbered';
 const LABELED_LIST_TEMPLATE_ID = 'labeled-list-flexible';
 
 export const LAYOUT_PRESETS: LayoutPreset[] = [

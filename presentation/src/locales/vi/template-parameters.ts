@@ -40,5 +40,9 @@ export default {
       label: 'Khoảng cách',
       description: 'Khoảng cách giữa các phần tử',
     },
+    MAX_ITEMS_PER_LINE: {
+      label: 'Số mục tối đa mỗi hàng',
+      description: 'Số lượng mục tối đa trên mỗi dòng',
+    },
   },
 };

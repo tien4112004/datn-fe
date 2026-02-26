@@ -1,7 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
-import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@ui/chart';
-import { Users, Palette, LayoutTemplate, Database, TrendingUp, Activity } from 'lucide-react';
 import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
   BarChart,
   Bar,
   LineChart,
@@ -14,8 +15,10 @@ import {
   PieChart,
   Pie,
   Cell,
+  type ChartConfig,
   type TooltipContentProps,
-} from 'recharts';
+} from '@ui/chart';
+import { Users, Palette, LayoutTemplate, Database, TrendingUp, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const quickStats = [

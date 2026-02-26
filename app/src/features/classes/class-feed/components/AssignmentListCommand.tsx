@@ -1,12 +1,12 @@
-import { Button } from '@ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/popover';
+import type { Assignment } from '@/features/assignment';
+import { useAssignmentList } from '@/features/assignment/hooks';
 import { cn } from '@/shared/lib/utils';
+import { Button } from '@ui/button';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/popover';
 import { Check, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, Command } from '@ui/command';
-import { useAssignmentList } from '@/features/assignment/hooks';
-import type { Assignment } from '@/features/assignment';
 
 interface AssignmentListCommandProps {
   classId?: string;

@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { Assignment } from '../../types';
-import { useAssignmentList } from '@/features/assignment/hooks/useAssignmentApi';
+import { useAssignmentList, useDeleteAssignment } from '@/features/assignment/hooks/useAssignmentApi';
 import { Button } from '@ui/button';
 import { MoreHorizontal, ClipboardList } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@ui/dropdown-menu';
@@ -48,6 +48,7 @@ const AssignmentGrid = () => {
   const { data: assignmentsResponse, isLoading } = useAssignmentList({
     searchText: search,
   });
+  const deleteAssignment = useDeleteAssignment();
 
   const data = useMemo(() => assignmentsResponse?.assignments || [], [assignmentsResponse]);
   const totalItems = assignmentsResponse?.total || 0;
@@ -106,7 +107,7 @@ const AssignmentGrid = () => {
     if (!selectedAssignment) return;
 
     try {
-      // TODO: Implement delete assignment mutation
+      await deleteAssignment.mutateAsync(selectedAssignment.id);
       toast.success(t('assignment.deleteSuccess', { name: selectedAssignment.title }));
       setIsDeleteOpen(false);
       setSelectedAssignment(null);

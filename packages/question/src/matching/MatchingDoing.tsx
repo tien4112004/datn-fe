@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { MatchingQuestion, MatchingAnswer } from '@aiprimary/core';
 import { MarkdownPreview, QuestionTitle } from '../shared';
@@ -27,7 +27,7 @@ interface DraggableItemProps {
   isMatched?: boolean;
 }
 
-const DraggableItem = ({ id, content, imageUrl, index, isMatched }: DraggableItemProps) => {
+const DraggableItem = memo(({ id, content, imageUrl, index, isMatched }: DraggableItemProps) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id,
     disabled: isMatched,
@@ -63,7 +63,7 @@ const DraggableItem = ({ id, content, imageUrl, index, isMatched }: DraggableIte
       {!isMatched && <GripVertical className="text-muted-foreground h-4 w-4 flex-shrink-0" />}
     </div>
   );
-};
+});
 
 interface DroppableZoneProps {
   id: string;
@@ -71,11 +71,11 @@ interface DroppableZoneProps {
   imageUrl?: string;
   index: number;
   matchedItem?: { id: string; content: string; imageUrl?: string; itemIndex: number };
-  onRemove?: () => void;
+  onRemove: (rightId: string) => void;
   dropHereText: string;
 }
 
-const DroppableZone = ({
+const DroppableZone = memo(({
   id,
   content,
   imageUrl,
@@ -120,7 +120,7 @@ const DroppableZone = ({
                 <MarkdownPreview content={matchedItem.content} />
               </div>
             </div>
-            <Button type="button" variant="ghost" size="sm" onClick={onRemove}>
+            <Button type="button" variant="ghost" size="sm" onClick={() => onRemove(id)}>
               <RotateCcw className="h-3 w-3" />
             </Button>
           </div>
@@ -132,7 +132,7 @@ const DroppableZone = ({
       )}
     </div>
   );
-};
+});
 
 interface MatchingDoingProps {
   question: MatchingQuestion;
@@ -160,46 +160,77 @@ export const MatchingDoing = ({
     }
   }, [answer]);
 
-  const handleDragStart = (event: DragStartEvent) => {
+  const handleDragStart = useCallback((event: DragStartEvent) => {
     setActiveId(event.active.id as string);
-  };
+  }, []);
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    setActiveId(null);
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      setActiveId(null);
 
-    if (over) {
-      const newMatches = new Map(matches);
-      newMatches.set(over.id as string, active.id as string);
-      setMatches(newMatches);
+      if (over) {
+        setMatches((prev) => {
+          const newMatches = new Map(prev);
+          newMatches.set(over.id as string, active.id as string);
 
-      onAnswerChange({
-        questionId: question.id,
-        type: QUESTION_TYPE.MATCHING,
-        matches: Array.from(newMatches.entries()).map(([rightId, leftId]) => ({
-          leftId,
-          rightId,
-        })),
+          onAnswerChange({
+            questionId: question.id,
+            type: QUESTION_TYPE.MATCHING,
+            matches: Array.from(newMatches.entries()).map(([rightId, leftId]) => ({
+              leftId,
+              rightId,
+            })),
+          });
+
+          return newMatches;
+        });
+      }
+    },
+    [onAnswerChange, question.id]
+  );
+
+  const handleRemoveMatch = useCallback(
+    (rightId: string) => {
+      setMatches((prev) => {
+        const newMatches = new Map(prev);
+        newMatches.delete(rightId);
+
+        onAnswerChange({
+          questionId: question.id,
+          type: QUESTION_TYPE.MATCHING,
+          matches: Array.from(newMatches.entries()).map(([rightId, leftId]) => ({
+            leftId,
+            rightId,
+          })),
+        });
+
+        return newMatches;
       });
+    },
+    [onAnswerChange, question.id]
+  );
+
+  const matchedLeftIds = useMemo(() => new Set(Array.from(matches.values())), [matches]);
+
+  // Precompute lookup: pairId -> { matchedItem } for drop zones
+  const matchedItemsByRightId = useMemo(() => {
+    const lookup = new Map<string, { id: string; content: string; imageUrl?: string; itemIndex: number }>();
+    for (const [rightId, leftId] of matches) {
+      const idx = question.data.pairs.findIndex((p) => p.id === leftId);
+      if (idx !== -1) {
+        const pair = question.data.pairs[idx];
+        lookup.set(rightId, {
+          id: pair.id,
+          content: pair.left,
+          imageUrl: pair.leftImageUrl,
+          itemIndex: idx,
+        });
+      }
     }
-  };
+    return lookup;
+  }, [matches, question.data.pairs]);
 
-  const handleRemoveMatch = (rightId: string) => {
-    const newMatches = new Map(matches);
-    newMatches.delete(rightId);
-    setMatches(newMatches);
-
-    onAnswerChange({
-      questionId: question.id,
-      type: QUESTION_TYPE.MATCHING,
-      matches: Array.from(newMatches.entries()).map(([rightId, leftId]) => ({
-        leftId,
-        rightId,
-      })),
-    });
-  };
-
-  const matchedLeftIds = new Set(Array.from(matches.values()));
   const activePair = activeId ? question.data.pairs.find((p) => p.id === activeId) : null;
 
   return (
@@ -239,33 +270,18 @@ export const MatchingDoing = ({
           {/* Right Column - Drop Zones */}
           <div className="space-y-2">
             <h4 className="text-sm font-semibold">{t('matching.doing.columnBDrop')}</h4>
-            {question.data.pairs.map((pair, index) => {
-              const matchedLeftId = matches.get(pair.id);
-              const matchedPair = matchedLeftId
-                ? question.data.pairs.find((p) => p.id === matchedLeftId)
-                : undefined;
-              const matchedItem = matchedPair
-                ? {
-                    id: matchedPair.id,
-                    content: matchedPair.left,
-                    imageUrl: matchedPair.leftImageUrl,
-                    itemIndex: question.data.pairs.findIndex((p) => p.id === matchedPair.id),
-                  }
-                : undefined;
-
-              return (
-                <DroppableZone
-                  key={pair.id}
-                  id={pair.id}
-                  content={pair.right}
-                  imageUrl={pair.rightImageUrl}
-                  index={index}
-                  matchedItem={matchedItem}
-                  onRemove={() => handleRemoveMatch(pair.id)}
-                  dropHereText={t('matching.doing.dropHere')}
-                />
-              );
-            })}
+            {question.data.pairs.map((pair, index) => (
+              <DroppableZone
+                key={pair.id}
+                id={pair.id}
+                content={pair.right}
+                imageUrl={pair.rightImageUrl}
+                index={index}
+                matchedItem={matchedItemsByRightId.get(pair.id)}
+                onRemove={handleRemoveMatch}
+                dropHereText={t('matching.doing.dropHere')}
+              />
+            ))}
           </div>
         </div>
 

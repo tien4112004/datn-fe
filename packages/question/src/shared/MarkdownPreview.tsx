@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { cn } from '@ui/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -7,7 +8,7 @@ interface MarkdownPreviewProps {
   className?: string;
 }
 
-export const MarkdownPreview = ({ content, className }: MarkdownPreviewProps) => {
+export const MarkdownPreview = memo(({ content, className }: MarkdownPreviewProps) => {
   return (
     <div
       className={cn(
@@ -21,4 +22,4 @@ export const MarkdownPreview = ({ content, className }: MarkdownPreviewProps) =>
       <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
     </div>
   );
-};
+});

@@ -621,13 +621,32 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
 
     :deep(.button-group) {
       gap: 0 !important;
-      height: 2rem;
+      height: auto !important;
+      flex-direction: column;
+      width: 2rem;
+    }
+
+    // Vertical border-radius overrides
+    :deep(.button-group > *:first-child),
+    :deep(.button-group > *:first-child > *),
+    :deep(.button-group > *:first-child [data-slot='popover-trigger']),
+    :deep(.button-group > *:first-child [data-slot='popover-trigger'] > *) {
+      border-radius: var(--presentation-radius) var(--presentation-radius) 0 0 !important;
+    }
+
+    :deep(.button-group > *:last-child),
+    :deep(.button-group > *:last-child > *),
+    :deep(.button-group > *:last-child [data-slot='popover-trigger']),
+    :deep(.button-group > *:last-child [data-slot='popover-trigger'] > *) {
+      border-radius: 0 0 var(--presentation-radius) var(--presentation-radius) !important;
     }
 
     :deep(button) {
       padding: 0.5rem;
       font-size: 0.75rem;
       gap: 0;
+      width: 2rem;
+      height: 2rem;
 
       svg {
         width: 1rem;

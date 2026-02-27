@@ -102,6 +102,7 @@ export default {
     // Bảng AI Sửa đổi
     aiModification: {
       title: 'AI Sửa đổi',
+      disclaimer: 'Nội dung được tạo bởi AI có thể chứa lỗi. Vui lòng xem xét và xác minh trước khi sử dụng.',
       context: {
         slide: 'Trang chiếu hiện tại',
         element: 'Thành phần đã chọn',

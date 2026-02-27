@@ -15,7 +15,7 @@
     <!-- AI Disclaimer -->
     <div class="ai-disclaimer-container">
       <Info :size="14" class="ai-disclaimer-icon" />
-      <p class="ai-disclaimer">{{ t('ai.ai.disclaimer') }}</p>
+      <p class="ai-disclaimer">{{ t('panels.aiModification.disclaimer') }}</p>
     </div>
 
     <ArtStyleSelector v-model="selectedStyle" :art-style-options="artStyleOptions" :disabled="isProcessing" />

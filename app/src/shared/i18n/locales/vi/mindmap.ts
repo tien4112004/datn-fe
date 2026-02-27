@@ -52,10 +52,13 @@ export default {
       history: 'Lịch sử',
       layout: 'Bố cục',
       utilities: 'Tiện ích',
+      nodeProperties: 'Thuộc tính',
+      nodeAI: 'Công cụ AI',
     },
     tabs: {
       general: 'Chung',
       selection: 'Lựa chọn',
+      node: 'Nút',
       tree: 'Cây',
     },
     actions: {
@@ -225,6 +228,10 @@ export default {
   title: {
     updateSuccess: 'Cập nhật tiêu đề thành công',
     updateError: 'Không thể cập nhật tiêu đề',
+  },
+  breadcrumb: {
+    backToClass: 'Quay lại lớp học',
+    mindmaps: 'Sơ đồ tư duy',
   },
   errors: {
     cannotMoveToDescendant: 'Không thể di chuyển nút đến các nút con của nó',

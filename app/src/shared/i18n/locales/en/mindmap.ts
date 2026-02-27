@@ -52,10 +52,13 @@ export default {
       history: 'History',
       layout: 'Layout',
       utilities: 'Utilities',
+      nodeProperties: 'Properties',
+      nodeAI: 'AI Tools',
     },
     tabs: {
       general: 'General',
       selection: 'Selection',
+      node: 'Node',
       tree: 'Tree',
     },
     actions: {
@@ -225,6 +228,10 @@ export default {
   title: {
     updateSuccess: 'Title updated successfully',
     updateError: 'Failed to update title',
+  },
+  breadcrumb: {
+    backToClass: 'Back to Class',
+    mindmaps: 'Mindmaps',
   },
   errors: {
     cannotMoveToDescendant: 'Cannot move a node to one of its descendants',

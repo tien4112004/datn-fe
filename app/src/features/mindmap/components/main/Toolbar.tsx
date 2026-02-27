@@ -23,14 +23,13 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useSaveMindmap } from '../../hooks';
 import { useDuplicateMindmap } from '../../hooks/useApi';
-import { useCoreStore, useNodeOperationsStore, useUndoRedoStore } from '../../stores';
+import { useNodeOperationsStore, useUndoRedoStore } from '../../stores';
 import { useSavingStore } from '../../stores/saving';
-import AIMindmapPanel from '../ai-panel/AIMindmapPanel';
 import ExportMindmapDialog from '../export';
 import { GenerateTreeDialog } from '../generate';
 import ShareMindmapDialog from '../share/ShareMindmapDialog';
 import { TreePanelContent } from '../tree-panel';
-import NodeSelectionTab from './NodeSelectionTab';
+import NodeTab from './NodeTab';
 
 // Memoized dialogs component to prevent re-renders when Toolbar state changes
 const ToolbarDialogs = memo(
@@ -96,13 +95,6 @@ const Toolbar = memo(
     const canUndo = useUndoRedoStore((state) => !state.undoStack.isEmpty());
     const canRedo = useUndoRedoStore((state) => !state.redoStack.isEmpty());
 
-    // Selection state
-    // Selection state - usage of useNodeSelection hook causes re-renders on every node change (e.g. drag)
-    // because it returns a new array of selected nodes.
-    // We only need the count and existence here.
-    const selectedCount = useCoreStore((state) => state.selectedNodeIds.size);
-    const hasSelection = selectedCount > 0;
-
     // Permission state
     const userPermission = permission;
 
@@ -148,28 +140,12 @@ const Toolbar = memo(
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-1 flex-col">
-          <TabsList className={cn('grid w-full grid-cols-4', isMobileSheet ? 'h-12' : 'h-10')}>
+          <TabsList className={cn('grid w-full grid-cols-3', isMobileSheet ? 'h-12' : 'h-10')}>
             <TabsTrigger value="general" className={cn(isMobileSheet ? 'text-base' : 'text-sm')}>
               {t('toolbar.tabs.general')}
             </TabsTrigger>
-            <TabsTrigger
-              value="selection"
-              className={cn(hasSelection && 'relative', isMobileSheet ? 'text-base' : 'text-sm')}
-            >
-              {t('toolbar.tabs.selection')}
-              {hasSelection && (
-                <span
-                  className={cn(
-                    'ml-1 inline-flex items-center justify-center rounded-full bg-blue-500 text-white',
-                    isMobileSheet ? 'h-6 w-6 text-sm' : 'h-5 w-5 text-xs'
-                  )}
-                >
-                  {selectedCount}
-                </span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="ai" className={cn(isMobileSheet ? 'text-base' : 'text-sm')}>
-              {t('toolbar.tabs.ai', 'AI')}
+            <TabsTrigger value="node" className={cn(isMobileSheet ? 'text-base' : 'text-sm')}>
+              {t('toolbar.tabs.node')}
             </TabsTrigger>
             <TabsTrigger value="tree" className={cn(isMobileSheet ? 'text-base' : 'text-sm')}>
               {t('toolbar.tabs.tree')}
@@ -335,14 +311,9 @@ const Toolbar = memo(
             </div>
           </TabsContent>
 
-          {/* Selection Tab Content */}
-          <TabsContent value="selection" className="mt-4 flex-1">
-            <NodeSelectionTab />
-          </TabsContent>
-
-          {/* AI Tab Content */}
-          <TabsContent value="ai" className="mt-4 flex-1 overflow-hidden">
-            <AIMindmapPanel mindmapId={mindmapId} />
+          {/* Node Tab Content – Properties + AI Tools in collapsible accordions */}
+          <TabsContent value="node" className="mt-4 flex-1 overflow-y-auto">
+            <NodeTab mindmapId={mindmapId} />
           </TabsContent>
 
           {/* Tree Tab Content */}

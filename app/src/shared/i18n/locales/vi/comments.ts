@@ -14,6 +14,8 @@ export default {
     edit: 'Chỉnh sửa',
     delete: 'Xóa',
     save: 'Lưu',
+    submitting: 'Đang gửi...',
+    charactersRemaining: 'Còn {{count}} ký tự',
   },
   actions: {
     edit: 'Chỉnh sửa',
@@ -21,7 +23,9 @@ export default {
     edited: '(đã chỉnh sửa)',
   },
   confirmations: {
-    deleteComment: 'Bạn có chắc chắn muốn xóa bình luận này?',
+    deleteTitle: 'Xóa bình luận',
+    deleteComment: 'Bạn có chắc chắn muốn xóa bình luận này? Hành động này không thể hoàn tác.',
+    deleting: 'Đang xóa...',
   },
   messages: {
     loadFailed: 'Không thể tải bình luận',

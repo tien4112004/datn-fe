@@ -14,6 +14,8 @@ export default {
     edit: 'Edit',
     delete: 'Delete',
     save: 'Save',
+    submitting: 'Submitting...',
+    charactersRemaining: '{{count}} characters remaining',
   },
   actions: {
     edit: 'Edit',
@@ -21,7 +23,9 @@ export default {
     edited: '(edited)',
   },
   confirmations: {
-    deleteComment: 'Are you sure you want to delete this comment?',
+    deleteTitle: 'Delete comment',
+    deleteComment: 'Are you sure you want to delete this comment? This action cannot be undone.',
+    deleting: 'Deleting...',
   },
   messages: {
     loadFailed: 'Failed to load comments',

@@ -31,8 +31,11 @@ export function isValidDate(date: Date): boolean {
 }
 
 /**
- * Safely parse date with timezone adjustment
+ * Safely parse date from backend
  * Use this for all date parsing from backend
+ *
+ * JavaScript's Date constructor already correctly parses UTC ISO strings (with Z suffix).
+ * No manual timezone adjustment is needed — date-fns comparisons work on UTC timestamps.
  *
  * @param date - Date string or Date object from backend
  * @returns Valid Date object (never null, falls back to current date)
@@ -41,15 +44,5 @@ export function parseDateSafe(date: string | Date | null | undefined): Date {
   const parsed = parseDate(date);
   if (!parsed) return new Date();
 
-  return adjustForLocalTimezone(parsed);
-}
-
-/**
- * Adjust date for local timezone offset
- * Backend sends UTC time, we add the offset to convert to local time
- * For example: UTC 10:00 + 7 hours = 17:00 local time (UTC+7)
- */
-function adjustForLocalTimezone(date: Date): Date {
-  const offsetMs = LOCAL_TIMEZONE_OFFSET * 60 * 60 * 1000;
-  return new Date(date.getTime() + offsetMs);
+  return parsed;
 }

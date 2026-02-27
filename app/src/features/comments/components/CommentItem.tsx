@@ -3,6 +3,16 @@ import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { Button } from '@ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@ui/alert-dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/dropdown-menu';
 import { CommentForm } from './CommentForm';
 import type { Comment } from '../types';
@@ -18,6 +28,8 @@ export function CommentItem({ comment, onEdit, onDelete }: CommentItemProps) {
   const { t } = useTranslation(I18N_NAMESPACES.COMMENTS);
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleEdit = async (content: string, mentions: string[]) => {
     if (!onEdit) return;
@@ -32,14 +44,16 @@ export function CommentItem({ comment, onEdit, onDelete }: CommentItemProps) {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDeleteConfirm = async () => {
     if (!onDelete) return;
-    if (!confirm(t('confirmations.deleteComment'))) return;
-
+    setIsDeleting(true);
     try {
       await onDelete();
+      setIsDeleteDialogOpen(false);
     } catch (error) {
       console.error('Failed to delete:', error);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -95,7 +109,10 @@ export function CommentItem({ comment, onEdit, onDelete }: CommentItemProps) {
                         </DropdownMenuItem>
                       )}
                       {comment.canDelete && (
-                        <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+                        <DropdownMenuItem
+                          onClick={() => setIsDeleteDialogOpen(true)}
+                          className="text-red-600"
+                        >
                           <Trash2 className="mr-2 h-4 w-4" />
                           {t('actions.delete')}
                         </DropdownMenuItem>
@@ -108,6 +125,28 @@ export function CommentItem({ comment, onEdit, onDelete }: CommentItemProps) {
           )}
         </div>
       </div>
+
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={(open) => !isDeleting && setIsDeleteDialogOpen(open)}
+      >
+        <AlertDialogContent className="z-[10002]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('confirmations.deleteTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('confirmations.deleteComment')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>{t('form.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {isDeleting ? t('confirmations.deleting') : t('actions.delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

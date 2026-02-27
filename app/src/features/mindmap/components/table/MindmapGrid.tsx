@@ -135,7 +135,7 @@ const MindmapGrid = () => {
           <img
             src={mindmap.thumbnail}
             alt={mindmap.title || 'Mindmap Thumbnail'}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-contain"
           />
         ) : (
           <div className="bg-muted/50 flex h-full w-full items-center justify-center">

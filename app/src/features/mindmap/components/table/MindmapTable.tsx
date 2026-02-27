@@ -54,7 +54,7 @@ const MindmapTable = () => {
     () => [
       columnHelper.accessor('thumbnail', {
         header: t('mindmap.thumbnail'),
-        size: 176,
+        size: 178,
         cell: (info) => {
           const thumbnail = info.getValue();
           if (thumbnail && typeof thumbnail === 'string') {
@@ -62,13 +62,13 @@ const MindmapTable = () => {
               <img
                 src={thumbnail}
                 alt="Mindmap Thumbnail"
-                className="aspect-video w-[120px] rounded border object-cover"
+                className="aspect-video w-[160px] rounded border object-contain"
               />
             );
           }
           // Fallback to icon
           return (
-            <div className="bg-muted/50 flex aspect-video w-[120px] items-center justify-center rounded border">
+            <div className="bg-muted/50 flex aspect-video w-[160px] items-center justify-center rounded border">
               <BrainCircuit className="text-muted-foreground h-8 w-8" />
             </div>
           );

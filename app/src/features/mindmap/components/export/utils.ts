@@ -61,6 +61,11 @@ export function getPaperSizeDimensions(
   return orientation === 'landscape' ? { width: size.height, height: size.width } : size;
 }
 
+// Wait for the browser to actually paint before continuing.
+// Double rAF guarantees a frame has been committed to the screen.
+export const waitForPaint = () =>
+  new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+
 export const getImageData = (
   format: 'png' | 'jpg',
   viewport: HTMLElement,

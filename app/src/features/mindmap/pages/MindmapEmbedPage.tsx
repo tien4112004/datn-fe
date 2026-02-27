@@ -16,7 +16,7 @@ import {
 } from '../types';
 import { MindmapPermissionProvider } from '../contexts/MindmapPermissionContext';
 import { migrateLayoutDataToRootNodes } from '../utils/layoutUtils';
-import { useCommentDrawerTrigger, useGenerateMindmap, useUpdateMindmap } from '../hooks';
+import { useCommentDrawerTrigger, useGenerateMindmap, useUpdateMindmapWithMetadata } from '../hooks';
 import { CommentDrawer } from '@/features/comments';
 import { convertAiDataToMindMapNodes, DEFAULT_LAYOUT_TYPE } from '../services/utils';
 
@@ -65,7 +65,7 @@ const MindmapEmbedPage = () => {
 
   // Generation hooks
   const generateMutation = useGenerateMindmap();
-  const updateMindmapMutation = useUpdateMindmap();
+  const updateMindmapMutation = useUpdateMindmapWithMetadata();
   const { applyAutoLayout } = useLayoutStore();
 
   const userPermission = mindmap?.permission;

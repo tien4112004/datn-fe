@@ -1,7 +1,7 @@
 import { Controller, type Control } from 'react-hook-form';
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
 import { Button } from '@ui/button';
-import { Palette, Sparkles, Loader2 } from 'lucide-react';
+import { Palette, Sparkles, Loader2, Ban } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { MODEL_TYPES, useModels } from '@/features/model';
@@ -12,6 +12,7 @@ import useOutlineStore from '../../stores/useOutlineStore';
 import { useSlideThemes, useRecentSlideThemes } from '../../hooks';
 import { getRecentThemeIds, addRecentThemeId } from '../../utils/recentThemes';
 import { useArtStyles } from '@/features/image/hooks';
+import { ART_STYLE_OPTIONS } from '@/features/image/types';
 import { ThemePreviewCard } from './ThemePreviewCard';
 import ThemeGalleryDialog from './ThemeGalleryDialog';
 import type { SlideTheme } from '../../types/slide';
@@ -29,6 +30,7 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
   const { themes, isLoading } = useSlideThemes();
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [displayedThemes, setDisplayedThemes] = useState<SlideTheme[]>([]);
+  const [gallerySelectedTheme, setGallerySelectedTheme] = useState<SlideTheme | null>(null);
 
   // Get recent theme IDs from localStorage
   const recentThemeIds = useMemo(() => getRecentThemeIds(), []);
@@ -46,7 +48,15 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
       const otherThemes = themes.filter((theme) => !recentThemeIdSet.has(theme.id));
 
       // Merge: recent themes first, then others
-      const mergedThemes = [...recentThemes, ...otherThemes];
+      let mergedThemes = [...recentThemes, ...otherThemes];
+
+      // If a theme was selected from gallery, ensure it's displayed first
+      if (gallerySelectedTheme) {
+        mergedThemes = [
+          gallerySelectedTheme,
+          ...mergedThemes.filter((t) => t.id !== gallerySelectedTheme.id),
+        ];
+      }
 
       // Take first 6 for display
       const displayThemes = mergedThemes.slice(0, 6);
@@ -61,7 +71,7 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
       // Clear displayed themes if no themes loaded
       setDisplayedThemes([]);
     }
-  }, [themes, recentThemes, isLoading, isLoadingRecent]);
+  }, [themes, recentThemes, isLoading, isLoadingRecent, gallerySelectedTheme]);
 
   const handleThemeSelect = useCallback(
     (theme: SlideTheme) => {
@@ -83,8 +93,8 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
         addRecentThemeId(theme.id);
       }
 
-      // Move selected theme to first position in displayed themes
-      setDisplayedThemes((prev) => [theme, ...prev.filter((t) => t.id !== theme.id)].slice(0, 6));
+      // Track gallery selection so the useEffect includes it in the merge
+      setGallerySelectedTheme(theme);
 
       onThemeSelect(theme);
     },
@@ -175,7 +185,14 @@ interface ArtSectionProps {
 
 const ArtSection = ({ selectedStyle, onStyleSelect, disabled = false }: ArtSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'customization' });
-  const { artStyles, isLoading } = useArtStyles();
+  const { artStyles: apiArtStyles, isLoading } = useArtStyles();
+
+  // Ensure "None" option is always first
+  const noneStyle = ART_STYLE_OPTIONS.find((s) => s.id === '');
+  const artStyles = useMemo(() => {
+    const stylesWithoutNone = apiArtStyles.filter((s) => s.id !== '' && s.name !== '');
+    return noneStyle ? [noneStyle, ...stylesWithoutNone] : stylesWithoutNone;
+  }, [apiArtStyles, noneStyle]);
 
   return (
     <>
@@ -195,24 +212,33 @@ const ArtSection = ({ selectedStyle, onStyleSelect, disabled = false }: ArtSecti
             {artStyles.map((style) => {
               const styleValue = style.id || style.name;
               const selectedValue = selectedStyle?.id || selectedStyle?.name;
+              const isSelected = selectedValue === styleValue;
+              const isNoneStyle = style.id === '' && style.labelKey === 'none';
 
               return (
                 <div
-                  key={styleValue}
+                  key={styleValue || 'none'}
                   className={cn(
                     'group relative overflow-hidden rounded-lg border-2 transition-all',
                     disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105',
-                    selectedValue === styleValue ? 'border-primary shadow-md' : 'border-border'
+                    isSelected ? 'border-primary shadow-md' : 'border-border'
                   )}
                   onClick={() => !disabled && onStyleSelect(style)}
                 >
-                  {/* Preview gradient/image */}
-                  <div
-                    className="h-24 w-full bg-cover bg-center"
-                    style={{
-                      background: `url(${style.visual}) center/cover no-repeat`,
-                    }}
-                  />
+                  {isNoneStyle ? (
+                    <div className="bg-muted/30 flex h-24 w-full items-center justify-center">
+                      <Ban
+                        className={cn('h-10 w-10', isSelected ? 'text-primary' : 'text-muted-foreground')}
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      className="h-24 w-full bg-cover bg-center"
+                      style={{
+                        background: `url(${style.visual}) center/cover no-repeat`,
+                      }}
+                    />
+                  )}
 
                   {/* Label section */}
                   <div className="bg-card flex items-center justify-center p-2">

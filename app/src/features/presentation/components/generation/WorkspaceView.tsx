@@ -186,12 +186,15 @@ const OutlineFormSection = memo(({ isFetching, onRegenerateOutline }: OutlineFor
                   <SelectValue placeholder={t('grade.placeholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">{t('grade.none')}</SelectItem>
-                  {grades.map((g) => (
-                    <SelectItem key={g.code} value={g.code}>
-                      {i18n.language === 'vi' ? g.name : g.nameEn}
-                    </SelectItem>
-                  ))}
+                  <SelectGroup>
+                    <SelectLabel>{t('grade.label')}</SelectLabel>
+                    <SelectItem value="none">{t('grade.none')}</SelectItem>
+                    {grades.map((g) => (
+                      <SelectItem key={g.code} value={g.code}>
+                        {i18n.language === 'vi' ? g.name : g.nameEn}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
                 </SelectContent>
               </Select>
             )}
@@ -209,12 +212,15 @@ const OutlineFormSection = memo(({ isFetching, onRegenerateOutline }: OutlineFor
                   <SelectValue placeholder={t('subject.placeholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">{t('subject.none')}</SelectItem>
-                  {subjects.map((s) => (
-                    <SelectItem key={s.code} value={s.code}>
-                      {s.name}
-                    </SelectItem>
-                  ))}
+                  <SelectGroup>
+                    <SelectLabel>{t('subject.label')}</SelectLabel>
+                    <SelectItem value="none">{t('subject.none')}</SelectItem>
+                    {subjects.map((s) => (
+                      <SelectItem key={s.code} value={s.code}>
+                        {s.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
                 </SelectContent>
               </Select>
             )}

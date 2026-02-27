@@ -200,27 +200,6 @@ export const useDuplicateMindmap = () => {
   });
 };
 
-export const useUpdateMindmap = () => {
-  const mindmapApiService = useMindmapApiService();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Partial<Mindmap> }) => {
-      const result = await mindmapApiService.updateMindmap(id, data);
-      return { id, data: result };
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: [mindmapApiService.getType(), 'mindmaps'],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: [mindmapApiService.getType(), 'mindmap', data.id],
-      });
-    },
-  });
-};
-
 export const useUpdateMindmapWithMetadata = () => {
   const mindmapApiService = useMindmapApiService();
   const queryClient = useQueryClient();

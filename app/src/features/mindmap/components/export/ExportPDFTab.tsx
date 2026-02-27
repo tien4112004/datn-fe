@@ -11,6 +11,7 @@ import {
   getMindmapViewport,
   getPaperSizeDimensions,
   getImageData,
+  yieldToMain,
 } from './utils';
 import { PDFPreviewCard } from './PDFPreviewCard';
 import { usePreview } from './usePreview';
@@ -50,6 +51,7 @@ function ExportPDFTab() {
 
   const handleExport = async () => {
     setIsExporting(true);
+    await yieldToMain();
     try {
       const viewport = getMindmapViewport();
       if (!viewport) {

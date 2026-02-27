@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { debounce } from 'lodash';
-import { getMindmapViewport } from './utils';
+import { getMindmapViewport, yieldToMain } from './utils';
 
 interface UsePreviewOptions {
   executor: () => Promise<string>;
@@ -35,6 +35,7 @@ export function usePreview({
         return;
       }
 
+      await yieldToMain();
       const dataUrl = await executor();
       setPreviewDataUrl(dataUrl);
       setPreviewLoading(false);

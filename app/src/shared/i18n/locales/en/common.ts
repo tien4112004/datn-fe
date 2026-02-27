@@ -110,6 +110,8 @@ export default {
       statusPublished: 'Published',
       statusArchived: 'Archived',
       due: 'Due',
+      subject: 'Subject',
+      grade: 'Grade',
     },
     sharedResources: {
       thumbnail: 'Thumbnail',

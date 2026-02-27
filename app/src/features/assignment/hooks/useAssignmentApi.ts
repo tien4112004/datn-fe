@@ -17,6 +17,8 @@ type AssignmentListFilters = {
   classId?: string;
   status?: 'draft' | 'published' | 'archived';
   searchText?: string;
+  page?: number;
+  size?: number;
 };
 
 export const useAssignmentList = (filters?: AssignmentListFilters) => {
@@ -28,6 +30,8 @@ export const useAssignmentList = (filters?: AssignmentListFilters) => {
       const response = await service.getAssignments({
         classId: filters?.classId,
         search: filters?.searchText,
+        page: filters?.page,
+        size: filters?.size,
       });
       return {
         assignments: response.data,

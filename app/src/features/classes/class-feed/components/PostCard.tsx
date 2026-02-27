@@ -6,7 +6,7 @@ import { parseDateSafe } from '@/shared/utils/date';
 import { format, formatDistanceToNow } from 'date-fns';
 import { ClipboardList, Clock, FileText, MessageCircleMore, Pin } from 'lucide-react';
 import { useState, useCallback } from 'react';
-import { ImageLightbox } from './ImageLightbox';
+import { ImageLightbox } from '../../../image/components/ImageLightbox';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';

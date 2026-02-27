@@ -58,7 +58,7 @@ function NavLayoutContent() {
 export default function NavLayout() {
   return (
     <SidebarProvider>
-      <Toaster />
+      <Toaster richColors />
       <NavLayoutContent />
     </SidebarProvider>
   );
@@ -76,7 +76,7 @@ export function NavLayoutErrorBoundary() {
 
   return (
     <SidebarProvider>
-      <Toaster />
+      <Toaster richColors />
       <AppSidebar />
       <SidebarInset className="bg-white">
         {/* Mobile header with sidebar trigger */}

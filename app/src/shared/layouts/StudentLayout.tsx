@@ -12,7 +12,7 @@ export default function StudentLayout() {
 
   return (
     <>
-      <Toaster />
+      <Toaster richColors />
       <div className="min-h-screen bg-white">
         {isLoading && <GlobalSpinner text={t('page')} />}
         <ErrorBoundary pathname={location.pathname}>

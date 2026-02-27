@@ -50,4 +50,10 @@ export class TemplateService implements ITemplateApi {
       return [];
     }
   }
+
+  async getFileData(filename: string): Promise<any> {
+    const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+    const response = await this.apiClient.get(`${base}/mocks/${filename}.json`);
+    return response.data;
+  }
 }

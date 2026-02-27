@@ -14,6 +14,15 @@ const straightTimelineTemplate: SlideTemplate = {
       step: 1,
       description: 'Left/right slide padding',
     },
+    {
+      key: 'ITEMS_SPACING',
+      label: 'Items Spacing',
+      defaultValue: 40,
+      min: 0,
+      max: 100,
+      step: 1,
+      description: 'Spacing between items',
+    },
   ],
   containers: {
     title: {
@@ -59,7 +68,7 @@ const straightTimelineTemplate: SlideTemplate = {
           maxItemsPerLine: 4,
           lineCount: 2,
           wrapDistribution: 'balanced',
-          lineSpacing: 40,
+          lineSpacing: 'ITEMS_SPACING',
           syncSize: true,
           snake: true,
         },
@@ -131,6 +140,15 @@ const alternatingTimelineTemplate: SlideTemplate = {
       step: 1,
       description: 'Left/right slide padding',
     },
+    {
+      key: 'ITEMS_SPACING',
+      label: 'Items Spacing',
+      defaultValue: 70,
+      min: 0,
+      max: 150,
+      step: 1,
+      description: 'Spacing between items',
+    },
   ],
   containers: {
     title: {
@@ -173,7 +191,7 @@ const alternatingTimelineTemplate: SlideTemplate = {
         wrap: {
           enabled: true,
           zigzag: true,
-          lineSpacing: 70,
+          lineSpacing: 'ITEMS_SPACING',
           reverseOddRowChildren: true,
         },
         structure: {
@@ -244,6 +262,15 @@ const zigZagTimelineTemplate: SlideTemplate = {
       step: 1,
       description: 'Left/right slide padding',
     },
+    {
+      key: 'ITEMS_SPACING',
+      label: 'Items Spacing',
+      defaultValue: 120,
+      min: 0,
+      max: 200,
+      step: 1,
+      description: 'Spacing between items',
+    },
   ],
   containers: {
     title: {
@@ -286,7 +313,7 @@ const zigZagTimelineTemplate: SlideTemplate = {
         wrap: {
           enabled: true,
           zigzag: true,
-          lineSpacing: 120,
+          lineSpacing: 'ITEMS_SPACING',
         },
         structure: {
           type: 'block',

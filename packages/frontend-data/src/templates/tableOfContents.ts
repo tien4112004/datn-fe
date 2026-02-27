@@ -18,11 +18,20 @@ export const tableOfContentsTemplates: SlideTemplate[] = [
       {
         key: 'MAX_ITEMS_PER_LINE',
         label: 'Items Per Line',
-        defaultValue: 2,
+        defaultValue: 4,
         min: 1,
         max: 6,
         step: 1,
         description: 'Number of columns',
+      },
+      {
+        key: 'ITEMS_SPACING',
+        label: 'Items Spacing',
+        defaultValue: 10,
+        min: 0,
+        max: 60,
+        step: 1,
+        description: 'Spacing between items',
       },
     ],
     containers: {
@@ -72,7 +81,7 @@ export const tableOfContentsTemplates: SlideTemplate[] = [
             maxItemsPerLine: 'MAX_ITEMS_PER_LINE',
             lineCount: 'auto',
             wrapDistribution: 'balanced',
-            lineSpacing: 10,
+            lineSpacing: 'ITEMS_SPACING',
             syncSize: true,
           },
           structure: {
@@ -146,6 +155,15 @@ export const tableOfContentsTemplates: SlideTemplate[] = [
         step: 1,
         description: 'Number of items per row',
       },
+      {
+        key: 'ITEMS_SPACING',
+        label: 'Items Spacing',
+        defaultValue: 18,
+        min: 0,
+        max: 60,
+        step: 1,
+        description: 'Spacing between items',
+      },
     ],
     containers: {
       title: {
@@ -199,7 +217,7 @@ export const tableOfContentsTemplates: SlideTemplate[] = [
             maxItemsPerLine: 'MAX_ITEMS_PER_LINE',
             lineCount: 2,
             wrapDistribution: 'balanced',
-            lineSpacing: 18,
+            lineSpacing: 'ITEMS_SPACING',
           },
           structure: {
             type: 'block',
@@ -347,6 +365,15 @@ export const tableOfContentsTemplates: SlideTemplate[] = [
         step: 1,
         description: 'Maximum number of items per row',
       },
+      {
+        key: 'ITEMS_SPACING',
+        label: 'Items Spacing',
+        defaultValue: 20,
+        min: 0,
+        max: 60,
+        step: 1,
+        description: 'Spacing between items',
+      },
     ],
     containers: {
       title: {
@@ -395,7 +422,7 @@ export const tableOfContentsTemplates: SlideTemplate[] = [
             maxItemsPerLine: 'MAX_ITEMS_PER_LINE',
             lineCount: 2,
             wrapDistribution: 'balanced',
-            lineSpacing: 20,
+            lineSpacing: 'ITEMS_SPACING',
             syncSize: true,
           },
           structure: {

@@ -48,7 +48,7 @@ import { ref, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
 import type { Slide } from '@/types/slides';
-import api from '@/services';
+import { getTemplateApi } from '@/services/template/api';
 
 import ThumbnailSlide from '@/views/components/ThumbnailSlide/index.vue';
 import Button from '@/components/Button.vue';
@@ -90,9 +90,11 @@ const insertTemplates = (slides: Slide[]) => {
   emit('selectAll', slides);
 };
 
+const templateApi = getTemplateApi();
+
 const changeCatalog = (id: string) => {
   activeCatalog.value = id;
-  api.getFileData(activeCatalog.value).then((ret) => {
+  templateApi.getFileData(activeCatalog.value).then((ret) => {
     slides.value = ret.slides;
 
     if (listRef.value) listRef.value.scrollTo(0, 0);

@@ -24,6 +24,15 @@ export const labeledListTemplates: SlideTemplate[] = [
         step: 1,
         description: 'Maximum number of items per row',
       },
+      {
+        key: 'ITEMS_SPACING',
+        label: 'Items Spacing',
+        defaultValue: 15,
+        min: 0,
+        max: 60,
+        step: 1,
+        description: 'Spacing between items',
+      },
     ],
     containers: {
       title: {
@@ -72,7 +81,7 @@ export const labeledListTemplates: SlideTemplate[] = [
             maxItemsPerLine: 'MAX_ITEMS_PER_LINE',
             lineCount: 2,
             wrapDistribution: 'balanced',
-            lineSpacing: 15,
+            lineSpacing: 'ITEMS_SPACING',
             alternating: { start: 20, end: 20 },
           },
           structure: {

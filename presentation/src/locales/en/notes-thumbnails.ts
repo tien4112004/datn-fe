@@ -28,6 +28,8 @@ export default {
       paste: 'Paste',
       selectAll: 'Select All',
       fromCurrentShow: 'From Current Show',
+      layouts: 'Layouts',
+      templates: 'Templates',
     },
 
     sections: {

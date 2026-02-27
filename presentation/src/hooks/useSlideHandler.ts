@@ -7,6 +7,7 @@ import { copyText, readClipboard } from '@/utils/clipboard';
 import { encrypt } from '@/utils/crypto';
 import { createElementIdMap } from '@/utils/element';
 import { KEYS } from '@/configs/hotkey';
+import type { LayoutPreset } from '@/configs/layoutPresets';
 import message from '@/utils/message';
 import usePasteTextClipboardData from '@/hooks/usePasteTextClipboardData';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
@@ -118,6 +119,34 @@ export default () => {
     addHistorySnapshot();
   };
 
+  // Create new page from a layout preset
+  const createSlideFromPreset = async (preset: LayoutPreset) => {
+    const { selectTemplateById, selectFirstTemplate, convertToSlide } = await import('@/utils/slideLayout');
+
+    let template;
+    try {
+      template = await selectTemplateById(preset.layoutType, preset.preferredTemplateId);
+    } catch {
+      template = await selectFirstTemplate(preset.layoutType);
+    }
+
+    const viewport = {
+      width: slidesStore.viewportSize,
+      height: slidesStore.viewportSize * slidesStore.viewportRatio,
+    };
+
+    const slide = await convertToSlide(
+      JSON.parse(JSON.stringify(preset.schema)),
+      viewport,
+      theme.value,
+      template
+    );
+
+    mainStore.setActiveElementIdList([]);
+    slidesStore.addSlide(slide);
+    addHistorySnapshot();
+  };
+
   // Copy current page to next page
   const copyAndPasteSlide = () => {
     const slide = JSON.parse(JSON.stringify(currentSlide.value));
@@ -197,6 +226,7 @@ export default () => {
     pasteSlide,
     createSlide,
     createSlideByTemplate,
+    createSlideFromPreset,
     copyAndPasteSlide,
     deleteSlide,
     cutSlide,

@@ -7,12 +7,7 @@
     padding="normal"
   >
     <div class="tw-w-full tw-flex tw-justify-center tw-items-center tw-mb-1" v-if="mode === 'edit'">
-      <Button @click="createSlide()">
-        <IconPlus class="tw-h-3.5 tw-w-3.5" /><span class="button-text">{{
-          $t('thumbnails.slides.addSlide')
-        }}</span>
-      </Button>
-      <!-- <ButtonGroup
+      <ButtonGroup
         class="tw-flex tw-gap-[1px] tw-h-10 tw-cursor-pointer tw-rounded-md tw-text-sm tw-transition-all tw-duration-200 tw-ease-in-out"
       >
         <Button @click="createSlide()">
@@ -22,24 +17,44 @@
         </Button>
         <Popover trigger="click" placement="bottom-start" v-model:value="presetLayoutPopoverVisible" center>
           <template #content>
-            <Templates
-              @select="
-                (slide) => {
-                  createSlideByTemplate(slide);
-                  presetLayoutPopoverVisible = false;
-                }
-              "
-              @selectAll="
-                (slides) => {
-                  insertAllTemplates(slides);
-                  presetLayoutPopoverVisible = false;
-                }
-              "
-            />
+            <div class="slide-picker">
+              <div class="picker-tabs">
+                <div
+                  class="picker-tab"
+                  :class="{ active: pickerTab === 'layouts' }"
+                  @click="pickerTab = 'layouts'"
+                >
+                  {{ t('thumbnails.slides.layouts') }}
+                </div>
+                <div
+                  class="picker-tab"
+                  :class="{ active: pickerTab === 'templates' }"
+                  @click="pickerTab = 'templates'"
+                >
+                  {{ t('thumbnails.slides.templates') }}
+                </div>
+              </div>
+              <LayoutPresets v-if="pickerTab === 'layouts'" @select="handlePresetSelect" />
+              <Templates
+                v-else
+                @select="
+                  (slide) => {
+                    createSlideByTemplate(slide);
+                    presetLayoutPopoverVisible = false;
+                  }
+                "
+                @selectAll="
+                  (slides) => {
+                    insertAllTemplates(slides);
+                    presetLayoutPopoverVisible = false;
+                  }
+                "
+              />
+            </div>
           </template>
           <Button><IconDown class="tw-h-3.5 tw-w-3.5" /></Button>
         </Popover>
-      </ButtonGroup> -->
+      </ButtonGroup>
     </div>
 
     <template v-if="slides.length > 0">
@@ -134,6 +149,8 @@ import type { Slide } from '@/types/slides';
 
 import ThumbnailSlide from '@/views/components/ThumbnailSlide/index.vue';
 import Templates from './Templates.vue';
+import LayoutPresets from './LayoutPresets.vue';
+import type { LayoutPreset } from '@/configs/layoutPresets';
 import Popover from '@/components/Popover.vue';
 import Draggable from 'vuedraggable';
 import Divider from '@/components/Divider.vue';
@@ -156,6 +173,7 @@ const { slidesLoadLimit } = useLoadSlides();
 const selectedSlidesIndex = computed(() => [..._selectedSlidesIndex.value, slideIndex.value]);
 
 const presetLayoutPopoverVisible = ref(false);
+const pickerTab = ref<'layouts' | 'templates'>('layouts');
 
 const hasSection = computed(() => {
   return slides.value.some((item) => item.sectionTag);
@@ -168,6 +186,7 @@ const {
   pasteSlide,
   createSlide,
   createSlideByTemplate,
+  createSlideFromPreset,
   copyAndPasteSlide,
   deleteSlide,
   cutSlide,
@@ -175,6 +194,11 @@ const {
   sortSlides,
   isEmptySlide,
 } = useSlideHandler();
+
+const handlePresetSelect = async (preset: LayoutPreset) => {
+  presetLayoutPopoverVisible.value = false;
+  await createSlideFromPreset(preset);
+};
 
 const { createSection, removeSection, removeAllSection, removeSectionSlides, updateSectionTitle } =
   useSectionHandler();
@@ -696,6 +720,37 @@ const contextmenusThumbnailItem = (): ContextmenuItem[] => {
     left: 50%;
     transform: translateX(-50%);
     font-size: 0.75rem;
+  }
+}
+
+.slide-picker {
+  display: flex;
+  flex-direction: column;
+}
+
+.picker-tabs {
+  display: flex;
+  gap: 4px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--presentation-border);
+  margin-bottom: 10px;
+}
+
+.picker-tab {
+  padding: 4px 12px;
+  border-radius: var(--presentation-radius);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+
+  &.active {
+    color: var(--presentation-primary);
+    background-color: color-mix(in srgb, var(--presentation-primary) 5%, transparent);
+    font-weight: 700;
   }
 }
 </style>

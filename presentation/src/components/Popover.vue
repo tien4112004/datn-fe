@@ -40,6 +40,7 @@ const props = withDefaults(
     offset?: number;
     triggerClass?: string;
     contentClass?: string;
+    disabled?: boolean;
   }>(),
   {
     value: false,
@@ -48,6 +49,7 @@ const props = withDefaults(
     offset: 8,
     triggerClass: '',
     contentClass: '',
+    disabled: false,
   }
 );
 
@@ -77,6 +79,7 @@ const getAlign = (placement: Placement) => {
 
 // Handle open state changes
 const handleOpenChange = (open: boolean) => {
+  if (props.disabled && open) return;
   internalOpen.value = open;
   emit('update:value', open);
 

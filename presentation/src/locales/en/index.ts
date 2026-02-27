@@ -18,6 +18,7 @@ import files from './files';
 import system from './system';
 import templateParameters from './template-parameters';
 import emptyState from './empty-state';
+import layoutPresets from './layout-presets';
 
 // Combine all locale modules
 export default {
@@ -42,4 +43,5 @@ export default {
   ...system,
   template: templateParameters,
   ...emptyState,
+  ...layoutPresets,
 };

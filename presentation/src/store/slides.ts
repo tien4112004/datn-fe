@@ -198,28 +198,24 @@ export const useSlidesStore = defineStore('slides', {
         id: 'template_1',
         layout: 'title',
         containers: {},
-        cover: 'https://asset.pptist.cn/img/template_1.jpg',
       },
       {
         name: 'Blue Universal',
         id: 'template_2',
         layout: 'title',
         containers: {},
-        cover: 'https://asset.pptist.cn/img/template_2.jpg',
       },
       {
         name: 'Purple Universal',
         id: 'template_3',
         layout: 'title',
         containers: {},
-        cover: 'https://asset.pptist.cn/img/template_3.jpg',
       },
       {
         name: 'Morandi Color Scheme',
         id: 'template_4',
         layout: 'title',
         containers: {},
-        cover: 'https://asset.pptist.cn/img/template_4.jpg',
       },
     ], // Templates
   }),
@@ -301,7 +297,7 @@ export const useSlidesStore = defineStore('slides', {
         if (slide.sectionTag) delete slide.sectionTag;
       }
 
-      const addIndex = this.slideIndex + 1;
+      const addIndex = this.slides.length === 0 ? 0 : this.slideIndex + 1;
       this.slides.splice(addIndex, 0, ...slides);
       this.slideIndex = addIndex;
     },

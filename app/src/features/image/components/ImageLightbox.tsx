@@ -48,6 +48,7 @@ export const ImageLightbox = ({ src, alt, open, onClose, originalFilename, image
       plugins={[Zoom]}
       carousel={{ finite: true }}
       render={{ buttonPrev: () => null, buttonNext: () => null }}
+      styles={{ root: { '--yarl__color_backdrop': 'rgba(0, 0, 0, 0.8)' } }}
       toolbar={{
         buttons: [
           <button

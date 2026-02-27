@@ -30,11 +30,11 @@
         <Popover trigger="click" style="width: 60%">
           <template #content>
             <ColorPicker
-              :modelValue="outline.color"
+              :modelValue="outline.color || '#d14424'"
               @update:modelValue="(value) => updateOutline({ color: value })"
             />
           </template>
-          <ColorButton :color="outline.color || 'var(--presentation-foreground)'" />
+          <ColorButton :color="outline.color || '#d14424'" />
         </Popover>
       </div>
       <div class="row">

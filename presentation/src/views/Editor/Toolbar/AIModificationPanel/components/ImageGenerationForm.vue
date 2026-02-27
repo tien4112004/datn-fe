@@ -5,10 +5,11 @@
     <ImagePreview :src="currentImage" :alt="t('panels.aiModification.imageGeneration.imagePreviewAlt')" />
 
     <InputGroup :label="t('panels.aiModification.imageGeneration.imageDescription')">
-      <input
+      <textarea
         v-model="imagePrompt"
         class="panel-input"
         :placeholder="t('panels.aiModification.imageGeneration.describeImage')"
+        rows="3"
       />
     </InputGroup>
 
@@ -122,6 +123,10 @@ const matchSlideTheme = computed({
   font-size: 13px;
   color: var(--presentation-foreground);
   font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 60px;
 
   &:focus {
     outline: none;

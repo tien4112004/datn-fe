@@ -154,12 +154,6 @@ const router = createBrowserRouter([
         }),
       },
       {
-        path: 'profile',
-        lazy: async () => ({
-          Component: (await import('@/features/user/components/UserProfile')).default,
-        }),
-      },
-      {
         path: 'question-bank',
         lazy: async () => ({
           Component: (await import('@/features/question-bank/pages/TeacherQuestionBankPage'))

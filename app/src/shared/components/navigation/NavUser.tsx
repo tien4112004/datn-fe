@@ -97,7 +97,7 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <NavLink to="/profile">
+                <NavLink to="/settings?tab=profile">
                   <BadgeCheck />
                   {t('nav.account')}
                 </NavLink>

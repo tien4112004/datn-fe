@@ -69,23 +69,25 @@ export const AssignmentListCommand = ({
                 ? t('integration.assignmentSelection.loading')
                 : t('integration.assignmentSelection.noAssignmentsFound')}
             </CommandEmpty>
-            <CommandGroup heading={t('integration.assignmentSelection.availableAssignments')}>
-              {availableAssignments.map((assignment) => (
-                <CommandItem
-                  key={assignment.id}
-                  value={assignment.id}
-                  onSelect={() => handleSelectAssignment(assignment)}
-                >
-                  <Check
-                    className={cn(
-                      'mr-2 h-4 w-4',
-                      effectiveSelection?.id === assignment.id ? 'opacity-100' : 'opacity-0'
-                    )}
-                  />
-                  {assignment.title}
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            {availableAssignments.length > 0 && (
+              <CommandGroup heading={t('integration.assignmentSelection.availableAssignments')}>
+                {availableAssignments.map((assignment) => (
+                  <CommandItem
+                    key={assignment.id}
+                    value={assignment.id}
+                    onSelect={() => handleSelectAssignment(assignment)}
+                  >
+                    <Check
+                      className={cn(
+                        'mr-2 h-4 w-4',
+                        effectiveSelection?.id === assignment.id ? 'opacity-100' : 'opacity-0'
+                      )}
+                    />
+                    {assignment.title}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
           </CommandList>
         </Command>
       </PopoverContent>

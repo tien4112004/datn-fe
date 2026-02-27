@@ -291,13 +291,13 @@ export default function ShareMindmapDialog({ isOpen, onOpenChange, mindmapId }: 
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
+      <DialogContent className="flex max-h-[90vh] !max-w-xl flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>{t('share.title')}</DialogTitle>
           <DialogDescription>{t('share.description')}</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-y-auto p-2">
           {/* Add People Section */}
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -378,7 +378,7 @@ export default function ShareMindmapDialog({ isOpen, onOpenChange, mindmapId }: 
           ) : selectedUsers.length > 0 ? (
             <div className="space-y-2">
               <h4 className="mb-3 text-sm font-medium">{t('share.peopleWithAccess')}</h4>
-              <div className="space-y-2">
+              <div className="max-h-52 space-y-2 overflow-y-auto">
                 {selectedUsers.map((user) => (
                   <div key={user.id} className="flex items-center gap-3 py-1.5">
                     <Avatar className="h-8 w-8">

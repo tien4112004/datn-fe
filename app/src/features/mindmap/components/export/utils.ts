@@ -61,9 +61,10 @@ export function getPaperSizeDimensions(
   return orientation === 'landscape' ? { width: size.height, height: size.width } : size;
 }
 
-// Yield to the main thread so the browser can paint UI updates (e.g. loading spinners)
-// before heavy synchronous work like html-to-image canvas rendering
-export const yieldToMain = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+// Wait for the browser to actually paint before continuing.
+// Double rAF guarantees a frame has been committed to the screen.
+export const waitForPaint = () =>
+  new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
 
 export const getImageData = (
   format: 'png' | 'jpg',

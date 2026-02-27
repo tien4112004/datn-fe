@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { debounce } from 'lodash';
-import { getMindmapViewport, yieldToMain } from './utils';
+import { getMindmapViewport } from './utils';
 
 interface UsePreviewOptions {
   executor: () => Promise<string>;
@@ -14,6 +13,11 @@ interface UsePreviewReturn {
   previewError: string | null;
 }
 
+// Wait for the browser to actually paint before continuing.
+// Double rAF guarantees a frame has been committed to the screen.
+const waitForPaint = () =>
+  new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+
 export function usePreview({
   executor,
   dependencies = [],
@@ -23,43 +27,48 @@ export function usePreview({
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
 
-  const generatePreview = async () => {
+  // Always reference the latest executor without re-triggering effects
+  const executorRef = useRef(executor);
+  executorRef.current = executor;
+
+  useEffect(() => {
+    // Show loading immediately when dependencies change
     setPreviewLoading(true);
     setPreviewError(null);
 
-    try {
-      const viewport = getMindmapViewport();
-      if (!viewport) {
-        setPreviewError('Viewport not found');
-        setPreviewLoading(false);
-        return;
+    let cancelled = false;
+
+    const timeoutId = setTimeout(async () => {
+      // Wait for the loading spinner to actually paint on screen
+      await waitForPaint();
+
+      if (cancelled) return;
+
+      try {
+        const viewport = getMindmapViewport();
+        if (!viewport) {
+          setPreviewError('Viewport not found');
+          setPreviewLoading(false);
+          return;
+        }
+
+        const dataUrl = await executorRef.current();
+        if (!cancelled) {
+          setPreviewDataUrl(dataUrl);
+          setPreviewLoading(false);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          const errorMessage = error instanceof Error ? error.message : 'Failed to generate preview';
+          setPreviewError(errorMessage);
+          setPreviewLoading(false);
+        }
       }
-
-      await yieldToMain();
-      const dataUrl = await executor();
-      setPreviewDataUrl(dataUrl);
-      setPreviewLoading(false);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to generate preview';
-      setPreviewError(errorMessage);
-      setPreviewLoading(false);
-    }
-  };
-
-  // Create debounced version - recreate when executor or debounceDelay changes
-  const debouncedGeneratePreview = useRef(debounce(generatePreview, debounceDelay));
-
-  // Update debounced function when executor or debounceDelay changes
-  useEffect(() => {
-    debouncedGeneratePreview.current = debounce(generatePreview, debounceDelay);
-  }, [debounceDelay]);
-
-  // Generate preview when dependencies change
-  useEffect(() => {
-    debouncedGeneratePreview.current();
+    }, debounceDelay);
 
     return () => {
-      debouncedGeneratePreview.current.cancel();
+      cancelled = true;
+      clearTimeout(timeoutId);
     };
   }, dependencies);
 

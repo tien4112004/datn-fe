@@ -4,7 +4,7 @@ import { Label } from '@ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
 import { useTranslation } from 'react-i18next';
 import { useReactFlow, getViewportForBounds } from '@xyflow/react';
-import { generateFilename, downloadFile, getMindmapViewport, getImageData, yieldToMain } from './utils';
+import { generateFilename, downloadFile, getMindmapViewport, getImageData, waitForPaint } from './utils';
 import { PreviewCard } from './PreviewCard';
 import { usePreview } from './usePreview';
 import { useLatest } from '@/hooks/useLatest';
@@ -63,7 +63,7 @@ function ExportImageTab({ format }: ExportImageTabProps) {
 
   const handleExport = async () => {
     setIsExporting(true);
-    await yieldToMain();
+    await waitForPaint();
     try {
       const viewport = getMindmapViewport();
       if (!viewport) {

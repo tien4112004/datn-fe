@@ -50,7 +50,6 @@ const NodeSelectionTab = memo(({ className }: NodeSelectionTabProps) => {
     firstSelectedNode,
     deleteSelected,
     copyToClipboard,
-    deselectAll,
   } = useNodeSelection();
 
   // Actions only - no state subscriptions to avoid rerenders
@@ -506,18 +505,6 @@ const NodeSelectionTab = memo(({ className }: NodeSelectionTabProps) => {
           </Button>
         </div>
       )}
-
-      {/* 5. Unselect Button */}
-      <div className="mt-4">
-        <Button
-          onClick={deselectAll}
-          variant="ghost"
-          size="sm"
-          className="w-full text-gray-500 hover:text-gray-700"
-        >
-          {t('toolbar.selection.deselectAll')}
-        </Button>
-      </div>
     </div>
   );
 });

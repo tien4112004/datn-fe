@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Avatar, AvatarFallback, AvatarImage } from '@ui/avatar';
 import { useMindmapApiService } from '../../api';
 import { useUserProfileApiService } from '@/features/user/api';
+import { useAuth } from '@/shared/context/auth';
 import type { User, PermissionLevel } from '../../types/share';
 import { toast } from 'sonner';
 import type { LucideIcon } from 'lucide-react';
@@ -40,6 +41,7 @@ export default function ShareMindmapDialog({ isOpen, onOpenChange, mindmapId }: 
   const { t } = useTranslation('mindmap');
   const apiService = useMindmapApiService();
   const userService = useUserProfileApiService();
+  const { user: currentUser } = useAuth();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<User[]>([]);
@@ -135,8 +137,10 @@ export default function ShareMindmapDialog({ isOpen, onOpenChange, mindmapId }: 
         setIsSearching(true);
         try {
           const users = await userService.searchUsers(searchQuery);
-          // Filter out already selected users
-          const filtered = users.filter((user) => !selectedUsers.some((selected) => selected.id === user.id));
+          // Filter out already-shared users and the current user themselves
+          const filtered = users.filter(
+            (u) => !selectedUsers.some((selected) => selected.id === u.id) && u.id !== currentUser?.id
+          );
           setSearchResults(filtered);
         } catch (error) {
           console.error('Search failed:', error);

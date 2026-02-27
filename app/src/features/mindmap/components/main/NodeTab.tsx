@@ -1,5 +1,6 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@ui/accordion';
-import { Palette, Sparkles } from 'lucide-react';
+import { Button } from '@ui/button';
+import { Palette, Sparkles, X } from 'lucide-react';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
@@ -25,6 +26,7 @@ const selectHasSelection = (state: any) => state.selectedNodeIds.size > 0;
 const NodeTab = memo(({ mindmapId }: NodeTabProps) => {
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
   const hasSelection = useCoreStore(selectHasSelection);
+  const deselectAll = useCoreStore((state) => state.deselectAllNodesAndEdges);
 
   if (!hasSelection) {
     return (
@@ -62,27 +64,40 @@ const NodeTab = memo(({ mindmapId }: NodeTabProps) => {
   }
 
   return (
-    <Accordion type="multiple" defaultValue={['properties', 'ai']} className="w-full space-y-2">
-      {/* Properties accordion */}
-      <AccordionItem value="properties" className="rounded-md border border-gray-200 px-1">
-        <AccordionTrigger className="rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gray-700 hover:bg-gray-50 hover:no-underline">
-          {t('toolbar.sections.nodeProperties')}
-        </AccordionTrigger>
-        <AccordionContent className="px-1 pb-2">
-          <NodeSelectionTab />
-        </AccordionContent>
-      </AccordionItem>
+    <>
+      {/* Persistent deselect footer — always visible while a selection exists */}
+      <Button
+        onClick={deselectAll}
+        variant="ghost"
+        size="sm"
+        className="w-full gap-1.5 pb-2 text-gray-400 hover:text-gray-600"
+      >
+        <X size={14} />
+        {t('toolbar.selection.deselectAll')}
+      </Button>
 
-      {/* AI Tools accordion */}
-      <AccordionItem value="ai" className="rounded-md border border-purple-200 px-1">
-        <AccordionTrigger className="rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wider text-purple-700 hover:bg-purple-50 hover:no-underline">
-          {t('toolbar.sections.nodeAI')}
-        </AccordionTrigger>
-        <AccordionContent className="px-1 pb-2">
-          <AIMindmapPanel mindmapId={mindmapId} />
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
+      <Accordion type="multiple" defaultValue={['properties', 'ai']} className="w-full space-y-2">
+        {/* Properties accordion */}
+        <AccordionItem value="properties" className="rounded-md border border-gray-200 px-1">
+          <AccordionTrigger className="rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gray-700 hover:bg-gray-50 hover:no-underline">
+            {t('toolbar.sections.nodeProperties')}
+          </AccordionTrigger>
+          <AccordionContent className="px-1 pb-2">
+            <NodeSelectionTab />
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* AI Tools accordion */}
+        <AccordionItem value="ai" className="rounded-md border border-purple-200 px-1">
+          <AccordionTrigger className="rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wider text-purple-700 hover:bg-purple-50 hover:no-underline">
+            {t('toolbar.sections.nodeAI')}
+          </AccordionTrigger>
+          <AccordionContent className="px-1 pb-2">
+            <AIMindmapPanel mindmapId={mindmapId} />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </>
   );
 });
 

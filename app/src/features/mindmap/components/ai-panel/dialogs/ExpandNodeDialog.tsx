@@ -97,7 +97,7 @@ export function ExpandNodeDialog({
             >
               {EXPAND_MAX_CHILDREN_OPTIONS.map((num) => (
                 <option key={num} value={num}>
-                  {num} node{num !== 1 ? 's' : ''}
+                  {t('expandNode.nodeOption', { count: num })}
                 </option>
               ))}
             </select>
@@ -117,7 +117,7 @@ export function ExpandNodeDialog({
             >
               {EXPAND_MAX_DEPTH_OPTIONS.map((num) => (
                 <option key={num} value={num}>
-                  {num} level{num !== 1 ? 's' : ''}
+                  {t('expandNode.levelOption', { count: num })}
                 </option>
               ))}
             </select>

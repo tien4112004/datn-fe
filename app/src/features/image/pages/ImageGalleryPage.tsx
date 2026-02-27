@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Masonry } from 'masonic';
 import { useImageManager } from '../hooks';
 import ImageCard from '../components/ImageCard';
-import ImagePreviewDialog from '../components/ImagePreviewDialog';
+import { ImageLightbox } from '../components/ImageLightbox';
 import { ImagePreviewProvider, useImagePreview } from '../context/ImagePreviewContext';
 import { Button } from '@ui/button';
 import { Loader2, Minus, Plus } from 'lucide-react';
@@ -23,7 +23,7 @@ const ImageGalleryContent = ({ initialImage }: ImageGalleryContentProps) => {
   const hasOpenedInitialImage = useRef(false);
   const location = useLocation();
   const { images, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useImageManager();
-  const { openPreview } = useImagePreview();
+  const { isOpen, selectedImage, openPreview, closePreview } = useImagePreview();
   const [columnSizeIndex, setColumnSizeIndex] = useState(DEFAULT_COLUMN_INDEX);
 
   const columnWidth = COLUMN_SIZES[columnSizeIndex];
@@ -140,7 +140,14 @@ const ImageGalleryContent = ({ initialImage }: ImageGalleryContentProps) => {
           <p className="text-muted-foreground text-sm">{t('gallery.noMoreImages')}</p>
         )}
       </div>
-      <ImagePreviewDialog />
+      <ImageLightbox
+        src={selectedImage?.url ?? ''}
+        alt={selectedImage?.originalFilename}
+        open={isOpen}
+        onClose={closePreview}
+        originalFilename={selectedImage?.originalFilename}
+        imageId={selectedImage?.id}
+      />
     </div>
   );
 };

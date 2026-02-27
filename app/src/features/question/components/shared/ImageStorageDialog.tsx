@@ -52,7 +52,7 @@ export const ImageStorageDialog = ({ open, onClose, onSelect }: ImageStorageDial
         </DialogHeader>
 
         {/* Image Grid */}
-        <div className="flex-1 overflow-y-auto px-3">
+        <div className="flex-1 overflow-y-auto px-3 py-2">
           {isLoading ? (
             <div className="flex h-40 items-center justify-center">
               <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
@@ -80,7 +80,7 @@ export const ImageStorageDialog = ({ open, onClose, onSelect }: ImageStorageDial
                     <img src={image.url} alt={t('imageAlt')} className="h-full w-full object-cover" />
                     {selectedImage?.id === image.id && (
                       <div className="bg-primary/20 absolute inset-0 flex items-center justify-center">
-                        <div className="bg-primary text-primary-foreground rounded-full p-2">
+                        <div className="bg-primary text-primary-foreground flex items-center justify-center rounded-full p-2">
                           <Check className="h-6 w-6" />
                         </div>
                       </div>

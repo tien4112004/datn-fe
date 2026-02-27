@@ -102,6 +102,7 @@ export default {
     // AI Modification Panel
     aiModification: {
       title: 'AI Modification',
+      disclaimer: 'AI-generated content may contain errors. Please review and verify before use.',
       context: {
         slide: 'Current Slide',
         element: 'Selected Element',

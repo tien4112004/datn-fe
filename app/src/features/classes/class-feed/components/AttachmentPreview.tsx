@@ -1,6 +1,6 @@
 import { Archive, FileDown, FileSpreadsheet, FileText, Paperclip, Presentation } from 'lucide-react';
 import { useState } from 'react';
-import { ImageLightbox } from './ImageLightbox';
+import { ImageLightbox } from '../../../image/components/ImageLightbox';
 
 interface AttachmentPreviewProps {
   url: string;

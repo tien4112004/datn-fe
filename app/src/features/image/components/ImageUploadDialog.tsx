@@ -160,26 +160,28 @@ export const ImageUploadDialog = ({ open, onClose, onSuccess }: ImageUploadDialo
             />
 
             {selectedFile && previewUrl ? (
-              <div className="relative w-full p-4">
-                <img
-                  src={previewUrl}
-                  alt={t('upload.preview')}
-                  className="mx-auto max-h-[200px] rounded-md object-contain"
-                />
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="icon"
-                  className="absolute right-2 top-2 h-8 w-8"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRemove();
-                  }}
-                  disabled={uploadMutation.isPending}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-                <p className="text-muted-foreground mt-2 text-center text-sm">
+              <div className="flex w-full flex-col items-center gap-2 p-4">
+                <div className="relative inline-block">
+                  <img
+                    src={previewUrl}
+                    alt={t('upload.preview')}
+                    className="max-h-[200px] rounded-md object-contain"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute -right-2 -top-2 h-6 w-6 rounded-full shadow"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemove();
+                    }}
+                    disabled={uploadMutation.isPending}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+                <p className="text-muted-foreground text-center text-sm">
                   {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
                 </p>
               </div>

@@ -271,6 +271,9 @@ export default {
       imageGenerationModel: {
         label: 'Mô hình tạo hình ảnh',
       },
+      textGenerationModel: {
+        label: 'Mô hình văn bản',
+      },
       // Chat/Input
       chat: {
         defaultPlaceholder: 'Nhập hướng dẫn của bạn...',

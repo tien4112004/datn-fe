@@ -271,6 +271,9 @@ export default {
       imageGenerationModel: {
         label: 'Image Generation Model',
       },
+      textGenerationModel: {
+        label: 'Text Generation Model',
+      },
       // Chat/Input
       chat: {
         defaultPlaceholder: 'Type your instruction...',

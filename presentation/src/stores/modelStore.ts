@@ -18,9 +18,13 @@ export const useModelStore = defineStore('model', () => {
   // Available IMAGE models (populated by query)
   const imageModels = ref<ModelInfo[]>([]);
 
+  // Available TEXT models (populated by query)
+  const textModels = ref<ModelInfo[]>([]);
+
   return {
     selectedModel,
     selectedImageModel,
     imageModels,
+    textModels,
   };
 });

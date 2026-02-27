@@ -1,5 +1,5 @@
 <template>
-  <InputGroup :label="t('panels.aiModification.imageGenerationModel.label')">
+  <InputGroup :label="label ?? t('panels.aiModification.imageGenerationModel.label')">
     <div v-if="isLoading" class="loading-state">
       {{ t('panels.aiModification.imageGeneration.loadingModels') }}
     </div>
@@ -32,6 +32,7 @@ interface Props {
   models: Model[];
   isLoading?: boolean;
   isProcessing?: boolean;
+  label?: string;
 }
 
 interface Emits {

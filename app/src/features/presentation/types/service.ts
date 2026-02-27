@@ -21,6 +21,7 @@ export interface ImageOptions {
   artStyle: string;
   artStyleModifiers?: string;
   imageModel: ModelConfig;
+  negativePrompt?: string;
 }
 
 export interface PresentationGenerationRequest {

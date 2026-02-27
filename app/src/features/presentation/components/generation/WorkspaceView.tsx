@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Controller } from 'react-hook-form';
+import { Controller, useWatch } from 'react-hook-form';
 import { CircleAlert, RotateCcw } from 'lucide-react';
 import OutlineWorkspace from './OutlineWorkspace';
 import { AutosizeTextarea } from '@ui/autosize-textarea';
@@ -41,7 +41,6 @@ const WorkspaceView = ({ onWorkspaceEmpty }: WorkspaceViewProps) => {
     handleGeneratePresentation,
     isStreaming,
     control,
-    watch,
     setValue,
     getValues,
   } = useWorkspace({});
@@ -74,7 +73,6 @@ const WorkspaceView = ({ onWorkspaceEmpty }: WorkspaceViewProps) => {
 
             <CustomizationSection
               control={control}
-              watch={watch}
               setValue={setValue}
               onGeneratePresentation={handleGeneratePresentation}
               isGenerating={isStreaming}
@@ -264,11 +262,18 @@ OutlineFormSection.displayName = 'OutlineFormSection';
 
 const OutlineSection = memo(() => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
-  const { watch } = usePresentationForm();
-  const slideCount = watch('slideCount', 10);
+  const { control } = usePresentationForm();
+  const slideCount = useWatch({ control, name: 'slideCount' });
 
   const handleDownload = useCallback(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const markdown = useOutlineStore.getState().markdownContent();
+    const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'outline.md';
+    a.click();
+    URL.revokeObjectURL(url);
   }, []);
 
   return (

@@ -7,5 +7,5 @@ export default function mapOutlineItemsToMarkdown(items: OutlineItem[]): string 
 
   const markdown = items.map((item) => item.markdownContent || '').join('\n\n');
 
-  return `\`\`\`markdown\n\n${markdown}\n\n\`\`\``;
+  return markdown;
 }

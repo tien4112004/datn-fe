@@ -37,6 +37,7 @@ export class ImageService {
           themeDescription: params.themeDescription,
           artStyle: params.artStyle,
           artDescription: params.artStyleModifiers,
+          negativePrompt: params.negativePrompt,
         },
         {
           headers: {

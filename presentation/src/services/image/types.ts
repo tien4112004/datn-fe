@@ -13,6 +13,7 @@ export interface ImageGenerationParams {
   themeDescription?: string;
   artStyle?: string;
   artStyleModifiers?: string;
+  negativePrompt?: string;
 }
 
 export interface ImageGenerationResponse {

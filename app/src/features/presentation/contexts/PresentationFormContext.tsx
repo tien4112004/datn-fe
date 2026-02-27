@@ -32,6 +32,8 @@ export type UnifiedFormData = {
     name: string;
     provider: string;
   };
+  // Image generation fields (optional)
+  negativePrompt?: string;
   // Metadata fields (optional)
   grade?: string;
   subject?: string;
@@ -89,6 +91,7 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
             provider: z.string().min(1),
           })
           .optional(),
+        negativePrompt: z.string().optional(),
         grade: z.string().max(50).optional(),
         subject: z.string().max(100).optional(),
       }),
@@ -112,6 +115,7 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
         name: '',
         provider: '',
       },
+      negativePrompt: '',
       grade: '',
       subject: '',
       ...persistedData,
@@ -123,7 +127,7 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
     watch: form.watch,
     setValue: form.setValue,
     storage: window.localStorage,
-    exclude: [],
+    exclude: ['negativePrompt'],
   });
 
   useEffect(() => {
@@ -131,13 +135,16 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
     moduleMap.thumbnail();
   }, []);
 
-  const contextValue: PresentationFormContextValue = {
-    control: form.control,
-    watch: form.watch,
-    setValue: form.setValue,
-    trigger: form.trigger,
-    getValues: form.getValues,
-  };
+  const contextValue = useMemo<PresentationFormContextValue>(
+    () => ({
+      control: form.control,
+      watch: form.watch,
+      setValue: form.setValue,
+      trigger: form.trigger,
+      getValues: form.getValues,
+    }),
+    [form.control, form.watch, form.setValue, form.trigger, form.getValues]
+  );
 
   return <PresentationFormContext.Provider value={contextValue}>{children}</PresentationFormContext.Provider>;
 };

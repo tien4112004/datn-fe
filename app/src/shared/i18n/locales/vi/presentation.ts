@@ -136,6 +136,10 @@ export default {
       long: 'Dài',
       longDesc: 'Giải thích sâu',
     },
+    imageConfig: {
+      title: 'Cấu hình hình ảnh',
+      description: 'Cấu hình cài đặt tạo hình ảnh cho bài trình bày của bạn',
+    },
     imageModels: {
       title: 'Mô hình hình ảnh',
     },
@@ -153,6 +157,11 @@ export default {
       abstract: 'Trừu tượng',
       surreal: 'Siêu thực',
       minimalist: 'Tối giản',
+    },
+    negativePrompt: {
+      label: 'Từ khóa loại trừ',
+      placeholder: 'Nhập từ khóa muốn tránh (ví dụ: mờ, chất lượng thấp, méo mó)',
+      description: 'Chỉ định những gì bạn không muốn trong hình ảnh. Phân tách các từ khóa bằng dấu phẩy.',
     },
   },
   list: {

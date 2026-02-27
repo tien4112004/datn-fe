@@ -120,6 +120,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
           artStyle: data.artStyle?.id ?? '',
           artStyleModifiers: data.artStyle?.modifiers,
           imageModel: data.imageModel ?? { name: '', provider: '' },
+          negativePrompt: data.negativePrompt || undefined,
         },
       });
       clearOutline();
@@ -162,7 +163,6 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
 
     // Only return needed form properties
     control: formHook.control,
-    watch: formHook.watch,
     setValue: formHook.setValue,
     getValues: formHook.getValues,
   };

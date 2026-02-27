@@ -30,7 +30,6 @@ const AssignmentGrid = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [search, setSearch] = useState('');
-  const [sorting, setSorting] = useState<any>([]);
   const [pagination, setPagination] = useState<any>({
     pageIndex: 0,
     pageSize: 20,
@@ -49,6 +48,8 @@ const AssignmentGrid = () => {
   // Fetch assignments
   const { data: assignmentsResponse, isLoading } = useAssignmentList({
     searchText: search,
+    page: pagination.pageIndex + 1,
+    size: pagination.pageSize,
   });
   const deleteAssignment = useDeleteAssignment();
 
@@ -73,13 +74,11 @@ const AssignmentGrid = () => {
     columns: columns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
-    manualSorting: true,
+    enableSorting: false,
     state: {
-      sorting,
       pagination,
     },
     rowCount: totalItems,
-    onSortingChange: setSorting,
     onPaginationChange: setPagination,
   });
 

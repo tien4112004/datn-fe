@@ -3,7 +3,6 @@ import {
   createColumnHelper,
   getCoreRowModel,
   useReactTable,
-  type SortingState,
   type PaginationState,
   type Updater,
 } from '@tanstack/react-table';
@@ -34,7 +33,6 @@ const AssignmentTable = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [search, setSearch] = useState('');
-  const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -53,6 +51,8 @@ const AssignmentTable = () => {
   // Fetch assignments
   const { data: assignmentsResponse, isLoading } = useAssignmentList({
     searchText: search,
+    page: pagination.pageIndex + 1,
+    size: pagination.pageSize,
   });
   const deleteAssignment = useDeleteAssignment();
 
@@ -66,7 +66,6 @@ const AssignmentTable = () => {
         cell: (info) => <div className="font-medium">{info.getValue()}</div>,
         minSize: 200,
         meta: { isGrow: true },
-        enableSorting: true,
       }),
 
       columnHelper.accessor('subject', {
@@ -82,7 +81,6 @@ const AssignmentTable = () => {
           );
         },
         size: 120,
-        enableSorting: true,
       }),
       columnHelper.accessor('grade', {
         header: t('assignment.grade'),
@@ -95,7 +93,6 @@ const AssignmentTable = () => {
           );
         },
         size: 100,
-        enableSorting: true,
       }),
 
       columnHelper.accessor('createdAt', {
@@ -122,16 +119,14 @@ const AssignmentTable = () => {
     columns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
-    manualSorting: true,
+    enableSorting: false,
     enableColumnResizing: true,
     columnResizeMode: 'onChange',
     columnResizeDirection: 'ltr',
     state: {
-      sorting,
       pagination,
     },
     rowCount: totalItems,
-    onSortingChange: setSorting as any as (updaterOrValue: Updater<SortingState>) => void,
     onPaginationChange: setPagination as any as (updaterOrValue: Updater<PaginationState>) => void,
   });
 

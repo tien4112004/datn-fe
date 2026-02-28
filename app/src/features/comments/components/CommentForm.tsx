@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@ui/button';
 import { Textarea } from '@ui/textarea';
+import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 
 interface CommentFormProps {
   onSubmit: (content: string, mentionedUserIds: string[]) => void;
@@ -16,11 +18,12 @@ export function CommentForm({
   onSubmit,
   onCancel,
   initialContent = '',
-  placeholder = 'Write a comment...',
-  submitLabel = 'Comment',
+  placeholder,
+  submitLabel,
   autoFocus = false,
   isSubmitting = false,
 }: CommentFormProps) {
+  const { t } = useTranslation(I18N_NAMESPACES.COMMENTS);
   const [content, setContent] = useState(initialContent);
   const [mentions, setMentions] = useState<string[]>([]);
 
@@ -47,7 +50,7 @@ export function CommentForm({
       <Textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t('form.placeholder')}
         autoFocus={autoFocus}
         className="min-h-[80px] resize-none"
         disabled={isSubmitting}
@@ -55,17 +58,17 @@ export function CommentForm({
 
       <div className="flex items-center justify-between">
         <span className={`text-xs ${isOverLimit ? 'text-red-500' : 'text-gray-500'}`}>
-          {remainingChars} characters remaining
+          {t('form.charactersRemaining', { count: remainingChars })}
         </span>
 
         <div className="flex gap-2">
           {onCancel && (
             <Button type="button" variant="outline" size="sm" onClick={handleCancel} disabled={isSubmitting}>
-              Cancel
+              {t('form.cancel')}
             </Button>
           )}
           <Button type="submit" size="sm" disabled={!content.trim() || isOverLimit || isSubmitting}>
-            {isSubmitting ? 'Submitting...' : submitLabel}
+            {isSubmitting ? t('form.submitting') : (submitLabel ?? t('form.submit'))}
           </Button>
         </div>
       </div>

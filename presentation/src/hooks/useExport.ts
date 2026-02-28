@@ -400,7 +400,7 @@ export default () => {
 
   // Get outline configuration
   const getOutlineOption = (outline: PPTElementOutline): pptxgen.ShapeLineProps => {
-    const c = formatColor(outline?.color || '#000000');
+    const c = formatColor(outline?.color || '#d14424');
 
     return {
       color: c.color,

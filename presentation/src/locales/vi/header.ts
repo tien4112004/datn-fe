@@ -13,6 +13,8 @@ export default {
       duplicateSuccess: 'Đã lưu bài trình chiếu thành bản sao: {title}',
       duplicateError: 'Không thể lưu thành bản sao',
       duplicateConfirm: 'Lưu bài trình chiếu này thành bản sao mới?',
+      saveSuccess: 'Đã lưu bài trình chiếu thành công',
+      saveError: 'Không thể lưu bài trình chiếu',
     },
 
     // Tính năng AI
@@ -22,9 +24,11 @@ export default {
 
     // Trình chiếu
     presentation: {
-      slideShow: 'Trình chiếu (F5)',
+      slideShow: 'Trình chiếu',
       fromBeginning: 'Từ đầu',
+      fromBeginningDescription: 'Bắt đầu trình chiếu từ slide đầu tiên',
       fromCurrentPage: 'Từ trang hiện tại',
+      fromCurrentPageDescription: 'Bắt đầu từ slide đang được chọn',
       presenterView: 'Chế độ trình chiếu',
       presenterViewDescription: 'Trình chiếu với ghi chú diễn giả và xem trước',
       separatedWindow: 'Mở trong cửa sổ mới',
@@ -98,7 +102,7 @@ export default {
     // Trình đơn Chia sẻ
     shareMenu: {
       title: 'Chia sẻ "Bài trình chiếu"',
-      addPeople: 'Thêm mọi người, nhóm hoặc sự kiện lịch',
+      addPeople: 'Thêm mọi người bằng email hoặc tên',
       peopleWithAccess: 'Mọi người có quyền truy cập',
       generalAccess: 'Quyền truy cập chung',
       copyLink: 'Sao chép liên kết',

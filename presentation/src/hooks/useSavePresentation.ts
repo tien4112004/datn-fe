@@ -1,4 +1,5 @@
 import { computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { Pinia } from 'pinia';
 import { useSaveStore, useContainerStore, useSlidesStore } from '@/store';
 import { generateThumbnail } from '@/utils/thumbnail';
@@ -26,6 +27,7 @@ function dataURLtoBlob(dataURL: string): Blob {
  * Handles thumbnail generation, API calls, and state management
  */
 export function useSavePresentation(presentationId: string, pinia: Pinia) {
+  const { t } = useI18n();
   const saveStore = useSaveStore();
   const containerStore = useContainerStore();
   const slidesStore = useSlidesStore();
@@ -101,10 +103,10 @@ export function useSavePresentation(presentationId: string, pinia: Pinia) {
       // Mark as saved in store
       saveStore.markSaved();
       // Dispatch success message
-      dispatchMessage('success', 'Presentation saved successfully');
+      dispatchMessage('success', t('header.file.saveSuccess'));
     } catch (error) {
       console.error('Failed to save presentation:', error);
-      dispatchMessage('error', 'Failed to save presentation');
+      dispatchMessage('error', t('header.file.saveError'));
       throw error;
     }
   }

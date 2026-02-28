@@ -68,6 +68,18 @@ watch(
   { immediate: true }
 );
 
+// Fetch TEXT models and sync to store
+const { data: textModels } = useModels('TEXT');
+watch(
+  textModels,
+  (models) => {
+    if (models) {
+      modelStore.textModels = models;
+    }
+  },
+  { immediate: true }
+);
+
 // Fetch IMAGE models and default, sync to store
 const { data: imageModels } = useModels('IMAGE');
 const { data: defaultImageModel } = useDefaultModel('IMAGE');

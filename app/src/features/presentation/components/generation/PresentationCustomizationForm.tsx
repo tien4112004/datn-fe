@@ -1,7 +1,8 @@
-import { Controller, type Control } from 'react-hook-form';
+import { Controller, useWatch, type Control } from 'react-hook-form';
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
 import { Button } from '@ui/button';
-import { Palette, Sparkles, Loader2 } from 'lucide-react';
+import { Palette, Sparkles, Loader2, Ban, ChevronDown, ChevronUp } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { MODEL_TYPES, useModels } from '@/features/model';
@@ -12,11 +13,13 @@ import useOutlineStore from '../../stores/useOutlineStore';
 import { useSlideThemes, useRecentSlideThemes } from '../../hooks';
 import { getRecentThemeIds, addRecentThemeId } from '../../utils/recentThemes';
 import { useArtStyles } from '@/features/image/hooks';
+import { ART_STYLE_OPTIONS } from '@/features/image/types';
 import { ThemePreviewCard } from './ThemePreviewCard';
 import ThemeGalleryDialog from './ThemeGalleryDialog';
 import type { SlideTheme } from '../../types/slide';
 import { cn } from '@/shared/lib/utils';
 import { AiDisclaimer } from '@/shared/components/common/AiDisclaimer';
+import { AutosizeTextarea } from '@ui/autosize-textarea';
 
 interface ThemeSectionProps {
   selectedTheme?: SlideTheme;
@@ -29,6 +32,7 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
   const { themes, isLoading } = useSlideThemes();
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [displayedThemes, setDisplayedThemes] = useState<SlideTheme[]>([]);
+  const [gallerySelectedTheme, setGallerySelectedTheme] = useState<SlideTheme | null>(null);
 
   // Get recent theme IDs from localStorage
   const recentThemeIds = useMemo(() => getRecentThemeIds(), []);
@@ -46,7 +50,15 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
       const otherThemes = themes.filter((theme) => !recentThemeIdSet.has(theme.id));
 
       // Merge: recent themes first, then others
-      const mergedThemes = [...recentThemes, ...otherThemes];
+      let mergedThemes = [...recentThemes, ...otherThemes];
+
+      // If a theme was selected from gallery, ensure it's displayed first
+      if (gallerySelectedTheme) {
+        mergedThemes = [
+          gallerySelectedTheme,
+          ...mergedThemes.filter((t) => t.id !== gallerySelectedTheme.id),
+        ];
+      }
 
       // Take first 6 for display
       const displayThemes = mergedThemes.slice(0, 6);
@@ -61,7 +73,7 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
       // Clear displayed themes if no themes loaded
       setDisplayedThemes([]);
     }
-  }, [themes, recentThemes, isLoading, isLoadingRecent]);
+  }, [themes, recentThemes, isLoading, isLoadingRecent, gallerySelectedTheme]);
 
   const handleThemeSelect = useCallback(
     (theme: SlideTheme) => {
@@ -83,8 +95,8 @@ const ThemeSection = ({ selectedTheme, onThemeSelect, disabled = false }: ThemeS
         addRecentThemeId(theme.id);
       }
 
-      // Move selected theme to first position in displayed themes
-      setDisplayedThemes((prev) => [theme, ...prev.filter((t) => t.id !== theme.id)].slice(0, 6));
+      // Track gallery selection so the useEffect includes it in the merge
+      setGallerySelectedTheme(theme);
 
       onThemeSelect(theme);
     },
@@ -175,15 +187,20 @@ interface ArtSectionProps {
 
 const ArtSection = ({ selectedStyle, onStyleSelect, disabled = false }: ArtSectionProps) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'customization' });
-  const { artStyles, isLoading } = useArtStyles();
+  const { artStyles: apiArtStyles, isLoading } = useArtStyles();
+
+  // Ensure "None" option is always first
+  const noneStyle = ART_STYLE_OPTIONS.find((s) => s.id === '');
+  const artStyles = useMemo(() => {
+    const stylesWithoutNone = apiArtStyles.filter((s) => s.id !== '' && s.name !== '');
+    return noneStyle ? [noneStyle, ...stylesWithoutNone] : stylesWithoutNone;
+  }, [apiArtStyles, noneStyle]);
 
   return (
     <>
-      <CardHeader>
-        <CardTitle>{t('artStyle.title')}</CardTitle>
-        <CardDescription>{t('artStyle.description')}</CardDescription>
-      </CardHeader>
       <CardContent className="flex flex-col gap-2">
+        <CardTitle>{t('artStyle.title')}</CardTitle>
+        <p className="text-muted-foreground text-sm">{t('artStyle.description')}</p>
         {isLoading ? (
           <div className="grid grid-cols-3 gap-3 lg:grid-cols-5">
             {Array.from({ length: 5 }).map((_, idx) => (
@@ -195,24 +212,33 @@ const ArtSection = ({ selectedStyle, onStyleSelect, disabled = false }: ArtSecti
             {artStyles.map((style) => {
               const styleValue = style.id || style.name;
               const selectedValue = selectedStyle?.id || selectedStyle?.name;
+              const isSelected = selectedValue === styleValue;
+              const isNoneStyle = style.id === '' && style.labelKey === 'none';
 
               return (
                 <div
-                  key={styleValue}
+                  key={styleValue || 'none'}
                   className={cn(
                     'group relative overflow-hidden rounded-lg border-2 transition-all',
                     disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:scale-105',
-                    selectedValue === styleValue ? 'border-primary shadow-md' : 'border-border'
+                    isSelected ? 'border-primary shadow-md' : 'border-border'
                   )}
                   onClick={() => !disabled && onStyleSelect(style)}
                 >
-                  {/* Preview gradient/image */}
-                  <div
-                    className="h-24 w-full bg-cover bg-center"
-                    style={{
-                      background: `url(${style.visual}) center/cover no-repeat`,
-                    }}
-                  />
+                  {isNoneStyle ? (
+                    <div className="bg-muted/30 flex h-24 w-full items-center justify-center">
+                      <Ban
+                        className={cn('h-10 w-10', isSelected ? 'text-primary' : 'text-muted-foreground')}
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      className="h-24 w-full bg-cover bg-center"
+                      style={{
+                        background: `url(${style.visual}) center/cover no-repeat`,
+                      }}
+                    />
+                  )}
 
                   {/* Label section */}
                   <div className="bg-card flex items-center justify-center p-2">
@@ -230,7 +256,6 @@ const ArtSection = ({ selectedStyle, onStyleSelect, disabled = false }: ArtSecti
 
 interface CustomizationSectionProps {
   control: Control<UnifiedFormData>;
-  watch: any;
   setValue: any;
   onGeneratePresentation: () => void;
   isGenerating: boolean;
@@ -238,7 +263,6 @@ interface CustomizationSectionProps {
 
 const CustomizationSection = ({
   control,
-  watch,
   setValue,
   onGeneratePresentation,
   isGenerating,
@@ -247,7 +271,11 @@ const CustomizationSection = ({
   const disabled = useOutlineStore((state) => state.isStreaming);
   const { models } = useModels(MODEL_TYPES.IMAGE);
 
+  const theme = useWatch({ control, name: 'theme' });
+  const artStyle = useWatch({ control, name: 'artStyle' });
+
   const isFormDisabled = disabled || isGenerating;
+  const [showNegativePrompt, setShowNegativePrompt] = useState(false);
 
   const onThemeSelect = useCallback(
     (theme: SlideTheme) => {
@@ -276,21 +304,19 @@ const CustomizationSection = ({
         {t('workspace.customizeSection')}
       </div>
       <Card className="w-full max-w-3xl">
-        <ThemeSection
-          selectedTheme={watch('theme')}
-          onThemeSelect={onThemeSelect}
-          disabled={isFormDisabled}
-        />
-        <ArtSection
-          selectedStyle={watch('artStyle')}
-          onStyleSelect={onArtStyleSelect}
-          disabled={isFormDisabled}
-        />
+        <ThemeSection selectedTheme={theme} onThemeSelect={onThemeSelect} disabled={isFormDisabled} />
         {/* <ContentSection
           selectedContentLength={watch('contentLength')}
           onContentLengthSelect={onContentLengthSelect}
           disabled={isFormDisabled}
         /> */}
+      </Card>
+
+      <div className="scroll-m-20 text-xl font-semibold tracking-tight">
+        {t('customization.imageConfig.title')}
+      </div>
+      <Card className="w-full max-w-3xl">
+        <ArtSection selectedStyle={artStyle} onStyleSelect={onArtStyleSelect} disabled={isFormDisabled} />
 
         <CardContent className="flex flex-row items-center gap-2">
           <CardTitle>{t('customization.imageModels.title')}</CardTitle>
@@ -309,6 +335,54 @@ const CustomizationSection = ({
               />
             )}
           />
+        </CardContent>
+
+        {/* Negative Prompt - Collapsible */}
+        <CardContent>
+          <div
+            className="group flex cursor-pointer items-center"
+            onClick={() => setShowNegativePrompt(!showNegativePrompt)}
+          >
+            <CardTitle className="text-sm font-medium">{t('customization.negativePrompt.label')}</CardTitle>
+            {showNegativePrompt ? (
+              <ChevronUp className="text-muted-foreground group-hover:text-foreground ml-2 h-4 w-4 transition-colors" />
+            ) : (
+              <ChevronDown className="text-muted-foreground group-hover:text-foreground ml-2 h-4 w-4 transition-colors" />
+            )}
+          </div>
+          <AnimatePresence>
+            {showNegativePrompt && (
+              <motion.div
+                key="negativePrompt"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30, duration: 0.4 }}
+                style={{ overflow: 'hidden' }}
+              >
+                <div className="mt-2 space-y-2 px-2">
+                  <Controller
+                    name="negativePrompt"
+                    control={control}
+                    render={({ field }) => (
+                      <AutosizeTextarea
+                        placeholder={t('customization.negativePrompt.placeholder')}
+                        minHeight={60}
+                        maxHeight={120}
+                        className="text-sm"
+                        value={field.value || ''}
+                        onChange={field.onChange}
+                        disabled={isFormDisabled}
+                      />
+                    )}
+                  />
+                  <p className="text-muted-foreground text-xs">
+                    {t('customization.negativePrompt.description')}
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </CardContent>
       </Card>
       <div className="mt-5 space-y-2">

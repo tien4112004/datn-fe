@@ -120,6 +120,10 @@ export default {
       long: 'Long',
       longDesc: 'In-depth explanation',
     },
+    imageConfig: {
+      title: 'Image Configuration',
+      description: 'Configure the image generation settings for your presentation',
+    },
     imageModels: {
       title: 'Image Models',
     },
@@ -137,6 +141,11 @@ export default {
       abstract: 'Abstract',
       surreal: 'Surreal',
       minimalist: 'Minimalist',
+    },
+    negativePrompt: {
+      label: 'Negative Prompt',
+      placeholder: 'Enter negative keywords to avoid (e.g., blurry, low quality, distorted)',
+      description: "Specify what you don't want in the generated images. Separate keywords with commas.",
     },
   },
   list: {

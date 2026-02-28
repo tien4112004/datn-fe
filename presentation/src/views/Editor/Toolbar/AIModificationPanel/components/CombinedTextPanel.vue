@@ -13,6 +13,14 @@
       <p class="ai-disclaimer">{{ t('panels.aiModification.disclaimer') }}</p>
     </div>
 
+    <ModelSelector
+      v-model="selectedModel"
+      :models="textModels"
+      :is-loading="isLoadingTextModels"
+      :is-processing="isProcessing"
+      :label="t('panels.aiModification.textGenerationModel.label')"
+    />
+
     <ChatInterface
       v-model="chatInput"
       :is-processing="isProcessing"
@@ -25,12 +33,16 @@
 
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n';
+import { storeToRefs } from 'pinia';
 import { Info } from 'lucide-vue-next';
 import type { CurrentContext } from '@/types/aiModification';
+import { useModelStore } from '@/stores/modelStore';
+import { useModels } from '@/services/model/queries';
 import { useTextRefinement } from '../composables/useTextRefinement';
 import { useQuickActions } from '../composables/useQuickActions';
 import ContextBadge from '../ContextBadge.vue';
 import QuickActionsRow from './common/QuickActionsRow.vue';
+import ModelSelector from './common/ModelSelector.vue';
 import ChatInterface from './common/ChatInterface.vue';
 
 const { t } = useI18n();
@@ -40,6 +52,10 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const modelStore = useModelStore();
+const { selectedModel, textModels } = storeToRefs(modelStore);
+const { isLoading: isLoadingTextModels } = useModels('TEXT');
 
 const { chatInput, isProcessing, refineMessage, refineType, currentOperation, refineCombinedText } =
   useTextRefinement();

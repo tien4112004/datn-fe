@@ -13,6 +13,8 @@ export default {
       duplicateSuccess: 'Presentation saved as copy: {title}',
       duplicateError: 'Failed to save as copy',
       duplicateConfirm: 'Save this presentation as a new copy?',
+      saveSuccess: 'Presentation saved successfully',
+      saveError: 'Failed to save presentation',
     },
 
     // AI Features
@@ -22,9 +24,11 @@ export default {
 
     // Presentation
     presentation: {
-      slideShow: 'Slide Show (F5)',
+      slideShow: 'Slide Show',
       fromBeginning: 'From Beginning',
+      fromBeginningDescription: 'Start presenting from the first slide',
       fromCurrentPage: 'From Current Page',
+      fromCurrentPageDescription: 'Start from the currently selected slide',
       presenterView: 'Presenter View',
       presenterViewDescription: 'Present with speaker notes and preview',
       separatedWindow: 'Open in New Window',
@@ -98,7 +102,7 @@ export default {
     // Share Menu
     shareMenu: {
       title: 'Share "Presentation"',
-      addPeople: 'Add people, groups, or calendar events',
+      addPeople: 'Add people by email or name',
       peopleWithAccess: 'People with access',
       generalAccess: 'General access',
       copyLink: 'Copy link',

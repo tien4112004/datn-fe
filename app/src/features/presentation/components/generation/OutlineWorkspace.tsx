@@ -13,6 +13,7 @@ import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrate
 import { useState, useCallback, memo } from 'react';
 import { Download, Loader, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useWatch } from 'react-hook-form';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
 import { Card } from '@ui/card';
 import { Skeleton } from '@ui/skeleton';
@@ -32,9 +33,9 @@ const OutlineWorkspace = memo(({ onDownload, totalSlide }: OutlineWorkspaceProps
   const swap = useOutlineStore((state) => state.swap);
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace.outline' });
   const [isDownloading, setIsDownloading] = useState(false);
-  const { watch } = usePresentationForm();
-  const grade = watch('grade');
-  const subject = watch('subject');
+  const { control } = usePresentationForm();
+  const grade = useWatch({ control, name: 'grade' });
+  const subject = useWatch({ control, name: 'subject' });
   const grades = getAllGrades();
   const subjects = getAllSubjects();
 

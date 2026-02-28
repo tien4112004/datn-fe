@@ -1,11 +1,13 @@
-import { onMounted, onUnmounted } from 'vue';
-import { storeToRefs } from 'pinia';
 import { useMainStore } from '@/store';
-import usePasteTextClipboardData from './usePasteTextClipboardData';
+import { storeToRefs } from 'pinia';
+import { onMounted, onUnmounted } from 'vue';
 import usePasteDataTransfer from './usePasteDataTransfer';
+import usePasteTextClipboardData from './usePasteTextClipboardData';
+import useSlideEditLock from './useSlideEditLock';
 
 export default () => {
   const { editorAreaFocus, thumbnailsFocus, disableHotkeys } = storeToRefs(useMainStore());
+  const { isCurrentSlideLocked } = useSlideEditLock();
 
   const { pasteTextClipboardData } = usePasteTextClipboardData();
   const { pasteDataTransfer } = usePasteDataTransfer();
@@ -17,6 +19,7 @@ export default () => {
   const pasteListener = async (e: ClipboardEvent) => {
     if (!editorAreaFocus.value && !thumbnailsFocus.value) return;
     if (disableHotkeys.value) return;
+    if (isCurrentSlideLocked.value) return;
 
     if (!e.clipboardData) return;
 

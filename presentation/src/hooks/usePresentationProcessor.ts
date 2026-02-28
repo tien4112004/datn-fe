@@ -57,6 +57,7 @@ export function usePresentationProcessor(
     themeDescription?: string;
     artStyle?: string;
     artStyleModifiers?: string;
+    negativePrompt?: string;
   }) {
     const result = await generateImageMutation({
       presentationId,
@@ -68,6 +69,7 @@ export function usePresentationProcessor(
         themeDescription: variables.themeDescription,
         artStyle: variables.artStyle,
         artStyleModifiers: variables.artStyleModifiers,
+        negativePrompt: variables.negativePrompt,
       },
     });
 
@@ -314,6 +316,7 @@ export function usePresentationProcessor(
         themeDescription: currentTheme.modifiers || undefined,
         artStyle: request.generationOptions.artStyle || undefined,
         artStyleModifiers: request.generationOptions.artStyleModifiers,
+        negativePrompt: request.generationOptions.negativePrompt || undefined,
       });
 
       const imageUrl = response.imageUrl;

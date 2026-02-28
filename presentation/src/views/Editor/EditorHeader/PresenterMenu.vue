@@ -21,7 +21,7 @@
           {{ $t('header.presentation.fromBeginning') }}
         </h4>
         <p class="tw-text-xs tw-text-gray-600 tw-m-0 tw-leading-tight">
-          Start presenting from the first slide
+          {{ $t('header.presentation.fromBeginningDescription') }}
         </p>
       </div>
     </div>
@@ -43,7 +43,7 @@
           {{ $t('header.presentation.fromCurrentPage') }}
         </h4>
         <p class="tw-text-xs tw-text-gray-600 tw-m-0 tw-leading-tight">
-          Start from the currently selected slide
+          {{ $t('header.presentation.fromCurrentPageDescription') }}
         </p>
       </div>
     </div>
@@ -69,33 +69,11 @@
         </p>
       </div>
     </div>
-
-    <div class="tw-h-px tw-bg-gray-200 tw-mx-4"></div>
-
-    <!-- Separated Window Option -->
-    <div
-      @click="$emit('select', 'separatedWindow')"
-      class="tw-flex tw-items-center tw-gap-3 tw-px-4 tw-py-3 tw-cursor-pointer tw-transition-colors hover:tw-bg-gray-50"
-    >
-      <div
-        class="tw-flex-shrink-0 tw-w-12 tw-h-12 tw-flex tw-items-center tw-justify-center tw-bg-orange-50 tw-rounded-lg tw-border tw-border-orange-200"
-      >
-        <IconPresentSeparated class="tw-text-orange-600" />
-      </div>
-      <div class="tw-flex-1 tw-min-w-0">
-        <h4 class="tw-text-sm tw-font-semibold tw-text-gray-800 tw-m-0 tw-mb-1">
-          {{ $t('header.presentation.separatedWindow') }}
-        </h4>
-        <p class="tw-text-xs tw-text-gray-600 tw-m-0 tw-leading-tight">
-          {{ $t('header.presentation.separatedWindowDescription') }}
-        </p>
-      </div>
-    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 defineEmits<{
-  select: [mode: 'fromBeginning' | 'fromCurrent' | 'presenterView' | 'separatedWindow'];
+  select: [mode: 'fromBeginning' | 'fromCurrent' | 'presenterView'];
 }>();
 </script>

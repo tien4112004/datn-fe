@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Avatar, AvatarFallback, AvatarImage } from '@ui/avatar';
 import { useMindmapApiService } from '../../api';
 import { useUserProfileApiService } from '@/features/user/api';
+import { useAuth } from '@/shared/context/auth';
 import type { User, PermissionLevel } from '../../types/share';
 import { toast } from 'sonner';
 import type { LucideIcon } from 'lucide-react';
@@ -40,6 +41,7 @@ export default function ShareMindmapDialog({ isOpen, onOpenChange, mindmapId }: 
   const { t } = useTranslation('mindmap');
   const apiService = useMindmapApiService();
   const userService = useUserProfileApiService();
+  const { user: currentUser } = useAuth();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<User[]>([]);
@@ -135,8 +137,10 @@ export default function ShareMindmapDialog({ isOpen, onOpenChange, mindmapId }: 
         setIsSearching(true);
         try {
           const users = await userService.searchUsers(searchQuery);
-          // Filter out already selected users
-          const filtered = users.filter((user) => !selectedUsers.some((selected) => selected.id === user.id));
+          // Filter out already-shared users and the current user themselves
+          const filtered = users.filter(
+            (u) => !selectedUsers.some((selected) => selected.id === u.id) && u.id !== currentUser?.id
+          );
           setSearchResults(filtered);
         } catch (error) {
           console.error('Search failed:', error);
@@ -291,13 +295,13 @@ export default function ShareMindmapDialog({ isOpen, onOpenChange, mindmapId }: 
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
+      <DialogContent className="flex max-h-[90vh] !max-w-xl flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>{t('share.title')}</DialogTitle>
           <DialogDescription>{t('share.description')}</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-y-auto p-2">
           {/* Add People Section */}
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -378,7 +382,7 @@ export default function ShareMindmapDialog({ isOpen, onOpenChange, mindmapId }: 
           ) : selectedUsers.length > 0 ? (
             <div className="space-y-2">
               <h4 className="mb-3 text-sm font-medium">{t('share.peopleWithAccess')}</h4>
-              <div className="space-y-2">
+              <div className="max-h-52 space-y-2 overflow-y-auto">
                 {selectedUsers.map((user) => (
                   <div key={user.id} className="flex items-center gap-3 py-1.5">
                     <Avatar className="h-8 w-8">

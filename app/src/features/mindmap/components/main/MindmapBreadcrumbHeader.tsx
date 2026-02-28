@@ -128,7 +128,7 @@ const MindmapBreadcrumbHeader = memo(({ mindmapId, initialTitle }: MindmapBreadc
           <BreadcrumbItem className="hidden md:block">
             <BreadcrumbLink asChild>
               <button onClick={handleNavigateToMindmaps} className="flex cursor-pointer items-center gap-1">
-                {isStudent ? 'Back to Class' : 'Mindmaps'}
+                {isStudent ? t('breadcrumb.backToClass') : t('breadcrumb.mindmaps')}
               </button>
             </BreadcrumbLink>
           </BreadcrumbItem>

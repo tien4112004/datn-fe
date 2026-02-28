@@ -3,8 +3,11 @@ import { useMindmapApiService } from '../../api';
 import type { RefineNodeContentRequest } from '../../types/aiModification';
 import type { MindmapMetadataResponse } from '../../types/service';
 import { useCoreStore } from '../../stores';
+import { useLayoutStore } from '../../stores/layout';
 import { htmlToMarkdown, markdownToHtml } from '../../services/utils/contentUtils';
 import { buildTreeContext } from '../../services/utils/contextBuilder';
+import { getRootNodeOfSubtree, getRootForceLayout } from '../../services/utils';
+import type { RootNode } from '../../types';
 import { toast } from 'sonner';
 
 interface UseNodeRefinementReturn {
@@ -54,12 +57,43 @@ export function useNodeRefinement(metadata?: MindmapMetadataResponse): UseNodeRe
         // Convert Markdown response back to HTML for storage
         const refinedContent = await markdownToHtml(refinedMarkdown);
 
-        // Update the node with refined content
-        setNodes((prevNodes) =>
-          prevNodes.map((node) =>
-            node.id === request.nodeId ? { ...node, data: { ...node.data, content: refinedContent } } : node
-          )
-        );
+        // Check if auto-layout is enabled for this tree
+        const currentNodes = useCoreStore.getState().nodes;
+        const rootNode = getRootNodeOfSubtree(request.nodeId, currentNodes);
+        const isForceLayout = rootNode ? getRootForceLayout(rootNode as RootNode) : false;
+
+        if (isForceLayout) {
+          // forceLayout enabled: update content, then re-layout subtree after DOM measurement
+          setNodes((prevNodes) =>
+            prevNodes.map((node) =>
+              node.id === request.nodeId ? { ...node, data: { ...node.data, content: refinedContent } } : node
+            )
+          );
+
+          setTimeout(() => {
+            const latestNodes = useCoreStore.getState().nodes;
+            const latestRoot = getRootNodeOfSubtree(request.nodeId, latestNodes);
+            if (latestRoot) {
+              useLayoutStore.getState().applyAutoLayout(latestRoot.id);
+            }
+          }, 200);
+        } else {
+          // forceLayout disabled: lock current width so content wraps vertically
+          const targetNode = currentNodes.find((n) => n.id === request.nodeId);
+          const currentWidth = targetNode?.measured?.width ?? targetNode?.width;
+
+          setNodes((prevNodes) =>
+            prevNodes.map((node) =>
+              node.id === request.nodeId
+                ? {
+                    ...node,
+                    ...(currentWidth ? { width: currentWidth } : {}),
+                    data: { ...node.data, content: refinedContent },
+                  }
+                : node
+            )
+          );
+        }
 
         toast.success('Node refined successfully');
       } catch (err) {

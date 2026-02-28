@@ -52,10 +52,13 @@ export default {
       history: 'History',
       layout: 'Layout',
       utilities: 'Utilities',
+      nodeProperties: 'Properties',
+      nodeAI: 'AI Tools',
     },
     tabs: {
       general: 'General',
       selection: 'Selection',
+      node: 'Node',
       tree: 'Tree',
     },
     actions: {
@@ -226,6 +229,10 @@ export default {
     updateSuccess: 'Title updated successfully',
     updateError: 'Failed to update title',
   },
+  breadcrumb: {
+    backToClass: 'Back to Class',
+    mindmaps: 'Mindmaps',
+  },
   errors: {
     cannotMoveToDescendant: 'Cannot move a node to one of its descendants',
   },
@@ -364,6 +371,10 @@ export default {
     subject: 'Subject',
     'subject.placeholder': 'e.g., science, history',
     'subject.hint': 'Optional: Specify the subject (e.g., science, history)',
+    nodeOption_one: '{{count}} node',
+    nodeOption_other: '{{count}} nodes',
+    levelOption_one: '{{count}} level',
+    levelOption_other: '{{count}} levels',
     model: 'Model',
     'model.hint': 'Select the AI model to use for generation',
     cancel: 'Cancel',

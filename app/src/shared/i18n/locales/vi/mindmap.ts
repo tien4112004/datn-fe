@@ -52,10 +52,13 @@ export default {
       history: 'Lịch sử',
       layout: 'Bố cục',
       utilities: 'Tiện ích',
+      nodeProperties: 'Thuộc tính',
+      nodeAI: 'Công cụ AI',
     },
     tabs: {
       general: 'Chung',
       selection: 'Lựa chọn',
+      node: 'Nút',
       tree: 'Cây',
     },
     actions: {
@@ -226,6 +229,10 @@ export default {
     updateSuccess: 'Cập nhật tiêu đề thành công',
     updateError: 'Không thể cập nhật tiêu đề',
   },
+  breadcrumb: {
+    backToClass: 'Quay lại lớp học',
+    mindmaps: 'Sơ đồ tư duy',
+  },
   errors: {
     cannotMoveToDescendant: 'Không thể di chuyển nút đến các nút con của nó',
   },
@@ -251,7 +258,7 @@ export default {
     peopleWithAccess: 'Người có quyền truy cập',
     generalAccess: 'Quyền truy cập chung',
     copyLink: 'Sao chép liên kết',
-    noUsersFound: 'No users found',
+    noUsersFound: 'Không tìm thấy người dùng nào',
     permissions: {
       viewer: 'Người xem',
       viewerDescription: 'Chỉ có thể xem',
@@ -364,6 +371,10 @@ export default {
     subject: 'Môn học',
     'subject.placeholder': 'ví dụ: science, history',
     'subject.hint': 'Tùy chọn: Chỉ định môn học (ví dụ: science, history)',
+    nodeOption_one: '{{count}} nút',
+    nodeOption_other: '{{count}} nút',
+    levelOption_one: '{{count}} cấp độ',
+    levelOption_other: '{{count}} cấp độ',
     model: 'Mô hình',
     'model.hint': 'Chọn mô hình AI để sử dụng để tạo',
     cancel: 'Hủy',

@@ -1,26 +1,32 @@
+import type { Assignment } from '@/features/assignment';
 import { ResourceSelectorDialog } from '@/features/projects/components/resource-selector';
 import type { LinkedResource } from '@/features/projects/types/resource';
 import RichTextEditor from '@/shared/components/rte/RichTextEditor';
 import { useRichTextEditor } from '@/shared/components/rte/useRichTextEditor';
+import { getLocaleDateFns } from '@/shared/i18n/helper';
+import { cn } from '@/shared/lib/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Badge } from '@ui/badge';
 import { Button } from '@ui/button';
+import { Calendar } from '@ui/calendar';
 import { Checkbox } from '@ui/checkbox';
-import { Switch } from '@ui/switch';
-import { Input } from '@ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/dialog';
+import { Input } from '@ui/input';
 import { Label } from '@ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/popover';
 import { Progress } from '@ui/progress';
 import { RadioGroup, RadioGroupItem } from '@ui/radio-group';
 import { Separator } from '@ui/separator';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { Switch } from '@ui/switch';
+import { format } from 'date-fns/format';
 import {
   BrainCircuit,
+  CalendarIcon,
   ClipboardList,
   Eye,
   Link2,
   Loader2,
   MessageSquare,
-  CalendarIcon,
   Paperclip,
   Plus,
   Presentation,
@@ -34,13 +40,7 @@ import { useAttachmentUpload } from '../hooks/useAttachmentUpload';
 import { PostType, type PostCreateRequest } from '../types';
 import { formatFileSize, getAcceptString } from '../utils/attachmentValidation';
 import { postEditorSchema } from '../validation/postSchema';
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/popover';
-import { getLocaleDateFns } from '@/shared/i18n/helper';
-import { cn } from '@/shared/lib/utils';
 import { AssignmentListCommand } from './AssignmentListCommand';
-import { format } from 'date-fns/format';
-import type { Assignment } from '@/features/assignment';
-import { Calendar } from '@ui/calendar';
 
 interface PostCreatorProps {
   classId: string;
@@ -102,6 +102,7 @@ export const PostCreator = ({
   const {
     handleSubmit: handleFormSubmit,
     setValue,
+    clearErrors,
     formState: { errors },
   } = form;
 
@@ -111,6 +112,7 @@ export const PostCreator = ({
     try {
       const md = await editor.blocksToMarkdownLossy(editor.document);
       setValue('content', md, { shouldValidate: false, shouldDirty: true });
+      clearErrors('content');
       setAttachmentErrors([]);
     } catch (err) {
       console.error('Failed to convert blocks to markdown:', err);

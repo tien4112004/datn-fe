@@ -1,4 +1,4 @@
-import { Archive, FileDown, FileSpreadsheet, FileText, Paperclip, Presentation } from 'lucide-react';
+import { Archive, FileDown, FileSpreadsheet, FileText, Loader2, Paperclip, Presentation } from 'lucide-react';
 import { useState } from 'react';
 import { ImageLightbox } from '../../../image/components/ImageLightbox';
 
@@ -44,7 +44,11 @@ export const AttachmentPreview = ({ url, className = '' }: AttachmentPreviewProp
     return mimeTypes[ext] || 'application/octet-stream';
   };
 
+  const [isDownloading, setIsDownloading] = useState(false);
+
   const handleDownload = async () => {
+    if (isDownloading) return;
+    setIsDownloading(true);
     try {
       const response = await fetch(url);
       const blob = await response.blob();
@@ -60,6 +64,8 @@ export const AttachmentPreview = ({ url, className = '' }: AttachmentPreviewProp
       console.error('Download failed:', error);
       // Fallback to simple link
       window.open(url, '_blank');
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -82,10 +88,15 @@ export const AttachmentPreview = ({ url, className = '' }: AttachmentPreviewProp
             />
             <button
               onClick={handleDownload}
-              className="absolute right-2 top-2 flex cursor-pointer items-center rounded-lg bg-black/60 p-2 text-white transition-all hover:bg-black/80"
+              disabled={isDownloading}
+              className="absolute right-2 top-2 flex cursor-pointer items-center rounded-lg bg-black/60 p-2 text-white transition-all hover:bg-black/80 disabled:cursor-not-allowed disabled:opacity-70"
               title={fileName}
             >
-              <FileDown className="h-4 w-4" />
+              {isDownloading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <FileDown className="h-4 w-4" />
+              )}
             </button>
           </div>
         </div>
@@ -108,13 +119,23 @@ export const AttachmentPreview = ({ url, className = '' }: AttachmentPreviewProp
   };
 
   return (
-    <div className={`bg-muted/50 flex items-center gap-2 rounded-lg border p-2 md:gap-3 md:p-3 ${className}`}>
+    <div
+      className={`bg-muted/50 hover:bg-muted flex items-center gap-2 rounded-lg border p-2 transition-colors md:gap-3 md:p-3 ${className}`}
+    >
       {getFileIcon(fileType)}
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{fileName}</p>
       </div>
-      <button onClick={handleDownload} className="text-primary hover:text-primary/80">
-        <FileDown className="h-5 w-5" />
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          handleDownload();
+        }}
+        disabled={isDownloading}
+        className="text-primary hover:text-primary/80 flex cursor-pointer items-center rounded-lg p-1 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+        title="Download"
+      >
+        {isDownloading ? <Loader2 className="h-5 w-5 animate-spin" /> : <FileDown className="h-5 w-5" />}
       </button>
     </div>
   );

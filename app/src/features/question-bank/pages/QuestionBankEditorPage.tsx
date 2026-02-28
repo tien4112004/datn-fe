@@ -5,7 +5,8 @@ import { Label } from '@ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
 import { Alert, AlertDescription, AlertTitle } from '@ui/alert';
 import { Separator } from '@ui/separator';
-import { Collapsible, CollapsibleContent } from '@ui/collapsible';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/collapsible';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@ui/tooltip';
 import { useCreateQuestion, useUpdateQuestion, useQuestionBankChapters } from '../hooks/useQuestionBankApi';
 import { useLoaderData } from 'react-router-dom';
 import { CriticalError } from '@aiprimary/api';
@@ -31,7 +32,7 @@ import { VIEW_MODE } from '@aiprimary/core';
 import { QuestionRenderer } from '@/features/question';
 import { generateId } from '@/shared/lib/utils';
 import { toast } from 'sonner';
-import { AlertCircle, Save, Eye, Edit3, Unlink, ChevronDown, ChevronUp } from 'lucide-react';
+import { AlertCircle, Save, Eye, Edit3, Unlink, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
 import { useValidateQuestion } from '../hooks/useValidateQuestion';
 import { useTranslation } from 'react-i18next';
 
@@ -113,6 +114,7 @@ export function QuestionBankEditorPage() {
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isContextOpen, setIsContextOpen] = useState(true);
+  const [showContextSelector, setShowContextSelector] = useState(false);
 
   // Loader-provided question (edit mode) or null (create mode)
   const { question: existingQuestion } = useLoaderData() as { question?: QuestionBankItem | null };
@@ -270,223 +272,122 @@ export function QuestionBankEditorPage() {
                 <h3 className="text-lg font-semibold">{t('editor.metadataSection')}</h3>
                 <Separator />
 
-                {/* Question Type - Only for create mode */}
-                {!isEditMode && (
-                  <div className="space-y-2">
-                    <Label>{t('form.questionType')}</Label>
-                    <Select value={questionData.type} onValueChange={handleTypeChange}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {getAllQuestionTypes().map((type) => (
-                          <SelectItem key={type.value} value={type.value}>
-                            {t(type.i18nKey as any)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-
-                {/* Metadata Row */}
-                <div className="grid grid-cols-4 gap-4">
-                  <div className="space-y-2">
-                    <Label>{t('form.subject')}</Label>
-                    <Select
-                      value={questionData.subject}
-                      onValueChange={(value) =>
-                        setQuestionData({
-                          ...questionData,
-                          subject: value as SubjectCode,
-                          chapter: undefined,
-                        })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {getAllSubjects().map((subject) => (
-                          <SelectItem key={subject.code} value={subject.code}>
-                            {subject.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>{t('form.difficulty')}</Label>
-                    <Select
-                      value={questionData.difficulty}
-                      onValueChange={(value) =>
-                        setQuestionData({ ...questionData, difficulty: value as Difficulty })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {getAllDifficulties().map((difficulty) => (
-                          <SelectItem key={difficulty.value} value={difficulty.value}>
-                            {t(difficulty.i18nKey as any)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>{t('form.grade')}</Label>
-                    <Select
-                      value={questionData.grade || ''}
-                      onValueChange={(value) =>
-                        setQuestionData({ ...questionData, grade: value || undefined, chapter: undefined })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={t('form.selectGradeOptional')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {getAllGrades().map((grade) => (
-                          <SelectItem key={grade.code} value={grade.code}>
-                            {grade.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>{t('form.chapter')}</Label>
-                    <Select
-                      value={questionData.chapter || ''}
-                      onValueChange={(value) =>
-                        setQuestionData({ ...questionData, chapter: value || undefined })
-                      }
-                      disabled={!questionData.subject || !questionData.grade}
-                    >
-                      <SelectTrigger className="w-full truncate">
-                        <SelectValue
-                          placeholder={
-                            !questionData.subject || !questionData.grade
-                              ? t('form.selectSubjectGradeFirst')
-                              : t('form.selectChapterOptional')
-                          }
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {chapters?.map((chapter) => (
-                          <SelectItem key={chapter.id} value={chapter.name}>
-                            {chapter.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Context Section */}
-            {!isPreviewMode && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">{tContext('readingPassage')}</h3>
-                <Separator />
-
-                {/* Context Selector */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label>{tContext('contextLabel')}</Label>
-                    {questionData.contextId && (
-                      <div className="flex items-center gap-1">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 gap-1 text-xs"
-                          onClick={() => setQuestionData({ ...questionData, contextId: undefined })}
-                        >
-                          <Unlink className="h-3 w-3" />
-                          {tContext('disconnect')}
-                        </Button>
-                        {contextData && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                            onClick={() => setIsContextOpen(!isContextOpen)}
-                          >
-                            {isContextOpen ? (
-                              <ChevronUp className="h-4 w-4" />
-                            ) : (
-                              <ChevronDown className="h-4 w-4" />
-                            )}
-                          </Button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  {!questionData.contextId && (
-                    <ContextSelector
-                      value={questionData.contextId}
-                      onChange={(contextId) => setQuestionData({ ...questionData, contextId })}
-                    />
+                <div className="space-y-4 px-4">
+                  {/* Question Type - Only for create mode */}
+                  {!isEditMode && (
+                    <div className="space-y-2">
+                      <Label>{t('form.questionType')}</Label>
+                      <Select value={questionData.type} onValueChange={handleTypeChange}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {getAllQuestionTypes().map((type) => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {t(type.i18nKey as any)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   )}
-                  <p className="text-muted-foreground text-xs">{t('editor.contextDescription')}</p>
-                </div>
 
-                {/* Context Display */}
-                {contextData && (
-                  <Collapsible open={isContextOpen} onOpenChange={setIsContextOpen}>
-                    <CollapsibleContent>
-                      <div className="mt-2 rounded-lg border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
-                        <div className="space-y-3">
-                          {contextData.title && (
-                            <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                              {contextData.title}
-                            </h4>
-                          )}
-                          <MarkdownPreview
-                            content={contextData.content}
-                            className="text-sm text-gray-700 dark:text-gray-300"
+                  {/* Metadata Row */}
+                  <div className="grid grid-cols-4 gap-4">
+                    <div className="space-y-2">
+                      <Label>{t('form.subject')}</Label>
+                      <Select
+                        value={questionData.subject}
+                        onValueChange={(value) =>
+                          setQuestionData({
+                            ...questionData,
+                            subject: value as SubjectCode,
+                            chapter: undefined,
+                          })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {getAllSubjects().map((subject) => (
+                            <SelectItem key={subject.code} value={subject.code}>
+                              {subject.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>{t('form.difficulty')}</Label>
+                      <Select
+                        value={questionData.difficulty}
+                        onValueChange={(value) =>
+                          setQuestionData({ ...questionData, difficulty: value as Difficulty })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {getAllDifficulties().map((difficulty) => (
+                            <SelectItem key={difficulty.value} value={difficulty.value}>
+                              {t(difficulty.i18nKey as any)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>{t('form.grade')}</Label>
+                      <Select
+                        value={questionData.grade || ''}
+                        onValueChange={(value) =>
+                          setQuestionData({ ...questionData, grade: value || undefined, chapter: undefined })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={t('form.selectGradeOptional')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {getAllGrades().map((grade) => (
+                            <SelectItem key={grade.code} value={grade.code}>
+                              {grade.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>{t('form.chapter')}</Label>
+                      <Select
+                        value={questionData.chapter || ''}
+                        onValueChange={(value) =>
+                          setQuestionData({ ...questionData, chapter: value || undefined })
+                        }
+                        disabled={!questionData.subject || !questionData.grade}
+                      >
+                        <SelectTrigger className="w-full truncate">
+                          <SelectValue
+                            placeholder={
+                              !questionData.subject || !questionData.grade
+                                ? t('form.selectSubjectGradeFirst')
+                                : t('form.selectChapterOptional')
+                            }
                           />
-                          {contextData.author && (
-                            <p className="text-right text-xs italic text-gray-600 dark:text-gray-400">
-                              — {contextData.author}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </CollapsibleContent>
-                  </Collapsible>
-                )}
-              </div>
-            )}
-
-            {/* Context Display - Preview Mode (Read-only) */}
-            {isPreviewMode && contextData && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">{tContext('readingPassage')}</h3>
-                <Separator />
-                <div className="rounded-lg border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
-                  <div className="space-y-3">
-                    {contextData.title && (
-                      <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                        {contextData.title}
-                      </h4>
-                    )}
-                    <MarkdownPreview
-                      content={contextData.content}
-                      className="text-sm text-gray-700 dark:text-gray-300"
-                    />
-                    {contextData.author && (
-                      <p className="text-right text-xs italic text-gray-600 dark:text-gray-400">
-                        — {contextData.author}
-                      </p>
-                    )}
+                        </SelectTrigger>
+                        <SelectContent>
+                          {chapters?.map((chapter) => (
+                            <SelectItem key={chapter.id} value={chapter.name}>
+                              {chapter.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -511,14 +412,99 @@ export function QuestionBankEditorPage() {
 
             {/* Question Content Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">{t('editor.contentSection')}</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">{t('editor.contentSection')}</h3>
+                {!isPreviewMode && !questionData.contextId && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant={showContextSelector ? 'secondary' : 'outline'}
+                        size="sm"
+                        className="gap-1.5"
+                        onClick={() => setShowContextSelector(!showContextSelector)}
+                      >
+                        <BookOpen className="h-4 w-4" />
+                        {tContext('readingPassage')}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{t('editor.contextDescription')}</TooltipContent>
+                  </Tooltip>
+                )}
+              </div>
               <Separator />
 
-              <QuestionRenderer
-                question={questionData as Question}
-                viewMode={isPreviewMode ? VIEW_MODE.VIEWING : VIEW_MODE.EDITING}
-                onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
-              />
+              <div className="space-y-4 px-4">
+                {/* Context Selector - shown when toggle is on and no context linked */}
+                {!isPreviewMode && showContextSelector && !questionData.contextId && (
+                  <div className="space-y-1">
+                    <ContextSelector
+                      value={questionData.contextId}
+                      onChange={(contextId) => {
+                        setQuestionData({ ...questionData, contextId });
+                        setShowContextSelector(false);
+                      }}
+                    />
+                    <p className="text-muted-foreground text-xs">{t('editor.contextDescription')}</p>
+                  </div>
+                )}
+
+                {/* Context Display - Collapsible */}
+                {contextData && (
+                  <Collapsible open={isContextOpen} onOpenChange={setIsContextOpen}>
+                    <div className="flex items-center gap-1">
+                      <CollapsibleTrigger asChild>
+                        <button
+                          type="button"
+                          className="flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-blue-200 bg-blue-50/50 px-4 py-3 text-left transition-colors hover:bg-blue-100/50 dark:border-blue-800 dark:bg-blue-900/20 dark:hover:bg-blue-900/30"
+                        >
+                          <BookOpen className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
+                          <span className="flex-1 truncate text-sm font-medium text-blue-700 dark:text-blue-300">
+                            {contextData.title || tContext('readingPassage')}
+                          </span>
+                          {isContextOpen ? (
+                            <ChevronUp className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
+                          )}
+                        </button>
+                      </CollapsibleTrigger>
+                      {!isPreviewMode && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-9 w-9 shrink-0 p-0 text-gray-400 hover:text-red-600"
+                          onClick={() => setQuestionData({ ...questionData, contextId: undefined })}
+                        >
+                          <Unlink className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                    <CollapsibleContent>
+                      <div className="rounded-b-lg border border-t-0 border-blue-200 bg-blue-50/50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+                        <div className="space-y-3">
+                          <MarkdownPreview
+                            content={contextData.content}
+                            className="text-sm text-gray-700 dark:text-gray-300"
+                          />
+                          {contextData.author && (
+                            <p className="text-right text-xs italic text-gray-600 dark:text-gray-400">
+                              — {contextData.author}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                )}
+
+                <QuestionRenderer
+                  question={questionData as Question}
+                  viewMode={isPreviewMode ? VIEW_MODE.VIEWING : VIEW_MODE.EDITING}
+                  onChange={(updated) => setQuestionData({ ...questionData, ...updated })}
+                />
+              </div>
             </div>
           </form>
         </div>

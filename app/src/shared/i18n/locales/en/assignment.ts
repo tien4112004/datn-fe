@@ -1452,6 +1452,7 @@ export default {
     contentPlaceholder: 'Enter reading passage content...',
     authorPlaceholder: 'Author (optional)',
     done: 'Done',
+    cancel: 'Cancel',
     disconnect: 'Disconnect reading passage',
     assignmentOnlyHint: 'Changes only apply to this assignment.',
     viewQuestions: 'View questions',

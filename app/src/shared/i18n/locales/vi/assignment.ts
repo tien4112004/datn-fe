@@ -1439,6 +1439,7 @@ export default {
     contentPlaceholder: 'Nhập nội dung đoạn văn...',
     authorPlaceholder: 'Tác giả (tùy chọn)',
     done: 'Xong',
+    cancel: 'Hủy',
     disconnect: 'Ngắt kết nối đoạn văn',
     assignmentOnlyHint: 'Thay đổi chỉ áp dụng cho bài tập này.',
     viewQuestions: 'Xem câu hỏi',

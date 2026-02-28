@@ -438,11 +438,11 @@ export function GenerateMatrixPanel({
               isError={isErrorModels}
             />
           </div>
+          <AiDisclaimer />
         </div>
 
         {/* Footer */}
         <div className="space-y-3 px-2 pt-4">
-          <AiDisclaimer />
           <div className="flex justify-end gap-2">
             {onClose && (
               <Button variant="outline" onClick={onClose}>

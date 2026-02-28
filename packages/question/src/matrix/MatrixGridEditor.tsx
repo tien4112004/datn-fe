@@ -121,9 +121,16 @@ export const MatrixGridEditor = ({
                     {topic.chapters && topic.chapters.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1">
                         {topic.chapters.map((chapter, idx) => (
-                          <Badge key={idx} variant="secondary" className="text-xs">
-                            {chapter}
-                          </Badge>
+                          <Tooltip key={idx}>
+                            <TooltipTrigger asChild>
+                              <Badge variant="secondary" className="max-w-full overflow-hidden text-xs">
+                                <span className="block truncate">{chapter}</span>
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{chapter}</p>
+                            </TooltipContent>
+                          </Tooltip>
                         ))}
                       </div>
                     )}

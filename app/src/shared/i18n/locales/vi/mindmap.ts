@@ -184,6 +184,14 @@ export default {
       cancel: 'Hủy',
       generate: 'Tạo',
     },
+    fileUpload: {
+      attachFiles: 'Đính kèm tệp',
+      uploading: 'Đang tải lên...',
+      uploadError: 'Tải tệp lên thất bại. Vui lòng thử lại.',
+      topicOrFileRequired: 'Vui lòng nhập chủ đề hoặc đính kèm ít nhất một tệp',
+      fileTooLarge: '"{{name}}" vượt quá giới hạn 10 MB',
+      totalSizeTooLarge: 'Tổng kích thước tệp không được vượt quá 10 MB',
+    },
   },
   export: {
     title: 'Xuất Mindmap',

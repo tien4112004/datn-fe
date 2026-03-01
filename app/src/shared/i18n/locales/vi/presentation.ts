@@ -38,6 +38,7 @@ export default {
       uploading: 'Đang tải lên...',
       uploadError: 'Tải tệp lên thất bại. Vui lòng thử lại.',
       fileTooLarge: '"{{name}}" vượt quá giới hạn 10 MB',
+      totalSizeTooLarge: 'Tổng kích thước tệp không được vượt quá 10 MB',
     },
     advancedOptions: 'Tùy chọn nâng cao',
     style: {

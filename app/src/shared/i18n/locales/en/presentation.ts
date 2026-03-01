@@ -22,6 +22,7 @@ export default {
       uploading: 'Uploading...',
       uploadError: 'Failed to upload file. Please try again.',
       fileTooLarge: '"{{name}}" exceeds the 10 MB limit',
+      totalSizeTooLarge: 'Total file size cannot exceed 10 MB',
     },
     advancedOptions: 'Advanced Options',
     style: {

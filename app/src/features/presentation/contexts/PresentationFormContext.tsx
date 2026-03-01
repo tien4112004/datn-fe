@@ -1,13 +1,5 @@
 import { getLocalStorageData } from '@/shared/lib/utils';
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from 'react';
+import React, { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
 import {
   useForm,
   type Control,
@@ -22,10 +14,8 @@ import useFormPersist from 'react-hook-form-persist';
 import { moduleMap } from '../components/remote/module';
 import type { SlideTheme } from '../types/slide';
 import type { ArtStyle } from '@aiprimary/core';
-import { useImageApiService } from '@/features/image/api';
-import { toast } from 'sonner';
 import type { AttachedFile } from '@/shared/components/FileAttachmentInput';
-import { MAX_FILE_SIZE } from '@/shared/components/FileAttachmentInput';
+import { useFileUpload } from '@/shared/hooks/useFileUpload';
 import { t } from 'i18next';
 
 export type UnifiedFormData = {
@@ -74,39 +64,11 @@ const PRESENTATION_FORM_KEY = 'presentation-unified-form';
 
 export const PresentationFormProvider = ({ children }: PresentationFormProviderProps) => {
   const persistedData = useMemo(() => getLocalStorageData(PRESENTATION_FORM_KEY), []);
-  const imageApiService = useImageApiService();
 
-  const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
-  const [isUploadingFiles, setIsUploadingFiles] = useState(false);
-
-  const uploadFiles = useCallback(
-    async (files: FileList) => {
-      const allFiles = Array.from(files);
-      const oversized = allFiles.filter((f) => f.size > MAX_FILE_SIZE);
-      const valid = allFiles.filter((f) => f.size <= MAX_FILE_SIZE);
-
-      oversized.forEach((f) =>
-        toast.error(t('presentation:createOutline.fileUpload.fileTooLarge', { name: f.name }))
-      );
-
-      if (valid.length === 0) return;
-
-      setIsUploadingFiles(true);
-      try {
-        const uploads = valid.map(async (file) => {
-          const cdnUrl = await imageApiService.uploadImage(file);
-          return { name: file.name, url: cdnUrl, size: file.size };
-        });
-        const results = await Promise.all(uploads);
-        setAttachedFiles((prev) => [...prev, ...results]);
-      } catch {
-        toast.error(t('presentation:createOutline.fileUpload.uploadError'));
-      } finally {
-        setIsUploadingFiles(false);
-      }
-    },
-    [imageApiService]
-  );
+  const { attachedFiles, setAttachedFiles, isUploadingFiles, uploadFiles } = useFileUpload({
+    totalSizeTooLargeMessage: t('presentation:createOutline.fileUpload.totalSizeTooLarge'),
+    uploadErrorMessage: t('presentation:createOutline.fileUpload.uploadError'),
+  });
 
   // Zod validation schema for presentation form
   const presentationFormSchema = useMemo(

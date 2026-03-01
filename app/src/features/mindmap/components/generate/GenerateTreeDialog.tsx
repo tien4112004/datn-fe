@@ -15,6 +15,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@ui/separator';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { AiDisclaimer } from '@/shared/components/common/AiDisclaimer';
+import { FileChips, FileAttachButton } from '@/shared/components/FileAttachmentInput';
+import { useFileUpload } from '@/shared/hooks/useFileUpload';
 import { getAllGrades, getAllSubjects } from '@aiprimary/core';
 import { useGenerateMindmap } from '../../hooks/useApi';
 import { convertAiDataToMindMapNodes, getTreeLayoutType } from '../../services/utils';
@@ -72,7 +74,19 @@ function GenerateTreeDialog({ isOpen, onOpenChange }: GenerateTreeDialogProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const { attachedFiles, setAttachedFiles, isUploadingFiles, uploadFiles } = useFileUpload({
+    totalSizeTooLargeMessage: t('generate.fileUpload.totalSizeTooLarge'),
+    uploadErrorMessage: t('generate.fileUpload.uploadError'),
+  });
+
   const onSubmit = async (data: CreateMindmapFormData) => {
+    const hasTopic = data.topic.trim().length > 0;
+    const hasFiles = attachedFiles.length > 0;
+    if (!hasTopic && !hasFiles) {
+      setError(t('generate.fileUpload.topicOrFileRequired'));
+      return;
+    }
+
     setError(null);
     setIsGenerating(true);
     prepareToPushUndo();
@@ -80,7 +94,7 @@ function GenerateTreeDialog({ isOpen, onOpenChange }: GenerateTreeDialogProps) {
     try {
       // Generate AI nodes using the API
       const aiResponse = await generateMutation.mutateAsync({
-        topic: data.topic,
+        topic: data.topic || undefined,
         model: data.model.name,
         provider: data.model.provider,
         language: data.language,
@@ -88,6 +102,7 @@ function GenerateTreeDialog({ isOpen, onOpenChange }: GenerateTreeDialogProps) {
         maxBranchesPerNode: data.maxBranchesPerNode,
         grade: data.grade || undefined,
         subject: data.subject || undefined,
+        fileUrls: hasFiles ? attachedFiles.map((f) => f.url) : undefined,
       });
 
       // Get current viewport center as base position
@@ -120,6 +135,7 @@ function GenerateTreeDialog({ isOpen, onOpenChange }: GenerateTreeDialogProps) {
 
       pushToUndoStack();
       reset();
+      setAttachedFiles([]);
       onOpenChange(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate mindmap tree');
@@ -132,6 +148,7 @@ function GenerateTreeDialog({ isOpen, onOpenChange }: GenerateTreeDialogProps) {
   const handleCancel = () => {
     reset();
     setError(null);
+    setAttachedFiles([]);
     onOpenChange(false);
   };
 
@@ -157,7 +174,7 @@ function GenerateTreeDialog({ isOpen, onOpenChange }: GenerateTreeDialogProps) {
                     <Controller
                       name="topic"
                       control={control}
-                      rules={{ required: true, minLength: 1, maxLength: 500 }}
+                      rules={{ maxLength: 500 }}
                       render={({ field }) => (
                         <div className="px-2">
                           <AutosizeTextarea
@@ -172,7 +189,18 @@ function GenerateTreeDialog({ isOpen, onOpenChange }: GenerateTreeDialogProps) {
                         </div>
                       )}
                     />
+                    {/* File chips — above the hint */}
+                    <FileChips
+                      attachedFiles={attachedFiles}
+                      onRemove={(url) => setAttachedFiles((prev) => prev.filter((f) => f.url !== url))}
+                    />
                     <p className="text-muted-foreground text-xs">{t('generate.prompt.hint')}</p>
+                    <FileAttachButton
+                      onFilesSelected={uploadFiles}
+                      isUploading={isUploadingFiles}
+                      buttonLabel={t('generate.fileUpload.attachFiles')}
+                      uploadingLabel={t('generate.fileUpload.uploading')}
+                    />
                   </div>
                 </div>
 
@@ -364,7 +392,13 @@ function GenerateTreeDialog({ isOpen, onOpenChange }: GenerateTreeDialogProps) {
             <Button type="button" variant="outline" onClick={handleCancel} disabled={isGenerating}>
               {t('generate.actions.cancel')}
             </Button>
-            <Button type="submit" disabled={!topicValue.trim() || isGenerating} className="gap-2">
+            <Button
+              type="submit"
+              disabled={
+                (!topicValue.trim() && attachedFiles.length === 0) || isGenerating || isUploadingFiles
+              }
+              className="gap-2"
+            >
               <Sparkles className="h-4 w-4" />
               {isGenerating ? t('create.generating') : t('generate.actions.generate')}
             </Button>

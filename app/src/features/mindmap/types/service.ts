@@ -112,7 +112,7 @@ export type MindmapTitleUpdateResponse = null;
  */
 export type MindmapGenerateRequest = {
   /** The main topic or subject for the mindmap generation (1-500 chars) */
-  topic: string;
+  topic?: string;
   /** The AI model id to use for generation (from Model.id in /features/model) */
   model: string;
   /** The AI service provider (from Model.provider in /features/model) */
@@ -127,4 +127,6 @@ export type MindmapGenerateRequest = {
   grade?: string;
   /** The subject area for the content (max 100 chars) */
   subject?: string;
+  /** CDN URLs of uploaded files to use as source material */
+  fileUrls?: string[];
 };

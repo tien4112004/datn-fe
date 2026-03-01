@@ -382,5 +382,13 @@ export default {
     cancel: 'Cancel',
     generate: 'Generate',
     generating: 'Generating...',
+    errors: {
+      parentNodeNotFound: 'Parent node not found',
+      failedToExpand: 'Failed to expand node',
+      noChildrenGenerated: 'No children generated. Try adjusting settings.',
+    },
+    success: {
+      childrenGenerated: 'Child nodes generated successfully',
+    },
   },
 };

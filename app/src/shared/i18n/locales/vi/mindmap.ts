@@ -382,5 +382,13 @@ export default {
     cancel: 'Hủy',
     generate: 'Tạo',
     generating: 'Đang tạo...',
+    errors: {
+      parentNodeNotFound: 'Không tìm thấy nút cha',
+      failedToExpand: 'Không thể mở rộng nút',
+      noChildrenGenerated: 'Không có nút con nào được tạo. Hãy thử điều chỉnh cài đặt.',
+    },
+    success: {
+      childrenGenerated: 'Các nút con đã được tạo thành công',
+    },
   },
 };

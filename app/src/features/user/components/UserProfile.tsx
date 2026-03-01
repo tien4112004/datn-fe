@@ -2,6 +2,7 @@ import { UserProfileForm } from './UserProfileForm';
 import { AvatarUploader } from './AvatarUploader';
 import { useUserProfile } from '../hooks/useApi';
 import { Alert, AlertDescription, AlertTitle } from '@ui/alert';
+import { Separator } from '@ui/separator';
 import { Terminal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -33,11 +34,22 @@ const UserProfile = () => {
 
   return (
     <div className="space-y-6 py-4">
-      <div className="flex flex-col gap-8 lg:flex-row">
-        <div className="">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="lg:col-span-1">
+          <h3 className="text-lg font-medium">{t('profile.title')}</h3>
+          <p className="text-muted-foreground text-sm">{t('profile.subtitle')}</p>
+        </div>
+        <div className="lg:col-span-2">
           <AvatarUploader />
         </div>
-        <div className="flex-1">
+      </div>
+      <Separator />
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="lg:col-span-1">
+          <h3 className="text-lg font-medium">{t('profile.form.title')}</h3>
+          <p className="text-muted-foreground text-sm">{t('profile.form.subtitle')}</p>
+        </div>
+        <div className="lg:col-span-2">
           <UserProfileForm />
         </div>
       </div>

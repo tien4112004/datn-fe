@@ -3,9 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import CommonTabs, { type TabItem } from '@/shared/components/common/CommonTabs';
 import { PageHeader } from '@/shared/components/common/PageHeader';
 import { PageContainer } from '@/shared/components/common/PageContainer';
-import { Separator } from '@ui/separator';
-import GeneralSettings from '../components/GeneralSettings';
-import AppearanceSettings from '../components/AppearanceSettings';
 import DevToolsSettings from '../components/DevToolsSettings';
 import LanguageSettings from '../components/LanguageSettings';
 import UserProfilePage from '@/features/user/components/UserProfile';
@@ -46,16 +43,8 @@ function SettingsPage() {
               <LanguageSettings />
             </div>
           </div>
-          <Separator />
-          <GeneralSettings />
         </div>
       ),
-    },
-    {
-      key: 'appearance',
-      value: 'appearance',
-      label: t('tabs.appearance'),
-      content: <AppearanceSettings />,
     },
     {
       key: 'devtools',

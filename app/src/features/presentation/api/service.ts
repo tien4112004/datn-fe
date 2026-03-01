@@ -244,6 +244,7 @@ export default class PresentationService implements PresentationApiService {
       theme: data?.theme,
       viewport: data?.viewport,
       isParsed: data?.parsed || data?.isParsed || false,
+      pageNumberSettings: data?.pageNumberSettings,
       createdAt: data?.createdAt,
       updatedAt: data?.updatedAt,
     };

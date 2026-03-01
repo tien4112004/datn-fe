@@ -40,10 +40,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useSlidesStore } from '@/store';
-import type { PPTTextElement } from '@/types/slides';
+import type { PageNumberPosition } from '@/types/slides';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
 import Checkbox from '@/components/Checkbox.vue';
 import Button from '@/components/Button.vue';
@@ -53,20 +53,19 @@ const emit = defineEmits<{
 }>();
 
 const slidesStore = useSlidesStore();
-const { slides, viewportSize, viewportRatio, theme } = storeToRefs(slidesStore);
+const { pageNumberSettings } = storeToRefs(slidesStore);
 const { addHistorySnapshot } = useHistorySnapshot();
-
-type PageNumberPosition =
-  | 'top-left'
-  | 'top-center'
-  | 'top-right'
-  | 'bottom-left'
-  | 'bottom-center'
-  | 'bottom-right';
 
 const showPageNumbers = ref(true);
 const skipTitlePage = ref(true);
 const selectedPosition = ref<PageNumberPosition>('bottom-right');
+
+// Initialize from store settings
+onMounted(() => {
+  showPageNumbers.value = pageNumberSettings.value.enabled;
+  skipTitlePage.value = pageNumberSettings.value.skipTitlePage;
+  selectedPosition.value = pageNumberSettings.value.position;
+});
 
 const pageNumberPositions: Array<{
   value: PageNumberPosition;
@@ -105,71 +104,17 @@ const pageNumberPositions: Array<{
   },
 ];
 
-const getPositionCoordinates = (position: PageNumberPosition) => {
-  const width = 50;
-  const height = 30;
-  const margin = 20;
-  const slideWidth = viewportSize.value;
-  const slideHeight = viewportSize.value * viewportRatio.value;
-
-  const positions: Record<PageNumberPosition, { left: number; top: number }> = {
-    'top-left': { left: margin, top: margin },
-    'top-center': { left: (slideWidth - width) / 2, top: margin },
-    'top-right': { left: slideWidth - width - margin, top: margin },
-    'bottom-left': { left: margin, top: slideHeight - height - margin },
-    'bottom-center': { left: (slideWidth - width) / 2, top: slideHeight - height - margin },
-    'bottom-right': { left: slideWidth - width - margin, top: slideHeight - height - margin },
-  };
-
-  return positions[position];
-};
-
 const applyPageNumbers = () => {
-  const newSlides = slides.value.map((slide, index) => {
-    const filteredElements = slide.elements.filter(
-      (el) => !(el.type === 'text' && (el as PPTTextElement).textType === 'pageNumber')
-    );
-
-    if (!showPageNumbers.value) {
-      return {
-        ...slide,
-        elements: filteredElements,
-      };
-    }
-
-    if (skipTitlePage.value && index === 0) {
-      return {
-        ...slide,
-        elements: filteredElements,
-      };
-    }
-
-    const pageNumber = skipTitlePage.value ? index : index + 1;
-    const position = getPositionCoordinates(selectedPosition.value);
-
-    const pageNumberElement: PPTTextElement = {
-      type: 'text' as const,
-      lock: true,
-      id: `el-${Date.now()}-${Math.random()}`,
-      left: position.left,
-      top: position.top,
-      width: 50,
-      height: 30,
-      content: pageNumber.toString(),
-      rotate: 0,
-      textType: 'pageNumber' as const,
-      defaultFontName: theme.value.fontName,
-      defaultColor: theme.value.fontColor,
-      vertical: false,
-    };
-
-    return {
-      ...slide,
-      elements: [...filteredElements, pageNumberElement],
-    };
+  // Save settings to store (persisted on next save)
+  slidesStore.setPageNumberSettings({
+    enabled: showPageNumbers.value,
+    position: selectedPosition.value,
+    skipTitlePage: skipTitlePage.value,
   });
 
-  slidesStore.setSlides(newSlides);
+  // Reapply page numbers to all existing slides
+  slidesStore.reapplyPageNumbers();
+
   addHistorySnapshot();
   emit('close');
 };

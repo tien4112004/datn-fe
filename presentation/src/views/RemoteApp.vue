@@ -126,6 +126,10 @@ onMounted(async () => {
     slidesStore.setViewportSize(props.presentation.viewport.width);
   }
 
+  if (props.presentation.pageNumberSettings) {
+    slidesStore.setPageNumberSettings(props.presentation.pageNumberSettings);
+  }
+
   // Get pinia instance
   const instance = getCurrentInstance();
   const pinia = instance?.appContext.config.globalProperties.$pinia;

@@ -1,4 +1,4 @@
-import type { Slide, SlideTheme } from '@aiprimary/core';
+import type { Slide, SlideTheme, PageNumberSettings } from '@aiprimary/core';
 
 /** Permission levels (kept local to avoid deep-import from application code) */
 export type Permission = 'read' | 'comment' | 'edit';
@@ -16,6 +16,7 @@ export interface Presentation {
   thumbnail?: string;
   slides?: Slide[];
   isParsed?: boolean;
+  pageNumberSettings?: PageNumberSettings;
   createdAt?: Date | string;
   updatedAt?: Date | string;
   permission?: Permission;

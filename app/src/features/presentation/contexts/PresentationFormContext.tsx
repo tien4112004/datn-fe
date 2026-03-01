@@ -1,5 +1,13 @@
 import { getLocalStorageData } from '@/shared/lib/utils';
-import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 import {
   useForm,
   type Control,
@@ -14,6 +22,11 @@ import useFormPersist from 'react-hook-form-persist';
 import { moduleMap } from '../components/remote/module';
 import type { SlideTheme } from '../types/slide';
 import type { ArtStyle } from '@aiprimary/core';
+import { useImageApiService } from '@/features/image/api';
+import { toast } from 'sonner';
+import type { AttachedFile } from '@/shared/components/FileAttachmentInput';
+import { MAX_FILE_SIZE } from '@/shared/components/FileAttachmentInput';
+import { t } from 'i18next';
 
 export type UnifiedFormData = {
   // Outline fields
@@ -45,6 +58,10 @@ interface PresentationFormContextValue {
   setValue: UseFormSetValue<UnifiedFormData>;
   trigger: UseFormTrigger<UnifiedFormData>;
   getValues: UseFormGetValues<UnifiedFormData>;
+  attachedFiles: AttachedFile[];
+  setAttachedFiles: React.Dispatch<React.SetStateAction<AttachedFile[]>>;
+  isUploadingFiles: boolean;
+  uploadFiles: (files: FileList) => Promise<void>;
 }
 
 const PresentationFormContext = createContext<PresentationFormContextValue | null>(null);
@@ -57,13 +74,46 @@ const PRESENTATION_FORM_KEY = 'presentation-unified-form';
 
 export const PresentationFormProvider = ({ children }: PresentationFormProviderProps) => {
   const persistedData = useMemo(() => getLocalStorageData(PRESENTATION_FORM_KEY), []);
+  const imageApiService = useImageApiService();
+
+  const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
+  const [isUploadingFiles, setIsUploadingFiles] = useState(false);
+
+  const uploadFiles = useCallback(
+    async (files: FileList) => {
+      const allFiles = Array.from(files);
+      const oversized = allFiles.filter((f) => f.size > MAX_FILE_SIZE);
+      const valid = allFiles.filter((f) => f.size <= MAX_FILE_SIZE);
+
+      oversized.forEach((f) =>
+        toast.error(t('presentation:createOutline.fileUpload.fileTooLarge', { name: f.name }))
+      );
+
+      if (valid.length === 0) return;
+
+      setIsUploadingFiles(true);
+      try {
+        const uploads = valid.map(async (file) => {
+          const cdnUrl = await imageApiService.uploadImage(file);
+          return { name: file.name, url: cdnUrl, size: file.size };
+        });
+        const results = await Promise.all(uploads);
+        setAttachedFiles((prev) => [...prev, ...results]);
+      } catch {
+        toast.error(t('presentation:createOutline.fileUpload.uploadError'));
+      } finally {
+        setIsUploadingFiles(false);
+      }
+    },
+    [imageApiService]
+  );
 
   // Zod validation schema for presentation form
   const presentationFormSchema = useMemo(
     () =>
       z.object({
-        // Outline fields - required
-        topic: z.string().min(1),
+        // Outline fields - topic optional when files are attached
+        topic: z.string(),
         slideCount: z.number().min(1),
         language: z.string().min(1),
         model: z.object({
@@ -142,8 +192,21 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
       setValue: form.setValue,
       trigger: form.trigger,
       getValues: form.getValues,
+      attachedFiles,
+      setAttachedFiles,
+      isUploadingFiles,
+      uploadFiles,
     }),
-    [form.control, form.watch, form.setValue, form.trigger, form.getValues]
+    [
+      form.control,
+      form.watch,
+      form.setValue,
+      form.trigger,
+      form.getValues,
+      attachedFiles,
+      isUploadingFiles,
+      uploadFiles,
+    ]
   );
 
   return <PresentationFormContext.Provider value={contextValue}>{children}</PresentationFormContext.Provider>;

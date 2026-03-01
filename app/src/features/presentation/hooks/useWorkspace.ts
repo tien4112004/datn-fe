@@ -18,7 +18,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
 
   // Form context
   const formHook = usePresentationForm();
-  const { getValues, trigger, setValue } = formHook;
+  const { getValues, trigger, setValue, attachedFiles } = formHook;
 
   // Stores
   const setOutlines = useOutlineStore((state) => state.setOutlines);
@@ -40,7 +40,8 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
     fetch,
   } = useFetchStreamingOutline(
     {
-      topic: getValues().topic,
+      topic: getValues().topic || undefined,
+      fileUrls: attachedFiles.map((f) => f.url),
       slideCount: getValues().slideCount,
       language: getValues().language,
       model: getValues().model,
@@ -66,12 +67,17 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
 
   // Form handlers
   const handleRegenerateOutline = useCallback(async () => {
-    const isValid = await trigger(['topic', 'slideCount', 'language', 'model']);
+    const data = getValues();
+    const hasTopic = data.topic?.trim().length > 0;
+    const hasFiles = attachedFiles.length > 0;
+    if (!hasTopic && !hasFiles) return;
+
+    const isValid = await trigger(['slideCount', 'language', 'model']);
     if (!isValid) return;
 
-    const data = getValues();
     const outlineData = {
-      topic: data.topic,
+      topic: data.topic || undefined,
+      fileUrls: attachedFiles.map((f) => f.url),
       slideCount: data.slideCount,
       language: data.language,
       model: data.model,
@@ -79,7 +85,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
       subject: data.subject || undefined,
     };
     restartStream(outlineData);
-  }, []);
+  }, [attachedFiles, getValues, trigger, restartStream]);
 
   const handleGeneratePresentation = useCallback(async () => {
     const isValid = await trigger([

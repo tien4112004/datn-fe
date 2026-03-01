@@ -4,7 +4,8 @@ export type OutlineItem = {
 };
 
 export type OutlineData = {
-  topic: string;
+  topic?: string;
+  fileUrls?: string[];
   slideCount: number;
   language: string;
   model: {

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Controller, useWatch } from 'react-hook-form';
-import { CircleAlert, RotateCcw } from 'lucide-react';
+import { CircleAlert, File, Loader2, Paperclip, RotateCcw, X } from 'lucide-react';
 import OutlineWorkspace from './OutlineWorkspace';
 import { AutosizeTextarea } from '@ui/autosize-textarea';
 import {
@@ -20,10 +20,12 @@ import { useWorkspace } from '@/features/presentation/hooks/useWorkspace';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
 import CustomizationSection from './PresentationCustomizationForm';
 import LoadingButton from '@/components/common/LoadingButton';
-import { useCallback, useEffect, memo } from 'react';
+import { useCallback, useEffect, memo, useRef } from 'react';
 import useOutlineStore from '../../stores/useOutlineStore';
 import { UnsavedChangesDialog } from '../UnsavedChangesDialog';
 import { useGeneratingBlocker } from '../../hooks/useGeneratingBlocker';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/tooltip';
+import { formatFileSize } from '@/shared/components/FileAttachmentInput';
 
 interface WorkspaceViewProps {
   onWorkspaceEmpty: () => void;
@@ -45,11 +47,13 @@ const WorkspaceView = ({ onWorkspaceEmpty }: WorkspaceViewProps) => {
     getValues,
   } = useWorkspace({});
 
+  const { attachedFiles } = usePresentationForm();
+
   useEffect(() => {
-    if (isEmpty() && getValues().topic.trim() === '' && !isStreaming) {
+    if (isEmpty() && getValues().topic.trim() === '' && attachedFiles.length === 0 && !isStreaming) {
       onWorkspaceEmpty();
     }
-  }, [isEmpty, isStreaming, onWorkspaceEmpty]);
+  }, [isEmpty, isStreaming, onWorkspaceEmpty, attachedFiles.length]);
 
   const { showDialog, setShowDialog, handleStay, handleProceed } = useGeneratingBlocker(stopStream);
 
@@ -98,19 +102,52 @@ interface OutlineFormSectionProps {
   onRegenerateOutline: () => void;
 }
 
+const FILE_ACCEPT = '.pdf,.docx,.doc,.txt,.jpg,.jpeg,.png,.gif,.webp,.bmp';
+
 const OutlineFormSection = memo(({ isFetching, onRegenerateOutline }: OutlineFormSectionProps) => {
   const { t, i18n } = useTranslation('presentation', { keyPrefix: 'createOutline' });
   const { models } = useModels(MODEL_TYPES.TEXT);
-  const { control } = usePresentationForm();
+  const { control, attachedFiles, setAttachedFiles, isUploadingFiles, uploadFiles } = usePresentationForm();
   const disabled = useOutlineStore((state) => state.isStreaming);
   const grades = getAllGrades();
   const subjects = getAllSubjects();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex w-full flex-row items-center gap-4">
         <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('promptSection')}</div>
         <div className="my-2 flex flex-1 flex-row gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept={FILE_ACCEPT}
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files && e.target.files.length > 0) {
+                uploadFiles(e.target.files);
+                e.target.value = '';
+              }
+            }}
+          />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploadingFiles || disabled}
+                className="shadow-xs text-muted-foreground hover:bg-accent flex h-9 items-center gap-2 whitespace-nowrap rounded-md border bg-transparent px-3 text-sm outline-none transition-colors disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {isUploadingFiles ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Paperclip className="h-4 w-4" />
+                )}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>{t('fileUpload.attachFiles')}</TooltipContent>
+          </Tooltip>
           <Controller
             name="slideCount"
             control={control}
@@ -225,6 +262,31 @@ const OutlineFormSection = memo(({ isFetching, onRegenerateOutline }: OutlineFor
           />
         </div>
       </div>
+      {attachedFiles.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {attachedFiles.map((file) => (
+            <div key={file.url} className="bg-background flex items-center gap-2 rounded-lg border px-3 py-2">
+              <File className="text-muted-foreground h-4 w-4 shrink-0" />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="max-w-[200px] truncate text-sm">{file.name}</span>
+                </TooltipTrigger>
+                <TooltipContent>{file.name}</TooltipContent>
+              </Tooltip>
+              <span className="text-muted-foreground shrink-0 text-xs">{formatFileSize(file.size)}</span>
+              <button
+                type="button"
+                onClick={() => setAttachedFiles((prev) => prev.filter((f) => f.url !== file.url))}
+                disabled={disabled}
+                className="text-muted-foreground hover:text-foreground ml-0.5 inline-flex shrink-0 items-center justify-center rounded-full transition-colors disabled:pointer-events-none"
+                aria-label={`Remove ${file.name}`}
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
       <Controller
         name="topic"
         control={control}

@@ -17,6 +17,12 @@ export default {
     slideCountUnit: 'slides',
     slideCountDescription: 'Number of slides to generate',
     generateOutline: 'Generate Outline',
+    fileUpload: {
+      attachFiles: 'Attach files',
+      uploading: 'Uploading...',
+      uploadError: 'Failed to upload file. Please try again.',
+      fileTooLarge: '"{{name}}" exceeds the 10 MB limit',
+    },
     advancedOptions: 'Advanced Options',
     style: {
       placeholder: 'Which style?',

@@ -33,6 +33,12 @@ export default {
     slideCountUnit: 'trang',
     slideCountDescription: 'Số lượng trang cần tạo',
     generateOutline: 'Tạo dàn ý',
+    fileUpload: {
+      attachFiles: 'Đính kèm tệp',
+      uploading: 'Đang tải lên...',
+      uploadError: 'Tải tệp lên thất bại. Vui lòng thử lại.',
+      fileTooLarge: '"{{name}}" vượt quá giới hạn 10 MB',
+    },
     advancedOptions: 'Tùy chọn nâng cao',
     style: {
       placeholder: 'Phong cách nào?',

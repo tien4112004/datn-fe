@@ -778,6 +778,10 @@ export default {
     // Hướng dẫn sử dụng
     tutorial: {
       steps: {
+        toolbar: {
+          title: 'Thanh công cụ điều hướng',
+          description: 'Truy cập nhanh thông tin bài tập, ma trận, đoạn văn đọc hiểu và chế độ danh sách.',
+        },
         infoIcon: {
           title: 'Thông tin bài tập',
           description: 'Xem và chỉnh sửa tiêu đề, môn học, khối lớp và các chi tiết khác của bài tập.',
@@ -794,6 +798,11 @@ export default {
           title: 'Danh sách câu hỏi',
           description: 'Xem tất cả câu hỏi dưới dạng danh sách cuộn để xem nhanh.',
         },
+        questionsGrid: {
+          title: 'Lưới câu hỏi',
+          description:
+            'Tất cả câu hỏi hiển thị ở đây. Kéo bất kỳ số câu hỏi nào để sắp xếp lại. Nhóm đọc hiểu sẽ di chuyển cùng nhau.',
+        },
         questionItem: {
           title: 'Câu hỏi',
           description: 'Mỗi ô số đại diện cho một câu hỏi. Nhấp để chỉnh sửa, kéo để sắp xếp lại.',
@@ -801,10 +810,6 @@ export default {
         contextGroup: {
           title: 'Nhóm đọc hiểu',
           description: 'Biểu tượng này nhóm các câu hỏi cùng đoạn văn. Nhấp để quản lý nhóm.',
-        },
-        dragDrop: {
-          title: 'Kéo & Thả',
-          description: 'Kéo bất kỳ số câu hỏi nào để sắp xếp lại. Nhóm đọc hiểu sẽ di chuyển cùng nhau.',
         },
       },
       actions: {

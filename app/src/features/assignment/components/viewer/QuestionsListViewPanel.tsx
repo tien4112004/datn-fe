@@ -3,7 +3,7 @@ import { useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VIEW_MODE } from '@aiprimary/core';
 import { QuestionRenderer } from '@/features/question/components/QuestionRenderer';
-import { ContextDisplay } from '@/features/context';
+import { ContextGroupView } from '../context/ContextGroupView';
 import { Badge } from '@ui/badge';
 import { Button } from '@ui/button';
 import type { Assignment, AssignmentQuestionWithTopic, AssignmentContext } from '../../types';
@@ -86,58 +86,25 @@ export const QuestionsListViewPanel = ({ assignment }: QuestionsListViewPanelPro
             // Context group — reading passage + questions
             const startNumber = getQuestionDisplayNumber(groups, group.questions[0]?.question?.id);
             return (
-              <div key={group.id} className="space-y-4">
+              <div key={group.id} className="space-y-6">
                 {/* Context header */}
-                <div className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                <div className="flex items-center gap-3 border-b pb-4">
+                  <BookOpen className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                     {group.context.title || tContext('readingPassage')}
-                  </span>
-                  <Badge variant="secondary" className="text-xs">
+                  </h2>
+                  <Badge variant="secondary">
                     {tContext('questionsCount', { count: group.questions.length })}
                   </Badge>
                 </div>
 
-                {/* Reading passage */}
-                <ContextDisplay context={group.context as any} defaultCollapsed={false} />
-
-                {/* Questions in this context */}
-                <div className="space-y-4 border-l-2 border-blue-200 pl-4 dark:border-blue-800">
-                  {group.questions.map((aq, index) => {
-                    const questionNumber = startNumber + index;
-                    return (
-                      <div
-                        key={aq.question.id}
-                        className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900"
-                      >
-                        <div className="mb-3 flex items-center justify-between">
-                          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            {t('questionNumber', { number: questionNumber })}
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-500 dark:text-gray-400">
-                              {t('points', { points: aq.points || 0 })}
-                            </span>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="h-6 w-6 p-0"
-                              onClick={() => handleNavigateToQuestion(aq.question.id)}
-                            >
-                              <ArrowRight className="h-3.5 w-3.5" />
-                            </Button>
-                          </div>
-                        </div>
-                        <QuestionRenderer
-                          question={aq.question as any}
-                          viewMode={VIEW_MODE.VIEWING}
-                          points={aq.points}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
+                {/* Context Group View */}
+                <ContextGroupView
+                  context={group.context as any}
+                  questions={group.questions}
+                  viewMode={VIEW_MODE.VIEWING}
+                  startNumber={startNumber}
+                />
               </div>
             );
           }

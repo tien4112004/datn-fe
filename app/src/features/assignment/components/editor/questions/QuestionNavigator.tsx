@@ -171,9 +171,9 @@ export const QuestionNavigator = () => {
       icon={<List className="h-5 w-5" />}
       defaultOpen={true}
     >
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <div className="grid grid-cols-5 gap-1.5 overflow-hidden" data-tutorial="nav-grid">
-          {/* Assignment Info Icon */}
+      <div className="space-y-2">
+        {/* Toolbar: hardcoded navigation buttons */}
+        <div className="flex gap-1.5" data-tutorial="nav-toolbar">
           <Tooltip>
             <TooltipTrigger asChild>
               <button
@@ -182,7 +182,7 @@ export const QuestionNavigator = () => {
                 onClick={() => setMainView('info')}
                 disabled={isGeneratingQuestions}
                 className={cn(
-                  'flex h-8 w-full items-center justify-center rounded text-xs transition-colors',
+                  'flex h-8 flex-1 items-center justify-center rounded text-xs transition-colors',
                   mainView === 'info'
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
@@ -200,7 +200,6 @@ export const QuestionNavigator = () => {
             </TooltipContent>
           </Tooltip>
 
-          {/* Matrix Builder Icon */}
           <Tooltip>
             <TooltipTrigger asChild>
               <button
@@ -209,7 +208,7 @@ export const QuestionNavigator = () => {
                 onClick={() => setMainView('matrix')}
                 disabled={isGeneratingQuestions}
                 className={cn(
-                  'flex h-8 w-full items-center justify-center rounded text-xs transition-colors',
+                  'flex h-8 flex-1 items-center justify-center rounded text-xs transition-colors',
                   mainView === 'matrix'
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
@@ -227,7 +226,6 @@ export const QuestionNavigator = () => {
             </TooltipContent>
           </Tooltip>
 
-          {/* Contexts Panel Icon */}
           <Tooltip>
             <TooltipTrigger asChild>
               <button
@@ -236,7 +234,7 @@ export const QuestionNavigator = () => {
                 onClick={() => setMainView('contexts')}
                 disabled={isGeneratingQuestions}
                 className={cn(
-                  'flex h-8 w-full items-center justify-center rounded text-xs transition-colors',
+                  'flex h-8 flex-1 items-center justify-center rounded text-xs transition-colors',
                   mainView === 'contexts'
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
@@ -251,7 +249,6 @@ export const QuestionNavigator = () => {
             </TooltipContent>
           </Tooltip>
 
-          {/* Questions List View Icon */}
           <Tooltip>
             <TooltipTrigger asChild>
               <button
@@ -260,7 +257,7 @@ export const QuestionNavigator = () => {
                 onClick={() => setMainView('questionsList')}
                 disabled={isGeneratingQuestions}
                 className={cn(
-                  'flex h-8 w-full items-center justify-center rounded text-xs transition-colors',
+                  'flex h-8 flex-1 items-center justify-center rounded text-xs transition-colors',
                   mainView === 'questionsList'
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
@@ -274,112 +271,118 @@ export const QuestionNavigator = () => {
               <p>{t('listView')}</p>
             </TooltipContent>
           </Tooltip>
-
-          {/* Groups: Context groups and standalone questions */}
-          <SortableContext
-            items={questions.filter((q) => q?.question?.id).map((q) => q.question.id)}
-            strategy={rectSortingStrategy}
-          >
-            {groups.map((group) => {
-              if (group.type === 'context') {
-                // Context group - show BookOpen icon THEN individual questions
-                const isContextActive = mainView === 'contextGroup' && currentContextId === group.contextId;
-                const isFirstContextGroup = contextGroupIndex === 0;
-                contextGroupIndex++;
-
-                return (
-                  <React.Fragment key={group.id}>
-                    {/* Context group icon - click to view all questions together */}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          {...(isFirstContextGroup ? { 'data-tutorial': 'nav-context-group' } : {})}
-                          onClick={() => handleContextClick(group.contextId!)}
-                          disabled={isGeneratingQuestions}
-                          className={cn(
-                            'flex h-8 w-full items-center justify-center rounded text-xs font-medium transition-colors',
-                            isContextActive
-                              ? 'bg-primary text-primary-foreground'
-                              : 'bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800',
-                            isGeneratingQuestions && 'cursor-not-allowed opacity-50'
-                          )}
-                        >
-                          <BookOpen className="h-3 w-3" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>
-                          {group.context?.title || tContext('readingPassage')} (
-                          {tContext('questionsCount', { count: group.questions.length })})
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-
-                    {/* Individual questions in the context group */}
-                    {group.questions.map((aq) => {
-                      const question = aq?.question;
-                      if (!question) return null;
-                      questionNumber++;
-                      const isQuestionActive = mainView === 'questions' && currentQuestionId === question.id;
-                      const hasTitle = Boolean(question.title) && question.title.trim() !== '';
-
-                      return (
-                        <SortableItem
-                          key={question.id}
-                          id={question.id}
-                          isActive={isQuestionActive}
-                          onClick={() => handleQuestionClick(question.id)}
-                          disabled={isGeneratingQuestions}
-                          dataTutorial={questionNumber === 1 ? 'nav-question-item' : undefined}
-                          className={cn(
-                            hasTitle
-                              ? 'bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900'
-                              : 'bg-blue-50/50 text-blue-600 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-400 dark:hover:bg-blue-900',
-                            hasQuestionError(question.id) &&
-                              'bg-destructive/15 text-destructive hover:bg-destructive/25'
-                          )}
-                          tooltip={question.title || t('untitled')}
-                        >
-                          {questionNumber}
-                        </SortableItem>
-                      );
-                    })}
-                  </React.Fragment>
-                );
-              } else {
-                // Standalone question (no context)
-                const aq = group.questions[0];
-                const question = aq?.question;
-                if (!question) return null;
-                questionNumber++;
-                const isActive = mainView === 'questions' && currentQuestionId === question.id;
-                const hasTitle = Boolean(question.title) && question.title.trim() !== '';
-
-                return (
-                  <SortableItem
-                    key={group.id}
-                    id={question.id}
-                    isActive={isActive}
-                    onClick={() => handleQuestionClick(question.id)}
-                    disabled={isGeneratingQuestions}
-                    dataTutorial={questionNumber === 1 ? 'nav-question-item' : undefined}
-                    className={cn(
-                      hasTitle
-                        ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
-                      hasQuestionError(question.id) &&
-                        'bg-destructive/15 text-destructive hover:bg-destructive/25'
-                    )}
-                  >
-                    {questionNumber}
-                  </SortableItem>
-                );
-              }
-            })}
-          </SortableContext>
         </div>
-      </DndContext>
+
+        {questions.length > 0 && <hr className="border-border" />}
+
+        {/* Questions/Contexts grid */}
+        {questions.length > 0 && (
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <div className="grid grid-cols-5 gap-1.5 overflow-hidden" data-tutorial="nav-grid">
+              <SortableContext
+                items={questions.filter((q) => q?.question?.id).map((q) => q.question.id)}
+                strategy={rectSortingStrategy}
+              >
+                {groups.map((group) => {
+                  if (group.type === 'context') {
+                    const isContextActive =
+                      mainView === 'contextGroup' && currentContextId === group.contextId;
+                    const isFirstContextGroup = contextGroupIndex === 0;
+                    contextGroupIndex++;
+
+                    return (
+                      <React.Fragment key={group.id}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              type="button"
+                              {...(isFirstContextGroup ? { 'data-tutorial': 'nav-context-group' } : {})}
+                              onClick={() => handleContextClick(group.contextId!)}
+                              disabled={isGeneratingQuestions}
+                              className={cn(
+                                'flex h-8 w-full items-center justify-center rounded text-xs font-medium transition-colors',
+                                isContextActive
+                                  ? 'bg-primary text-primary-foreground'
+                                  : 'bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800',
+                                isGeneratingQuestions && 'cursor-not-allowed opacity-50'
+                              )}
+                            >
+                              <BookOpen className="h-3 w-3" />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>
+                              {group.context?.title || tContext('readingPassage')} (
+                              {tContext('questionsCount', { count: group.questions.length })})
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+
+                        {group.questions.map((aq) => {
+                          const question = aq?.question;
+                          if (!question) return null;
+                          questionNumber++;
+                          const isQuestionActive =
+                            mainView === 'questions' && currentQuestionId === question.id;
+                          const hasTitle = Boolean(question.title) && question.title.trim() !== '';
+
+                          return (
+                            <SortableItem
+                              key={question.id}
+                              id={question.id}
+                              isActive={isQuestionActive}
+                              onClick={() => handleQuestionClick(question.id)}
+                              disabled={isGeneratingQuestions}
+                              dataTutorial={questionNumber === 1 ? 'nav-question-item' : undefined}
+                              className={cn(
+                                hasTitle
+                                  ? 'bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900'
+                                  : 'bg-blue-50/50 text-blue-600 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-400 dark:hover:bg-blue-900',
+                                hasQuestionError(question.id) &&
+                                  'bg-destructive/15 text-destructive hover:bg-destructive/25'
+                              )}
+                              tooltip={question.title || t('untitled')}
+                            >
+                              {questionNumber}
+                            </SortableItem>
+                          );
+                        })}
+                      </React.Fragment>
+                    );
+                  } else {
+                    const aq = group.questions[0];
+                    const question = aq?.question;
+                    if (!question) return null;
+                    questionNumber++;
+                    const isActive = mainView === 'questions' && currentQuestionId === question.id;
+                    const hasTitle = Boolean(question.title) && question.title.trim() !== '';
+
+                    return (
+                      <SortableItem
+                        key={group.id}
+                        id={question.id}
+                        isActive={isActive}
+                        onClick={() => handleQuestionClick(question.id)}
+                        disabled={isGeneratingQuestions}
+                        dataTutorial={questionNumber === 1 ? 'nav-question-item' : undefined}
+                        className={cn(
+                          hasTitle
+                            ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
+                          hasQuestionError(question.id) &&
+                            'bg-destructive/15 text-destructive hover:bg-destructive/25'
+                        )}
+                      >
+                        {questionNumber}
+                      </SortableItem>
+                    );
+                  }
+                })}
+              </SortableContext>
+            </div>
+          </DndContext>
+        )}
+      </div>
     </CollapsibleSection>
   );
 };

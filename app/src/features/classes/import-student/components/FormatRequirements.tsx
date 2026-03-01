@@ -35,12 +35,16 @@ export function FormatRequirements({ className = '' }: FormatRequirementsProps) 
     keyPrefix: 'csvImport.requirements',
   });
 
+  const requiredColumns: Array<[string, string]> = [
+    ['columnFullName', 'columnFullNameDescription'],
+    ['columnParentName', 'columnParentNameDescription'],
+    ['columnParentPhone', 'columnParentPhoneDescription'],
+  ];
+
   const optionalColumns: Array<[string, string]> = [
     ['columnDateOfBirth', 'columnDateOfBirthDescription'],
     ['columnGender', 'columnGenderDescription'],
     ['columnAddress', 'columnAddressDescription'],
-    ['columnParentName', 'columnParentNameDescription'],
-    ['columnParentPhone', 'columnParentPhoneDescription'],
     ['columnParentEmail', 'columnParentEmailDescription'],
     ['columnAdditionalNotes', 'columnAdditionalNotesDescription'],
   ];
@@ -91,13 +95,15 @@ export function FormatRequirements({ className = '' }: FormatRequirementsProps) 
               {t('requiredColumns')}
             </h4>
             <div className="space-y-2">
-              <div className="rounded border border-blue-100 bg-white p-2">
-                <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-red-700">
-                  <X className="h-3.5 w-3.5" />
-                  {t('columnFullName')}
-                </p>
-                <p className="text-xs text-blue-700">{t('columnFullNameDescription')}</p>
-              </div>
+              {requiredColumns.map(([labelKey, descKey]) => (
+                <div key={labelKey} className="rounded border border-blue-100 bg-white p-2">
+                  <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-red-700">
+                    <X className="h-3.5 w-3.5" />
+                    {t(labelKey as never)}
+                  </p>
+                  <p className="text-xs text-blue-700">{t(descKey as never)}</p>
+                </div>
+              ))}
             </div>
           </div>
 

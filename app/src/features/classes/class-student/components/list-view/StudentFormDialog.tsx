@@ -175,6 +175,36 @@ export function StudentFormDialog({
               <Input id="fullName" {...register('fullName')} placeholder={t('form.fullNamePlaceholder')} />
               {errors.fullName && <p className="text-sm text-red-500">{getErrorMessage(errors.fullName)}</p>}
             </div>
+
+            {/* Parent/Guardian Name */}
+            <div className="space-y-2">
+              <Label htmlFor="parentName">
+                {t('form.parentName')} <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="parentName"
+                {...register('parentName')}
+                placeholder={t('form.parentNamePlaceholder')}
+              />
+              {errors.parentName && (
+                <p className="text-sm text-red-500">{getErrorMessage(errors.parentName)}</p>
+              )}
+            </div>
+
+            {/* Parent/Guardian Phone */}
+            <div className="space-y-2">
+              <Label htmlFor="parentPhone">
+                {t('form.parentPhone')} <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="parentPhone"
+                {...register('parentPhone')}
+                placeholder={t('form.parentPhonePlaceholder')}
+              />
+              {errors.parentPhone && (
+                <p className="text-sm text-red-500">{getErrorMessage(errors.parentPhone)}</p>
+              )}
+            </div>
           </div>
 
           {/* Optional Fields Section */}
@@ -240,36 +270,6 @@ export function StudentFormDialog({
               <Label htmlFor="address">{t('form.address')}</Label>
               <Input id="address" {...register('address')} placeholder={t('form.addressPlaceholder')} />
               {errors.address && <p className="text-sm text-red-500">{getErrorMessage(errors.address)}</p>}
-            </div>
-
-            {/* Parent/Guardian Name */}
-            <div className="space-y-2">
-              <Label htmlFor="parentName">
-                {t('form.parentName')} <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="parentName"
-                {...register('parentName')}
-                placeholder={t('form.parentNamePlaceholder')}
-              />
-              {errors.parentName && (
-                <p className="text-sm text-red-500">{getErrorMessage(errors.parentName)}</p>
-              )}
-            </div>
-
-            {/* Parent/Guardian Phone */}
-            <div className="space-y-2">
-              <Label htmlFor="parentPhone">
-                {t('form.parentPhone')} <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="parentPhone"
-                {...register('parentPhone')}
-                placeholder={t('form.parentPhonePlaceholder')}
-              />
-              {errors.parentPhone && (
-                <p className="text-sm text-red-500">{getErrorMessage(errors.parentPhone)}</p>
-              )}
             </div>
           </div>
 

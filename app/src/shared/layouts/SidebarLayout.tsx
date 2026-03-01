@@ -1,4 +1,4 @@
-import { Outlet, useNavigate, useNavigation, useRouteError, useLocation } from 'react-router-dom';
+import { Navigate, Outlet, useNavigate, useNavigation, useRouteError, useLocation } from 'react-router-dom';
 import GlobalSpinner from '@/components/common/GlobalSpinner';
 import { SidebarInset, SidebarProvider, SidebarTrigger, useSidebar } from '../components/ui/sidebar';
 import { AppSidebar } from '../components/navigation/AppSidebar';
@@ -9,6 +9,7 @@ import { Toaster } from 'sonner';
 import ErrorBoundary, { ErrorPageFallback } from '@/components/common/ErrorBoundary';
 import type { AppError } from '@aiprimary/api';
 import { NotificationBell } from '@/features/notifications/components';
+import { useAuth } from '@/shared/context/auth';
 
 function NavLayoutContent() {
   const navigation = useNavigation();
@@ -67,6 +68,17 @@ export default function NavLayout() {
 export function NavLayoutErrorBoundary() {
   const error = useRouteError();
   const navigate = useNavigate();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // Show loading spinner while checking auth status
+  if (isLoading) {
+    return <GlobalSpinner />;
+  }
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace state={{ requireAuth: true }} />;
+  }
 
   const resetError = () => {
     navigate('/');

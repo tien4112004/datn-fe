@@ -1,16 +1,19 @@
 import { useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/shared/context/auth';
 import { LoginForm } from '../components/LoginForm';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { PageHeader } from '@/shared/components/common/PageHeader';
+import { Alert, AlertDescription } from '@ui/alert';
 
 export function LoginPage() {
   const { t } = useTranslation(I18N_NAMESPACES.AUTH);
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const requireAuth = (location.state as { requireAuth?: boolean })?.requireAuth;
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -48,6 +51,12 @@ export function LoginPage() {
       <div className="flex w-full items-center justify-center p-8 lg:w-1/3">
         <div className="w-full max-w-md space-y-8">
           <PageHeader title={t('login.title')} description={t('login.subtitle')} />
+
+          {requireAuth && (
+            <Alert variant="destructive">
+              <AlertDescription>{t('login.signInRequired')}</AlertDescription>
+            </Alert>
+          )}
 
           <LoginForm />
 

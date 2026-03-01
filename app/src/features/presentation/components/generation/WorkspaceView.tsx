@@ -348,5 +348,4 @@ const OutlineSection = memo(() => {
 
 OutlineSection.displayName = 'OutlineSection';
 
-export default WorkspaceView;
-export { OutlineFormSection, OutlineSection };
+export { WorkspaceView, OutlineFormSection, OutlineSection };

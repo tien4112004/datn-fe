@@ -13,6 +13,8 @@ import { StudentCredentialsModal, type StudentCredential } from '../credentials'
 import { type StudentFormMode, useStudentMutations } from '../../hooks';
 import { useConfirmDialog } from '@/shared/hooks/useConfirmDialog';
 import { CsvImportButton } from '../../../import-student';
+import { format } from 'date-fns';
+import { getLocaleDateFns } from '@/shared/i18n/helper';
 
 interface StudentListViewProps {
   students: Student[];
@@ -89,7 +91,15 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
       header: t('form.dateOfBirth'),
       cell: ({ row }) => {
         const dateOfBirth = row.getValue('dateOfBirth') as string | null | undefined;
-        return <div className="text-sm">{dateOfBirth || '-'}</div>;
+        return (
+          <div className="text-sm">
+            {dateOfBirth
+              ? format(new Date(dateOfBirth), 'P', {
+                  locale: getLocaleDateFns(),
+                })
+              : '-'}
+          </div>
+        );
       },
     },
     {
@@ -182,7 +192,22 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
         </div>
         {isTeacher && (
           <div className="flex items-center gap-2">
-            <CsvImportButton classId={classId} />
+            <CsvImportButton
+              classId={classId}
+              onSuccess={(result) => {
+                if (result.credentials && result.credentials.length > 0) {
+                  handleShowCredentials(
+                    result.credentials.map((c) => ({
+                      studentId: c.studentId,
+                      fullName: c.fullName,
+                      username: c.username,
+                      password: c.password,
+                      email: c.email,
+                    }))
+                  );
+                }
+              }}
+            />
             <Button onClick={handleOpenAddDialog}>{t('addStudentButton')}</Button>
           </div>
         )}

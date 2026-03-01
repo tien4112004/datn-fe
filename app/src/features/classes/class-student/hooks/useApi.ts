@@ -62,6 +62,17 @@ export function useClassStudents(classId: string): UseClassStudentsReturn {
   };
 }
 
+export function useAllClassStudents(classId: string) {
+  const classApiService = useClassApiService();
+
+  return useQuery({
+    queryKey: classKeys.students(classId, { all: true }),
+    queryFn: () => classApiService.getStudentsByClassId(classId, 1, 9999),
+    enabled: !!classId,
+    select: (data) => data.data,
+  });
+}
+
 // Student enrollment mutations
 export function useEnrollStudent() {
   const queryClient = useQueryClient();

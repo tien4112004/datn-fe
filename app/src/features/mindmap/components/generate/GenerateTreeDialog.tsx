@@ -171,6 +171,12 @@ function GenerateTreeDialog({ isOpen, onOpenChange }: GenerateTreeDialogProps) {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="topic">{t('create.promptTitle')}</Label>
+
+                    {/* File chips — above the hint */}
+                    <FileChips
+                      attachedFiles={attachedFiles}
+                      onRemove={(url) => setAttachedFiles((prev) => prev.filter((f) => f.url !== url))}
+                    />
                     <Controller
                       name="topic"
                       control={control}
@@ -189,18 +195,15 @@ function GenerateTreeDialog({ isOpen, onOpenChange }: GenerateTreeDialogProps) {
                         </div>
                       )}
                     />
-                    {/* File chips — above the hint */}
-                    <FileChips
-                      attachedFiles={attachedFiles}
-                      onRemove={(url) => setAttachedFiles((prev) => prev.filter((f) => f.url !== url))}
-                    />
-                    <p className="text-muted-foreground text-xs">{t('generate.prompt.hint')}</p>
+
                     <FileAttachButton
                       onFilesSelected={uploadFiles}
                       isUploading={isUploadingFiles}
                       buttonLabel={t('generate.fileUpload.attachFiles')}
                       uploadingLabel={t('generate.fileUpload.uploading')}
                     />
+
+                    <p className="text-muted-foreground text-xs">{t('generate.prompt.hint')}</p>
                   </div>
                 </div>
 

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Controller, useWatch } from 'react-hook-form';
-import { CircleAlert, File, Loader2, Paperclip, RotateCcw, X } from 'lucide-react';
+import { CircleAlert, Loader2, Paperclip, RotateCcw } from 'lucide-react';
 import { Label } from '@ui/label';
 import OutlineWorkspace from './OutlineWorkspace';
 import { AutosizeTextarea } from '@ui/autosize-textarea';
@@ -26,7 +26,7 @@ import useOutlineStore from '../../stores/useOutlineStore';
 import { UnsavedChangesDialog } from '../UnsavedChangesDialog';
 import { useGeneratingBlocker } from '../../hooks/useGeneratingBlocker';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/tooltip';
-import { formatFileSize } from '@/shared/components/FileAttachmentInput';
+import { FileChips } from '@/shared/components/FileAttachmentInput';
 
 interface WorkspaceViewProps {
   onWorkspaceEmpty: () => void;
@@ -174,30 +174,10 @@ const OutlineFormSection = memo(({ isFetching, onRegenerateOutline }: OutlineFor
             <TooltipContent>{t('fileUpload.attachFiles')}</TooltipContent>
           </Tooltip>
 
-          {attachedFiles.map((file) => (
-            <div
-              key={file.url}
-              className="flex items-center gap-1.5 rounded-md border bg-transparent px-2.5 py-1"
-            >
-              <File className="text-muted-foreground h-3.5 w-3.5 shrink-0" />
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="max-w-[160px] truncate text-sm">{file.name}</span>
-                </TooltipTrigger>
-                <TooltipContent>{file.name}</TooltipContent>
-              </Tooltip>
-              <span className="text-muted-foreground shrink-0 text-xs">{formatFileSize(file.size)}</span>
-              <button
-                type="button"
-                onClick={() => setAttachedFiles((prev) => prev.filter((f) => f.url !== file.url))}
-                disabled={disabled}
-                className="text-muted-foreground hover:text-foreground ml-0.5 inline-flex shrink-0 items-center justify-center rounded-full transition-colors disabled:pointer-events-none"
-                aria-label={`Remove ${file.name}`}
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </div>
-          ))}
+          <FileChips
+            attachedFiles={attachedFiles}
+            onRemove={(url) => setAttachedFiles((prev) => prev.filter((f) => f.url !== url))}
+          />
         </div>
 
         <div className="border-t" />

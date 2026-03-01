@@ -1,7 +1,8 @@
 import { Button } from '@ui/button';
 import { useTranslation } from 'react-i18next';
 import { Controller } from 'react-hook-form';
-import { File, Loader2, Paperclip, Sparkles, X } from 'lucide-react';
+import { Loader2, Paperclip, Sparkles } from 'lucide-react';
+import { FileChips } from '@/shared/components/FileAttachmentInput';
 import { Card, CardContent, CardTitle } from '@ui/card';
 import { AutosizeTextarea } from '@ui/autosize-textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
@@ -17,7 +18,6 @@ import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { EXAMPLE_PROMPT_TYPE } from '@/features/projects/types/examplePrompt';
 import { AiDisclaimer } from '@/shared/components/common/AiDisclaimer';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/tooltip';
-import { formatFileSize } from '@/shared/components/FileAttachmentInput';
 
 const FILE_ACCEPT = '.pdf,.docx,.doc,.txt,.jpg,.jpeg,.png,.gif,.webp,.bmp';
 
@@ -101,35 +101,10 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
               <CardTitle className="text-medium">{t('promptTitle')}</CardTitle>
               <div className="border-primary rounded border-2 px-2 pt-2">
                 {/* File chips — above the textarea */}
-                {attachedFiles.length > 0 && (
-                  <div className="flex flex-wrap gap-2 pb-2 pt-1">
-                    {attachedFiles.map((file) => (
-                      <div
-                        key={file.url}
-                        className="bg-background flex items-center gap-2 rounded-lg border px-3 py-2"
-                      >
-                        <File className="text-muted-foreground h-4 w-4 shrink-0" />
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="max-w-[200px] truncate text-sm">{file.name}</span>
-                          </TooltipTrigger>
-                          <TooltipContent>{file.name}</TooltipContent>
-                        </Tooltip>
-                        <span className="text-muted-foreground shrink-0 text-xs">
-                          {formatFileSize(file.size)}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setAttachedFiles((prev) => prev.filter((f) => f.url !== file.url))}
-                          className="text-muted-foreground hover:text-foreground ml-0.5 inline-flex shrink-0 items-center justify-center rounded-full transition-colors"
-                          aria-label={`Remove ${file.name}`}
-                        >
-                          <X className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <FileChips
+                  attachedFiles={attachedFiles}
+                  onRemove={(url) => setAttachedFiles((prev) => prev.filter((f) => f.url !== url))}
+                />
 
                 {/* Prompt textarea */}
                 <Controller

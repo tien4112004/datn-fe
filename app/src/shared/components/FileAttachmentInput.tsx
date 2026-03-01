@@ -1,6 +1,26 @@
 import { useRef } from 'react';
-import { Paperclip, X, Loader2, File } from 'lucide-react';
+import { Paperclip, X, Loader2, File, FileImage, FileText, type LucideIcon } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/tooltip';
+
+export function getFileIcon(filename: string): LucideIcon {
+  const ext = filename.split('.').pop()?.toLowerCase();
+  switch (ext) {
+    case 'jpg':
+    case 'jpeg':
+    case 'png':
+    case 'gif':
+    case 'webp':
+    case 'bmp':
+      return FileImage;
+    case 'pdf':
+    case 'doc':
+    case 'docx':
+    case 'txt':
+      return FileText;
+    default:
+      return File;
+  }
+}
 
 export type AttachedFile = { name: string; url: string; size: number };
 
@@ -24,26 +44,29 @@ export const FileChips = ({ attachedFiles, onRemove }: FileChipsProps) => {
 
   return (
     <div className="flex flex-wrap gap-2 pb-2 pt-1">
-      {attachedFiles.map((file) => (
-        <div key={file.url} className="bg-background flex items-center gap-2 rounded-lg border px-3 py-2">
-          <File className="text-muted-foreground h-4 w-4 shrink-0" />
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="max-w-[200px] truncate text-sm">{file.name}</span>
-            </TooltipTrigger>
-            <TooltipContent>{file.name}</TooltipContent>
-          </Tooltip>
-          <span className="text-muted-foreground shrink-0 text-xs">{formatFileSize(file.size)}</span>
-          <button
-            type="button"
-            onClick={() => onRemove(file.url)}
-            className="text-muted-foreground hover:text-foreground ml-0.5 inline-flex shrink-0 items-center justify-center rounded-full transition-colors"
-            aria-label={`Remove ${file.name}`}
-          >
-            <X className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      ))}
+      {attachedFiles.map((file) => {
+        const FileIcon = getFileIcon(file.name);
+        return (
+          <div key={file.url} className="bg-background flex items-center gap-2 rounded-lg border px-3 py-2">
+            <FileIcon className="text-muted-foreground h-4 w-4 shrink-0" />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="max-w-[200px] truncate text-sm">{file.name}</span>
+              </TooltipTrigger>
+              <TooltipContent>{file.name}</TooltipContent>
+            </Tooltip>
+            <span className="text-muted-foreground shrink-0 text-xs">{formatFileSize(file.size)}</span>
+            <button
+              type="button"
+              onClick={() => onRemove(file.url)}
+              className="text-muted-foreground hover:text-foreground ml-0.5 inline-flex shrink-0 items-center justify-center rounded-full transition-colors"
+              aria-label={`Remove ${file.name}`}
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        );
+      })}
     </div>
   );
 };

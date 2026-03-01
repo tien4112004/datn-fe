@@ -253,6 +253,12 @@ const router = createBrowserRouter([
         }),
       },
       {
+        path: 'payment/transaction/:id',
+        lazy: async () => ({
+          Component: (await import('@/features/payment/pages/TransactionDetailPage')).TransactionDetailPage,
+        }),
+      },
+      {
         path: 'error',
         Component: () => {
           throw new CriticalError('This is a critical error page.');

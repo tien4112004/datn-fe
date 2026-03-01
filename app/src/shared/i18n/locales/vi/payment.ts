@@ -93,4 +93,17 @@ export default {
     cancelled: 'Đã hủy',
     refunded: 'Đã hoàn tiền',
   },
+  transactionDetail: {
+    title: 'Chi tiết giao dịch',
+    id: 'Mã giao dịch',
+    referenceCode: 'Mã tham chiếu',
+    description: 'Mô tả',
+    amount: 'Số tiền',
+    gateway: 'Cổng thanh toán',
+    status: 'Trạng thái',
+    createdAt: 'Ngày tạo',
+    completedAt: 'Ngày hoàn thành',
+    updatedAt: 'Cập nhật lần cuối',
+    notFound: 'Không tìm thấy giao dịch hoặc không thể tải.',
+  },
 };

@@ -12,6 +12,8 @@ import { CoinBalanceBadge } from '../components/CoinBalanceBadge';
 import { useTransactions, useCoinHistory } from '../hooks/usePayment';
 import { formatVND, getCoinTypeLabelKey, getCoinSourceLabelKey } from '../constants';
 import type { TransactionStatus } from '../types';
+import { format } from 'date-fns';
+import { getLocaleDateFns } from '@/shared/i18n/helper';
 
 type Tab = 'transactions' | 'coinHistory';
 
@@ -34,8 +36,7 @@ export function TransactionHistoryPage() {
   const coinPagination = coinData?.pagination;
 
   const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleString('vi-VN');
+    return format(new Date(dateStr || ''), 'dd/MM/yyyy HH:mm', { locale: getLocaleDateFns() });
   };
 
   const tabs: { value: Tab; label: string }[] = [
@@ -101,7 +102,11 @@ export function TransactionHistoryPage() {
                     </TableRow>
                   ) : (
                     transactions.map((tx) => (
-                      <TableRow key={tx.id}>
+                      <TableRow
+                        key={tx.id}
+                        className="hover:bg-muted/50 cursor-pointer"
+                        onClick={() => navigate(`/payment/transaction/${tx.id}`)}
+                      >
                         <TableCell className="text-sm">{formatDate(tx.createdAt)}</TableCell>
                         <TableCell className="text-sm">{tx.description}</TableCell>
                         <TableCell className="text-sm font-medium">{formatVND(tx.amount)}</TableCell>

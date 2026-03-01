@@ -93,4 +93,17 @@ export default {
     cancelled: 'Cancelled',
     refunded: 'Refunded',
   },
+  transactionDetail: {
+    title: 'Transaction Details',
+    id: 'Transaction ID',
+    referenceCode: 'Reference Code',
+    description: 'Description',
+    amount: 'Amount',
+    gateway: 'Gateway',
+    status: 'Status',
+    createdAt: 'Created At',
+    completedAt: 'Completed At',
+    updatedAt: 'Updated At',
+    notFound: 'Transaction not found or could not be loaded.',
+  },
 };

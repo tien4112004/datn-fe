@@ -131,6 +131,22 @@ export const AssignmentDoingPage = () => {
 
   const answeredCount = useMemo(() => answers.filter((a) => isAnswerValid(a)).length, [answers]);
 
+  const allQuestionIds = useMemo(
+    () => questionGroups.flatMap((g) => g.questions.map((aq) => aq.question.id)),
+    [questionGroups]
+  );
+
+  const isFirstQuestion = useMemo(() => {
+    if (!currentQuestionId) return true;
+    return allQuestionIds.length > 0 && allQuestionIds[0] === currentQuestionId;
+  }, [currentQuestionId, allQuestionIds]);
+
+  const isLastQuestion = useMemo(() => {
+    if (!currentQuestionId) return false;
+    const last = allQuestionIds[allQuestionIds.length - 1];
+    return allQuestionIds.length > 0 && last === currentQuestionId;
+  }, [currentQuestionId, allQuestionIds]);
+
   const handleAnswerChange = useCallback((answer: Answer) => {
     setAnswers((prev) => {
       const existing = prev.findIndex((a) => a.questionId === answer.questionId);
@@ -325,6 +341,14 @@ export const AssignmentDoingPage = () => {
           </div>
         </div>
 
+        {/* Submit Button */}
+        <div className="border-b p-6">
+          <Button onClick={handleSubmitAttempt} className="w-full bg-green-600 hover:bg-green-700">
+            <Send className="mr-2 h-4 w-4" />
+            {tActions('submit')}
+          </Button>
+        </div>
+
         {/* Question Navigation - Dual-level with context headers and individual questions */}
         <div className="p-6">
           <h3 className="mb-4 text-sm font-semibold">{t('questions')}</h3>
@@ -356,7 +380,8 @@ export const AssignmentDoingPage = () => {
                             {group.context?.title || `Context ${groupIdx + 1}`}
                           </div>
                           <div className="text-muted-foreground text-xs">
-                            {group.questions.length} {group.questions.length === 1 ? 'question' : 'questions'}
+                            {group.questions.length}{' '}
+                            {group.questions.length === 1 ? t('question') : t('questions')}
                           </div>
                         </div>
                         {allContextQuestionsAnswered && (
@@ -374,23 +399,27 @@ export const AssignmentDoingPage = () => {
                       );
 
                       return (
-                        <button
-                          key={aq.question.id}
-                          onClick={() => handleQuestionClick(aq.question.id)}
-                          className={cn(
-                            'ml-6 w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors',
-                            isQuestionActive
-                              ? 'border-blue-600 bg-blue-50 dark:bg-blue-950'
-                              : 'border-blue-200 hover:bg-blue-50/50 dark:border-blue-800 dark:hover:bg-blue-950/30'
-                          )}
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="font-medium text-blue-700 dark:text-blue-300">
-                              Q{questionNumber}
-                            </span>
-                            {isAnswered && <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-green-600" />}
-                          </div>
-                        </button>
+                        <div className="ml-6">
+                          <button
+                            key={aq.question.id}
+                            onClick={() => handleQuestionClick(aq.question.id)}
+                            className={cn(
+                              'w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors',
+                              isQuestionActive
+                                ? 'border-blue-600 bg-blue-50 dark:bg-blue-950'
+                                : 'border-blue-200 hover:bg-blue-50/50 dark:border-blue-800 dark:hover:bg-blue-950/30'
+                            )}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="font-medium text-blue-700 dark:text-blue-300">
+                                {t('question')} {questionNumber}
+                              </span>
+                              {isAnswered && (
+                                <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-green-600" />
+                              )}
+                            </div>
+                          </button>
+                        </div>
                       );
                     })}
                   </div>
@@ -414,7 +443,9 @@ export const AssignmentDoingPage = () => {
                     )}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="font-medium">Q{questionNumber}</span>
+                      <span className="font-medium">
+                        {t('question')} {questionNumber}
+                      </span>
                       {isAnswered && <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-green-600" />}
                     </div>
                   </button>
@@ -495,21 +526,15 @@ export const AssignmentDoingPage = () => {
 
             {/* Navigation Buttons */}
             <div className="mt-8 flex items-center justify-between">
-              <Button variant="outline" onClick={handlePrevious} disabled={!currentQuestionId}>
+              <Button variant="outline" onClick={handlePrevious} disabled={isFirstQuestion}>
                 <ChevronLeft className="mr-2 h-4 w-4" />
                 {tActions('previous')}
               </Button>
 
-              <div className="flex items-center gap-2">
-                <Button onClick={handleNext} variant="outline">
-                  {tActions('next')}
-                  <ChevronRight className="ml-2 h-4 w-4" />
-                </Button>
-                <Button onClick={handleSubmitAttempt} className="bg-green-600 hover:bg-green-700">
-                  <Send className="mr-2 h-4 w-4" />
-                  {tActions('submit')}
-                </Button>
-              </div>
+              <Button onClick={handleNext} variant="outline" disabled={isLastQuestion}>
+                {tActions('next')}
+                <ChevronRight className="ml-2 h-4 w-4" />
+              </Button>
             </div>
 
             {/* Warning if not all answered */}

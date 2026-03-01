@@ -28,6 +28,7 @@ export interface Class {
   academicYear?: string; // e.g., "2024-2025" (deprecated)
   teacherId?: string; // alias for ownerId (deprecated)
   class?: string; // physical location (deprecated)
+  teacher?: { id: string; firstName: string; lastName: string } | null;
   students?: Student[]; // populated from separate endpoint
   layout?: Layout; // populated from separate endpoint
 }

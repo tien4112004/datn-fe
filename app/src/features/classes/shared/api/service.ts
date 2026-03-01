@@ -183,6 +183,7 @@ export default class ClassService implements ClassApiService {
       updatedAt: data.updatedAt,
 
       // Legacy/compatibility fields
+      teacher: data.teacher ?? null,
       teacherId: data.ownerId, // Map ownerId to teacherId for backwards compatibility
       students: (data.students || []).map((item: any) => this._mapStudent(item)),
       layout: data.layout ?? undefined,

@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useClass } from '@/features/classes/shared/hooks';
 import GlobalSpinner from '@/components/common/GlobalSpinner';
+import { saveTeacher } from '@/shared/utils/teacherStorage';
 import { StudentClassDetailTabs } from './StudentClassDetailTabs';
 
 export const StudentClassDetailPage = () => {
@@ -9,6 +10,10 @@ export const StudentClassDetailPage = () => {
   const { id } = useParams<{ id: string }>();
 
   const { data: currentClass, isLoading } = useClass(id!);
+
+  if (currentClass?.teacher) {
+    saveTeacher(currentClass.teacher);
+  }
 
   if (isLoading) {
     return <GlobalSpinner />;

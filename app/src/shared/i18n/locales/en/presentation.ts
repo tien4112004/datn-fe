@@ -4,8 +4,8 @@
  */
 export default {
   createOutline: {
-    title: 'Create Presentation Outline',
-    subtitle: 'Generate a slide outline with AI',
+    title: 'Create AI Presentation',
+    subtitle: 'Generate a comprehensive presentation with AI',
     promptSection: 'Prompt',
     regenerate: 'Regenerate',
     stop: 'Stop',

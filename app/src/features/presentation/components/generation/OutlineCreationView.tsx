@@ -188,7 +188,7 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
                         value={field.value?.toString()}
                         onValueChange={(value) => field.onChange(Number(value))}
                       >
-                        <SelectTrigger className="w-fit">
+                        <SelectTrigger className="ml-auto w-fit">
                           <SelectValue placeholder={t('slideCountPlaceholder')} />
                         </SelectTrigger>
                         <SelectContent>

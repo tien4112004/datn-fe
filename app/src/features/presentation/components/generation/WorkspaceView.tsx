@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Controller, useWatch } from 'react-hook-form';
 import { CircleAlert, File, Loader2, Paperclip, RotateCcw, X } from 'lucide-react';
+import { Label } from '@ui/label';
 import OutlineWorkspace from './OutlineWorkspace';
 import { AutosizeTextarea } from '@ui/autosize-textarea';
 import {
@@ -114,10 +115,34 @@ const OutlineFormSection = memo(({ isFetching, onRegenerateOutline }: OutlineFor
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex w-full flex-row items-center gap-4">
-        <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('promptSection')}</div>
-        <div className="my-2 flex flex-1 flex-row gap-2">
+    <div className="flex flex-col gap-3">
+      <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('promptSection')}</div>
+
+      <div className="bg-card flex flex-col gap-0 rounded-xl border">
+        {/* Textarea */}
+        <Controller
+          name="topic"
+          control={control}
+          render={({ field }) => (
+            <div className="relative px-4 pt-4">
+              <AutosizeTextarea className="pr-12 text-lg" {...field} disabled={disabled} />
+              <LoadingButton
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={onRegenerateOutline}
+                disabled={disabled || isFetching}
+                loading={isFetching}
+                className="absolute bottom-4 right-4"
+              >
+                <RotateCcw className="h-5 w-5" />
+              </LoadingButton>
+            </div>
+          )}
+        />
+
+        {/* File attach button + attached file chips */}
+        <div className="flex flex-wrap items-center gap-2 px-4 py-3">
           <input
             ref={fileInputRef}
             type="file"
@@ -137,139 +162,27 @@ const OutlineFormSection = memo(({ isFetching, onRegenerateOutline }: OutlineFor
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploadingFiles || disabled}
-                className="shadow-xs text-muted-foreground hover:bg-accent flex h-9 items-center gap-2 whitespace-nowrap rounded-md border bg-transparent px-3 text-sm outline-none transition-colors disabled:cursor-not-allowed disabled:opacity-70"
+                className="text-muted-foreground hover:bg-accent flex h-8 items-center gap-1.5 whitespace-nowrap rounded-md border bg-transparent px-2.5 text-sm outline-none transition-colors disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {isUploadingFiles ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 ) : (
-                  <Paperclip className="h-4 w-4" />
+                  <Paperclip className="h-3.5 w-3.5" />
                 )}
               </button>
             </TooltipTrigger>
             <TooltipContent>{t('fileUpload.attachFiles')}</TooltipContent>
           </Tooltip>
-          <Controller
-            name="slideCount"
-            control={control}
-            render={({ field }) => (
-              <Select
-                value={field.value?.toString()}
-                onValueChange={(value) => field.onChange(Number(value))}
-                disabled={disabled}
-              >
-                <SelectTrigger className="bg-card w-fit">
-                  <SelectValue placeholder={t('slideCountPlaceholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>{t('slideCountLabel')}</SelectLabel>
-                    {SLIDE_COUNT_OPTIONS.map((num) => (
-                      <SelectItem key={num} value={num.toString()}>
-                        {num} {t('slideCountUnit')}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            )}
-          />
-          <Controller
-            name="language"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange} disabled={disabled}>
-                <SelectTrigger className="w-fit">
-                  <SelectValue placeholder={t('language.placeholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>{t('language.label')}</SelectLabel>
-                    {LANGUAGE_OPTIONS.map((languageOption) => (
-                      <SelectItem key={languageOption.value} value={languageOption.value}>
-                        {t(languageOption.labelKey as never)}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            )}
-          />
-          <Controller
-            name="model"
-            control={control}
-            render={({ field }) => (
-              <ModelSelect
-                models={models}
-                value={field.value}
-                onValueChange={field.onChange}
-                placeholder={t('model.placeholder')}
-                label={t('model.label')}
-                disabled={disabled}
-              />
-            )}
-          />
-          <Controller
-            name="grade"
-            control={control}
-            render={({ field }) => (
-              <Select
-                value={field.value || 'none'}
-                onValueChange={(val) => field.onChange(val === 'none' ? '' : val)}
-                disabled={disabled}
-              >
-                <SelectTrigger className="w-fit">
-                  <SelectValue placeholder={t('grade.placeholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>{t('grade.label')}</SelectLabel>
-                    <SelectItem value="none">{t('grade.none')}</SelectItem>
-                    {grades.map((g) => (
-                      <SelectItem key={g.code} value={g.code}>
-                        {i18n.language === 'vi' ? g.name : g.nameEn}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            )}
-          />
-          <Controller
-            name="subject"
-            control={control}
-            render={({ field }) => (
-              <Select
-                value={field.value || 'none'}
-                onValueChange={(val) => field.onChange(val === 'none' ? '' : val)}
-                disabled={disabled}
-              >
-                <SelectTrigger className="w-fit">
-                  <SelectValue placeholder={t('subject.placeholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>{t('subject.label')}</SelectLabel>
-                    <SelectItem value="none">{t('subject.none')}</SelectItem>
-                    {subjects.map((s) => (
-                      <SelectItem key={s.code} value={s.code}>
-                        {s.name}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </div>
-      </div>
-      {attachedFiles.length > 0 && (
-        <div className="flex flex-wrap gap-2">
+
           {attachedFiles.map((file) => (
-            <div key={file.url} className="bg-background flex items-center gap-2 rounded-lg border px-3 py-2">
-              <File className="text-muted-foreground h-4 w-4 shrink-0" />
+            <div
+              key={file.url}
+              className="flex items-center gap-1.5 rounded-md border bg-transparent px-2.5 py-1"
+            >
+              <File className="text-muted-foreground h-3.5 w-3.5 shrink-0" />
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="max-w-[200px] truncate text-sm">{file.name}</span>
+                  <span className="max-w-[160px] truncate text-sm">{file.name}</span>
                 </TooltipTrigger>
                 <TooltipContent>{file.name}</TooltipContent>
               </Tooltip>
@@ -281,41 +194,162 @@ const OutlineFormSection = memo(({ isFetching, onRegenerateOutline }: OutlineFor
                 className="text-muted-foreground hover:text-foreground ml-0.5 inline-flex shrink-0 items-center justify-center rounded-full transition-colors disabled:pointer-events-none"
                 aria-label={`Remove ${file.name}`}
               >
-                <X className="h-3.5 w-3.5" />
+                <X className="h-3 w-3" />
               </button>
             </div>
           ))}
         </div>
-      )}
-      <Controller
-        name="topic"
-        control={control}
-        render={({ field }) => (
-          <div className="relative">
-            <AutosizeTextarea className="pr-12 text-lg" {...field} disabled={disabled} />
-            <LoadingButton
-              type="button"
-              size="sm"
-              variant={'ghost'}
-              onClick={onRegenerateOutline}
-              disabled={disabled || isFetching}
-              loading={isFetching}
-              className="absolute right-3 top-1/2 h-8 w-8 -translate-y-1/2 p-0"
-            >
-              <RotateCcw className="h-4 w-4" />
-            </LoadingButton>
+
+        <div className="border-t" />
+
+        {/* Controls grid */}
+        <div className="flex flex-col gap-4 p-4">
+          {/* Row 1: Slides (1) + Model (2) */}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label>{t('slideCountLabel')}</Label>
+              <Controller
+                name="slideCount"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value?.toString()}
+                    onValueChange={(value) => field.onChange(Number(value))}
+                    disabled={disabled}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('slideCountPlaceholder')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>{t('slideCountLabel')}</SelectLabel>
+                        {SLIDE_COUNT_OPTIONS.map((num) => (
+                          <SelectItem key={num} value={num.toString()}>
+                            {num} {t('slideCountUnit')}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="col-span-2 space-y-2">
+              <Label>{t('model.label')}</Label>
+              <Controller
+                name="model"
+                control={control}
+                render={({ field }) => (
+                  <ModelSelect
+                    models={models}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    placeholder={t('model.placeholder')}
+                    label={t('model.label')}
+                    disabled={disabled}
+                  />
+                )}
+              />
+            </div>
           </div>
-        )}
-      />
-      <div className="flex w-full justify-between">
-        {/* // Warning user to not navigate while generating */}
-        {isFetching && (
-          <div className="flex items-center">
-            <CircleAlert className="mr-1 h-4 w-4 text-orange-600" />
-            <span className="text-xs text-orange-600">{t('generatingOutlineWarning')}</span>
+
+          {/* Row 2: Language + Grade + Subject */}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label>{t('language.label')}</Label>
+              <Controller
+                name="language"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange} disabled={disabled}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('language.placeholder')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>{t('language.label')}</SelectLabel>
+                        {LANGUAGE_OPTIONS.map((languageOption) => (
+                          <SelectItem key={languageOption.value} value={languageOption.value}>
+                            {t(languageOption.labelKey as never)}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('grade.label')}</Label>
+              <Controller
+                name="grade"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value || 'none'}
+                    onValueChange={(val) => field.onChange(val === 'none' ? '' : val)}
+                    disabled={disabled}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('grade.placeholder')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>{t('grade.label')}</SelectLabel>
+                        <SelectItem value="none">{t('grade.none')}</SelectItem>
+                        {grades.map((g) => (
+                          <SelectItem key={g.code} value={g.code}>
+                            {i18n.language === 'vi' ? g.name : g.nameEn}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('subject.label')}</Label>
+              <Controller
+                name="subject"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value || 'none'}
+                    onValueChange={(val) => field.onChange(val === 'none' ? '' : val)}
+                    disabled={disabled}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('subject.placeholder')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>{t('subject.label')}</SelectLabel>
+                        <SelectItem value="none">{t('subject.none')}</SelectItem>
+                        {subjects.map((s) => (
+                          <SelectItem key={s.code} value={s.code}>
+                            {s.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
           </div>
-        )}
+        </div>
       </div>
+
+      {isFetching && (
+        <div className="flex items-center">
+          <CircleAlert className="mr-1 h-4 w-4 text-orange-600" />
+          <span className="text-xs text-orange-600">{t('generatingOutlineWarning')}</span>
+        </div>
+      )}
     </div>
   );
 });

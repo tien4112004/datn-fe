@@ -20,8 +20,8 @@
  */
 export default {
   createOutline: {
-    title: 'Tạo dàn ý trình bày',
-    subtitle: 'Tạo dàn ý slide với AI',
+    title: 'Tạo bài thuyết trình AI',
+    subtitle: 'Tạo bài thuyết trình trực quan với AI',
     promptSection: 'Đầu vào',
     regenerate: 'Tạo lại',
     stop: 'Dừng',

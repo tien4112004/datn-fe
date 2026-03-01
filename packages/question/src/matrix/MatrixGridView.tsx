@@ -18,13 +18,14 @@ interface MatrixGridViewProps {
 }
 
 export const MatrixGridView = ({ topics, matrixCells }: MatrixGridViewProps) => {
+  const { t } = useTranslation('questions', { keyPrefix: 'matrix.view' });
   const { t: tDifficulty } = useTranslation('questions');
   const { t: tQuestionType } = useTranslation('questions');
 
   if (topics.length === 0) {
     return (
       <div className="rounded-lg border border-dashed bg-gray-50 p-8 text-center dark:bg-gray-900">
-        <p className="text-sm text-gray-600 dark:text-gray-400">No topics in the assignment</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{t('noTopics')}</p>
       </div>
     );
   }
@@ -39,7 +40,7 @@ export const MatrixGridView = ({ topics, matrixCells }: MatrixGridViewProps) => 
           {/* First header row: Topic + Difficulties spanning questionTypes */}
           <TableRow>
             <TableHead rowSpan={2} className="w-[160px] bg-gray-50 font-semibold dark:bg-gray-900">
-              Topic
+              {t('tableHeaders.topic')}
             </TableHead>
             {difficulties.map((difficulty) => (
               <TableHead

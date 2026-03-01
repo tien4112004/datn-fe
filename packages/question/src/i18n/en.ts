@@ -463,6 +463,12 @@ export default {
       },
       usesContext: 'Uses reading passages',
     },
+    view: {
+      noTopics: 'No topics in the assignment',
+      tableHeaders: {
+        topic: 'Topic',
+      },
+    },
   },
 
   generatedResults: {

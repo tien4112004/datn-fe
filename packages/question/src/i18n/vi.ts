@@ -465,6 +465,12 @@ export default {
       },
       usesContext: 'Sử dụng đoạn văn đọc hiểu',
     },
+    view: {
+      noTopics: 'Không có chủ đề nào trong bài kiểm tra',
+      tableHeaders: {
+        topic: 'Chủ đề',
+      },
+    },
   },
 
   generatedResults: {

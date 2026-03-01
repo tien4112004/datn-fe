@@ -65,7 +65,7 @@ const EdgeBlock = memo(
     targetPosition,
     data,
   }: EdgeProps<MindMapEdge> & { pathType: PathType }) => {
-    const [edgePath] = getEdgePath(data?.pathType || 'smoothstep', {
+    const [edgePath] = getEdgePath(data?.pathType || 'bezier', {
       id,
       sourceX,
       sourceY,
@@ -115,7 +115,7 @@ export const ConnectionLine = ({
 
   const rootNode = getRoot(fromNode.id) as RootNode;
 
-  const [edgePath] = getEdgePath(rootNode.data.pathType || 'smoothstep', {
+  const [edgePath] = getEdgePath(rootNode.data.pathType || 'bezier', {
     sourceX: fromX,
     sourceY: fromY,
     targetX: toX,

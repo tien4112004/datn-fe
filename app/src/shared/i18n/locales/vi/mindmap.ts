@@ -243,6 +243,8 @@ export default {
   },
   node: {
     loadingImage: 'Đang tải hình ảnh...',
+    newNode: 'Cây mới',
+    newChildNode: 'Nút con mới {{count}}',
   },
   saving: {
     cannotSaveInViewMode: 'Không thể lưu ở chế độ xem',
@@ -373,8 +375,8 @@ export default {
     'subject.hint': 'Tùy chọn: Chỉ định môn học (ví dụ: science, history)',
     nodeOption_one: '{{count}} nút',
     nodeOption_other: '{{count}} nút',
-    levelOption_one: '{{count}} cấp độ',
-    levelOption_other: '{{count}} cấp độ',
+    levelOption_one: '{{count}} cấp',
+    levelOption_other: '{{count}} cấp',
     model: 'Mô hình',
     'model.hint': 'Chọn mô hình AI để sử dụng để tạo',
     cancel: 'Hủy',

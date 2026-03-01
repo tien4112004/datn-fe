@@ -14,6 +14,8 @@ import {
 import { useCoreStore } from './core';
 import { useUndoRedoStore } from './undoredo';
 import { useLayoutStore } from './layout';
+import i18n from '@/shared/i18n';
+import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 
 interface NewNodeData {
   content: string;
@@ -195,23 +197,20 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
       nodesToBeDeleted: new Set<string>(),
 
       addNode: (data?: NewNodeData) => {
-        const { nodes, setNodes } = useCoreStore.getState();
+        const { setNodes } = useCoreStore.getState();
         const { prepareToPushUndo, pushToUndoStack } = useUndoRedoStore.getState();
         prepareToPushUndo();
 
         const newNode: MindMapNode = {
           id: generateId(),
           type: MINDMAP_TYPES.ROOT_NODE,
-          position: data?.position || {
-            x: Math.random() * 500 + 100,
-            y: Math.random() * 400 + 100,
-          },
+          position: data?.position || { x: 0, y: 0 },
           data: {
             level: 0,
-            content: data?.content || `<p>New Node ${nodes.length + 1}</p>`,
+            content: data?.content || `<p>${i18n.t('node.newNode', { ns: I18N_NAMESPACES.MINDMAP })}</p>`,
             side: SIDE.MID,
             isCollapsed: false,
-            pathType: PATH_TYPES.SMOOTHSTEP,
+            pathType: PATH_TYPES.BEZIER,
           },
           style: {
             width: 'fit-content',
@@ -277,7 +276,7 @@ export const useNodeOperationsStore = create<NodeOperationsState>()(
           type: nodeType,
           data: {
             level: fullParentNode.data?.level ? fullParentNode.data.level + 1 : 1,
-            content: `<p> New node ${allChildren.length + 1}</p>`,
+            content: `<p>${i18n.t('node.newChildNode', { ns: I18N_NAMESPACES.MINDMAP, count: allChildren.length + 1 })}</p>`,
             parentId: fullParentNode.id,
             side: side,
             isCollapsed: false,

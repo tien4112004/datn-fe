@@ -243,6 +243,8 @@ export default {
   },
   node: {
     loadingImage: 'Loading image...',
+    newNode: 'New Tree',
+    newChildNode: 'New node {{count}}',
   },
   saving: {
     cannotSaveInViewMode: 'Cannot save in view mode',

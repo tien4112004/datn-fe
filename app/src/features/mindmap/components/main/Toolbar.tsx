@@ -21,6 +21,7 @@ import { Copy, Download, GitBranchPlus, Redo, Save, Share2, Sparkles, Undo } fro
 import { memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useReactFlow } from '@xyflow/react';
 import { useSaveMindmap } from '../../hooks';
 import { useDuplicateMindmap } from '../../hooks/useApi';
 import { useNodeOperationsStore, useUndoRedoStore } from '../../stores';
@@ -90,6 +91,7 @@ const Toolbar = memo(
     const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
     const navigate = useNavigate();
     const addNode = useNodeOperationsStore((state) => state.addNode);
+    const { screenToFlowPosition } = useReactFlow();
     const undo = useUndoRedoStore((state) => state.undo);
     const redo = useUndoRedoStore((state) => state.redo);
     const canUndo = useUndoRedoStore((state) => !state.undoStack.isEmpty());
@@ -162,7 +164,11 @@ const Toolbar = memo(
               <div className="space-y-2">
                 <Button
                   onClick={() => {
-                    addNode();
+                    const position = screenToFlowPosition({
+                      x: window.innerWidth / 2,
+                      y: window.innerHeight / 2,
+                    });
+                    addNode({ position } as any);
                   }}
                   title={t('toolbar.tooltips.addTree')}
                   variant="default"

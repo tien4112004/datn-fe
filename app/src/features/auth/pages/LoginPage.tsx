@@ -13,18 +13,22 @@ export function LoginPage() {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const requireAuth = (location.state as { requireAuth?: boolean })?.requireAuth;
+  const locationState = location.state as { requireAuth?: boolean; from?: string } | null;
+  const requireAuth = locationState?.requireAuth;
+  const from = locationState?.from;
 
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated && user) {
-      if (user.role === 'student') {
+      if (from) {
+        navigate(from, { replace: true });
+      } else if (user.role === 'student') {
         navigate('/student');
       } else {
         navigate('/');
       }
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, user, navigate, from]);
 
   return (
     <div className="relative flex min-h-screen">

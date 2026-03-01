@@ -68,7 +68,8 @@ export default function NavLayout() {
 export function NavLayoutErrorBoundary() {
   const error = useRouteError();
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   // Show loading spinner while checking auth status
   if (isLoading) {
@@ -77,7 +78,18 @@ export function NavLayoutErrorBoundary() {
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace state={{ requireAuth: true }} />;
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ requireAuth: true, from: location.pathname + location.search }}
+      />
+    );
+  }
+
+  // Redirect students to student dashboard — they shouldn't see the teacher sidebar layout
+  if (user?.role === 'student') {
+    return <Navigate to="/student" replace />;
   }
 
   const resetError = () => {

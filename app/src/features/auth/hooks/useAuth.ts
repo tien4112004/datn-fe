@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth as useAuthContext } from '@/shared/context/auth';
 import { useAuthApiService, getAuthApiService } from '../api';
 import type { LoginRequest, SignupRequest } from '@/shared/types/auth';
@@ -32,7 +32,9 @@ export const useProfile = (enabled: boolean = true) => {
 export const useLogin = () => {
   const { setUser } = useAuthContext();
   const navigate = useNavigate();
+  const location = useLocation();
   const authService = useAuthApiService();
+  const from = (location.state as { from?: string })?.from;
 
   return useMutation({
     mutationFn: async (request: LoginRequest) => {
@@ -48,8 +50,10 @@ export const useLogin = () => {
       // Update auth context
       setUser(user);
 
-      // Redirect based on role
-      if (user.role === 'student') {
+      // Redirect to original URL if available, otherwise redirect based on role
+      if (from) {
+        navigate(from, { replace: true });
+      } else if (user.role === 'student') {
         navigate('/student');
       } else {
         navigate('/');
@@ -82,8 +86,16 @@ export const useRegister = () => {
  */
 export const useLogout = () => {
   const { logout } = useAuthContext();
+  const navigate = useNavigate();
   const authService = useAuthApiService();
   const queryClient = useQueryClient();
+
+  const clearSession = () => {
+    logout();
+    queryClient.clear();
+    // Navigate to login directly so the route guard doesn't redirect with the auth indicator
+    navigate('/login', { replace: true });
+  };
 
   return useMutation({
     mutationFn: async () => {
@@ -95,17 +107,7 @@ export const useLogout = () => {
         console.warn('Backend logout failed, clearing frontend session anyway:', error);
       }
     },
-    onSuccess: () => {
-      // Always clear frontend session regardless of backend response
-      logout();
-      // Clear all cached queries to prevent data leakage between users
-      queryClient.clear();
-    },
-    onError: () => {
-      // Even on error, clear frontend session
-      logout();
-      // Clear all cached queries to prevent data leakage between users
-      queryClient.clear();
-    },
+    onSuccess: clearSession,
+    onError: clearSession,
   });
 };

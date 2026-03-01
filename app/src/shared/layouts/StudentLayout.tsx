@@ -28,6 +28,7 @@ export default function StudentLayout() {
 export function StudentLayoutErrorBoundary() {
   const error = useRouteError();
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
@@ -35,7 +36,13 @@ export function StudentLayoutErrorBoundary() {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace state={{ requireAuth: true }} />;
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ requireAuth: true, from: location.pathname + location.search }}
+      />
+    );
   }
 
   const resetError = () => {

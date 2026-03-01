@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useUserProfileApiService } from '../api';
 import { authKeys } from '@/features/auth/hooks/useAuth';
 import type { UserProfileUpdateRequest } from '../types';
+import type { ChangePasswordRequest } from '../api/service';
 
 const USER_PROFILE_QUERY_KEY = ['userProfile'];
 
@@ -39,6 +40,13 @@ export const useUpdateUserAvatar = () => {
         queryKey: authKeys.profile,
       });
     },
+  });
+};
+
+export const useChangePassword = () => {
+  const userProfileApiService = useUserProfileApiService();
+  return useMutation({
+    mutationFn: (data: ChangePasswordRequest) => userProfileApiService.changePassword(data),
   });
 };
 

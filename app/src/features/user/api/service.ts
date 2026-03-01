@@ -1,6 +1,11 @@
 import type { ApiClient, ApiResponse } from '@aiprimary/api';
 import type { User, UserProfile, UserProfileUpdateRequest } from '../types';
 
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
 export interface UserProfileApiService {
   getType(): 'real' | 'mock';
   getCurrentUserProfile(): Promise<UserProfile>;
@@ -8,6 +13,7 @@ export interface UserProfileApiService {
   updateCurrentUserAvatar(avatar: File): Promise<{ avatarUrl: string }>;
   removeCurrentUserAvatar(): Promise<void>;
   searchUsers(query: string): Promise<User[]>;
+  changePassword(data: ChangePasswordRequest): Promise<void>;
 }
 
 export default class UserProfileService implements UserProfileApiService {
@@ -54,6 +60,10 @@ export default class UserProfileService implements UserProfileApiService {
 
   async removeCurrentUserAvatar(): Promise<void> {
     await this.apiClient.delete(`${this.baseUrl}/api/user/me/avatar`);
+  }
+
+  async changePassword(data: ChangePasswordRequest): Promise<void> {
+    await this.apiClient.post(`${this.baseUrl}/api/user/change-password`, data);
   }
 
   async searchUsers(query: string): Promise<User[]> {

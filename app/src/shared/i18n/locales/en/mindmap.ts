@@ -357,6 +357,8 @@ export default {
       selected: 'Selected Nodes',
       concepts: 'concepts',
       chatPlaceholder: 'Ask AI to modify these nodes...',
+      rootNode: 'Root node',
+      moreItems: '+ {{count}} more items...',
     },
     crossBranch: {
       title: 'Multiple Branches Selected',

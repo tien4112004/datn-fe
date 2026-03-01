@@ -39,6 +39,13 @@ function findSiblings(currentNode: MindMapNode, allNodes: MindMapNode[]): MindMa
 }
 
 /**
+ * Find existing children of a node
+ */
+function findChildren(nodeId: string, allNodes: MindMapNode[]): MindMapNode[] {
+  return allNodes.filter((n) => n.data.parentId === nodeId);
+}
+
+/**
  * Build TreeContext from current node and tree state
  */
 export function buildTreeContext(
@@ -64,6 +71,10 @@ export function buildTreeContext(
   const siblings = findSiblings(currentNode, nodes);
   const siblingContents = siblings.map(getNodePlainText).filter((s) => s.length > 0);
 
+  // Find existing children of the current node
+  const children = findChildren(nodeId, nodes);
+  const existingChildrenContents = children.map(getNodePlainText).filter((s) => s.length > 0);
+
   // Root content is first in ancestry path (if exists)
   const rootNodeContent = ancestryPath.length > 0 ? ancestryPath[0] : undefined;
 
@@ -75,6 +86,7 @@ export function buildTreeContext(
     currentLevel: currentNode.data.level || 0,
     parentContent: parent ? getNodePlainText(parent) : undefined,
     siblingContents: siblingContents.length > 0 ? siblingContents : undefined,
+    existingChildrenContents: existingChildrenContents.length > 0 ? existingChildrenContents : undefined,
     fullAncestryPath: ancestryPath.length > 0 ? ancestryPath : undefined,
   };
 }

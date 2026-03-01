@@ -13,6 +13,7 @@ export interface TreeContext {
   mindmapTitle?: string;
   rootNodeContent?: string;
   fullAncestryPath?: string[]; // Ordered from root to immediate parent
+  existingChildrenContents?: string[]; // Current children of the node being expanded
 }
 
 // API Request types
@@ -34,6 +35,7 @@ export interface ExpandNodeRequest {
   language?: string;
   grade?: string;
   subject?: string;
+  context?: TreeContext;
   model?: string;
   provider?: string;
 }

@@ -357,6 +357,8 @@ export default {
       selected: 'Nút được chọn',
       concepts: 'khái niệm',
       chatPlaceholder: 'Yêu cầu AI chỉnh sửa các nút này...',
+      rootNode: 'Nút gốc',
+      moreItems: '+ {{count}} mục khác...',
     },
     crossBranch: {
       title: 'Đã chọn nhiều nhánh',

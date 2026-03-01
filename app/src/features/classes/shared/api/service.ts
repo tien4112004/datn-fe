@@ -86,14 +86,21 @@ export default class ClassService implements ClassApiService {
     return response.data.data;
   }
 
-  async getStudentsByClassId(classId: string, page = 1, size = 10): Promise<Student[]> {
+  async getStudentsByClassId(classId: string, page = 1, size = 10): Promise<ApiResponse<Student[]>> {
     const response = await this.apiClient.get<ApiResponse<Student[]>>(
       `${this.baseUrl}/api/classes/${classId}/students`,
       {
         params: { page, size },
       }
     );
-    return response.data.data.map((item) => this._mapStudent(item));
+
+    const mappedData = response.data.data.map((item) => this._mapStudent(item));
+
+    return {
+      ...response.data,
+      data: mappedData,
+      pagination: mapPagination(response.data.pagination as Pagination),
+    };
   }
 
   async removeStudentFromClass(classId: string, studentId: string): Promise<void> {

@@ -18,7 +18,13 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
   const [viewMode, setViewMode] = useState('list');
 
   // Fetch students from /classes/:id/students endpoint
-  const { data: students = [], isLoading: isLoadingStudents } = useClassStudents(classData.id);
+  const {
+    data: students = [],
+    isLoading: isLoadingStudents,
+    pagination,
+    setPagination,
+    totalItems,
+  } = useClassStudents(classData.id);
   const { data: initialLayout, isLoading: isLoadingLayout, isError } = useSeatingChart(classData.id);
 
   // Auto-initialize layout if none exists
@@ -44,7 +50,7 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
         <div className="flex items-center gap-3">
           <Users className="text-muted-foreground h-5 w-5" />
           <h2 className="text-xl font-semibold">{t('tabs.students')}</h2>
-          <Badge variant="secondary">{students.length}</Badge>
+          <Badge variant="secondary">{totalItems}</Badge>
         </div>
         <div className="flex items-center gap-3">
           {/* Segmented Control */}
@@ -78,7 +84,14 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
       {/* Content - No Card Wrapper */}
       <div>
         {viewMode === 'list' && (
-          <StudentListView students={students} classId={classData.id} isLoading={isLoadingStudents} />
+          <StudentListView
+            students={students}
+            classId={classData.id}
+            isLoading={isLoadingStudents}
+            pagination={pagination}
+            setPagination={setPagination}
+            totalItems={totalItems}
+          />
         )}
         {viewMode === 'seating-chart' && (
           <>

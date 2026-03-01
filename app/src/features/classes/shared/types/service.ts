@@ -20,6 +20,13 @@ export interface ImportResult {
   studentsCreated?: number;
   message?: string;
   errors?: string[];
+  credentials?: Array<{
+    studentId: string;
+    username: string;
+    password: string;
+    email: string;
+    fullName: string;
+  }>;
 }
 
 export interface ClassApiService {

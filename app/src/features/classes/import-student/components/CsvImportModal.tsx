@@ -23,20 +23,21 @@ import { ImportProgress } from './ImportProgress';
 import { ImportErrors } from './ImportErrors';
 import { FormatRequirements } from './FormatRequirements';
 import { useCsvImport } from '../../class-student/hooks';
+import type { ImportResult } from '../../shared/types/service';
 
 interface CsvImportModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   classId: string;
-  onSuccess?: () => void;
+  onSuccess?: (result: ImportResult) => void;
 }
 
 export function CsvImportModal({ open, onOpenChange, classId, onSuccess }: CsvImportModalProps) {
   const { t } = useTranslation('classes');
   const { state, isLoading, handleFileSelect, handleSubmit, handleReset } = useCsvImport({
     classId,
-    onSuccess: () => {
-      onSuccess?.();
+    onSuccess: (result) => {
+      onSuccess?.(result);
       setTimeout(() => onOpenChange(false), 2000);
     },
   });

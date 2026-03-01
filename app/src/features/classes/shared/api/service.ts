@@ -238,6 +238,7 @@ export default class ClassService implements ClassApiService {
         success: true,
         studentsCreated: response.data.data?.studentsCreated || 0,
         message: response.data.message || 'Students imported successfully',
+        credentials: response.data.data?.credentials,
       };
     } catch (error) {
       const errorData = (error as any)?.response?.data;

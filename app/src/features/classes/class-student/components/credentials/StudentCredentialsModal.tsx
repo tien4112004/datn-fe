@@ -130,7 +130,7 @@ export function StudentCredentialsModal({ open, onOpenChange, credentials }: Cre
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="!max-w-3xl">
         <DialogHeader>
           <DialogTitle>{t('modal.title')}</DialogTitle>
           <DialogDescription>{t('modal.description')}</DialogDescription>

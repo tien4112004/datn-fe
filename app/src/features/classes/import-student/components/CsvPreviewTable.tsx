@@ -8,6 +8,8 @@
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { CsvStudentRow } from '@/features/classes/import-student/types/csvImport';
+import { format } from 'date-fns';
+import { getLocaleDateFns } from '@/shared/i18n/helper';
 
 interface CsvPreviewTableProps {
   data: CsvStudentRow[];
@@ -118,7 +120,13 @@ export function CsvPreviewTable({ data, totalRows, className = '' }: CsvPreviewT
                       {row.fullName || t('csvImport.preview.missing')}
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-3 py-2 text-gray-600">{row.dateOfBirth || '-'}</td>
+                  <td className="whitespace-nowrap px-3 py-2 text-gray-600">
+                    {row.dateOfBirth
+                      ? format(new Date(row.dateOfBirth), 'P', {
+                          locale: getLocaleDateFns(),
+                        })
+                      : '-'}
+                  </td>
                   <td className="whitespace-nowrap px-3 py-2 text-gray-600">{row.gender || '-'}</td>
                   <td className="whitespace-nowrap px-3 py-2 text-gray-600">{row.address || '-'}</td>
                   <td className="whitespace-nowrap px-3 py-2 text-gray-600">{row.phoneNumber || '-'}</td>

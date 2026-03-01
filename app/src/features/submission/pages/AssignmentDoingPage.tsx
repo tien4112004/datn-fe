@@ -31,6 +31,7 @@ import {
 } from '@ui/dialog';
 import { useAssignmentPublic } from '@/features/assignment/hooks/useAssignmentApi';
 import { useCreateSubmission } from '../hooks';
+import { useSubmissionDraftStore } from '../stores/useSubmissionDraftStore';
 
 // Check if an answer is valid (not empty) - moved outside component as pure function
 const isAnswerValid = (answer: Answer): boolean => {
@@ -81,9 +82,11 @@ export const AssignmentDoingPage = () => {
   const { t } = useTranslation('assignment', { keyPrefix: 'submissions.doing' });
   const { t: tActions } = useTranslation('assignment', { keyPrefix: 'submissions.actions' });
 
-  const [currentQuestionId, setCurrentQuestionId] = useState<string | null>(null);
-  const [currentContextId, setCurrentContextId] = useState<string | null>(null);
-  const [answers, setAnswers] = useState<Answer[]>([]);
+  const { drafts, setDraft, clearDraft } = useSubmissionDraftStore();
+  const draft = id ? drafts[id] : undefined;
+  const [currentQuestionId, setCurrentQuestionId] = useState<string | null>(draft?.currentQuestionId ?? null);
+  const [currentContextId, setCurrentContextId] = useState<string | null>(draft?.currentContextId ?? null);
+  const [answers, setAnswers] = useState<Answer[]>(draft?.answers ?? []);
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
 
   // Get postId from query params (for homework flow) or use assignmentId (for direct access)
@@ -97,6 +100,13 @@ export const AssignmentDoingPage = () => {
 
   // Derived state - all hooks must be called before any early returns
   const questions = useMemo(() => assignment?.questions || [], [assignment?.questions]);
+
+  // Persist draft to store
+  useEffect(() => {
+    if (id) {
+      setDraft(id, { answers, currentQuestionId, currentContextId });
+    }
+  }, [id, answers, currentQuestionId, currentContextId, setDraft]);
 
   // Initialize to first question on load
   useEffect(() => {
@@ -235,6 +245,7 @@ export const AssignmentDoingPage = () => {
       },
       {
         onSuccess: () => {
+          if (id) clearDraft(id);
           setShowSubmitDialog(false);
           navigate(-1);
         },

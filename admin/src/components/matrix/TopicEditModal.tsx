@@ -20,7 +20,10 @@ interface TopicEditModalProps {
   topic: AssignmentTopic | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (topicId: string, updates: { name: string; chapters?: string[] }) => void;
+  onSave: (
+    topicId: string,
+    updates: { name: string; subtopics?: Array<{ id: string; name: string }> }
+  ) => void;
   onDelete: (topicId: string) => void;
   subject?: string;
   grade?: string;
@@ -36,7 +39,7 @@ export const TopicEditModal = ({
   grade,
 }: TopicEditModalProps) => {
   const [name, setName] = useState(topic?.name || '');
-  const [chapters, setChapters] = useState<string[]>(topic?.chapters || []);
+  const [subtopics, setSubtopics] = useState<Array<{ id: string; name: string }>>(topic?.subtopics || []);
 
   const { data: chaptersData, isLoading: chaptersLoading } = useQuestionBankChapters(
     subject || undefined,
@@ -48,7 +51,7 @@ export const TopicEditModal = ({
   useEffect(() => {
     if (topic) {
       setName(topic.name);
-      setChapters(topic.chapters || []);
+      setSubtopics(topic.subtopics || []);
     }
   }, [topic]);
 
@@ -56,7 +59,7 @@ export const TopicEditModal = ({
     if (topic) {
       onSave(topic.id, {
         name,
-        chapters: chapters.length > 0 ? chapters : undefined,
+        subtopics: subtopics.length > 0 ? subtopics : undefined,
       });
       onOpenChange(false);
     }
@@ -69,8 +72,8 @@ export const TopicEditModal = ({
     }
   };
 
-  const handleChapterToggle = (chapterName: string, checked: boolean) => {
-    setChapters((prev) => (checked ? [...prev, chapterName] : prev.filter((c) => c !== chapterName)));
+  const handleSubtopicToggle = (subtopic: { id: string; name: string }, checked: boolean) => {
+    setSubtopics((prev) => (checked ? [...prev, subtopic] : prev.filter((s) => s.id !== subtopic.id)));
   };
 
   if (!topic) return null;
@@ -101,12 +104,12 @@ export const TopicEditModal = ({
               Select chapters from the curriculum to associate with this topic.
             </p>
 
-            {/* Selected chapters as badges */}
-            {chapters.length > 0 && (
+            {/* Selected subtopics as badges */}
+            {subtopics.length > 0 && (
               <div className="flex flex-wrap gap-1">
-                {chapters.map((chapter, idx) => (
-                  <Badge key={idx} variant="secondary" className="text-xs">
-                    {chapter}
+                {subtopics.map((subtopic) => (
+                  <Badge key={subtopic.id} variant="secondary" className="text-xs">
+                    {subtopic.name}
                   </Badge>
                 ))}
               </div>
@@ -125,8 +128,10 @@ export const TopicEditModal = ({
                   <div key={ch.id} className="flex items-center gap-2">
                     <Checkbox
                       id={`modal-chapter-${ch.id}`}
-                      checked={chapters.includes(ch.name)}
-                      onCheckedChange={(checked) => handleChapterToggle(ch.name, checked as boolean)}
+                      checked={subtopics.some((s) => s.id === ch.id)}
+                      onCheckedChange={(checked) =>
+                        handleSubtopicToggle({ id: ch.id, name: ch.name }, checked as boolean)
+                      }
                     />
                     <label
                       htmlFor={`modal-chapter-${ch.id}`}

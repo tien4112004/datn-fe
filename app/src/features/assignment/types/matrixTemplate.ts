@@ -45,7 +45,7 @@ export interface MatrixTemplateCreateRequest {
   name: string;
   subject: SubjectCode;
   grade: Grade;
-  matrixData: string; // JSON.stringify(ApiMatrix)
+  matrixData: ApiMatrix;
 }
 
 /**
@@ -53,7 +53,7 @@ export interface MatrixTemplateCreateRequest {
  */
 export interface MatrixTemplateUpdateRequest {
   name?: string;
-  matrixData?: string; // JSON.stringify(ApiMatrix)
+  matrixData?: ApiMatrix;
 }
 
 /**

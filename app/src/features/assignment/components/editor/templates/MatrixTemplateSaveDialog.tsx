@@ -67,7 +67,7 @@ export const MatrixTemplateSaveDialog = ({
         name: templateName.trim(),
         subject,
         grade,
-        matrixData: JSON.stringify(apiMatrix),
+        matrixData: apiMatrix,
       });
 
       toast.success(t('matrixTemplateSave.saveSuccess'));

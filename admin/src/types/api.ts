@@ -76,7 +76,7 @@ export interface ApiResponse<T> {
 
 // Matrix Template Types
 export interface MatrixDimensions {
-  topics: { id: string; name: string; chapters?: string[] }[];
+  topics: { id: string; name: string; subtopics?: Array<{ id: string; name: string }> }[];
   difficulties: string[]; // lowercase: "knowledge", "comprehension", "application"
   questionTypes: string[]; // lowercase: "multiple_choice", "fill_in_blank", etc.
 }

@@ -32,11 +32,11 @@ function transformGeneratedMatrix(response: GenerateMatrixResponse): {
   const difficulties = getAllDifficulties();
   const questionTypes = getAllQuestionTypes();
 
-  // Map topics directly (subtopics from API response become chapters)
+  // Map topics directly, forwarding subtopics as-is
   const topics: AssignmentTopic[] = response.dimensions.topics.map((topic) => ({
     id: topic.id || createTopicId(),
     name: topic.name,
-    chapters: topic.subtopics?.map((s) => s.name) || [],
+    subtopics: topic.subtopics || [],
   }));
 
   // Create full matrix cells grid for all topics
@@ -52,7 +52,7 @@ function transformGeneratedMatrix(response: GenerateMatrixResponse): {
       topics: response.dimensions.topics.map((t) => ({
         id: t.id,
         name: t.name,
-        chapters: t.subtopics?.map((s) => s.name) || [],
+        subtopics: t.subtopics || [],
       })),
       difficulties: response.dimensions.difficulties as any[],
       questionTypes: response.dimensions.questionTypes as any[],

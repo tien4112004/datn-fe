@@ -26,7 +26,8 @@ export interface MatrixMetadata {
 export interface MatrixDimensionTopic {
   id: string;
   name: string;
-  chapters?: string[];
+  hasContext?: boolean;
+  subtopics?: Array<{ id: string; name: string }>;
 }
 
 /**

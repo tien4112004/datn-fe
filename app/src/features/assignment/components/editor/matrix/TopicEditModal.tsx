@@ -38,7 +38,7 @@ export const TopicEditModal = ({ topicId, open, onOpenChange }: TopicEditModalPr
 
   const [name, setName] = useState(topic?.name || '');
   const [description, setDescription] = useState(topic?.description || '');
-  const [chapters, setChapters] = useState<string[]>(topic?.chapters || []);
+  const [subtopics, setSubtopics] = useState<Array<{ id: string; name: string }>>(topic?.subtopics || []);
   const [hasContext, setHasContext] = useState<boolean>(topic?.hasContext || false);
 
   // Fetch chapters from API
@@ -52,7 +52,7 @@ export const TopicEditModal = ({ topicId, open, onOpenChange }: TopicEditModalPr
     if (topic) {
       setName(topic.name);
       setDescription(topic.description || '');
-      setChapters(topic.chapters || []);
+      setSubtopics(topic.subtopics || []);
       setHasContext(topic.hasContext || false);
     }
   }, [topic]);
@@ -62,7 +62,7 @@ export const TopicEditModal = ({ topicId, open, onOpenChange }: TopicEditModalPr
       updateTopic(topicId, {
         name,
         description,
-        chapters: chapters.length > 0 ? chapters : undefined,
+        subtopics: subtopics.length > 0 ? subtopics : undefined,
         hasContext: hasContext || undefined,
       });
       onOpenChange(false);
@@ -76,8 +76,8 @@ export const TopicEditModal = ({ topicId, open, onOpenChange }: TopicEditModalPr
     }
   };
 
-  const handleChapterToggle = (chapterName: string, checked: boolean) => {
-    setChapters((prev) => (checked ? [...prev, chapterName] : prev.filter((c) => c !== chapterName)));
+  const handleSubtopicToggle = (subtopic: { id: string; name: string }, checked: boolean) => {
+    setSubtopics((prev) => (checked ? [...prev, subtopic] : prev.filter((s) => s.id !== subtopic.id)));
   };
 
   if (!topic) {
@@ -146,12 +146,12 @@ export const TopicEditModal = ({ topicId, open, onOpenChange }: TopicEditModalPr
             <Label className="text-sm font-semibold">{t('chapters')}</Label>
             <p className="text-xs text-gray-500">{t('chaptersHint')}</p>
 
-            {/* Selected chapters as badges */}
-            {chapters.length > 0 && (
+            {/* Selected subtopics as badges */}
+            {subtopics.length > 0 && (
               <div className="flex flex-wrap gap-1">
-                {chapters.map((chapter, idx) => (
-                  <Badge key={idx} variant="secondary" className="text-xs">
-                    {chapter}
+                {subtopics.map((subtopic) => (
+                  <Badge key={subtopic.id} variant="secondary" className="text-xs">
+                    {subtopic.name}
                   </Badge>
                 ))}
               </div>
@@ -168,8 +168,10 @@ export const TopicEditModal = ({ topicId, open, onOpenChange }: TopicEditModalPr
                   <div key={ch.id} className="flex items-center gap-2">
                     <Checkbox
                       id={`modal-chapter-${ch.id}`}
-                      checked={chapters.includes(ch.name)}
-                      onCheckedChange={(checked) => handleChapterToggle(ch.name, checked as boolean)}
+                      checked={subtopics.some((s) => s.id === ch.id)}
+                      onCheckedChange={(checked) =>
+                        handleSubtopicToggle({ id: ch.id, name: ch.name }, checked as boolean)
+                      }
                     />
                     <label
                       htmlFor={`modal-chapter-${ch.id}`}

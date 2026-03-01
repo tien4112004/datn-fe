@@ -20,8 +20,8 @@ export interface AssignmentTopic {
   id: string;
   name: string;
   description?: string;
-  chapters?: string[];
   hasContext?: boolean;
+  subtopics?: Array<{ id: string; name: string }>;
 }
 
 /**

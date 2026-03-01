@@ -36,6 +36,9 @@ export default class MatrixTemplateService implements MatrixTemplateApiService {
     if (filters?.grade) {
       queryParams.grade = filters.grade;
     }
+    if (filters?.bankType) {
+      queryParams.bankType = filters.bankType;
+    }
     if (filters?.page) {
       queryParams.page = filters.page;
     }

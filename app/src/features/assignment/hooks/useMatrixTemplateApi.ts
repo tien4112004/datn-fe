@@ -21,12 +21,14 @@ const TEMPLATE_PAGE_SIZE = 10;
 
 // GET all templates with infinite scrolling
 export const useInfiniteMatrixTemplateList = (
-  filters: Omit<MatrixTemplateFilters, 'page' | 'pageSize'> = {}
+  filters: Omit<MatrixTemplateFilters, 'page' | 'pageSize'> = {},
+  enabled = true
 ) => {
   const apiService = useMatrixTemplateApiService();
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = useInfiniteQuery({
     queryKey: matrixTemplateKeys.infiniteList(filters),
+    enabled,
     queryFn: async ({ pageParam = 1 }) => {
       const response = await apiService.getTemplates({
         ...filters,

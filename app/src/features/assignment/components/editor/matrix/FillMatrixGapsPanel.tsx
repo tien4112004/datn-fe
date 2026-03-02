@@ -38,6 +38,7 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
 
   // Get assignment data and actions
   const subject = useAssignmentFormStore((state) => state.subject);
+  const grade = useAssignmentFormStore((state) => state.grade);
   const topics = useAssignmentFormStore((state) => state.topics);
   const addQuestion = useAssignmentFormStore((state) => state.addQuestion);
   const setIsGeneratingQuestions = useAssignmentEditorStore((state) => state.setIsGeneratingQuestions);
@@ -88,7 +89,7 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
 
         // Build request for this gap
         const request: GenerateQuestionsRequest = {
-          grade: '5', // Default grade, could be parameterized
+          grade: grade || '5',
           topic: gap.topic,
           prompt: `Generate ${gap.gapCount} ${gap.difficulty} level ${gap.questionType} question${gap.gapCount > 1 ? 's' : ''} about ${gap.topic}.${shouldUseContext ? ' Include a reading passage for context.' : ''}${additionalPrompt ? ' ' + additionalPrompt : ''}`,
           subject: subject || 'T',

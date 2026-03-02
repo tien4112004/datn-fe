@@ -38,7 +38,7 @@ export const useGenerateMindmapFlow = () => {
 
       // Step 3: Create mindmap with title and generated content
       const mindmap = await mindmapApiService.createMindmap({
-        title: request.topic,
+        title: request.topic ?? '',
         description: '',
         nodes,
         edges,

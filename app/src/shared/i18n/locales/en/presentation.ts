@@ -4,8 +4,8 @@
  */
 export default {
   createOutline: {
-    title: 'Create Presentation Outline',
-    subtitle: 'Generate a slide outline with AI',
+    title: 'Create AI Presentation',
+    subtitle: 'Generate a comprehensive presentation with AI',
     promptSection: 'Prompt',
     regenerate: 'Regenerate',
     stop: 'Stop',
@@ -17,6 +17,13 @@ export default {
     slideCountUnit: 'slides',
     slideCountDescription: 'Number of slides to generate',
     generateOutline: 'Generate Outline',
+    fileUpload: {
+      attachFiles: 'Attach files',
+      uploading: 'Uploading...',
+      uploadError: 'Failed to upload file. Please try again.',
+      fileTooLarge: '"{{name}}" exceeds the 10 MB limit',
+      totalSizeTooLarge: 'Total file size cannot exceed 10 MB',
+    },
     advancedOptions: 'Advanced Options',
     style: {
       placeholder: 'Which style?',

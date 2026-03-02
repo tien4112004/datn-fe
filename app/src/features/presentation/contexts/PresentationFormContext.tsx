@@ -1,5 +1,5 @@
 import { getLocalStorageData } from '@/shared/lib/utils';
-import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
 import {
   useForm,
   type Control,
@@ -14,6 +14,9 @@ import useFormPersist from 'react-hook-form-persist';
 import { moduleMap } from '../components/remote/module';
 import type { SlideTheme } from '../types/slide';
 import type { ArtStyle } from '@aiprimary/core';
+import type { AttachedFile } from '@/shared/components/FileAttachmentInput';
+import { useFileUpload } from '@/shared/hooks/useFileUpload';
+import { t } from 'i18next';
 
 export type UnifiedFormData = {
   // Outline fields
@@ -45,6 +48,10 @@ interface PresentationFormContextValue {
   setValue: UseFormSetValue<UnifiedFormData>;
   trigger: UseFormTrigger<UnifiedFormData>;
   getValues: UseFormGetValues<UnifiedFormData>;
+  attachedFiles: AttachedFile[];
+  setAttachedFiles: React.Dispatch<React.SetStateAction<AttachedFile[]>>;
+  isUploadingFiles: boolean;
+  uploadFiles: (files: FileList) => Promise<void>;
 }
 
 const PresentationFormContext = createContext<PresentationFormContextValue | null>(null);
@@ -58,12 +65,17 @@ const PRESENTATION_FORM_KEY = 'presentation-unified-form';
 export const PresentationFormProvider = ({ children }: PresentationFormProviderProps) => {
   const persistedData = useMemo(() => getLocalStorageData(PRESENTATION_FORM_KEY), []);
 
+  const { attachedFiles, setAttachedFiles, isUploadingFiles, uploadFiles } = useFileUpload({
+    totalSizeTooLargeMessage: t('presentation:createOutline.fileUpload.totalSizeTooLarge'),
+    uploadErrorMessage: t('presentation:createOutline.fileUpload.uploadError'),
+  });
+
   // Zod validation schema for presentation form
   const presentationFormSchema = useMemo(
     () =>
       z.object({
-        // Outline fields - required
-        topic: z.string().min(1),
+        // Outline fields - topic optional when files are attached
+        topic: z.string(),
         slideCount: z.number().min(1),
         language: z.string().min(1),
         model: z.object({
@@ -142,8 +154,21 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
       setValue: form.setValue,
       trigger: form.trigger,
       getValues: form.getValues,
+      attachedFiles,
+      setAttachedFiles,
+      isUploadingFiles,
+      uploadFiles,
     }),
-    [form.control, form.watch, form.setValue, form.trigger, form.getValues]
+    [
+      form.control,
+      form.watch,
+      form.setValue,
+      form.trigger,
+      form.getValues,
+      attachedFiles,
+      isUploadingFiles,
+      uploadFiles,
+    ]
   );
 
   return <PresentationFormContext.Provider value={contextValue}>{children}</PresentationFormContext.Provider>;

@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import WorkspaceView from '@/features/presentation/components/generation/WorkspaceView';
+import { WorkspaceView } from '@/features/presentation/components/generation/WorkspaceView';
 import { renderWithProviders } from '@/tests/test-utils';
 import { PresentationFormProvider } from '@/features/presentation/contexts/PresentationFormContext';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';

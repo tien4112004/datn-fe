@@ -184,6 +184,14 @@ export default {
       cancel: 'Cancel',
       generate: 'Generate',
     },
+    fileUpload: {
+      attachFiles: 'Attach files',
+      uploading: 'Uploading...',
+      uploadError: 'Failed to upload file. Please try again.',
+      topicOrFileRequired: 'Please provide a topic or attach at least one file',
+      fileTooLarge: '"{{name}}" exceeds the 10 MB limit',
+      totalSizeTooLarge: 'Total file size cannot exceed 10 MB',
+    },
   },
   export: {
     title: 'Export Mindmap',

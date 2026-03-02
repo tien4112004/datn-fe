@@ -20,8 +20,8 @@
  */
 export default {
   createOutline: {
-    title: 'Tạo dàn ý trình bày',
-    subtitle: 'Tạo dàn ý slide với AI',
+    title: 'Tạo bài thuyết trình AI',
+    subtitle: 'Tạo bài thuyết trình trực quan với AI',
     promptSection: 'Đầu vào',
     regenerate: 'Tạo lại',
     stop: 'Dừng',
@@ -33,6 +33,13 @@ export default {
     slideCountUnit: 'trang',
     slideCountDescription: 'Số lượng trang cần tạo',
     generateOutline: 'Tạo dàn ý',
+    fileUpload: {
+      attachFiles: 'Đính kèm tệp',
+      uploading: 'Đang tải lên...',
+      uploadError: 'Tải tệp lên thất bại. Vui lòng thử lại.',
+      fileTooLarge: '"{{name}}" vượt quá giới hạn 10 MB',
+      totalSizeTooLarge: 'Tổng kích thước tệp không được vượt quá 10 MB',
+    },
     advancedOptions: 'Tùy chọn nâng cao',
     style: {
       placeholder: 'Phong cách nào?',

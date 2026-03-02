@@ -49,9 +49,8 @@ const AdvancedOptions = ({ control, isOpen, onToggle }: AdvancedOptionsProps) =>
             transition={{ type: 'spring', stiffness: 300, damping: 30, duration: 0.4 }}
             style={{ overflow: 'hidden' }}
           >
-            <div className="mt-4 space-y-4 px-1">
-              {/* 1x2 Grid for Language and Grade */}
-              <div className="grid grid-cols-2 gap-4">
+            <div className="mt-4 px-1">
+              <div className="grid grid-cols-3 gap-4">
                 {/* Language */}
                 <div className="space-y-2">
                   <Label>{t('language.label')}</Label>
@@ -101,10 +100,7 @@ const AdvancedOptions = ({ control, isOpen, onToggle }: AdvancedOptionsProps) =>
                     )}
                   />
                 </div>
-              </div>
 
-              {/* Subject Row */}
-              <div className="grid grid-cols-2 gap-4">
                 {/* Subject */}
                 <div className="space-y-2">
                   <Label>{t('subject.label')}</Label>

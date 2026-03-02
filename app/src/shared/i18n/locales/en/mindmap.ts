@@ -344,6 +344,7 @@ export default {
       button: 'Expand Node',
     },
     chat: {
+      label: 'Chat',
       placeholder: 'Ask AI to modify this content...',
     },
     feedback: {

@@ -344,6 +344,7 @@ export default {
       button: 'Mở rộng nút',
     },
     chat: {
+      label: 'Trò chuyện',
       placeholder: 'Yêu cầu AI chỉnh sửa nội dung này...',
     },
     feedback: {

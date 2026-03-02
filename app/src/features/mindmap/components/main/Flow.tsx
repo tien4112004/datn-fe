@@ -10,11 +10,6 @@ import ShapeNodeBlock from '../node/ShapeNode';
 import TextNodeBlock from '../node/TextNode';
 import ImageNodeBlock from '../node/ImageNode';
 import { useCoreStore, useLayoutStore } from '../../stores';
-
-/**
- * @deprecated ShapeNodeBlock and ImageNodeBlock are deprecated and will be removed in a future version.
- * Consider using TextNode or other alternative node types instead.
- */
 import { useMemo } from 'react';
 
 const handlersSelector = (state: any) => ({

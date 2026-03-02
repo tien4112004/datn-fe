@@ -19,7 +19,7 @@ export interface BaseNodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>,
 const clipboardSelector = (state: any) => state.dragTargetNodeId;
 
 export const BaseNodeBlock = memo(
-  ({ className, children, variant = 'card', node, ...props }: BaseNodeBlockProps) => {
+  ({ className, children, variant = 'card', node, style, ...props }: BaseNodeBlockProps) => {
     const { id, data, width, height, selected, dragging } = node;
 
     const dragTargetNodeId = useClipboardStore(useShallow(clipboardSelector));
@@ -67,12 +67,10 @@ export const BaseNodeBlock = memo(
     const nodeStyle = useMemo(
       () => ({
         width: width ? `${width}px` : undefined,
-        ...(variant === 'replacing'
-          ? { height: height ? `${height}px` : undefined }
-          : { minHeight: height ? `${height}px` : undefined }),
-        ...props.style,
+        minHeight: height ? `${height}px` : undefined,
+        ...style,
       }),
-      [width, height, props.style, variant]
+      [width, height, style]
     );
 
     // Determine which styles to use based on variant

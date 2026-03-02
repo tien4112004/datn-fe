@@ -11,7 +11,7 @@ import {
   DirtyTracker,
 } from '@/features/mindmap/components';
 import { Button } from '@ui/button';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import { useCoreStore, usePresenterModeStore } from '../stores';
 import { useDirtyStore } from '../stores/dirty';
@@ -30,8 +30,6 @@ import type { Mindmap, MindMapNode } from '../types';
 import { MINDMAP_TYPES } from '../types';
 import { useTranslation } from 'react-i18next';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
-import { useSaveMindmap } from '../hooks';
-
 /**
  * Migrate layout data from mindmap metadata to root nodes.
  * This ensures backward compatibility with mindmaps that stored layout data globally.
@@ -68,20 +66,6 @@ const migrateLayoutDataToRootNodes = (
   });
 };
 
-/**
- * Bridge component rendered inside ReactFlowProvider to expose the save
- * function (which depends on useReactFlow) to the parent page via a ref.
- */
-const MindmapSaveBridge = ({
-  saveFnRef,
-}: {
-  saveFnRef: React.MutableRefObject<((id: string) => Promise<void>) | null>;
-}) => {
-  const { saveWithThumbnail } = useSaveMindmap();
-  saveFnRef.current = saveWithThumbnail;
-  return null;
-};
-
 const MindmapPage = () => {
   const { mindmap } = useLoaderData() as { mindmap: Mindmap };
   const { t } = useTranslation(I18N_NAMESPACES.MINDMAP);
@@ -107,22 +91,12 @@ const MindmapPage = () => {
   const { isPresenterMode, togglePresenterMode } = usePresenterMode();
   const setPresenterModeStore = usePresenterModeStore((state) => state.setPresenterMode);
 
-  // Ref to save function exposed by MindmapSaveBridge inside ReactFlowProvider
-  const saveFnRef = useRef<((id: string) => Promise<void>) | null>(null);
-
-  const handleAutoSave = useCallback(async () => {
-    if (!saveFnRef.current) throw new Error('Save function not ready');
-    await saveFnRef.current(mindmap.id);
-  }, [mindmap.id]);
-
   // Listen for comment drawer open requests
   useCommentDrawerTrigger(() => setIsCommentDrawerOpen(true));
 
-  // Handle unsaved changes — auto-save silently when navigating away
+  // Handle unsaved changes — show dialog when navigating away
   const { showDialog, setShowDialog, handleStay, handleProceed, isAutoSaving } = useUnsavedChangesBlocker({
     eventName: 'app.mindmap.dirty-state-changed',
-    autoSave: userPermission === 'edit' ? handleAutoSave : undefined,
-    autoSaveTimeout: 15000,
   });
 
   // Sync fullscreen state with sidebar
@@ -162,7 +136,6 @@ const MindmapPage = () => {
   return (
     <>
       <ReactFlowProvider>
-        <MindmapSaveBridge saveFnRef={saveFnRef} />
         <MindmapPermissionProvider isPresenterMode={isPresenterMode} userPermission={userPermission}>
           <div className="flex h-screen w-full" style={{ backgroundColor: 'var(--background)' }}>
             <Flow isPanOnDrag={isPanOnDrag}>

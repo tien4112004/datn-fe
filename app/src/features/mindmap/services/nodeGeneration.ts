@@ -2,7 +2,7 @@
  * Utilities for AI-powered node generation
  */
 
-import type { AiGeneratedNode, MindMapNode, MindMapEdge, Side } from '../types';
+import type { AiGeneratedNode, MindMapNode, MindMapEdge, Side, PathType } from '../types';
 import { MINDMAP_TYPES, PATH_TYPES, DRAGHANDLE, SIDE } from '../types';
 import { generateId } from '@/shared/lib/utils';
 import { getOppositeSide } from './utils';
@@ -13,6 +13,11 @@ interface ConvertChildrenResult {
   edges: MindMapEdge[];
 }
 
+interface RootNodeStyle {
+  pathType: PathType;
+  edgeColor: string;
+}
+
 /**
  * Convert AI-generated children to ReactFlow nodes and edges.
  * Unlike convertAiDataToMindMapNodes, this creates TEXT_NODEs for children
@@ -20,7 +25,8 @@ interface ConvertChildrenResult {
  */
 export const convertChildrenToNodes = async (
   children: AiGeneratedNode[],
-  parentNode: MindMapNode
+  parentNode: MindMapNode,
+  rootStyle?: RootNodeStyle
 ): Promise<ConvertChildrenResult> => {
   const nodes: MindMapNode[] = [];
   const edges: MindMapEdge[] = [];
@@ -63,7 +69,7 @@ export const convertChildrenToNodes = async (
         content: htmlContent,
         side,
         parentId,
-        pathType: PATH_TYPES.SMOOTHSTEP,
+        pathType: rootStyle?.pathType ?? PATH_TYPES.SMOOTHSTEP,
       },
       dragHandle: DRAGHANDLE.SELECTOR,
     };
@@ -79,9 +85,9 @@ export const convertChildrenToNodes = async (
       sourceHandle: `${side}-source-${parentId}`,
       targetHandle: `${getOppositeSide(side)}-target-${nodeId}`,
       data: {
-        strokeColor: '#0044FF',
+        strokeColor: rootStyle?.edgeColor ?? '#0044FF',
         strokeWidth: 2,
-        pathType: PATH_TYPES.SMOOTHSTEP,
+        pathType: rootStyle?.pathType ?? PATH_TYPES.SMOOTHSTEP,
       },
     };
 

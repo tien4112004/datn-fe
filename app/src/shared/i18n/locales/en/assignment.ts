@@ -788,6 +788,10 @@ export default {
     // Tutorial
     tutorial: {
       steps: {
+        toolbar: {
+          title: 'Navigation Toolbar',
+          description: 'Quick access to assignment info, matrix, reading passages, and list view.',
+        },
         infoIcon: {
           title: 'Assignment Info',
           description: 'View and edit the assignment title, subject, grade, and other details.',
@@ -804,6 +808,11 @@ export default {
           title: 'Questions List',
           description: 'View all questions in a scrollable list format for quick review.',
         },
+        questionsGrid: {
+          title: 'Questions Grid',
+          description:
+            'All your questions appear here. Drag any question number to reorder. Context groups stay together when moved.',
+        },
         questionItem: {
           title: 'Question Item',
           description: 'Each numbered cell represents a question. Click to edit, drag to reorder.',
@@ -811,11 +820,6 @@ export default {
         contextGroup: {
           title: 'Context Group',
           description: 'This icon groups questions that share a reading passage. Click to manage the group.',
-        },
-        dragDrop: {
-          title: 'Drag & Drop',
-          description:
-            'Drag any question number to reorder questions. Context groups stay together when moved.',
         },
       },
       actions: {
@@ -1452,6 +1456,7 @@ export default {
     contentPlaceholder: 'Enter reading passage content...',
     authorPlaceholder: 'Author (optional)',
     done: 'Done',
+    cancel: 'Cancel',
     disconnect: 'Disconnect reading passage',
     assignmentOnlyHint: 'Changes only apply to this assignment.',
     viewQuestions: 'View questions',

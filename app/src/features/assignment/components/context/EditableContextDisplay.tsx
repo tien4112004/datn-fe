@@ -34,6 +34,7 @@ export const EditableContextDisplay = ({
   const { t } = useTranslation('assignment', { keyPrefix: 'context' });
   const [isOpen, setIsOpen] = useState(!defaultCollapsed);
   const [isEditing, setIsEditing] = useState(false);
+  const [savedContext, setSavedContext] = useState<Partial<AssignmentContext>>({});
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onUpdate({ title: e.target.value });
@@ -78,7 +79,10 @@ export const EditableContextDisplay = ({
                 variant="ghost"
                 size="sm"
                 className="h-8 w-8 p-0 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
-                onClick={() => setIsEditing(true)}
+                onClick={() => {
+                  setSavedContext({ title: context.title, content: context.content, author: context.author });
+                  setIsEditing(true);
+                }}
                 title={t('edit')}
               >
                 <Pencil className="h-4 w-4" />
@@ -139,9 +143,22 @@ export const EditableContextDisplay = ({
                     <Info className="h-3 w-3 shrink-0" />
                     {t('assignmentOnlyHint')}
                   </p>
-                  <Button type="button" size="sm" onClick={() => setIsEditing(false)}>
-                    {t('done')}
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        onUpdate(savedContext);
+                        setIsEditing(false);
+                      }}
+                    >
+                      {t('cancel')}
+                    </Button>
+                    <Button type="button" size="sm" onClick={() => setIsEditing(false)}>
+                      {t('done')}
+                    </Button>
+                  </div>
                 </div>
               </div>
             ) : (

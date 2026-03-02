@@ -74,8 +74,8 @@ export const QuestionBankCard = ({ question, isSelected, onToggleSelection }: Qu
           </div>
         </div>
       </HoverCardTrigger>
-      <HoverCardContent side="right" align="start" className="max-h-96 w-[28rem] p-0">
-        <ScrollArea className="max-h-96 p-4">
+      <HoverCardContent side="right" align="start" className="max-h-[70vh] w-[36rem] p-0">
+        <ScrollArea className="max-h-[70vh] p-4">
           {question.contextId && (
             <div className="mb-3 flex items-center gap-1.5 rounded-md bg-blue-50 px-2.5 py-1.5 text-xs text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
               <BookOpen className="h-3.5 w-3.5 shrink-0" />

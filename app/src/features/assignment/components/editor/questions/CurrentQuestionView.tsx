@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Trash2, Eye, Pencil, FileQuestion, Unlink, ChevronDown, ChevronUp, Check } from 'lucide-react';
 import { Button } from '@ui/button';
 import { Input } from '@ui/input';
+import { NumberInput } from '@ui/number-input';
 import { Label } from '@ui/label';
 import { Textarea } from '@ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
@@ -297,24 +298,23 @@ export const CurrentQuestionView = () => {
               </Select>
             </div>
 
-            <div>
+            <div className="w-fit">
               <Label
                 htmlFor={`points-${currentQuestionIndex}`}
                 className="text-xs text-gray-600 dark:text-gray-400"
               >
                 {t('collection.item.pointsLabel')}
               </Label>
-              <Input
+              <NumberInput
                 id={`points-${currentQuestionIndex}`}
-                type="number"
                 value={points}
-                onChange={(e) =>
+                onValueChange={(val) =>
                   updateQuestion(currentQuestionIndex, {
-                    points: parseInt(e.target.value, 10) || 0,
+                    points: val ?? 0,
                   })
                 }
                 min={0}
-                className="mt-1.5 h-9 text-sm"
+                className="mt-1.5 h-9"
               />
             </div>
           </div>

@@ -134,55 +134,57 @@ export function QuestionBankViewPage() {
             <h3 className="text-lg font-semibold">{t('sections.metadata')}</h3>
             <Separator />
 
-            <div className="grid grid-cols-4 gap-4">
-              <div className="space-y-2">
-                <Label>{t('fields.subject')}</Label>
-                <div>
-                  <Badge variant="outline" className={getSubjectBadgeClass(question.subject)}>
-                    {getSubjectName(question.subject)}
-                  </Badge>
+            <div className="space-y-4 px-4">
+              <div className="grid grid-cols-4 gap-4">
+                <div className="space-y-2">
+                  <Label>{t('fields.subject')}</Label>
+                  <div>
+                    <Badge variant="outline" className={getSubjectBadgeClass(question.subject)}>
+                      {getSubjectName(question.subject)}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{t('fields.difficulty')}</Label>
+                  <div>
+                    <Badge variant="outline" className={getDifficultyBadgeClass(question.difficulty)}>
+                      {getDifficultyName(question.difficulty)}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{t('fields.grade')}</Label>
+                  <div>
+                    {question.grade ? (
+                      <Badge variant="outline">{getGradeName(question.grade)}</Badge>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">-</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{t('fields.chapter')}</Label>
+                  <div>
+                    {question.chapter ? (
+                      <Badge variant="outline">{question.chapter}</Badge>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">-</span>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>{t('fields.difficulty')}</Label>
-                <div>
-                  <Badge variant="outline" className={getDifficultyBadgeClass(question.difficulty)}>
-                    {getDifficultyName(question.difficulty)}
-                  </Badge>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>{t('fields.grade')}</Label>
-                <div>
-                  {question.grade ? (
-                    <Badge variant="outline">{getGradeName(question.grade)}</Badge>
-                  ) : (
-                    <span className="text-muted-foreground text-sm">-</span>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>{t('fields.chapter')}</Label>
-                <div>
-                  {question.chapter ? (
-                    <Badge variant="outline">{question.chapter}</Badge>
-                  ) : (
-                    <span className="text-muted-foreground text-sm">-</span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-4 gap-4">
-              <div className="space-y-2">
-                <Label>{t('fields.type')}</Label>
-                <div>
-                  <Badge variant="outline" className={getQuestionTypeBadgeClass(question.type)}>
-                    {getQuestionTypeName(question.type)}
-                  </Badge>
+              <div className="grid grid-cols-4 gap-4">
+                <div className="space-y-2">
+                  <Label>{t('fields.type')}</Label>
+                  <div>
+                    <Badge variant="outline" className={getQuestionTypeBadgeClass(question.type)}>
+                      {getQuestionTypeName(question.type)}
+                    </Badge>
+                  </div>
                 </div>
               </div>
             </div>
@@ -193,22 +195,24 @@ export function QuestionBankViewPage() {
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">{t('sections.context')}</h3>
               <Separator />
-              <div className="rounded-lg border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
-                <div className="space-y-3">
-                  {contextData.title && (
-                    <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                      {contextData.title}
-                    </h4>
-                  )}
-                  <MarkdownPreview
-                    content={contextData.content}
-                    className="text-sm text-gray-700 dark:text-gray-300"
-                  />
-                  {contextData.author && (
-                    <p className="text-right text-xs italic text-gray-600 dark:text-gray-400">
-                      — {contextData.author}
-                    </p>
-                  )}
+              <div className="px-4">
+                <div className="rounded-lg border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+                  <div className="space-y-3">
+                    {contextData.title && (
+                      <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                        {contextData.title}
+                      </h4>
+                    )}
+                    <MarkdownPreview
+                      content={contextData.content}
+                      className="text-sm text-gray-700 dark:text-gray-300"
+                    />
+                    {contextData.author && (
+                      <p className="text-right text-xs italic text-gray-600 dark:text-gray-400">
+                        — {contextData.author}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -219,7 +223,9 @@ export function QuestionBankViewPage() {
             <h3 className="text-lg font-semibold">{t('sections.content')}</h3>
             <Separator />
 
-            <QuestionRenderer question={question as Question} viewMode={VIEW_MODE.VIEWING} />
+            <div className="px-4">
+              <QuestionRenderer question={question as Question} viewMode={VIEW_MODE.VIEWING} />
+            </div>
           </div>
 
           {/* Timestamps */}

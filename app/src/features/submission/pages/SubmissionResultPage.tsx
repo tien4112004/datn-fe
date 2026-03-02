@@ -23,6 +23,7 @@ import { ContextDisplay } from '@/features/context/components/ContextDisplay';
 import { useFormattedDistance } from '@/shared/lib/date-utils';
 import { useSubmission } from '../hooks';
 import { useAssignmentPublic } from '@/features/assignment/hooks/useAssignmentApi';
+import { getTeacher } from '@/shared/utils/teacherStorage';
 
 export const SubmissionResultPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -115,8 +116,7 @@ export const SubmissionResultPage = () => {
     );
   }
 
-  // Mock teacher data (backend doesn't provide teacher details)
-  const teacher = {
+  const teacher = getTeacher() || {
     id: submission.gradedBy || 'teacher-1',
     firstName: 'Teacher',
     lastName: '',

@@ -19,6 +19,8 @@ const USER_SPECIFIC_STORAGE_KEYS = [
   'class-store', // Class filters and selection (Zustand persist)
   'question-bank-store', // Question bank filters (Zustand persist)
   'user-preferences', // User preferences like "don't ask again" flags
+  'submission-drafts', // Assignment doing page draft answers (Zustand persist)
+  'class-teacher', // Teacher info cached from class API
 ];
 
 export function AuthProvider({ children }: { children: ReactNode }) {

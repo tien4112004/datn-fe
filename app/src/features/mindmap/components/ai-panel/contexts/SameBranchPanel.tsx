@@ -122,7 +122,7 @@ export function SameBranchPanel({ context, metadata }: Props): React.ReactElemen
             }}
           />
         ) : (
-          <span className="text-sm italic text-gray-400">Root node</span>
+          <span className="text-sm italic text-gray-400">{t('aiPanel.sameBranch.rootNode')}</span>
         )}
       </div>
 
@@ -151,7 +151,7 @@ export function SameBranchPanel({ context, metadata }: Props): React.ReactElemen
             ))}
             {context.nodeCount > 10 && (
               <div className="py-1 text-center text-xs italic text-gray-400">
-                + {context.nodeCount - 10} more items...
+                {t('aiPanel.sameBranch.moreItems', { count: context.nodeCount - 10 })}
               </div>
             )}
           </div>
@@ -183,7 +183,7 @@ export function SameBranchPanel({ context, metadata }: Props): React.ReactElemen
       <div className="space-y-2">
         <label className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
           <MessageSquare className="h-3 w-3" />
-          {t('aiPanel.chat.label', 'Custom Instruction')}
+          {t('aiPanel.chat.label')}
         </label>
         <ChatInterface
           placeholder={String(t('aiPanel.sameBranch.chatPlaceholder'))}

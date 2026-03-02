@@ -344,6 +344,7 @@ export default {
       button: 'Mở rộng nút',
     },
     chat: {
+      label: 'Trò chuyện',
       placeholder: 'Yêu cầu AI chỉnh sửa nội dung này...',
     },
     feedback: {
@@ -357,6 +358,8 @@ export default {
       selected: 'Nút được chọn',
       concepts: 'khái niệm',
       chatPlaceholder: 'Yêu cầu AI chỉnh sửa các nút này...',
+      rootNode: 'Nút gốc',
+      moreItems: '+ {{count}} mục khác...',
     },
     crossBranch: {
       title: 'Đã chọn nhiều nhánh',

@@ -18,13 +18,14 @@ interface MatrixGridViewProps {
 }
 
 export const MatrixGridView = ({ topics, matrixCells }: MatrixGridViewProps) => {
+  const { t } = useTranslation('questions', { keyPrefix: 'matrix.view' });
   const { t: tDifficulty } = useTranslation('questions');
   const { t: tQuestionType } = useTranslation('questions');
 
   if (topics.length === 0) {
     return (
       <div className="rounded-lg border border-dashed bg-gray-50 p-8 text-center dark:bg-gray-900">
-        <p className="text-sm text-gray-600 dark:text-gray-400">No topics in the assignment</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{t('noTopics')}</p>
       </div>
     );
   }
@@ -34,12 +35,12 @@ export const MatrixGridView = ({ topics, matrixCells }: MatrixGridViewProps) => 
 
   return (
     <div className="overflow-x-auto rounded-lg border">
-      <Table className="table-fixed min-w-[1000px]">
+      <Table className="min-w-[1000px] table-fixed">
         <TableHeader>
           {/* First header row: Topic + Difficulties spanning questionTypes */}
           <TableRow>
             <TableHead rowSpan={2} className="w-[160px] bg-gray-50 font-semibold dark:bg-gray-900">
-              Topic
+              {t('tableHeaders.topic')}
             </TableHead>
             {difficulties.map((difficulty) => (
               <TableHead
@@ -80,12 +81,12 @@ export const MatrixGridView = ({ topics, matrixCells }: MatrixGridViewProps) => 
               <TableCell className="w-[160px] align-top font-medium">
                 <div className="space-y-1">
                   <div className="whitespace-normal break-words">{topic.name}</div>
-                  {/* Display chapters as informational chips */}
-                  {topic.chapters && topic.chapters.length > 0 && (
+                  {/* Display subtopics as informational chips */}
+                  {topic.subtopics && topic.subtopics.length > 0 && (
                     <div className="flex flex-wrap gap-1 pt-1">
-                      {topic.chapters.map((chapter, idx) => (
+                      {topic.subtopics.map((subtopic, idx) => (
                         <Badge key={idx} variant="secondary" className="text-xs">
-                          {chapter}
+                          {subtopic.name}
                         </Badge>
                       ))}
                     </div>

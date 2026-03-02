@@ -12,7 +12,6 @@ import { generateId, createCellId } from '@aiprimary/core';
 import type { Grade } from '@aiprimary/core/assessment/grades.js';
 import type { SubjectCode } from '@aiprimary/core';
 import { apiMatrixToViewData } from '../utils/matrixConversion';
-import { toast } from 'sonner';
 
 /**
  * Sync matrix cell counts based on current questions
@@ -446,10 +445,11 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
 
       importMatrixTemplate: (template) => {
         const { topics, cells } = apiMatrixToViewData(template.matrix);
+        const nonZeroCells = cells.filter((cell) => cell.requiredCount > 0);
 
         set(
           {
-            matrix: cells,
+            matrix: nonZeroCells,
             topics: topics,
             isDirty: true,
           },
@@ -458,7 +458,6 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
         );
 
         dispatchDirtyEvent(true);
-        toast.success('Template imported successfully');
       },
 
       // === GETTERS ===

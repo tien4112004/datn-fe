@@ -53,7 +53,7 @@ export const MatrixGridEditor = ({
 
   return (
     <div className="overflow-x-auto rounded-lg border">
-      <Table className="table-fixed min-w-[1000px]">
+      <Table className="min-w-[1000px] table-fixed">
         <TableHeader>
           {/* First header row: Topic + Difficulties spanning questionTypes */}
           <TableRow>
@@ -117,18 +117,18 @@ export const MatrixGridEditor = ({
                         {topic.description}
                       </div>
                     )}
-                    {/* Display chapters as informational chips */}
-                    {topic.chapters && topic.chapters.length > 0 && (
+                    {/* Display subtopics as informational chips */}
+                    {topic.subtopics && topic.subtopics.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1">
-                        {topic.chapters.map((chapter, idx) => (
+                        {topic.subtopics.map((subtopic, idx) => (
                           <Tooltip key={idx}>
                             <TooltipTrigger asChild>
                               <Badge variant="secondary" className="max-w-full overflow-hidden text-xs">
-                                <span className="block truncate">{chapter}</span>
+                                <span className="block truncate">{subtopic.name}</span>
                               </Badge>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>{chapter}</p>
+                              <p>{subtopic.name}</p>
                             </TooltipContent>
                           </Tooltip>
                         ))}

@@ -61,7 +61,8 @@ export function cellsToApiMatrix(
   const dimensionTopics: MatrixDimensionTopic[] = topics.map((t) => ({
     id: t.id,
     name: t.name,
-    chapters: t.chapters, // Pass through chapter names
+    hasContext: t.hasContext,
+    subtopics: t.subtopics,
   }));
 
   // Build 3D matrix — rows are topics (not subtopics)
@@ -152,7 +153,8 @@ export function apiMatrixToViewData(
   const topics: AssignmentTopic[] = dimensions.topics.map((topic) => ({
     id: topic.id || createTopicId(),
     name: topic.name,
-    chapters: topic.chapters, // Carry over chapter names
+    hasContext: topic.hasContext,
+    subtopics: topic.subtopics,
   }));
 
   // Count questions per cell if questions are provided

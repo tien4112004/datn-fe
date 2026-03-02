@@ -147,7 +147,8 @@ export function transformAssignmentToFormData(assignment: Assignment): Assignmen
   let topics: AssignmentTopic[] = (assignment.matrix?.dimensions?.topics ?? []).map((topic) => ({
     id: topic.id || createTopicId(),
     name: topic.name,
-    chapters: topic.chapters, // Carry over chapter names
+    hasContext: topic.hasContext,
+    subtopics: topic.subtopics,
   }));
 
   // Fall back to a default topic if empty

@@ -51,14 +51,16 @@ export const TopicManager = () => {
     updateTopic(topicId, { hasContext });
   };
 
-  const handleChapterToggle = (topicId: string, chapterName: string, checked: boolean) => {
+  const handleSubtopicToggle = (
+    topicId: string,
+    subtopic: { id: string; name: string },
+    checked: boolean
+  ) => {
     const topic = topics.find((t) => t.id === topicId);
     if (!topic) return;
-    const currentChapters = topic.chapters || [];
-    const updatedChapters = checked
-      ? [...currentChapters, chapterName]
-      : currentChapters.filter((c) => c !== chapterName);
-    updateTopic(topicId, { chapters: updatedChapters.length > 0 ? updatedChapters : undefined });
+    const current = topic.subtopics || [];
+    const updated = checked ? [...current, subtopic] : current.filter((s) => s.id !== subtopic.id);
+    updateTopic(topicId, { subtopics: updated.length > 0 ? updated : undefined });
   };
 
   return (
@@ -137,12 +139,12 @@ export const TopicManager = () => {
                 {t('chaptersHint', 'Select chapters from the curriculum. Used as informational metadata.')}
               </p>
 
-              {/* Selected chapters as badges */}
-              {topic.chapters && topic.chapters.length > 0 && (
+              {/* Selected subtopics as badges */}
+              {topic.subtopics && topic.subtopics.length > 0 && (
                 <div className="flex flex-wrap gap-1">
-                  {topic.chapters.map((chapter, idx) => (
-                    <Badge key={idx} variant="secondary" className="text-xs">
-                      {chapter}
+                  {topic.subtopics.map((subtopic) => (
+                    <Badge key={subtopic.id} variant="secondary" className="text-xs">
+                      {subtopic.name}
                     </Badge>
                   ))}
                 </div>
@@ -161,9 +163,13 @@ export const TopicManager = () => {
                     <div key={chapter.id} className="flex items-center gap-2">
                       <Checkbox
                         id={`chapter-${topic.id}-${chapter.id}`}
-                        checked={(topic.chapters || []).includes(chapter.name)}
+                        checked={(topic.subtopics || []).some((s) => s.id === chapter.id)}
                         onCheckedChange={(checked) =>
-                          handleChapterToggle(topic.id, chapter.name, checked as boolean)
+                          handleSubtopicToggle(
+                            topic.id,
+                            { id: chapter.id, name: chapter.name },
+                            checked as boolean
+                          )
                         }
                       />
                       <label

@@ -31,7 +31,7 @@ const SUBJECTS = getAllSubjects();
  */
 function templateToEditorData(template: {
   dimensions?: {
-    topics: { id: string; name: string; chapters?: string[] }[];
+    topics: { id: string; name: string; subtopics?: Array<{ id: string; name: string }> }[];
     difficulties: string[];
     questionTypes: string[];
   };
@@ -43,7 +43,7 @@ function templateToEditorData(template: {
   const topics: AssignmentTopic[] = dimensions.topics.map((t) => ({
     id: t.id,
     name: t.name,
-    chapters: t.chapters,
+    subtopics: t.subtopics,
   }));
   const cells: MatrixCell[] = [];
 
@@ -96,7 +96,7 @@ function editorDataToTemplate(topics: AssignmentTopic[], cells: MatrixCell[]) {
     topics: topics.map((t) => ({
       id: t.id,
       name: t.name,
-      ...(t.chapters && t.chapters.length > 0 ? { chapters: t.chapters } : {}),
+      ...(t.subtopics && t.subtopics.length > 0 ? { subtopics: t.subtopics } : {}),
     })),
     difficulties: difficulties as string[],
     questionTypes: questionTypes as string[],
@@ -179,13 +179,16 @@ export function MatrixTemplateFormPage() {
     setCells((prev) => prev.filter((c) => c.topicId !== topicId));
   }, []);
 
-  const handleTopicUpdate = useCallback((topicId: string, updates: { name: string; chapters?: string[] }) => {
-    setTopics((prev) => prev.map((t) => (t.id === topicId ? { ...t, ...updates } : t)));
-    // Sync topic name into cells
-    if (updates.name !== undefined) {
-      setCells((prev) => prev.map((c) => (c.topicId === topicId ? { ...c, topicName: updates.name } : c)));
-    }
-  }, []);
+  const handleTopicUpdate = useCallback(
+    (topicId: string, updates: Partial<AssignmentTopic> & { name: string }) => {
+      setTopics((prev) => prev.map((t) => (t.id === topicId ? { ...t, ...updates } : t)));
+      // Sync topic name into cells
+      if (updates.name !== undefined) {
+        setCells((prev) => prev.map((c) => (c.topicId === topicId ? { ...c, topicName: updates.name } : c)));
+      }
+    },
+    []
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -336,11 +339,11 @@ export function MatrixTemplateFormPage() {
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
-                  {topic.chapters && topic.chapters.length > 0 && (
+                  {topic.subtopics && topic.subtopics.length > 0 && (
                     <div className="flex flex-wrap gap-1 pl-1">
-                      {topic.chapters.map((chapter, idx) => (
-                        <Badge key={idx} variant="secondary" className="text-xs">
-                          {chapter}
+                      {topic.subtopics.map((subtopic) => (
+                        <Badge key={subtopic.id} variant="secondary" className="text-xs">
+                          {subtopic.name}
                         </Badge>
                       ))}
                     </div>

@@ -1,4 +1,4 @@
-import { useMemo, Fragment, type ReactNode } from 'react';
+import { useMemo, useCallback, Fragment, type ReactNode } from 'react';
 import {
   Save,
   Wand2,
@@ -90,6 +90,13 @@ export const AssignmentEditorLayout = ({
   const { t: tContextsPanel } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.contextsPanel' });
   const { t: tActions } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.actions' });
   const { t: tMatrixActions } = useTranslation('assignment', { keyPrefix: 'matrixActions' });
+  const handleImportMatrixTemplate = useCallback(
+    (template: Parameters<typeof importMatrixTemplate>[0]) => {
+      importMatrixTemplate(template);
+      toast.success(tMatrixActions('importTemplateSuccess'));
+    },
+    [importMatrixTemplate, tMatrixActions]
+  );
 
   // Context questions for contextGroup view
   const contextQuestions = useMemo(
@@ -411,7 +418,7 @@ export const AssignmentEditorLayout = ({
         onOpenChange={setMatrixTemplateLibraryDialogOpen}
         currentGrade={grade}
         currentSubject={subject}
-        onImport={importMatrixTemplate}
+        onImport={handleImportMatrixTemplate}
       />
 
       {/* Matrix Template Save Dialog */}

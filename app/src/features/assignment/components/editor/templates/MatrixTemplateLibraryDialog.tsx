@@ -58,14 +58,13 @@ export const MatrixTemplateLibraryDialog = ({
   // Fetch templates filtered by current grade, subject, and bankType
   const { templates, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteMatrixTemplateList(
-      open
-        ? {
-            search: debouncedSearch || undefined,
-            subject: currentSubject || undefined,
-            grade: currentGrade || undefined,
-            bankType, // Filter by personal or public
-          }
-        : {}
+      {
+        search: debouncedSearch || undefined,
+        subject: currentSubject || undefined,
+        grade: currentGrade || undefined,
+        bankType, // Filter by personal or public
+      },
+      open // Only fetch when dialog is open
     );
 
   // Reset state when dialog closes

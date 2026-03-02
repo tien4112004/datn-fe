@@ -1654,5 +1654,6 @@ export default {
     saveAsTemplateTooltip: 'Save current matrix as a reusable template',
     saveAsTemplateDisabledMetadata: 'Set subject and grade first',
     saveAsTemplateDisabledMatrix: 'Create a matrix first',
+    importTemplateSuccess: 'Template imported successfully',
   },
 };

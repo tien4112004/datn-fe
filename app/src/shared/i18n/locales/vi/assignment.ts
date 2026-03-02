@@ -1642,5 +1642,6 @@ export default {
     saveAsTemplateTooltip: 'Lưu ma trận hiện tại làm mẫu có thể tái sử dụng',
     saveAsTemplateDisabledMetadata: 'Đặt môn học và lớp trước',
     saveAsTemplateDisabledMatrix: 'Tạo ma trận trước',
+    importTemplateSuccess: 'Đã nhập mẫu thành công',
   },
 };

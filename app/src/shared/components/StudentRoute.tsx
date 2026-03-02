@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/shared/context/auth';
 import GlobalSpinner from '@/shared/components/common/GlobalSpinner';
 
@@ -8,6 +8,7 @@ interface StudentRouteProps {
 
 export function StudentRoute({ children }: StudentRouteProps) {
   const { user, isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
 
   // Show loading state while checking authentication
   if (isLoading) {
@@ -16,7 +17,13 @@ export function StudentRoute({ children }: StudentRouteProps) {
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ requireAuth: true, from: location.pathname + location.search }}
+      />
+    );
   }
 
   // Redirect non-students to main dashboard

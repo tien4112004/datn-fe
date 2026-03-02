@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 import NavLayout, { NavLayoutErrorBoundary } from '../shared/layouts/SidebarLayout';
-import StudentLayout from '../shared/layouts/StudentLayout';
+import StudentLayout, { StudentLayoutErrorBoundary } from '../shared/layouts/StudentLayout';
 import { CriticalError } from '@aiprimary/api';
 import { TeacherRoute } from '@/shared/components/TeacherRoute';
 import { StudentRoute } from '@/shared/components/StudentRoute';
@@ -272,6 +272,7 @@ const router = createBrowserRouter([
         <StudentLayout />
       </StudentRoute>
     ),
+    errorElement: <StudentLayoutErrorBoundary />,
     children: [
       {
         path: 'student/classes/:id',

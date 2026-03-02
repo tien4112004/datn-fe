@@ -2,13 +2,11 @@ import { useMemo, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Button } from '@ui/button';
 import { Input } from '@ui/input';
 import { PasswordInput } from '@ui/password-input';
-import { Checkbox } from '@ui/checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/form';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { useLogin } from '../hooks/useAuth';
@@ -26,7 +24,6 @@ export function LoginForm() {
       z.object({
         email: z.string(),
         password: z.string(),
-        rememberMe: z.boolean().default(false),
       }),
     [t]
   );
@@ -39,7 +36,6 @@ export function LoginForm() {
     defaultValues: {
       email: '',
       password: '',
-      rememberMe: false,
     },
   });
 
@@ -108,28 +104,6 @@ export function LoginForm() {
             </FormItem>
           )}
         />
-
-        <div className="flex items-center justify-between">
-          <FormField
-            control={form.control}
-            name="rememberMe"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    disabled={loginMutation.isPending}
-                  />
-                </FormControl>
-                <FormLabel className="cursor-pointer text-sm font-normal">{t('login.rememberMe')}</FormLabel>
-              </FormItem>
-            )}
-          />
-          <Link to="/forgot-password" className="text-primary text-sm hover:underline" tabIndex={-1}>
-            {t('login.forgotPassword')}
-          </Link>
-        </div>
 
         <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
           {loginMutation.isPending ? t('login.signingIn') : t('login.signInButton')}

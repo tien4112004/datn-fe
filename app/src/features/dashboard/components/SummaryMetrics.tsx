@@ -36,15 +36,15 @@ const MetricCard = ({
     >
       <CardContent>
         <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <p className="text-muted-foreground text-sm font-medium">{title}</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-muted-foreground truncate text-sm font-medium">{title}</p>
             {isLoading ? (
-              <div className="bg-muted mt-2 h-9 w-16 animate-pulse rounded" />
+              <div className="bg-muted mt-2 h-9 w-16 max-w-full animate-pulse rounded" />
             ) : (
               <h3 className="mt-2 text-3xl font-bold">{value}</h3>
             )}
             {isLoading ? (
-              <div className="bg-muted mt-1 h-3 w-32 animate-pulse rounded" />
+              <div className="bg-muted mt-1 h-3 w-32 max-w-full animate-pulse rounded" />
             ) : (
               subtitle && <p className="text-muted-foreground mt-1 text-xs">{subtitle}</p>
             )}

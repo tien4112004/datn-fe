@@ -74,8 +74,8 @@ export interface Grade {
  */
 export interface Submission {
   id: string; // Unique identifier for this submission
-  assignmentId: string; // Reference to the assignment
-  postId?: string; // Reference to the post this submission belongs to
+  assignmentId?: string; // Reference to the assignment
+  postId?: string; // Reference to the post (alternative to assignmentId)
   studentId: string; // Reference to the student
   student?: {
     // Populated student information (when included by backend)

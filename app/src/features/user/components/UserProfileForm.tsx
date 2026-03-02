@@ -49,82 +49,55 @@ export const UserProfileForm = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="border-b border-gray-100 pb-6">
-        <h2 className="text-2xl font-semibold text-gray-900">{t('profile.form.title')}</h2>
-        <p className="mt-2 text-sm text-gray-500">{t('profile.form.subtitle')}</p>
-      </div>
-      <div className="space-y-6">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="firstName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">
-                      {t('profile.form.firstName')}
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t('profile.form.firstNamePlaceholder')}
-                        {...field}
-                        className="border-border transition-colors duration-200 placeholder:text-gray-400 focus:border-gray-400 focus:outline-none focus:ring-0"
-                      />
-                    </FormControl>
-                    <FormMessage className="text-xs text-red-600" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="lastName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">
-                      {t('profile.form.lastName')}
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t('profile.form.lastNamePlaceholder')}
-                        {...field}
-                        className="border-border"
-                      />
-                    </FormControl>
-                    <FormMessage className="text-xs text-red-600" />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <FormField
-              control={form.control}
-              name="dateOfBirth"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700">
-                    {t('profile.form.dateOfBirth')}
-                  </FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} className="border-border" />
-                  </FormControl>
-                  <FormMessage className="text-xs text-red-600" />
-                </FormItem>
-              )}
-            />
-            <div className="flex justify-end gap-3 border-t border-gray-100 pt-6">
-              <LoadingButton
-                type="submit"
-                loading={isUpdatingProfile}
-                loadingText={t('profile.form.saving')}
-                className="px-6 py-2 font-medium"
-              >
-                {t('profile.form.saveChanges')}
-              </LoadingButton>
-            </div>
-          </form>
-        </Form>
-      </div>
-    </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="firstName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('profile.form.firstName')}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t('profile.form.firstNamePlaceholder')} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="lastName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('profile.form.lastName')}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t('profile.form.lastNamePlaceholder')} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <FormField
+          control={form.control}
+          name="dateOfBirth"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('profile.form.dateOfBirth')}</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="flex gap-3 pt-2">
+          <LoadingButton type="submit" loading={isUpdatingProfile} loadingText={t('profile.form.saving')}>
+            {t('profile.form.saveChanges')}
+          </LoadingButton>
+        </div>
+      </form>
+    </Form>
   );
 };

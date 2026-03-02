@@ -9,10 +9,11 @@ import { Upload } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@ui/button';
 import { CsvImportModal } from './CsvImportModal';
+import type { ImportResult } from '../../shared/types/service';
 
 interface CsvImportButtonProps {
   classId: string;
-  onSuccess?: () => void;
+  onSuccess?: (result: ImportResult) => void;
 }
 
 /**

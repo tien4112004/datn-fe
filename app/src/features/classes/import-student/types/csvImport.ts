@@ -124,7 +124,7 @@ export type ImportAction =
 export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
 export const MAX_PREVIEW_ROWS = 50;
 export const ACCEPTED_MIME_TYPES = ['text/csv', 'application/csv', 'text/plain'] as const;
-export const REQUIRED_COLUMNS = ['fullName'] as const;
+export const REQUIRED_COLUMNS = ['fullName', 'parentGuardianName', 'phoneNumber'] as const;
 
 // Type for required column keys
 export type RequiredColumn = (typeof REQUIRED_COLUMNS)[number];

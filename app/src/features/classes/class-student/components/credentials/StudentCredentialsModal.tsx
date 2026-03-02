@@ -10,7 +10,6 @@ import {
 } from '@ui/dialog';
 import { Button } from '@ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
-import './print-styles.css';
 import type { StudentCredential } from '../../types/credentials';
 
 /**
@@ -57,32 +56,90 @@ export function StudentCredentialsModal({ open, onOpenChange, credentials }: Cre
   }
 
   const handlePrint = () => {
-    if (!window.print) {
-      console.error('Print functionality not supported');
-      return;
+    const printWindow = window.open('', '_blank', 'width=900,height=650');
+    if (!printWindow) return;
+
+    const rows = credentials
+      .map(
+        (c) =>
+          `<tr>
+            <td>${c.fullName}</td>
+            <td class="mono">${c.username}</td>
+            <td class="mono">${c.password}</td>
+          </tr>`
+      )
+      .join('');
+
+    const generatedDate = new Date().toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+
+    printWindow.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>${t('print.title')}</title>
+  <style>
+    @page { margin: 0.5in; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; font-size: 11pt; color: #111; }
+    h1 { font-size: 18pt; margin-bottom: 4px; }
+    .subtitle { font-size: 10pt; color: #555; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; }
+    thead { display: table-header-group; }
+    th {
+      background-color: #f3f4f6;
+      border: 1px solid #d1d5db;
+      padding: 8px 10px;
+      text-align: left;
+      font-weight: 600;
     }
-    window.print();
+    td {
+      border: 1px solid #d1d5db;
+      padding: 8px 10px;
+    }
+    tr { page-break-inside: avoid; }
+    .mono { font-family: 'Courier New', Courier, monospace; font-size: 10pt; }
+    .footer { margin-top: 24px; border-top: 1px solid #d1d5db; padding-top: 12px; font-size: 9pt; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>${t('print.title')}</h1>
+  <p class="subtitle">${t('print.subtitle')}</p>
+  <table>
+    <thead>
+      <tr>
+        <th>${t('table.studentName')}</th>
+        <th>${t('table.username')}</th>
+        <th>${t('table.password')}</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div class="footer">${t('print.footer', { date: generatedDate })}</div>
+</body>
+</html>`);
+
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl print:max-w-full">
-        {/* Screen-only header */}
-        <DialogHeader className="print:hidden">
+      <DialogContent className="!max-w-3xl">
+        <DialogHeader>
           <DialogTitle>{t('modal.title')}</DialogTitle>
           <DialogDescription>{t('modal.description')}</DialogDescription>
         </DialogHeader>
 
-        {/* Main printable content area */}
-        <div id="credentials-print-area" className="space-y-4">
-          {/* Print-only header */}
-          <div className="hidden print:block">
-            <h1 className="text-2xl font-bold">{t('print.title')}</h1>
-            <p className="text-sm text-gray-600">{t('print.subtitle')}</p>
-          </div>
-
-          {/* Security warning - screen only */}
-          <div className="flex gap-3 rounded-lg bg-amber-50 p-4 print:hidden">
+        {/* Main content area */}
+        <div className="space-y-4">
+          {/* Security warning */}
+          <div className="flex gap-3 rounded-lg bg-amber-50 p-4">
             <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600" />
             <p className="text-sm text-amber-900">{t('modal.warning')}</p>
           </div>
@@ -108,23 +165,9 @@ export function StudentCredentialsModal({ open, onOpenChange, credentials }: Cre
               </TableBody>
             </Table>
           </div>
-
-          {/* Print-only footer */}
-          <div className="hidden print:block">
-            <p className="border-t pt-4 text-sm text-gray-500">
-              {t('print.footer', {
-                date: new Date().toLocaleDateString(undefined, {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                }),
-              })}
-            </p>
-          </div>
         </div>
 
-        {/* Screen-only footer with buttons */}
-        <DialogFooter className="print:hidden">
+        <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             {t('modal.close')}
           </Button>

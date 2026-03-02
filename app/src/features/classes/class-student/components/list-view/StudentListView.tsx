@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import {
+  type ColumnDef,
+  type PaginationState,
+  type Updater,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
 import { Button } from '@ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
 import { Pencil, Trash2 } from 'lucide-react';
@@ -13,14 +20,27 @@ import { StudentCredentialsModal, type StudentCredential } from '../credentials'
 import { type StudentFormMode, useStudentMutations } from '../../hooks';
 import { useConfirmDialog } from '@/shared/hooks/useConfirmDialog';
 import { CsvImportButton } from '../../../import-student';
+import { format } from 'date-fns';
+import { getLocaleDateFns } from '@/shared/i18n/helper';
+import TablePagination from '@/components/table/TablePagination';
 
 interface StudentListViewProps {
   students: Student[];
   classId: string;
   isLoading?: boolean;
+  pagination: PaginationState;
+  setPagination: (updaterOrValue: Updater<PaginationState>) => void;
+  totalItems: number;
 }
 
-export const StudentListView = ({ students, classId, isLoading = false }: StudentListViewProps) => {
+export const StudentListView = ({
+  students,
+  classId,
+  isLoading = false,
+  pagination,
+  setPagination,
+  totalItems,
+}: StudentListViewProps) => {
   const { t } = useTranslation('classes', { keyPrefix: 'roster' });
   const { user } = useAuth();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -89,7 +109,15 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
       header: t('form.dateOfBirth'),
       cell: ({ row }) => {
         const dateOfBirth = row.getValue('dateOfBirth') as string | null | undefined;
-        return <div className="text-sm">{dateOfBirth || '-'}</div>;
+        return (
+          <div className="text-sm">
+            {dateOfBirth
+              ? format(new Date(dateOfBirth), 'P', {
+                  locale: getLocaleDateFns(),
+                })
+              : '-'}
+          </div>
+        );
       },
     },
     {
@@ -163,6 +191,10 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
     data: students,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+    rowCount: totalItems,
+    state: { pagination },
+    onPaginationChange: setPagination,
   });
 
   if (isLoading) {
@@ -178,18 +210,33 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
       {/* Header with Add button */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-muted-foreground text-sm">{t('studentCount', { count: students.length })}</p>
+          <p className="text-muted-foreground text-sm">{t('studentCount', { count: totalItems })}</p>
         </div>
         {isTeacher && (
           <div className="flex items-center gap-2">
-            <CsvImportButton classId={classId} />
+            <CsvImportButton
+              classId={classId}
+              onSuccess={(result) => {
+                if (result.credentials && result.credentials.length > 0) {
+                  handleShowCredentials(
+                    result.credentials.map((c) => ({
+                      studentId: c.studentId,
+                      fullName: c.fullName,
+                      username: c.username,
+                      password: c.password,
+                      email: c.email,
+                    }))
+                  );
+                }
+              }}
+            />
             <Button onClick={handleOpenAddDialog}>{t('addStudentButton')}</Button>
           </div>
         )}
       </div>
 
       {/* Table */}
-      {students.length === 0 ? (
+      {totalItems === 0 ? (
         <div className="flex h-64 flex-col items-center justify-center rounded-lg border">
           <p className="text-muted-foreground mb-4">{t('noStudents')}</p>
           {isTeacher && <Button onClick={handleOpenAddDialog}>{t('addFirstStudent')}</Button>}
@@ -224,6 +271,9 @@ export const StudentListView = ({ students, classId, isLoading = false }: Studen
           </Table>
         </div>
       )}
+
+      {/* Pagination */}
+      {totalItems > 0 && <TablePagination table={table} />}
 
       {/* Student Form Dialog */}
       {isTeacher && (

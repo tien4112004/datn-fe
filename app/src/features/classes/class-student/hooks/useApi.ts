@@ -1,7 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
+import { useState } from 'react';
+import { type PaginationState, type Updater } from '@tanstack/react-table';
 import { toast } from 'sonner';
 import { useClassApiService, classApiService } from '@/features/classes/shared/api';
 import type { StudentEnrollmentRequest, Layout } from '@/features/classes/shared/types';
+import type { ApiResponse } from '@aiprimary/api';
 import type { Student } from '../types/student';
 import type { StudentFormData } from './useStudentForm';
 import type { StudentCreateRequest, StudentUpdateRequest } from '../types/requests';
@@ -14,19 +17,59 @@ const classKeys = {
   lists: () => [...classKeys.all, 'list'] as const,
   details: () => [...classKeys.all, 'detail'] as const,
   detail: (id: string) => [...classKeys.details(), id] as const,
-  students: (classId: string) => [...classKeys.all, 'students', classId] as const,
+  students: (classId: string, params?: Record<string, unknown>) =>
+    params
+      ? ([...classKeys.all, 'students', classId, params] as const)
+      : ([...classKeys.all, 'students', classId] as const),
   capacity: (classId: string) => [...classKeys.all, 'capacity', classId] as const,
   seatingChart: (classId: string) => [...classKeys.all, 'seating-chart', classId] as const,
 };
 
+export interface UseClassStudentsReturn extends Omit<UseQueryResult<ApiResponse<Student[]>>, 'data'> {
+  data: Student[];
+  pagination: PaginationState;
+  setPagination: (updaterOrValue: Updater<PaginationState>) => void;
+  totalItems: number;
+}
+
 // Student queries
-export function useClassStudents(classId: string) {
+export function useClassStudents(classId: string): UseClassStudentsReturn {
+  const classApiService = useClassApiService();
+
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
+  const queryParams = {
+    pageIndex: pagination.pageIndex,
+    pageSize: pagination.pageSize,
+  };
+
+  const { data, ...query } = useQuery({
+    queryKey: classKeys.students(classId, queryParams),
+    queryFn: () =>
+      classApiService.getStudentsByClassId(classId, pagination.pageIndex + 1, pagination.pageSize),
+    enabled: !!classId,
+  });
+
+  return {
+    data: data?.data || [],
+    pagination,
+    setPagination,
+    totalItems: data?.pagination?.totalItems || 0,
+    ...query,
+  };
+}
+
+export function useAllClassStudents(classId: string) {
   const classApiService = useClassApiService();
 
   return useQuery({
-    queryKey: classKeys.students(classId),
-    queryFn: () => classApiService.getStudentsByClassId(classId),
+    queryKey: classKeys.students(classId, { all: true }),
+    queryFn: () => classApiService.getStudentsByClassId(classId, 1, 9999),
     enabled: !!classId,
+    select: (data) => data.data,
   });
 }
 

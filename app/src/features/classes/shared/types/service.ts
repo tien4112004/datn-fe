@@ -20,6 +20,13 @@ export interface ImportResult {
   studentsCreated?: number;
   message?: string;
   errors?: string[];
+  credentials?: Array<{
+    studentId: string;
+    username: string;
+    password: string;
+    email: string;
+    fullName: string;
+  }>;
 }
 
 export interface ClassApiService {
@@ -35,7 +42,7 @@ export interface ClassApiService {
   saveSeatingChart(classId: string, layout: Layout): Promise<Layout>;
 
   // Student Management
-  getStudentsByClassId(classId: string, page?: number, size?: number): Promise<Student[]>;
+  getStudentsByClassId(classId: string, page?: number, size?: number): Promise<ApiResponse<Student[]>>;
   removeStudentFromClass(classId: string, studentId: string): Promise<void>;
   createStudent(classId: string, data: StudentCreateRequest): Promise<Student>;
   getStudentById(studentId: string): Promise<Student | null>;

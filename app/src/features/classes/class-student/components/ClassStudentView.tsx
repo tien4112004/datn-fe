@@ -6,7 +6,7 @@ import { Badge } from '@ui/badge';
 import { StudentListView } from './list-view/StudentListView';
 import { SeatingChartView } from './seating-chart/SeatingChartView';
 import type { Class } from '../../shared/types';
-import { useSeatingChart, useClassStudents } from '../hooks';
+import { useSeatingChart, useClassStudents, useAllClassStudents } from '../hooks';
 import { createDefaultLayout } from '../utils';
 
 interface ClassStudentListProps {
@@ -18,7 +18,14 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
   const [viewMode, setViewMode] = useState('list');
 
   // Fetch students from /classes/:id/students endpoint
-  const { data: students = [], isLoading: isLoadingStudents } = useClassStudents(classData.id);
+  const {
+    data: students = [],
+    isLoading: isLoadingStudents,
+    pagination,
+    setPagination,
+    totalItems,
+  } = useClassStudents(classData.id);
+  const { data: allStudents = [], isLoading: isLoadingAllStudents } = useAllClassStudents(classData.id);
   const { data: initialLayout, isLoading: isLoadingLayout, isError } = useSeatingChart(classData.id);
 
   // Auto-initialize layout if none exists
@@ -34,8 +41,8 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
 
     // If no layout exists (initialLayout === null) and not loading/error,
     // create default layout based on student count
-    return createDefaultLayout(students.length);
-  }, [initialLayout, isLoadingLayout, isError, students.length]);
+    return createDefaultLayout(allStudents.length);
+  }, [initialLayout, isLoadingLayout, isError, allStudents.length]);
 
   return (
     <div className="space-y-4">
@@ -44,7 +51,7 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
         <div className="flex items-center gap-3">
           <Users className="text-muted-foreground h-5 w-5" />
           <h2 className="text-xl font-semibold">{t('tabs.students')}</h2>
-          <Badge variant="secondary">{students.length}</Badge>
+          <Badge variant="secondary">{totalItems}</Badge>
         </div>
         <div className="flex items-center gap-3">
           {/* Segmented Control */}
@@ -78,7 +85,14 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
       {/* Content - No Card Wrapper */}
       <div>
         {viewMode === 'list' && (
-          <StudentListView students={students} classId={classData.id} isLoading={isLoadingStudents} />
+          <StudentListView
+            students={students}
+            classId={classData.id}
+            isLoading={isLoadingStudents}
+            pagination={pagination}
+            setPagination={setPagination}
+            totalItems={totalItems}
+          />
         )}
         {viewMode === 'seating-chart' && (
           <>
@@ -92,8 +106,8 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
                 <p className="text-destructive">{t('students.errorSeatingChart')}</p>
               </div>
             )}
-            {!isLoadingLayout && !isError && effectiveLayout && (
-              <SeatingChartView layout={effectiveLayout} students={students} classId={classData.id} />
+            {!isLoadingLayout && !isLoadingAllStudents && !isError && effectiveLayout && (
+              <SeatingChartView layout={effectiveLayout} students={allStudents} classId={classData.id} />
             )}
           </>
         )}

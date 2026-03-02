@@ -849,6 +849,20 @@ export interface Slide {
  *
  * fontName: font
  */
+export type PageNumberPosition =
+  | 'top-left'
+  | 'top-center'
+  | 'top-right'
+  | 'bottom-left'
+  | 'bottom-center'
+  | 'bottom-right';
+
+export interface PageNumberSettings {
+  enabled: boolean;
+  position: PageNumberPosition;
+  skipTitlePage: boolean;
+}
+
 export interface SlideTheme {
   id?: string;
   name?: string;

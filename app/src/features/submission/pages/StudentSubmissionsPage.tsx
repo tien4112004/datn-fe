@@ -18,6 +18,7 @@ import { useFormattedDistance } from '@/shared/lib/date-utils';
 import { useAssignment, useAssignmentByPost } from '@/features/assignment/hooks/useAssignmentApi';
 import { useSubmissionsByAssignment } from '../hooks';
 import { useAuth } from '@/shared/context/auth';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
 
 export const StudentSubmissionsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -66,7 +67,7 @@ export const StudentSubmissionsPage = () => {
     );
   }
 
-  const sortedSubmissions = submissions.sort(
+  const sortedSubmissions = [...submissions].sort(
     (a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
   );
 
@@ -94,6 +95,7 @@ export const StudentSubmissionsPage = () => {
           </span>
         );
       case 'in_progress':
+      default:
         return (
           <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">
             <Clock className="h-3 w-3" />
@@ -111,10 +113,14 @@ export const StudentSubmissionsPage = () => {
     return 'text-red-600 dark:text-red-400';
   };
 
-  const bestScore = Math.max(
-    ...sortedSubmissions.filter((s) => s.score !== undefined).map((s) => s.score!),
-    0
-  );
+  const gradedSubmissions = sortedSubmissions.filter((s) => s.score !== undefined && s.maxScore);
+  const bestSubmission =
+    gradedSubmissions.length > 0
+      ? gradedSubmissions.reduce((best, s) =>
+          s.score! / s.maxScore! > best.score! / best.maxScore! ? s : best
+        )
+      : null;
+  const bestScore = bestSubmission?.score ?? 0;
 
   return (
     <div className="flex h-full flex-col md:h-[calc(100vh-4rem)] md:flex-row">
@@ -192,10 +198,10 @@ export const StudentSubmissionsPage = () => {
             )}
           </div>
 
-          {bestScore > 0 && (
+          {bestSubmission && (
             <div>
               <div className="mb-2 flex items-center gap-2">
-                <Trophy className="h-4 w-4 text-blue-600" />
+                <Trophy className="h-4 w-4 text-yellow-500" />
                 <span className="text-sm font-semibold">{tStudent('bestScore')}</span>
               </div>
               <p className={`text-2xl font-bold ${getScoreColor(bestScore, totalPoints)}`}>
@@ -274,75 +280,107 @@ export const StudentSubmissionsPage = () => {
                 )}
               </div>
             ) : (
-              <div className="space-y-4">
-                {sortedSubmissions.map((submission, index) => (
-                  <div
-                    key={submission.id}
-                    className="hover:bg-muted/30 flex items-center justify-between rounded-lg border p-6 transition-colors"
-                  >
-                    <div className="flex-1">
-                      <div className="mb-2 flex items-center gap-3">
-                        <h3 className="text-lg font-semibold">
-                          {tStudent('attempt', { number: sortedSubmissions.length - index })}
-                        </h3>
-                        {getStatusBadge(submission.status)}
-                        {index === 0 && (
-                          <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                            {tStudent('latest')}
-                          </span>
-                        )}
-                      </div>
+              <div className="rounded-lg border bg-white dark:bg-gray-900">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{tStudent('tableHeaders.attempt')}</TableHead>
+                      <TableHead>{tStudent('tableHeaders.submitted')}</TableHead>
+                      <TableHead>{tStudent('tableHeaders.status')}</TableHead>
+                      <TableHead>{tStudent('tableHeaders.score')}</TableHead>
+                      <TableHead>{tStudent('tableHeaders.graded')}</TableHead>
+                      <TableHead className="text-right">{tStudent('tableHeaders.actions')}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {sortedSubmissions.map((submission, index) => {
+                      const attemptNumber = sortedSubmissions.length - index;
+                      const isBest = bestSubmission?.id === submission.id;
+                      const isLatest = index === 0;
 
-                      <div className="text-muted-foreground flex flex-wrap gap-x-6 gap-y-2 text-sm">
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4" />
-                          <span>
-                            {tStudent('submitted')}{' '}
-                            {formatDistanceToNow(new Date(submission.submittedAt), { addSuffix: true })}
-                          </span>
-                        </div>
-
-                        {submission.status === 'graded' && submission.score !== undefined && (
-                          <>
+                      return (
+                        <TableRow key={submission.id} className="hover:bg-muted/50">
+                          <TableCell className="font-medium">
                             <div className="flex items-center gap-2">
-                              <Trophy className="h-4 w-4" />
-                              <span className={getScoreColor(submission.score, submission.maxScore!)}>
-                                {tStudent('score')} {submission.score}/{submission.maxScore} (
-                                {Math.round((submission.score / submission.maxScore!) * 100)}%)
+                              <span>{tStudent('attempt', { number: attemptNumber })}</span>
+                              {isLatest && (
+                                <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                                  {tStudent('latest')}
+                                </span>
+                              )}
+                              {isBest && !isLatest && (
+                                <span className="rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">
+                                  {tStudent('best')}
+                                </span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Clock className="text-muted-foreground h-4 w-4" />
+                              <span className="text-sm">
+                                {formatDistanceToNow(new Date(submission.submittedAt), {
+                                  addSuffix: true,
+                                })}
                               </span>
                             </div>
-                            {submission.gradedAt && (
+                          </TableCell>
+                          <TableCell>{getStatusBadge(submission.status)}</TableCell>
+                          <TableCell>
+                            {submission.status === 'graded' &&
+                            submission.score !== undefined &&
+                            submission.maxScore ? (
                               <div className="flex items-center gap-2">
-                                <CheckCircle2 className="h-4 w-4" />
-                                <span>
-                                  {tStudent('graded')}{' '}
-                                  {formatDistanceToNow(new Date(submission.gradedAt), { addSuffix: true })}
+                                <Trophy className="h-4 w-4" />
+                                <span
+                                  className={`font-semibold ${getScoreColor(submission.score, submission.maxScore)}`}
+                                >
+                                  {submission.score}/{submission.maxScore}
+                                </span>
+                                <span className="text-muted-foreground text-xs">
+                                  ({Math.round((submission.score / submission.maxScore) * 100)}%)
                                 </span>
                               </div>
+                            ) : (
+                              <span className="text-muted-foreground text-sm">—</span>
                             )}
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="ml-4">
-                      {submission.status === 'graded' ? (
-                        <Button
-                          variant="outline"
-                          onClick={() => navigate(`/student/submissions/${submission.id}/result`)}
-                        >
-                          <Eye className="mr-2 h-4 w-4" />
-                          {tActions('viewResult')}
-                        </Button>
-                      ) : (
-                        <Button variant="outline" disabled>
-                          <Clock className="mr-2 h-4 w-4" />
-                          {t('status.pending')}
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                          </TableCell>
+                          <TableCell>
+                            {submission.gradedAt ? (
+                              <div className="flex items-center gap-2">
+                                <CheckCircle2 className="text-muted-foreground h-4 w-4" />
+                                <span className="text-sm">
+                                  {formatDistanceToNow(new Date(submission.gradedAt), {
+                                    addSuffix: true,
+                                  })}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground text-sm">—</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {submission.status === 'graded' ? (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => navigate(`/student/submissions/${submission.id}/result`)}
+                              >
+                                <Eye className="mr-2 h-4 w-4" />
+                                {tActions('viewResult')}
+                              </Button>
+                            ) : (
+                              <Button variant="outline" size="sm" disabled>
+                                <Clock className="mr-2 h-4 w-4" />
+                                {t('status.pending')}
+                              </Button>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
               </div>
             )}
           </div>

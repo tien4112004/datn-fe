@@ -260,6 +260,19 @@ export default {
         noModels: 'No IMAGE models available. Using default.',
         imagePreviewAlt: 'Image preview',
       },
+      // Slide Generation
+      slideGeneration: {
+        tabRefine: 'Refine',
+        tabGenerate: 'Generate',
+        title: 'Generate Slides',
+        prompt: 'PROMPT',
+        promptPlaceholder: 'Describe what you want to generate...',
+        slideCount: 'SLIDE COUNT',
+        negativePrompt: 'NEGATIVE PROMPT',
+        negativePromptPlaceholder: 'Elements to exclude from images...',
+        generate: 'Generate',
+        generating: 'Generating...',
+      },
       // Layout & Styling
       layout: {
         label: 'Layout',

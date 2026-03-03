@@ -174,7 +174,6 @@ const selectedSlidesIndex = computed(() => [..._selectedSlidesIndex.value, slide
 
 const presetLayoutPopoverVisible = ref(false);
 const pickerTab = ref<'layouts' | 'templates'>('layouts');
-
 const hasSection = computed(() => {
   return slides.value.some((item) => item.sectionTag);
 });

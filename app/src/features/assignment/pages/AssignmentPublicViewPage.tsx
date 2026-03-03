@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@ui/button';
 import { ArrowLeft, FileQuestion, Loader2 } from 'lucide-react';
-import { useAssignmentPublic } from '../hooks';
+import { useAssignment } from '../hooks';
 import { PageHeader } from '@/shared/components/common/PageHeader';
 import { PageContainer } from '@/shared/components/common/PageContainer';
 
@@ -9,7 +9,7 @@ export const AssignmentPublicViewPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const { data: assignment, isLoading, error } = useAssignmentPublic(id);
+  const { data: assignment, isLoading, error } = useAssignment(id);
 
   if (isLoading) {
     return (

@@ -25,7 +25,7 @@ import { ContextDisplay } from '@/features/context/components/ContextDisplay';
 import { toast } from 'sonner';
 import { useFormattedDistance } from '@/shared/lib/date-utils';
 import { useSubmission, useGradeSubmission } from '../hooks';
-import { useAssignmentPublic } from '@/features/assignment/hooks/useAssignmentApi';
+import { useAssignment, useAssignmentByPost } from '@/features/assignment/hooks/useAssignmentApi';
 
 export const TeacherGradingPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -42,8 +42,12 @@ export const TeacherGradingPage = () => {
   // Fetch submission data
   const { data: submission, isLoading: isLoadingSubmission } = useSubmission(id);
 
-  // Fetch assignment data - use public endpoint since submissions reference cloned assignments
-  const { data: assignment, isLoading: isLoadingAssignment } = useAssignmentPublic(submission?.assignmentId);
+  const { data: assignmentByPost, isLoading: isLoadingByPost } = useAssignmentByPost(submission?.postId);
+  const { data: assignmentById, isLoading: isLoadingById } = useAssignment(
+    submission?.postId ? undefined : submission?.assignmentId
+  );
+  const assignment = assignmentByPost ?? assignmentById;
+  const isLoadingAssignment = isLoadingByPost || isLoadingById;
 
   // Grade submission mutation
   const { mutate: gradeSubmission, isPending: isSaving } = useGradeSubmission();

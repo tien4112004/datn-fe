@@ -22,7 +22,7 @@ import { groupQuestionsByContext } from '@/features/assignment/utils/questionGro
 import { ContextDisplay } from '@/features/context/components/ContextDisplay';
 import { useFormattedDistance } from '@/shared/lib/date-utils';
 import { useSubmission } from '../hooks';
-import { useAssignmentPublic } from '@/features/assignment/hooks/useAssignmentApi';
+import { useAssignment, useAssignmentByPost } from '@/features/assignment/hooks/useAssignmentApi';
 import { getTeacher } from '@/shared/utils/teacherStorage';
 
 export const SubmissionResultPage = () => {
@@ -37,8 +37,12 @@ export const SubmissionResultPage = () => {
   // Fetch submission data
   const { data: submission, isLoading: isLoadingSubmission } = useSubmission(id);
 
-  // Fetch assignment data - use public endpoint since submissions reference cloned assignments
-  const { data: assignment, isLoading: isLoadingAssignment } = useAssignmentPublic(submission?.assignmentId);
+  const { data: assignmentByPost, isLoading: isLoadingByPost } = useAssignmentByPost(submission?.postId);
+  const { data: assignmentById, isLoading: isLoadingById } = useAssignment(
+    submission?.postId ? undefined : submission?.assignmentId
+  );
+  const assignment = assignmentByPost ?? assignmentById;
+  const isLoadingAssignment = isLoadingByPost || isLoadingById;
 
   // Derived state - build contexts map and groups
   const questions = useMemo(() => assignment?.questions || [], [assignment?.questions]);

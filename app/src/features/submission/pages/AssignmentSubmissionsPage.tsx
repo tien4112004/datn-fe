@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@ui/button';
 import { CheckCircle2, Clock, Eye, FileCheck, Loader2, Trophy, Users, TrendingUp, Edit } from 'lucide-react';
 import { useSubmissionsByPost } from '../hooks';
-import { useAssignmentPublic } from '@/features/assignment/hooks/useAssignmentApi';
+import { useAssignment, useAssignmentByPost } from '@/features/assignment/hooks/useAssignmentApi';
 import { useFormattedDistance } from '@/shared/lib/date-utils';
 import type { Submission } from '@aiprimary/core';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
@@ -23,8 +23,10 @@ export const AssignmentSubmissionsPage = () => {
   // Get postId from query params
   const postId = searchParams.get('postId');
 
-  // Fetch assignment and submissions
-  const { data: assignment, isLoading: isLoadingAssignment } = useAssignmentPublic(id);
+  const { data: assignmentByPost, isLoading: isLoadingByPost } = useAssignmentByPost(postId ?? undefined);
+  const { data: assignmentById, isLoading: isLoadingById } = useAssignment(postId ? undefined : id);
+  const assignment = assignmentByPost ?? assignmentById;
+  const isLoadingAssignment = isLoadingByPost || isLoadingById;
   const { data: submissions = [], isLoading: isLoadingSubmissions } = useSubmissionsByPost(
     postId || undefined
   );

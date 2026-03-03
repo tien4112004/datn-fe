@@ -36,15 +36,6 @@ export default class AssignmentService implements AssignmentApiService {
   }
 
   /**
-   * Get assignment by ID using public endpoint (no document permission check)
-   * This should be used by students accessing assignments through posts/submissions
-   */
-  async getAssignmentByIdPublic(id: string): Promise<Assignment> {
-    const response = await this.apiClient.get(`${this.baseUrl}/api/assignments/${id}/public`);
-    return this.normalizeAssignment(response.data.data);
-  }
-
-  /**
    * Get assignment by post ID using new post-based endpoint
    * This endpoint fetches assignment data through the post relationship
    * Should be used in feed contexts where post ID is available

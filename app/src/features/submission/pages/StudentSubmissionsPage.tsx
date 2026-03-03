@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import type { Submission } from '@aiprimary/core';
 import { useFormattedDistance } from '@/shared/lib/date-utils';
-import { useAssignmentPublic } from '@/features/assignment/hooks/useAssignmentApi';
+import { useAssignment, useAssignmentByPost } from '@/features/assignment/hooks/useAssignmentApi';
 import { useSubmissionsByAssignment } from '../hooks';
 import { useAuth } from '@/shared/context/auth';
 
@@ -32,8 +32,10 @@ export const StudentSubmissionsPage = () => {
   // Get postId from query params (for homework flow)
   const postId = searchParams.get('postId');
 
-  // Fetch assignment data using public endpoint (bypasses permission check for students)
-  const { data: assignment, isLoading: isLoadingAssignment } = useAssignmentPublic(id);
+  const { data: assignmentByPost, isLoading: isLoadingByPost } = useAssignmentByPost(postId ?? undefined);
+  const { data: assignmentById, isLoading: isLoadingById } = useAssignment(postId ? undefined : id);
+  const assignment = assignmentByPost ?? assignmentById;
+  const isLoadingAssignment = isLoadingByPost || isLoadingById;
 
   // Fetch submissions filtered by current student's ID
   const { data: submissions = [], isLoading: isLoadingSubmissions } = useSubmissionsByAssignment(

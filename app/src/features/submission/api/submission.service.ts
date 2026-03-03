@@ -259,6 +259,7 @@ export default class SubmissionService implements SubmissionApiService {
     return {
       id: data.id,
       assignmentId: data.assignmentId,
+      postId: data.postId,
       studentId: data.studentId,
       student: data.student,
       answers: questions.map(transformDtoToAnswer),

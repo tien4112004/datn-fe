@@ -14,6 +14,7 @@ export interface ImageGenerationParams {
   artStyle?: string;
   artStyleModifiers?: string;
   negativePrompt?: string;
+  documentId?: string;
 }
 
 export interface ImageGenerationResponse {

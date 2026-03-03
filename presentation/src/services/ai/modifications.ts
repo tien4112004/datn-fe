@@ -193,6 +193,7 @@ export const aiModificationService = {
       negativePrompt?: string;
       context?: Record<string, any>;
       language?: string;
+      presentationId?: string;
     },
     model: string = 'gemini-2.0-flash-exp',
     provider: string = 'google'

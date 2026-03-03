@@ -1,6 +1,6 @@
 <template>
   <div class="slide-panel">
-    <div class="slide-tabs">
+    <div v-if="isPreviewMode" class="slide-tabs">
       <div class="slide-tab" :class="{ active: activeTab === 'refine' }" @click="activeTab = 'refine'">
         {{ t('panels.aiModification.slideGeneration.tabRefine') }}
       </div>
@@ -9,8 +9,8 @@
       </div>
     </div>
 
-    <!-- Refine tab -->
-    <template v-if="activeTab === 'refine'">
+    <!-- Refine tab (only in preview mode) -->
+    <template v-if="isPreviewMode && activeTab === 'refine'">
       <QuickActionsRow
         :actions="slideQuickActions"
         :disabled="isProcessing"
@@ -53,10 +53,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import { Info } from 'lucide-vue-next';
+import { useSlidesStore } from '@/store';
 import { useModelStore } from '@/stores/modelStore';
 import { useModels } from '@/services/model/queries';
 import { useTextRefinement } from '../composables/useTextRefinement';
@@ -69,6 +70,10 @@ import LayoutSelector from './common/LayoutSelector.vue';
 import SlideGenerationPanel from './SlideGenerationPanel.vue';
 
 const { t } = useI18n();
+
+const slidesStore = useSlidesStore();
+const { currentSlide } = storeToRefs(slidesStore);
+const isPreviewMode = computed(() => !!currentSlide.value?.layout?.schema);
 
 const activeTab = ref<'refine' | 'generate'>('refine');
 

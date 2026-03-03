@@ -10,6 +10,7 @@ import type { Slide, PPTImageElement } from '@/types/slides';
 import useHistorySnapshot from '@/hooks/useHistorySnapshot';
 import { useGenerateImage } from '@/services/image/queries';
 import { useArtStyles } from './useArtStyles';
+import { buildContext } from './useContextExtraction';
 
 export function useSlideGeneration() {
   const containerStore = useContainerStore();
@@ -35,7 +36,12 @@ export function useSlideGeneration() {
 
   const canGenerate = computed(() => prompt.value.trim().length > 0 && !isProcessing.value);
 
-  async function handleImageGeneration(slideId: string, imageElement: PPTImageElement, imagePrompt: string) {
+  async function handleImageGeneration(
+    slideId: string,
+    imageElement: PPTImageElement,
+    imagePrompt: string,
+    documentId?: string
+  ) {
     // Set loading state
     const loadingUrl = 'https://storage.huy-devops.site/ai-primary/loading.gif';
     updateSlideImage(slideId, imageElement.id, loadingUrl);
@@ -60,6 +66,7 @@ export function useSlideGeneration() {
           artStyle: selectedArtStyle.value || undefined,
           artStyleModifiers,
           negativePrompt: negativePrompt.value || undefined,
+          documentId,
         },
       });
 
@@ -116,8 +123,9 @@ export function useSlideGeneration() {
           imageModel: modelStore.selectedImageModel.name,
           imageProvider: modelStore.selectedImageModel.provider,
           negativePrompt: negativePrompt.value || undefined,
-          context: {},
+          context: buildContext(slidesStore.slides, slidesStore.slideIndex),
           language: 'vi',
+          presentationId: presentationId.value || undefined,
         },
         modelStore.selectedModel.name,
         modelStore.selectedModel.provider
@@ -128,6 +136,7 @@ export function useSlideGeneration() {
       }
 
       const schemas = result.data.schemas as SlideLayoutSchema[];
+      const slideGenDocumentId = result.data.documentId as string | undefined;
 
       if (schemas.length === 0) {
         throw new Error('No slides were generated');
@@ -164,7 +173,7 @@ export function useSlideGeneration() {
         const imageElement = slide.elements.find((el) => el.type === 'image') as PPTImageElement | undefined;
         if (!imageElement) continue;
 
-        imagePromises.push(handleImageGeneration(slide.id, imageElement, imagePrompt));
+        imagePromises.push(handleImageGeneration(slide.id, imageElement, imagePrompt, slideGenDocumentId));
       }
 
       if (imagePromises.length > 0) {

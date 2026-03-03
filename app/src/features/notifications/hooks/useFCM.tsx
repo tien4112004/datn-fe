@@ -7,38 +7,10 @@ import {
   getFCMToken,
   onForegroundMessage,
 } from '@/shared/config/firebase';
+import { useAuth } from '@/shared/context/auth';
 import { useNotificationStore } from '../stores/notificationStore';
 import { useRegisterDevice } from './useApi';
-
-function getUrlFromNotificationData(data: Record<string, string> | undefined): string {
-  if (!data) return '/notifications';
-
-  const { type, referenceId } = data;
-
-  if (type && referenceId) {
-    switch (type) {
-      case 'POST':
-      case 'ANNOUNCEMENT':
-        return `/classes/${referenceId}`;
-      case 'ASSIGNMENT':
-        return `/assignments/${referenceId}`;
-      case 'GRADE':
-        return `/grades/${referenceId}`;
-      case 'SHARED_PRESENTATION':
-        return `/presentation/${referenceId}`;
-      case 'SHARED_MINDMAP':
-        return `/mindmap/${referenceId}`;
-      default:
-        return '/notifications';
-    }
-  }
-
-  if (data.url) {
-    return data.url;
-  }
-
-  return '/notifications';
-}
+import { getNotificationUrl } from '../utils';
 
 export function useFCM() {
   const {
@@ -50,6 +22,7 @@ export function useFCM() {
     setHasRequestedPermission,
   } = useNotificationStore();
 
+  const { user } = useAuth();
   const registerDevice = useRegisterDevice();
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
@@ -136,10 +109,12 @@ export function useFCM() {
       return;
     }
 
+    const role = user?.role ?? 'teacher';
+
     const unsubscribe = onForegroundMessage((payload) => {
       const title = payload.notification?.title || 'New Notification';
       const body = payload.notification?.body || '';
-      const url = getUrlFromNotificationData(payload.data);
+      const url = getNotificationUrl(payload.data?.type ?? '', payload.data?.referenceId, role);
 
       toast(title, {
         description: body,
@@ -165,7 +140,7 @@ export function useFCM() {
         unsubscribeRef.current = null;
       }
     };
-  }, [fcmToken]);
+  }, [fcmToken, user?.role]);
 
   return {
     fcmToken,

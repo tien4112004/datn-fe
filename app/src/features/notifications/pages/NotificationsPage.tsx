@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
 import { Lock, Loader2, Check } from 'lucide-react';
 import { PageHeader } from '@/shared/components/common/PageHeader';
@@ -7,21 +6,21 @@ import { PageContainer } from '@/shared/components/common/PageContainer';
 import { Button } from '@ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@ui/alert';
 import { useFCM } from '../hooks/useFCM';
-import { useNotifications, useMarkAsRead, useMarkAllAsRead, useUnreadCount } from '../hooks/useApi';
+import { useNotifications, useMarkAllAsRead, useUnreadCount } from '../hooks/useApi';
+import { useNotificationNavigate } from '../hooks/useNotificationNavigate';
 import { NotificationItem } from '../components/NotificationItem';
 import type { AppNotification } from '../types';
 
 export function NotificationsPage() {
   const { t } = useTranslation('notifications');
-  const navigate = useNavigate();
   const { isSupported, initialize } = useFCM();
   const [page, setPage] = useState(0);
   const pageSize = 20;
 
   const { data, isLoading } = useNotifications(page, pageSize);
   const { data: unreadData } = useUnreadCount();
-  const markAsRead = useMarkAsRead();
   const markAllAsRead = useMarkAllAsRead();
+  const { navigateToNotification } = useNotificationNavigate();
 
   const permission = typeof Notification !== 'undefined' ? Notification.permission : 'default';
   const isBlocked = permission === 'denied';
@@ -34,29 +33,7 @@ export function NotificationsPage() {
   const hasPrevious = page > 0;
 
   const handleNotificationClick = (notification: AppNotification) => {
-    if (!notification.isRead) {
-      markAsRead.mutate(notification.id);
-    }
-
-    // Navigate based on notification type and referenceId
-    if (notification.referenceId) {
-      switch (notification.type) {
-        case 'POST':
-        case 'ANNOUNCEMENT':
-          navigate(`/classes/${notification.referenceId}`);
-          break;
-        case 'ASSIGNMENT':
-        case 'GRADE':
-          navigate(`/assignment/${notification.referenceId}`);
-          break;
-        case 'SHARED_PRESENTATION':
-          navigate(`/presentation/${notification.referenceId}`);
-          break;
-        case 'SHARED_MINDMAP':
-          navigate(`/mindmap/${notification.referenceId}`);
-          break;
-      }
-    }
+    navigateToNotification(notification);
   };
 
   const handleMarkAllAsRead = () => {

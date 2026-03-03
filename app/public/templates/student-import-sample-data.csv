@@ -1,0 +1,33 @@
+fullName,dateOfBirth,gender,address,parentName,parentPhone,parentContactEmail
+Nguyễn Văn An,2008-03-15,male,12 Nguyễn Huệ P. Bến Nghé Q.1 TP.HCM,Nguyễn Văn Bình,0901234567,nguyenvbinh@gmail.com
+Trần Thị Bích Ngọc,2009-07-22,female,45 Lê Lợi P.Bến Thành Q.1 TP.HCM,Trần Văn Hùng,0912345678,tranhung45@gmail.com
+Lê Hoàng Minh,2008-11-08,male,78 Trần Hưng Đạo P.Phạm Ngũ Lão Q.1 TP.HCM,Lê Văn Tâm,0923456789,letam78@yahoo.com
+Phạm Thị Mai Anh,2009-01-20,female,23 Hai Bà Trưng P.Tân Định Q.1 TP.HCM,Phạm Văn Đức,0934567890,phamduc23@gmail.com
+Hoàng Đức Thịnh,2008-05-12,male,56 Điện Biên Phủ P.Đa Kao Q.1 TP.HCM,Hoàng Văn Nam,0945678901,hoangnam56@gmail.com
+Vũ Thị Hồng Nhung,2009-09-03,female,89 Cách Mạng Tháng 8 P.Bến Thành Q.1 TP.HCM,Vũ Văn Phong,0956789012,vuphong89@gmail.com
+Đặng Quốc Bảo,2008-02-28,male,34 Nguyễn Thị Minh Khai P.Đa Kao Q.1 TP.HCM,Đặng Văn Trường,0967890123,dangtruong34@gmail.com
+Bùi Thị Thanh Hằng,2009-06-14,female,67 Võ Văn Tần P.6 Q.3 TP.HCM,Bùi Văn Sơn,0978901234,buison67@yahoo.com
+Đỗ Minh Quân,2008-08-19,male,90 Nam Kỳ Khởi Nghĩa P.7 Q.3 TP.HCM,Đỗ Văn Hải,0989012345,dohai90@gmail.com
+Ngô Thị Lan Anh,2009-04-05,female,21 Pasteur P.Nguyễn Thái Bình Q.1 TP.HCM,Ngô Văn Thắng,0990123456,ngothang21@gmail.com
+Dương Công Danh,2008-12-25,male,43 Lý Tự Trọng P.Bến Nghé Q.1 TP.HCM,Dương Văn Khánh,0901112233,duongkhanh43@gmail.com
+Phan Thị Yến Nhi,2009-10-11,female,65 Nguyễn Đình Chiểu P.6 Q.3 TP.HCM,Phan Văn Long,0912223344,phanlong65@gmail.com
+Lý Thanh Tùng,2008-07-07,male,87 Trương Định P.Bến Thành Q.1 TP.HCM,Lý Văn Cường,0923334455,lycuong87@yahoo.com
+Trịnh Thị Phương Thảo,2009-03-18,female,32 Lê Văn Sỹ P.13 Q.3 TP.HCM,Trịnh Văn Quang,0934445566,trinhquang32@gmail.com
+Nguyễn Hữu Phúc,2008-09-30,male,54 Nguyễn Trãi P.Bến Thành Q.1 TP.HCM,Nguyễn Hữu Toàn,0945556677,nguyentoan54@gmail.com
+Võ Thị Cẩm Tú,2009-11-15,female,76 Bà Huyện Thanh Quan P.9 Q.3 TP.HCM,Võ Văn Minh,0956667788,vominh76@gmail.com
+Trần Đình Khoa,2008-04-22,male,98 Sương Nguyệt Ánh P.Bến Thành Q.1 TP.HCM,Trần Đình Lộc,0967778899,tranloc98@gmail.com
+Lê Thị Kim Ngân,2009-08-09,female,15 Tôn Đức Thắng P.Bến Nghé Q.1 TP.HCM,Lê Văn Tuấn,0978889900,letuan15@yahoo.com
+Phạm Quốc Huy,2008-01-03,male,37 Võ Thị Sáu P.Tân Định Q.1 TP.HCM,Phạm Văn Thành,0989990011,phamthanh37@gmail.com
+Hoàng Thị Diệu Linh,2009-05-27,female,59 Nguyễn Công Trứ P.Nguyễn Thái Bình Q.1 TP.HCM,Hoàng Văn Hưng,0990001122,hoanghung59@gmail.com
+Vũ Tiến Đạt,2008-10-16,male,81 Ký Con P.Nguyễn Thái Bình Q.1 TP.HCM,Vũ Văn Lâm,0901223344,vulam81@gmail.com
+Đặng Thị Hạnh Dung,2009-02-13,female,14 Lê Thánh Tôn P.Bến Nghé Q.1 TP.HCM,Đặng Văn Hòa,0912334455,danghoa14@gmail.com
+Bùi Anh Kiệt,2008-06-08,male,36 Đồng Khởi P.Bến Nghé Q.1 TP.HCM,Bùi Văn Nghĩa,0923445566,buinghia36@yahoo.com
+Đỗ Thị Quỳnh Như,2009-12-01,female,58 Mạc Đĩnh Chi P.Đa Kao Q.1 TP.HCM,Đỗ Văn Tài,0934556677,dotai58@gmail.com
+Ngô Gia Bách,2008-03-25,male,80 Phạm Ngọc Thạch P.6 Q.3 TP.HCM,Ngô Văn Đại,0945667788,ngodai80@gmail.com
+Dương Thị Ánh Tuyết,2009-07-14,female,13 Công Trường Lam Sơn P.Bến Nghé Q.1 TP.HCM,Dương Văn Thọ,0956778899,duongtho13@gmail.com
+Phan Nhật Hào,2008-11-20,male,35 Thái Văn Lung P.Bến Nghé Q.1 TP.HCM,Phan Văn Dũng,0967889900,phandung35@gmail.com
+Lý Thị Thanh Trúc,2009-04-17,female,57 Nguyễn Siêu P.Bến Nghé Q.1 TP.HCM,Lý Văn Phát,0978990011,lyphat57@yahoo.com
+Trịnh Bảo Long,2008-08-06,male,79 Hàm Nghi P.Nguyễn Thái Bình Q.1 TP.HCM,Trịnh Văn Khải,0989001122,trinhkhai79@gmail.com
+Nguyễn Thị Mỹ Duyên,2009-01-29,female,22 Phó Đức Chính P.Nguyễn Thái Bình Q.1 TP.HCM,Nguyễn Văn Hiếu,0990112233,nguyenhieu22@gmail.com
+Võ Tấn Phát,2008-05-11,male,44 Tôn Thất Đạm P.Bến Nghé Q.1 TP.HCM,Võ Văn Trí,0901334455,votri44@gmail.com
+Trần Thị Bảo Trân,2009-09-23,female,66 Nguyễn Thái Học P.Cầu Ông Lãnh Q.1 TP.HCM,Trần Văn Vinh,0912445566,tranvinh66@gmail.com

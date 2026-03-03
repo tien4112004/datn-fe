@@ -33,7 +33,14 @@ import type { TokenUsageFilterRequest, TokenUsageStats } from '@/types/tokenUsag
 import { exportQuestionsToCSV, parseQuestionBankCSV } from '@/utils/csvParser';
 import { validateQuestionBankCSV } from '@/utils/csvValidation';
 import { API_MODE, type ApiMode, api } from '@aiprimary/api';
-import type { ArtStyle, Model, ModelPatchData, SlideTemplate, SlideTheme } from '@aiprimary/core';
+import type {
+  ArtStyle,
+  Model,
+  ModelCreateData,
+  ModelPatchData,
+  SlideTemplate,
+  SlideTheme,
+} from '@aiprimary/core';
 import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
 
 import { generateId } from '@aiprimary/core';
@@ -256,6 +263,25 @@ export default class AdminRealApiService implements AdminApiService {
       provider: model.provider,
       type: model.modelType,
     }));
+
+    return {
+      ...response.data,
+      data: mappedData,
+    };
+  }
+
+  async createModel(data: ModelCreateData): Promise<ApiResponse<Model>> {
+    const response = await api.post<ApiResponse<any>>(`${this.baseUrl}/api/models`, data);
+
+    const mappedData = {
+      id: response.data.data.modelId,
+      name: response.data.data.modelName,
+      displayName: response.data.data.displayName,
+      enabled: response.data.data.enabled,
+      default: response.data.data.default,
+      provider: response.data.data.provider,
+      type: response.data.data.modelType,
+    };
 
     return {
       ...response.data,

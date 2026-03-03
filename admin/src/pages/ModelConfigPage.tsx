@@ -1,13 +1,16 @@
-import { useCallback, useMemo } from 'react';
-import { useModels, usePatchModel } from '@/hooks';
+import { useCallback, useMemo, useState } from 'react';
+import { useModels, useCreateModel, usePatchModel } from '@/hooks';
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
+import { Button } from '@ui/button';
 import { Switch } from '@ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
+import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { DataTable } from '@/components/table';
-import type { Model, ModelType } from '@aiprimary/core';
+import { CreateModelDialog } from '@/components/model/CreateModelDialog';
+import type { Model, ModelCreateData, ModelType } from '@aiprimary/core';
 import { MODEL_TYPES } from '@aiprimary/core';
 
 const columnHelper = createColumnHelper<Model>();
@@ -30,10 +33,21 @@ const getModelsForMediaType = (mediaType: string, models: Model[]) => {
 
 export function ModelConfigPage() {
   const { data, isLoading, isError } = useModels();
-
+  const createMutation = useCreateModel();
   const patchMutation = usePatchModel();
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const models = data?.data || [];
+
+  const providers = useMemo(() => [...new Set(models.map((m) => m.provider))].sort(), [models]);
+
+  const handleCreateModel = useCallback(
+    async (data: ModelCreateData) => {
+      await createMutation.mutateAsync(data);
+      setCreateDialogOpen(false);
+    },
+    [createMutation]
+  );
 
   const toggleModelEnabled = useCallback(
     async (model: Model) => {
@@ -160,9 +174,15 @@ export function ModelConfigPage() {
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>AI Models</CardTitle>
-          <CardDescription>Enable or disable AI models for the platform</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>AI Models</CardTitle>
+            <CardDescription>Enable or disable AI models for the platform</CardDescription>
+          </div>
+          <Button onClick={() => setCreateDialogOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            New Model
+          </Button>
         </CardHeader>
         <CardContent>
           <DataTable
@@ -172,6 +192,14 @@ export function ModelConfigPage() {
           />
         </CardContent>
       </Card>
+
+      <CreateModelDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onSubmit={handleCreateModel}
+        providers={providers}
+        isPending={createMutation.isPending}
+      />
 
       <Card>
         <CardHeader>

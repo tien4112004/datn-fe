@@ -22,3 +22,11 @@ export interface ModelPatchData {
   isEnabled?: boolean;
   isDefault?: boolean;
 }
+
+// Model create data for creating new models
+export interface ModelCreateData {
+  modelName: string;
+  displayName: string;
+  provider: string;
+  modelType: ModelType;
+}

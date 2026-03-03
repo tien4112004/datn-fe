@@ -11,7 +11,14 @@ import type {
   MatrixTemplate,
   MatrixTemplateParams,
 } from './api';
-import type { SlideTheme, SlideTemplate, ArtStyle, Model, ModelPatchData } from '@aiprimary/core';
+import type {
+  SlideTheme,
+  SlideTemplate,
+  ArtStyle,
+  Model,
+  ModelPatchData,
+  ModelCreateData,
+} from '@aiprimary/core';
 import type {
   QuestionBankItem,
   QuestionBankParams,
@@ -74,6 +81,7 @@ export interface AdminApiService extends Service {
 
   // AI Models
   getModels(type?: string | null): Promise<ApiResponse<Model[]>>;
+  createModel(data: ModelCreateData): Promise<ApiResponse<Model>>;
   patchModel(id: string, data: ModelPatchData): Promise<ApiResponse<Model>>;
 
   // FAQ Posts

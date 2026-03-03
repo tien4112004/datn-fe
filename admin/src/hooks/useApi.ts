@@ -10,7 +10,7 @@ import type {
   MatrixTemplate,
   MatrixTemplateParams,
 } from '@/types/api';
-import type { ModelPatchData } from '@aiprimary/core';
+import type { ModelCreateData, ModelPatchData } from '@aiprimary/core';
 import type { LoginRequest } from '@/types/auth';
 import type { SlideTemplate, SlideTheme } from '@aiprimary/core';
 import type {
@@ -384,6 +384,23 @@ export function useModels(type?: string | null) {
     queryFn: () => getAdminApiService().getModels(type),
     staleTime: 30000,
     gcTime: 300000,
+  });
+}
+
+export function useCreateModel() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: ModelCreateData) => getAdminApiService().createModel(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.models.all });
+      toast.success('Model created successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to create model', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    },
   });
 }
 

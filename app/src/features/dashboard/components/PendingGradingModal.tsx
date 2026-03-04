@@ -58,7 +58,7 @@ export const PendingGradingModal = ({ isOpen, onClose }: PendingGradingModalProp
 
   const handleGradeSubmission = (item: any) => {
     // Navigate to grading interface
-    navigate(`/grading/${item.submissionId}`);
+    navigate(`/submissions/${item.submissionId}/grade`);
     onClose();
   };
 

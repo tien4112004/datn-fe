@@ -4,8 +4,6 @@ import CommonTabs, { type TabItem } from '@/shared/components/common/CommonTabs'
 import { PageHeader } from '@/shared/components/common/PageHeader';
 import { PageContainer } from '@/shared/components/common/PageContainer';
 import { Separator } from '@ui/separator';
-import AppearanceSettings from '../components/AppearanceSettings';
-import DevToolsSettings from '../components/DevToolsSettings';
 import LanguageSettings from '../components/LanguageSettings';
 import ChangePasswordForm from '../components/ChangePasswordForm';
 import UserProfilePage from '@/features/user/components/UserProfile';

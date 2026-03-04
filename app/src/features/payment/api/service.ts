@@ -6,6 +6,7 @@ import type {
   TransactionDetails,
   UserCoin,
   CoinUsageTransaction,
+  CoinPackageDto,
   PaginationInfo,
 } from '../types';
 
@@ -62,5 +63,12 @@ export default class PaymentService implements PaymentApiService {
       params: { page, size },
     });
     return response.data;
+  }
+
+  async getCoinPackages(): Promise<CoinPackageDto[]> {
+    const response = await this.apiClient.get<{ data: CoinPackageDto[] }>(
+      `${this.baseUrl}/api/coin-packages`
+    );
+    return response.data.data;
   }
 }

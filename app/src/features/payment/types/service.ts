@@ -2,6 +2,17 @@ export type PaymentGate = 'SEPAY' | 'PAYOS';
 
 export type TransactionStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'CANCELLED' | 'PROCESSING' | 'REFUNDED';
 
+export interface CoinPackageDto {
+  id: string;
+  name: string;
+  coin: number;
+  price: number;
+  bonus: number;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface CheckoutRequest {
   amount: number;
   description: string;
@@ -69,4 +80,5 @@ export interface PaymentApiService {
     page?: number,
     size?: number
   ): Promise<{ data: CoinUsageTransaction[]; pagination: PaginationInfo }>;
+  getCoinPackages(): Promise<CoinPackageDto[]>;
 }

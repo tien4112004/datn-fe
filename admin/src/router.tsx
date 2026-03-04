@@ -38,6 +38,9 @@ const ContextFormPage = lazy(() =>
 const CoinPricingPage = lazy(() =>
   import('@/pages/CoinPricingPage').then((m) => ({ default: m.CoinPricingPage }))
 );
+const CoinPackagesPage = lazy(() =>
+  import('@/pages/CoinPackagesPage').then((m) => ({ default: m.CoinPackagesPage }))
+);
 const MatrixTemplatesPage = lazy(() =>
   import('@/pages/MatrixTemplatesPage').then((m) => ({ default: m.MatrixTemplatesPage }))
 );
@@ -195,6 +198,14 @@ export const router = createBrowserRouter([
         element: (
           <LazyWrapper>
             <CoinPricingPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'coin-packages',
+        element: (
+          <LazyWrapper>
+            <CoinPackagesPage />
           </LazyWrapper>
         ),
       },

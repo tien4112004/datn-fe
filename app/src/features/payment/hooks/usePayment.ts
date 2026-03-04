@@ -9,6 +9,7 @@ export const paymentKeys = {
   transaction: (id: string) => [...paymentKeys.all, 'transaction', id] as const,
   coinHistory: (userId: string, page: number, size: number) =>
     [...paymentKeys.all, 'coinHistory', userId, page, size] as const,
+  coinPackages: [...['payment'], 'coinPackages'] as const,
 };
 
 export const useCoinBalance = (userId?: string) => {
@@ -65,6 +66,16 @@ export const useCoinHistory = (userId?: string, page = 0, size = 20) => {
     },
     staleTime: 30 * 1000,
     enabled: !!userId,
+  });
+};
+
+export const useCoinPackages = () => {
+  const service = getPaymentApiService();
+
+  return useQuery({
+    queryKey: paymentKeys.coinPackages,
+    queryFn: () => service.getCoinPackages(),
+    staleTime: 5 * 60 * 1000,
   });
 };
 

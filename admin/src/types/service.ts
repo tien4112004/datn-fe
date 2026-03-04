@@ -36,6 +36,7 @@ import type {
   CoinPricingQueryParams,
   EnumOption,
 } from './coin';
+import type { CoinPackage, CoinPackageCreateRequest, CoinPackageUpdateRequest } from './coinPackage';
 import type { TokenUsageStats, TokenUsageFilterRequest } from './tokenUsage';
 
 /**
@@ -129,6 +130,13 @@ export interface AdminApiService extends Service {
   deleteCoinPricing(id: string): Promise<ApiResponse<void>>;
   getResourceTypes(): Promise<ApiResponse<EnumOption[]>>;
   getUnitTypes(): Promise<ApiResponse<EnumOption[]>>;
+
+  // Coin Packages
+  getCoinPackages(): Promise<ApiResponse<CoinPackage[]>>;
+  createCoinPackage(data: CoinPackageCreateRequest): Promise<ApiResponse<CoinPackage>>;
+  updateCoinPackage(id: string, data: CoinPackageUpdateRequest): Promise<ApiResponse<CoinPackage>>;
+  deleteCoinPackage(id: string): Promise<ApiResponse<void>>;
+  toggleCoinPackageStatus(id: string): Promise<ApiResponse<CoinPackage>>;
 
   // Matrix Templates
   getMatrixTemplates(params?: MatrixTemplateParams): Promise<ApiResponse<MatrixTemplate[]>>;

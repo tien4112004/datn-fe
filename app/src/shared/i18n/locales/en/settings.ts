@@ -9,6 +9,7 @@ export default {
     general: 'General',
     appearance: 'Appearance',
     devtools: 'DevTools',
+    aiPrompt: 'AI Prompt',
   },
   profile: {
     title: 'Profile Picture',
@@ -63,6 +64,25 @@ export default {
   language: {
     title: 'Language',
     subtitle: 'Select your preferred language',
+  },
+  teacherSystemPrompt: {
+    title: 'AI System Prompt',
+    subtitle: 'Customize AI behavior for all your generation requests',
+    label: 'System Prompt',
+    placeholder:
+      'e.g. Always use simple language suitable for grade 3 students. Prefer short sentences and avoid technical terms.',
+    loading: 'Loading your prompt...',
+    save: 'Save Prompt',
+    saving: 'Saving...',
+    delete: 'Remove Prompt',
+    deleting: 'Removing...',
+    success: 'System prompt saved successfully',
+    deleteSuccess: 'System prompt removed',
+    error: 'Failed to save system prompt. Please try again.',
+    validation: {
+      required: 'Prompt must not be empty',
+      maxLength: 'Prompt must not exceed {{max}} characters',
+    },
   },
   devtools: {
     title: 'Development',

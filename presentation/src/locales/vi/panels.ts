@@ -260,6 +260,19 @@ export default {
         noModels: 'Không có mô hình IMAGE nào có sẵn. Sử dụng mặc định.',
         imagePreviewAlt: 'Xem trước hình ảnh',
       },
+      // Tạo trang chiếu
+      slideGeneration: {
+        tabRefine: 'Tinh chỉnh',
+        tabGenerate: 'Tạo mới',
+        title: 'Tạo trang chiếu',
+        prompt: 'NỘI DUNG',
+        promptPlaceholder: 'Mô tả nội dung bạn muốn tạo...',
+        slideCount: 'SỐ TRANG',
+        negativePrompt: 'LOẠI TRỪ',
+        negativePromptPlaceholder: 'Các yếu tố cần loại trừ khỏi ảnh...',
+        generate: 'Tạo',
+        generating: 'Đang tạo...',
+      },
       // Bố cục & Tạo kiểu
       layout: {
         label: 'Bố cục',

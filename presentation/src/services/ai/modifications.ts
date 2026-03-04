@@ -181,6 +181,54 @@ export const aiModificationService = {
   },
 
   /**
+   * Generate slides for insertion into the current presentation (batch mode).
+   */
+  async generateSlides(
+    request: {
+      prompt: string;
+      slideCount: number;
+      artStyle?: string;
+      imageModel?: string;
+      imageProvider?: string;
+      negativePrompt?: string;
+      context?: Record<string, any>;
+      language?: string;
+      presentationId?: string;
+    },
+    model: string = 'gemini-2.0-flash-exp',
+    provider: string = 'google'
+  ): Promise<AIModificationResponse> {
+    console.log('[AI] generateSlides', { payload: request, model, provider });
+    try {
+      const response = await api.post<ApiResponse<any>>(`${BASE_URL}/api/ai/generate-slides`, {
+        ...request,
+        model,
+        provider,
+      });
+
+      if (response.data && response.data.success !== false) {
+        return {
+          success: true,
+          data: response.data.data,
+        };
+      } else {
+        return {
+          success: false,
+          data: {},
+          error: response.data.message || 'Failed to generate slides',
+        };
+      }
+    } catch (err: any) {
+      console.error('Slide generation error:', err);
+      return {
+        success: false,
+        data: {},
+        error: err.response?.data?.message || err.message || 'Network error',
+      };
+    }
+  },
+
+  /**
    * Expand content of combined text items
    * @param request The expansion request
    * @param model The AI model to use (defaults to gemini-2.0-flash-exp)

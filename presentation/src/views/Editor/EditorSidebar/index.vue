@@ -118,12 +118,7 @@ const elementTabs = computed<TabConfig[]>(() => {
     });
   }
 
-  let filteredTabs = filterTabsByLockState(tabs, isCurrentSlideLocked.value);
-
-  // Hide AI_MODIFICATION when there's no selected element AND NOT in Template Preview Mode
-  if (!activeElementIdList.value.length && !isCurrentSlideLocked.value) {
-    filteredTabs = filteredTabs.filter((tab) => tab.key !== ToolbarStates.AI_MODIFICATION);
-  }
+  const filteredTabs = filterTabsByLockState(tabs, isCurrentSlideLocked.value);
 
   return filteredTabs;
 });
@@ -173,12 +168,7 @@ const slideTabs = computed<TabConfig[]>(() => {
     });
   }
 
-  let filteredTabs = filterTabsByLockState(tabs, isCurrentSlideLocked.value);
-
-  // Hide AI_MODIFICATION when there's no selected element AND NOT in Template Preview Mode
-  if (!activeElementIdList.value.length && !isCurrentSlideLocked.value) {
-    filteredTabs = filteredTabs.filter((tab) => tab.key !== ToolbarStates.AI_MODIFICATION);
-  }
+  const filteredTabs = filterTabsByLockState(tabs, isCurrentSlideLocked.value);
 
   return filteredTabs;
 });

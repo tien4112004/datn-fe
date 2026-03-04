@@ -38,6 +38,7 @@ export class ImageService {
           artStyle: params.artStyle,
           artDescription: params.artStyleModifiers,
           negativePrompt: params.negativePrompt,
+          ...(params.documentId ? { documentId: params.documentId } : {}),
         },
         {
           headers: {

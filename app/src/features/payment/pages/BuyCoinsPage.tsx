@@ -9,8 +9,8 @@ import { PageContainer } from '@/shared/components/common/PageContainer';
 import { CoinBalanceBadge } from '../components/CoinBalanceBadge';
 import { CoinPackageCard } from '../components/CoinPackageCard';
 import { GatewaySelector } from '../components/GatewaySelector';
-import { useCreateCheckout } from '../hooks/usePayment';
-import { COIN_PACKAGES, type CoinPackage } from '../constants';
+import { useCreateCheckout, useCoinPackages } from '../hooks/usePayment';
+import type { CoinPackage } from '../constants';
 import type { PaymentGate } from '../types';
 
 export function BuyCoinsPage() {
@@ -19,6 +19,7 @@ export function BuyCoinsPage() {
   const [selectedPkg, setSelectedPkg] = useState<CoinPackage | null>(null);
   const [gate, setGate] = useState<PaymentGate>('SEPAY');
   const checkout = useCreateCheckout();
+  const { data: coinPackages, isLoading: packagesLoading, isError: packagesError } = useCoinPackages();
 
   const handleBuy = () => {
     if (!selectedPkg || !user) return;
@@ -28,7 +29,7 @@ export function BuyCoinsPage() {
     checkout.mutate(
       {
         amount: selectedPkg.price,
-        description: `Buy ${selectedPkg.coins} coins`,
+        description: `Buy ${selectedPkg.name}`,
         gate,
         successUrl: `${origin}/payment/success`,
         errorUrl: `${origin}/payment/error`,
@@ -93,16 +94,22 @@ export function BuyCoinsPage() {
         {/* Coin Packages Grid */}
         <div>
           <h2 className="mb-4 text-lg font-semibold">{t('buyCoins.selectPackage')}</h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-4">
-            {COIN_PACKAGES.map((pkg) => (
-              <CoinPackageCard
-                key={pkg.id}
-                pkg={pkg}
-                selected={selectedPkg?.id === pkg.id}
-                onSelect={setSelectedPkg}
-              />
-            ))}
-          </div>
+          {packagesLoading ? (
+            <p className="text-muted-foreground text-sm">{t('buyCoins.loadingPackages')}</p>
+          ) : packagesError ? (
+            <p className="text-destructive text-sm">{t('buyCoins.loadError')}</p>
+          ) : (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+              {(coinPackages ?? []).map((pkg) => (
+                <CoinPackageCard
+                  key={pkg.id}
+                  pkg={pkg}
+                  selected={selectedPkg?.id === pkg.id}
+                  onSelect={setSelectedPkg}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Payment Section */}

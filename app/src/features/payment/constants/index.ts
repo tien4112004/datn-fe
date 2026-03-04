@@ -1,19 +1,6 @@
-import type { TransactionStatus } from '../types';
+import type { TransactionStatus, CoinPackageDto } from '../types';
 
-export interface CoinPackage {
-  id: string;
-  coins: number;
-  price: number;
-  label: string;
-  popular?: boolean;
-}
-
-export const COIN_PACKAGES: CoinPackage[] = [
-  { id: 'basic', coins: 50, price: 50000, label: '50 Coins' },
-  { id: 'standard', coins: 120, price: 100000, label: '120 Coins', popular: true },
-  { id: 'premium', coins: 300, price: 200000, label: '300 Coins' },
-  { id: 'mega', coins: 800, price: 500000, label: '800 Coins' },
-];
+export type { CoinPackageDto as CoinPackage };
 
 export const TRANSACTION_STATUS_CONFIG: Record<
   TransactionStatus,

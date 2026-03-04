@@ -41,11 +41,17 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
 
   const latestSubmission = mySubmissions[0];
 
+  const bestSubmission = useMemo(() => {
+    const graded = mySubmissions.filter((s) => s.status === 'graded' && s.score !== undefined && s.maxScore);
+    if (graded.length === 0) return null;
+    return graded.reduce((best, s) => (s.score! / s.maxScore! > best.score! / best.maxScore! ? s : best));
+  }, [mySubmissions]);
+
   // Determine status
   const status = useMemo(() => {
     if (!latestSubmission) return 'not_started';
     if (latestSubmission.status === 'graded') return 'graded';
-    if (latestSubmission.status === 'submitted') return 'submitted';
+    if (latestSubmission.status === 'submitted' || latestSubmission.status === 'pending') return 'submitted';
     return 'in_progress';
   }, [latestSubmission]);
 
@@ -112,23 +118,20 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
             </div>
             <div>
               <p className={`font-semibold ${statusConfig.color}`}>{statusConfig.label}</p>
-              {latestSubmission && (
-                <p className="text-muted-foreground text-xs">
-                  {status === 'graded' &&
-                    latestSubmission.score !== undefined &&
-                    latestSubmission.maxScore !== undefined && (
-                      <span>
-                        {t('score')} {latestSubmission.score}/{latestSubmission.maxScore}
-                      </span>
-                    )}
-                  {status === 'submitted' && (
-                    <span>
-                      {t('submitted')}{' '}
-                      {formatDistanceToNow(new Date(latestSubmission.submittedAt), { addSuffix: true })}
-                    </span>
-                  )}
-                </p>
-              )}
+              <p className="text-muted-foreground text-xs">
+                {bestSubmission && bestSubmission.score !== undefined && bestSubmission.maxScore && (
+                  <span>
+                    {t('bestScore')} {bestSubmission.score}/{bestSubmission.maxScore} (
+                    {Math.round((bestSubmission.score / bestSubmission.maxScore) * 100)}%)
+                  </span>
+                )}
+                {!bestSubmission && status === 'submitted' && latestSubmission && (
+                  <span>
+                    {t('submitted')}{' '}
+                    {formatDistanceToNow(new Date(latestSubmission.submittedAt), { addSuffix: true })}
+                  </span>
+                )}
+              </p>
             </div>
           </div>
 
@@ -228,14 +231,24 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
                   return 'text-red-600 dark:text-red-400';
                 };
 
+                const isBest = bestSubmission?.id === submission.id;
+                const isLatest = index === 0;
                 return (
-                  <TableRow key={submission.id} className="hover:bg-muted/50">
+                  <TableRow
+                    key={submission.id}
+                    className={`hover:bg-muted/50 ${isBest ? 'bg-yellow-50/50 dark:bg-yellow-950/10' : ''}`}
+                  >
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-2">
                         <span>#{mySubmissions.length - index}</span>
-                        {index === 0 && (
+                        {isLatest && (
                           <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
                             {t('latest')}
+                          </span>
+                        )}
+                        {isBest && (
+                          <span className="rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">
+                            {t('best')}
                           </span>
                         )}
                       </div>

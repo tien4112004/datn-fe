@@ -62,27 +62,6 @@ export const useAssignment = (id?: string) => {
 };
 
 /**
- * Hook to fetch a single assignment by ID using public endpoint
- * This bypasses document permission checks and should be used by students
- * accessing assignments through posts/submissions
- * @param id - Assignment ID (optional, query disabled if undefined)
- * @returns Query result with assignment details
- */
-export const useAssignmentPublic = (id?: string) => {
-  const service = getAssignmentApiService();
-
-  return useQuery({
-    queryKey: id ? [...assignmentKeys.detail(id), 'public'] : [...assignmentKeys.details(), 'public'],
-    queryFn: async () => {
-      if (!id) throw new Error('Missing assignment id');
-      return service.getAssignmentByIdPublic(id);
-    },
-    staleTime: 60 * 1000, // 1 minute
-    enabled: !!id, // Only fetch if ID is provided
-  });
-};
-
-/**
  * Hook to fetch assignment data via post ID
  * Uses the post-based endpoint that joins through assignment_post table
  * Should be used in feed contexts where post ID is readily available

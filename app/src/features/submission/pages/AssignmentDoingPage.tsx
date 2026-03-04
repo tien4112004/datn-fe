@@ -29,7 +29,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@ui/dialog';
-import { useAssignmentPublic } from '@/features/assignment/hooks/useAssignmentApi';
+import { useAssignment, useAssignmentByPost } from '@/features/assignment/hooks/useAssignmentApi';
 import { useCreateSubmission } from '../hooks';
 import { useSubmissionDraftStore } from '../stores/useSubmissionDraftStore';
 
@@ -92,8 +92,10 @@ export const AssignmentDoingPage = () => {
   // Get postId from query params (for homework flow) or use assignmentId (for direct access)
   const postId = searchParams.get('postId');
 
-  // Fetch assignment data using public endpoint (bypasses permission check for students)
-  const { data: assignment, isLoading } = useAssignmentPublic(id);
+  const { data: assignmentByPost, isLoading: isLoadingByPost } = useAssignmentByPost(postId ?? undefined);
+  const { data: assignmentById, isLoading: isLoadingById } = useAssignment(postId ? undefined : id);
+  const assignment = assignmentByPost ?? assignmentById;
+  const isLoading = isLoadingByPost || isLoadingById;
 
   // Create submission mutation
   const { mutate: createSubmission, isPending: isSubmitting } = useCreateSubmission();

@@ -4,7 +4,6 @@ export * from './useDirtyFormTracking';
 export {
   useAssignmentList,
   useAssignment,
-  useAssignmentPublic,
   useAssignmentByPost,
   useCreateAssignment,
   useUpdateAssignment,

@@ -75,6 +75,7 @@ export interface Grade {
 export interface Submission {
   id: string; // Unique identifier for this submission
   assignmentId: string; // Reference to the assignment
+  postId?: string; // Reference to the post this submission belongs to
   studentId: string; // Reference to the student
   student?: {
     // Populated student information (when included by backend)
@@ -87,7 +88,7 @@ export interface Submission {
   submittedAt: string; // ISO timestamp when submitted
   score?: number; // Total score (sum of all question grades)
   maxScore?: number; // Maximum possible score
-  status: 'in_progress' | 'submitted' | 'graded'; // Current status of the submission
+  status: 'in_progress' | 'submitted' | 'graded' | 'pending'; // Current status of the submission
   grades?: Grade[]; // Teacher's grades for each question (available after grading)
   feedback?: string; // Overall feedback from teacher
   gradedAt?: string; // ISO timestamp when grading was completed

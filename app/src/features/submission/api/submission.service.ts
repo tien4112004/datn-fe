@@ -66,7 +66,7 @@ interface SubmissionDto {
   submittedAt: string;
   score?: number;
   maxScore?: number;
-  status: 'in_progress' | 'submitted' | 'graded';
+  status: 'in_progress' | 'submitted' | 'graded' | 'pending';
   feedback?: string;
   gradedAt?: string;
   gradedBy?: string;
@@ -259,6 +259,7 @@ export default class SubmissionService implements SubmissionApiService {
     return {
       id: data.id,
       assignmentId: data.assignmentId,
+      postId: data.postId,
       studentId: data.studentId,
       student: data.student,
       answers: questions.map(transformDtoToAnswer),

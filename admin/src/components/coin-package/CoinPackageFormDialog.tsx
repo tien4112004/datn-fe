@@ -93,8 +93,8 @@ export function CoinPackageFormDialog({
           <div className="grid grid-cols-3 gap-4">
             {/* Coins */}
             <div className="space-y-1.5">
-              <Label htmlFor="coins">Coins</Label>
-              <Input id="coins" type="number" min={1} {...register('coins')} />
+              <Label htmlFor="coin">Coins</Label>
+              <Input id="coin" type="number" min={1} {...register('coin')} />
               {errors.coin && <p className="text-destructive text-xs">{errors.coin.message}</p>}
             </div>
 

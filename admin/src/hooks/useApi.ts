@@ -10,7 +10,7 @@ import type {
   MatrixTemplate,
   MatrixTemplateParams,
 } from '@/types/api';
-import type { ModelPatchData } from '@aiprimary/core';
+import type { ModelCreateData, ModelPatchData, ModelUpdateData } from '@aiprimary/core';
 import type { LoginRequest } from '@/types/auth';
 import type { SlideTemplate, SlideTheme } from '@aiprimary/core';
 import type {
@@ -378,12 +378,29 @@ export function useUpdateArtStyle() {
 
 // ============= MODELS =============
 
-export function useModels(type?: string | null) {
+export function useModels(type?: string | null, includeDeleted?: boolean) {
   return useQuery({
-    queryKey: adminKeys.models.list(type),
-    queryFn: () => getAdminApiService().getModels(type),
+    queryKey: [...adminKeys.models.list(type), includeDeleted],
+    queryFn: () => getAdminApiService().getModels(type, includeDeleted),
     staleTime: 30000,
     gcTime: 300000,
+  });
+}
+
+export function useCreateModel() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: ModelCreateData) => getAdminApiService().createModel(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.models.all });
+      toast.success('Model created successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to create model', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    },
   });
 }
 
@@ -393,6 +410,41 @@ export function usePatchModel() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: ModelPatchData }) =>
       getAdminApiService().patchModel(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.models.all });
+      toast.success('Model updated successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to update model', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    },
+  });
+}
+
+export function useDeleteModel() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => getAdminApiService().deleteModel(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.models.all });
+      toast.success('Model deleted successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to delete model', {
+        description: error instanceof Error ? error.message : 'An error occurred',
+      });
+    },
+  });
+}
+
+export function useUpdateModel() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: ModelUpdateData }) =>
+      getAdminApiService().updateModel(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.models.all });
       toast.success('Model updated successfully');

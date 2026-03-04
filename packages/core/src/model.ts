@@ -7,6 +7,7 @@ export interface Model {
   default: boolean;
   provider: string;
   type: ModelType;
+  deletedAt?: string | null;
 }
 
 // Model type enum
@@ -21,4 +22,19 @@ export type ModelType = (typeof MODEL_TYPES)[keyof typeof MODEL_TYPES];
 export interface ModelPatchData {
   isEnabled?: boolean;
   isDefault?: boolean;
+}
+
+// Model create data for creating new models
+export interface ModelCreateData {
+  modelName: string;
+  displayName: string;
+  provider: string;
+  modelType: ModelType;
+}
+
+// Model update data for editing name, displayName, provider
+export interface ModelUpdateData {
+  modelName: string;
+  displayName: string;
+  provider: string;
 }

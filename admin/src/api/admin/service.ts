@@ -33,7 +33,15 @@ import type { TokenUsageFilterRequest, TokenUsageStats } from '@/types/tokenUsag
 import { exportQuestionsToCSV, parseQuestionBankCSV } from '@/utils/csvParser';
 import { validateQuestionBankCSV } from '@/utils/csvValidation';
 import { API_MODE, type ApiMode, api } from '@aiprimary/api';
-import type { ArtStyle, Model, ModelPatchData, SlideTemplate, SlideTheme } from '@aiprimary/core';
+import type {
+  ArtStyle,
+  Model,
+  ModelCreateData,
+  ModelPatchData,
+  ModelUpdateData,
+  SlideTemplate,
+  SlideTheme,
+} from '@aiprimary/core';
 import { getAllSubjects, getElementaryGrades } from '@aiprimary/core';
 
 import { generateId } from '@aiprimary/core';
@@ -242,9 +250,14 @@ export default class AdminRealApiService implements AdminApiService {
   }
 
   // AI Models
-  async getModels(type?: string | null): Promise<ApiResponse<Model[]>> {
-    const params = type ? { modelType: type } : undefined;
-    const response = await api.get<ApiResponse<any[]>>(`${this.baseUrl}/api/models`, { params });
+  async getModels(type?: string | null, includeDeleted?: boolean): Promise<ApiResponse<Model[]>> {
+    const params: Record<string, string> = {};
+    if (type) params.modelType = type;
+    if (includeDeleted) params.includeDeleted = 'true';
+
+    const response = await api.get<ApiResponse<any[]>>(`${this.baseUrl}/api/models`, {
+      params: Object.keys(params).length > 0 ? params : undefined,
+    });
 
     // Map backend response to frontend Model interface
     const mappedData = response.data.data.map((model: any) => ({
@@ -255,6 +268,7 @@ export default class AdminRealApiService implements AdminApiService {
       default: model.default,
       provider: model.provider,
       type: model.modelType,
+      deletedAt: model.deletedAt ?? null,
     }));
 
     return {
@@ -263,10 +277,53 @@ export default class AdminRealApiService implements AdminApiService {
     };
   }
 
+  async createModel(data: ModelCreateData): Promise<ApiResponse<Model>> {
+    const response = await api.post<ApiResponse<any>>(`${this.baseUrl}/api/models`, data);
+
+    const mappedData = {
+      id: response.data.data.modelId,
+      name: response.data.data.modelName,
+      displayName: response.data.data.displayName,
+      enabled: response.data.data.enabled,
+      default: response.data.data.default,
+      provider: response.data.data.provider,
+      type: response.data.data.modelType,
+    };
+
+    return {
+      ...response.data,
+      data: mappedData,
+    };
+  }
+
+  async deleteModel(id: string): Promise<ApiResponse<void>> {
+    const response = await api.delete<ApiResponse<void>>(`${this.baseUrl}/api/models/${id}`);
+    return response.data;
+  }
+
   async patchModel(id: string, data: ModelPatchData): Promise<ApiResponse<Model>> {
     const response = await api.patch<ApiResponse<any>>(`${this.baseUrl}/api/models/${id}`, data);
 
     // Map backend response to frontend Model interface
+    const mappedData = {
+      id: response.data.data.modelId,
+      name: response.data.data.modelName,
+      displayName: response.data.data.displayName,
+      enabled: response.data.data.enabled,
+      default: response.data.data.default,
+      provider: response.data.data.provider,
+      type: response.data.data.modelType,
+    };
+
+    return {
+      ...response.data,
+      data: mappedData,
+    };
+  }
+
+  async updateModel(id: string, data: ModelUpdateData): Promise<ApiResponse<Model>> {
+    const response = await api.put<ApiResponse<any>>(`${this.baseUrl}/api/models/${id}`, data);
+
     const mappedData = {
       id: response.data.data.modelId,
       name: response.data.data.modelName,

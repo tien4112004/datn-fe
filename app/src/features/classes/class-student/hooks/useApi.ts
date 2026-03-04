@@ -216,7 +216,7 @@ export function useStudentMutations(classId: string) {
    */
   const deleteStudent = useMutation({
     mutationFn: async (studentId: string): Promise<void> => {
-      return await classApiService.deleteStudent(studentId);
+      return await classApiService.removeStudentFromClass(classId, studentId);
     },
 
     onError: (error) => {

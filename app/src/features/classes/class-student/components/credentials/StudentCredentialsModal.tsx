@@ -130,14 +130,14 @@ export function StudentCredentialsModal({ open, onOpenChange, credentials }: Cre
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="!max-w-3xl">
+      <DialogContent className="flex max-h-[85vh] !max-w-3xl flex-col">
         <DialogHeader>
           <DialogTitle>{t('modal.title')}</DialogTitle>
           <DialogDescription>{t('modal.description')}</DialogDescription>
         </DialogHeader>
 
         {/* Main content area */}
-        <div className="space-y-4">
+        <div className="min-h-0 flex-1 space-y-4">
           {/* Security warning */}
           <div className="flex gap-3 rounded-lg bg-amber-50 p-4">
             <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600" />
@@ -145,9 +145,9 @@ export function StudentCredentialsModal({ open, onOpenChange, credentials }: Cre
           </div>
 
           {/* Credentials table */}
-          <div className="overflow-hidden rounded-md border">
+          <div className="overflow-auto rounded-md border" style={{ maxHeight: 'calc(85vh - 280px)' }}>
             <Table>
-              <TableHeader>
+              <TableHeader className="bg-background sticky top-0 z-10">
                 <TableRow>
                   <TableHead className="w-1/3">{t('table.studentName')}</TableHead>
                   <TableHead className="w-1/3">{t('table.username')}</TableHead>

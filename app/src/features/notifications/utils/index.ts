@@ -1,0 +1,1 @@
+export { getNotificationUrl } from './getNotificationUrl';

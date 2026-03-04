@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@ui/button';
 import { ScrollArea } from '@ui/scroll-area';
 import { Separator } from '@ui/separator';
-import { useNotifications, useMarkAsRead, useMarkAllAsRead, useUnreadCount } from '../hooks/useApi';
+import { useNotifications, useMarkAllAsRead, useUnreadCount } from '../hooks/useApi';
+import { useNotificationNavigate } from '../hooks/useNotificationNavigate';
 import { NotificationItem } from './NotificationItem';
 import type { AppNotification } from '../types';
 
@@ -17,35 +18,11 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
   const navigate = useNavigate();
   const { data, isLoading } = useNotifications(0, 5);
   const { data: unreadData } = useUnreadCount();
-  const markAsRead = useMarkAsRead();
   const markAllAsRead = useMarkAllAsRead();
+  const { navigateToNotification, getViewAllUrl } = useNotificationNavigate();
 
   const handleNotificationClick = (notification: AppNotification) => {
-    if (!notification.isRead) {
-      markAsRead.mutate(notification.id);
-    }
-
-    // Navigate based on notification type and referenceId
-    if (notification.referenceId) {
-      switch (notification.type) {
-        case 'POST':
-        case 'ANNOUNCEMENT':
-          navigate(`/classes/${notification.referenceId}`);
-          break;
-        case 'ASSIGNMENT':
-        case 'GRADE':
-          navigate(`/assignment/${notification.referenceId}`);
-          break;
-        case 'SHARED_PRESENTATION':
-          navigate(`/presentation/${notification.referenceId}`);
-          break;
-        case 'SHARED_MINDMAP':
-          navigate(`/mindmap/${notification.referenceId}`);
-          break;
-        default:
-          navigate('/notifications');
-      }
-    }
+    navigateToNotification(notification);
     onClose?.();
   };
 
@@ -54,7 +31,7 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
   };
 
   const handleViewAll = () => {
-    navigate('/notifications');
+    navigate(getViewAllUrl());
     onClose?.();
   };
 

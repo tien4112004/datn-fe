@@ -3,7 +3,9 @@ import { useSearchParams } from 'react-router-dom';
 import CommonTabs, { type TabItem } from '@/shared/components/common/CommonTabs';
 import { PageHeader } from '@/shared/components/common/PageHeader';
 import { PageContainer } from '@/shared/components/common/PageContainer';
+import { Separator } from '@ui/separator';
 import LanguageSettings from '../components/LanguageSettings';
+import ChangePasswordForm from '../components/ChangePasswordForm';
 import UserProfilePage from '@/features/user/components/UserProfile';
 
 function SettingsPage() {
@@ -40,6 +42,16 @@ function SettingsPage() {
             </div>
             <div className="lg:col-span-2">
               <LanguageSettings />
+            </div>
+          </div>
+          <Separator />
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <div className="lg:col-span-1">
+              <h3 className="text-lg font-medium">{t('changePassword.title')}</h3>
+              <p className="text-muted-foreground text-sm">{t('changePassword.subtitle')}</p>
+            </div>
+            <div className="lg:col-span-2">
+              <ChangePasswordForm />
             </div>
           </div>
         </div>

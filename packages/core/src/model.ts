@@ -7,6 +7,7 @@ export interface Model {
   default: boolean;
   provider: string;
   type: ModelType;
+  deletedAt?: string | null;
 }
 
 // Model type enum
@@ -29,4 +30,11 @@ export interface ModelCreateData {
   displayName: string;
   provider: string;
   modelType: ModelType;
+}
+
+// Model update data for editing name, displayName, provider
+export interface ModelUpdateData {
+  modelName: string;
+  displayName: string;
+  provider: string;
 }

@@ -18,6 +18,7 @@ import type {
   Model,
   ModelPatchData,
   ModelCreateData,
+  ModelUpdateData,
 } from '@aiprimary/core';
 import type {
   QuestionBankItem,
@@ -80,9 +81,11 @@ export interface AdminApiService extends Service {
   updateArtStyle(id: string, data: ArtStyleRequest): Promise<ApiResponse<ArtStyle>>;
 
   // AI Models
-  getModels(type?: string | null): Promise<ApiResponse<Model[]>>;
+  getModels(type?: string | null, includeDeleted?: boolean): Promise<ApiResponse<Model[]>>;
   createModel(data: ModelCreateData): Promise<ApiResponse<Model>>;
+  deleteModel(id: string): Promise<ApiResponse<void>>;
   patchModel(id: string, data: ModelPatchData): Promise<ApiResponse<Model>>;
+  updateModel(id: string, data: ModelUpdateData): Promise<ApiResponse<Model>>;
 
   // FAQ Posts
   getFAQPosts(params?: PaginationParams): Promise<ApiResponse<FAQPost[]>>;

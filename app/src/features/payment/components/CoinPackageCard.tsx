@@ -41,7 +41,7 @@ export function CoinPackageCard({ pkg, selected, onSelect }: CoinPackageCardProp
       )}
       <div className="text-base font-bold">{formatPackageName(pkg.name)}</div>
       <Coins className="size-8 text-yellow-500" />
-      <div className="text-2xl font-bold">{pkg.coins}</div>
+      <div className="text-2xl font-bold">{pkg.coin}</div>
       <div className="text-muted-foreground text-xs">{t('buyCoins.coins')}</div>
       <div className="text-sm font-semibold">{formatVND(pkg.price)}</div>
     </button>

@@ -5,3 +5,4 @@
 
 export * from './useApi';
 export * from './useCoinApi';
+export * from './useCoinPackageApi';

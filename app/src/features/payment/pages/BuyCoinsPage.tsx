@@ -123,7 +123,7 @@ export function BuyCoinsPage() {
                   <div className="flex items-center gap-2 text-lg">
                     <Coins className="size-5 text-yellow-500" />
                     <span className="font-semibold">
-                      {selectedPkg.coins} {t('buyCoins.coins')}
+                      {selectedPkg.coin} {t('buyCoins.coins')}
                     </span>
                     <span className="text-muted-foreground">•</span>
                     <span className="text-muted-foreground">

@@ -5,7 +5,7 @@ export type TransactionStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'
 export interface CoinPackageDto {
   id: string;
   name: string;
-  coins: number;
+  coin: number;
   price: number;
   bonus: number;
   active: boolean;

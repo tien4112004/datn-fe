@@ -16,6 +16,7 @@ import {
   BookOpen,
   Coins,
   Grid3X3,
+  Package,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -32,6 +33,7 @@ const navItems = [
   { to: '/matrix-templates', icon: Grid3X3, label: 'Matrix Templates' },
   { to: '/model-config', icon: Settings, label: 'Model Config' },
   { to: '/coin-pricing', icon: Coins, label: 'Coin Pricing' },
+  { to: '/coin-packages', icon: Package, label: 'Coin Packages' },
 ];
 
 export function AdminLayout() {

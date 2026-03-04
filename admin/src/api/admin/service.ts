@@ -18,6 +18,7 @@ import type {
   CoinPricingUpdateRequest,
   EnumOption,
 } from '@/types/coin';
+import type { CoinPackage, CoinPackageCreateRequest, CoinPackageUpdateRequest } from '@/types/coinPackage';
 import type { Context } from '@/types/context';
 import type {
   ChapterResponse,
@@ -664,6 +665,34 @@ export default class AdminRealApiService implements AdminApiService {
 
   async deleteCoinPricing(id: string): Promise<ApiResponse<void>> {
     const response = await api.delete<ApiResponse<void>>(`${this.baseUrl}/api/admin/coin-pricing/${id}`);
+    return response.data;
+  }
+
+  // Coin Packages
+  async getCoinPackages(): Promise<ApiResponse<CoinPackage[]>> {
+    const response = await api.get<ApiResponse<CoinPackage[]>>(`${this.baseUrl}/api/coin-packages`);
+    return response.data;
+  }
+
+  async createCoinPackage(data: CoinPackageCreateRequest): Promise<ApiResponse<CoinPackage>> {
+    const response = await api.post<ApiResponse<CoinPackage>>(`${this.baseUrl}/api/coin-packages`, data);
+    return response.data;
+  }
+
+  async updateCoinPackage(id: string, data: CoinPackageUpdateRequest): Promise<ApiResponse<CoinPackage>> {
+    const response = await api.put<ApiResponse<CoinPackage>>(`${this.baseUrl}/api/coin-packages/${id}`, data);
+    return response.data;
+  }
+
+  async deleteCoinPackage(id: string): Promise<ApiResponse<void>> {
+    const response = await api.delete<ApiResponse<void>>(`${this.baseUrl}/api/coin-packages/${id}`);
+    return response.data;
+  }
+
+  async toggleCoinPackageStatus(id: string): Promise<ApiResponse<CoinPackage>> {
+    const response = await api.patch<ApiResponse<CoinPackage>>(
+      `${this.baseUrl}/api/coin-packages/${id}/toggle-status`
+    );
     return response.data;
   }
 

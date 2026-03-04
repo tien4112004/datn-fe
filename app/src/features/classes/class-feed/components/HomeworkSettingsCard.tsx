@@ -11,8 +11,8 @@ const BooleanChip = ({ value, label }: { value: boolean; label: string }) => (
   <span
     className={
       value
-        ? 'rounded-full bg-emerald-50 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
-        : 'rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+        ? 'bg-muted rounded-full px-2 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400'
+        : 'bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs font-medium'
     }
   >
     {label}
@@ -28,12 +28,10 @@ const SettingItem = ({
   label: string;
   children: React.ReactNode;
 }) => (
-  <div className="flex items-start gap-1.5">
-    <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gray-400 dark:text-gray-500" />
-    <div className="min-w-0">
-      <p className="text-[11px] leading-tight text-gray-400 dark:text-gray-500">{label}</p>
-      <div className="mt-0.5">{children}</div>
-    </div>
+  <div className="flex items-center gap-2">
+    <Icon className="text-muted-foreground h-4 w-4 shrink-0" />
+    <span className="text-muted-foreground text-sm">{label}</span>
+    <span className="text-sm font-medium">{children}</span>
   </div>
 );
 
@@ -65,15 +63,13 @@ export const HomeworkSettingsCard = ({ post }: HomeworkSettingsCardProps) => {
   if (!hasSettings) return null;
 
   return (
-    <div className="mt-4 rounded-lg border border-gray-100 bg-gray-50/60 px-4 py-3 dark:border-gray-800 dark:bg-gray-900/30">
-      <div className="mb-3 flex items-center gap-1.5">
-        <Settings2 className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
-        <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500">
-          {t('feed.homeworkSettings.title')}
-        </span>
+    <div className="mt-6">
+      <div className="mb-4 flex items-center gap-2">
+        <Settings2 className="text-muted-foreground h-5 w-5" />
+        <h3 className="text-lg font-semibold">{t('feed.homeworkSettings.title')}</h3>
       </div>
 
-      <div className="grid grid-cols-2 gap-x-6 gap-y-2.5 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="space-y-2">
         {showCorrectAnswers !== undefined && (
           <SettingItem
             icon={Eye}
@@ -103,29 +99,25 @@ export const HomeworkSettingsCard = ({ post }: HomeworkSettingsCardProps) => {
             icon={Hash}
             label={t('feed.creator.assignmentSettings.submissionSettings.maxSubmissions')}
           >
-            <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{maxSubmissions}</span>
+            {maxSubmissions}
           </SettingItem>
         )}
 
         {passingScore !== undefined && (
           <SettingItem icon={Trophy} label={t('feed.creator.assignmentSettings.grading.passingScore')}>
-            <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{passingScore}%</span>
+            {passingScore}%
           </SettingItem>
         )}
 
         {availableFrom && (
           <SettingItem icon={Calendar} label={t('feed.creator.assignmentSettings.timing.availableFrom')}>
-            <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
-              {formatDateTime(availableFrom)}
-            </span>
+            {formatDateTime(availableFrom)}
           </SettingItem>
         )}
 
         {availableUntil && (
           <SettingItem icon={Calendar} label={t('feed.creator.assignmentSettings.timing.availableUntil')}>
-            <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
-              {formatDateTime(availableUntil)}
-            </span>
+            {formatDateTime(availableUntil)}
           </SettingItem>
         )}
       </div>

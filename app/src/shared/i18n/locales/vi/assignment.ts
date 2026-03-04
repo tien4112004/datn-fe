@@ -1564,8 +1564,6 @@ export default {
       overallFeedback: 'Nhận xét chung từ giáo viên',
       passed: 'Đạt',
       failed: 'Không đạt',
-      scoreHidden: 'Điểm chưa hiển thị',
-      scoreHiddenDesc: 'Điểm sẽ được hiển thị sau khi chấm bài',
       yourSubmission: 'Bài nộp của bạn',
       pendingGrading: 'Đang chờ giáo viên chấm bài',
     },

@@ -60,7 +60,6 @@ export default class ClassFeedService implements ClassFeedApiService {
       allowComments: request.allowComments,
       shuffleQuestions: request.shuffleQuestions,
       showCorrectAnswers: request.showCorrectAnswers,
-      showScoreImmediately: request.showScoreImmediately,
       allowRetake: request.allowRetake,
       maxSubmissions: request.maxSubmissions,
       passingScore: request.passingScore,

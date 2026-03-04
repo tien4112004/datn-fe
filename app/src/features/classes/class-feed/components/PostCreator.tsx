@@ -81,7 +81,6 @@ export const PostCreator = ({
   const [allowRetake, setAllowRetake] = useState(true);
   const [shuffleQuestions, setShuffleQuestions] = useState(false);
   const [showCorrectAnswers, setShowCorrectAnswers] = useState(false);
-  const [showScoreImmediately, setShowScoreImmediately] = useState(true);
   const [passingScore, setPassingScore] = useState<number | undefined>(undefined);
   const [availableFrom, setAvailableFrom] = useState<string>('');
   const [availableUntil, setAvailableUntil] = useState<string>('');
@@ -156,7 +155,6 @@ export const PostCreator = ({
           allowRetake,
           shuffleQuestions,
           showCorrectAnswers,
-          showScoreImmediately,
           passingScore,
           availableFrom: availableFrom || undefined,
           availableUntil: availableUntil || undefined,
@@ -369,25 +367,6 @@ export const PostCreator = ({
                         id="showAnswers"
                         checked={showCorrectAnswers}
                         onCheckedChange={setShowCorrectAnswers}
-                        className="cursor-pointer"
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <Label htmlFor="showScore" className="text-sm">
-                          {t('feed.creator.assignmentSettings.displaySettings.showScoreImmediately')}
-                        </Label>
-                        <p className="text-xs text-gray-500">
-                          {t(
-                            'feed.creator.assignmentSettings.displaySettings.showScoreImmediatelyDescription'
-                          )}
-                        </p>
-                      </div>
-                      <Switch
-                        id="showScore"
-                        checked={showScoreImmediately}
-                        onCheckedChange={setShowScoreImmediately}
                         className="cursor-pointer"
                       />
                     </div>

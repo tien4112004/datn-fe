@@ -1140,8 +1140,6 @@ export default {
           shuffleQuestionsDescription: 'Thay đổi thứ tự câu hỏi cho mỗi học sinh',
           showCorrectAnswers: 'Hiển thị đáp án đúng',
           showCorrectAnswersDescription: 'Học sinh có thể xem đáp án đúng sau khi nộp bài',
-          showScoreImmediately: 'Hiển thị điểm ngay lập tức',
-          showScoreImmediatelyDescription: 'Hiển thị điểm ngay sau khi nộp bài',
         },
         submissionSettings: {
           allowRetakes: 'Cho phép làm lại',

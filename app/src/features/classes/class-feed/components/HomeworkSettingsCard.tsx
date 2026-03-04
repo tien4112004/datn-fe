@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Settings2, Eye, Zap, RefreshCw, Hash, Trophy, Calendar } from 'lucide-react';
+import { Settings2, Eye, RefreshCw, Hash, Trophy, Calendar } from 'lucide-react';
 import { useAssignmentByPost } from '@/features/assignment';
 import type { Post } from '../types';
 
@@ -51,20 +51,12 @@ export const HomeworkSettingsCard = ({ post }: HomeworkSettingsCardProps) => {
 
   if (!assignment) return null;
 
-  const {
-    allowRetake,
-    showCorrectAnswers,
-    showScoreImmediately,
-    maxSubmissions,
-    passingScore,
-    availableFrom,
-    availableUntil,
-  } = assignment;
+  const { allowRetake, showCorrectAnswers, maxSubmissions, passingScore, availableFrom, availableUntil } =
+    assignment;
 
   const hasSettings =
     allowRetake !== undefined ||
     showCorrectAnswers !== undefined ||
-    showScoreImmediately !== undefined ||
     maxSubmissions !== undefined ||
     passingScore !== undefined ||
     availableFrom !== undefined ||
@@ -90,18 +82,6 @@ export const HomeworkSettingsCard = ({ post }: HomeworkSettingsCardProps) => {
             <BooleanChip
               value={showCorrectAnswers}
               label={showCorrectAnswers ? t('feed.homeworkSettings.yes') : t('feed.homeworkSettings.no')}
-            />
-          </SettingItem>
-        )}
-
-        {showScoreImmediately !== undefined && (
-          <SettingItem
-            icon={Zap}
-            label={t('feed.creator.assignmentSettings.displaySettings.showScoreImmediately')}
-          >
-            <BooleanChip
-              value={showScoreImmediately}
-              label={showScoreImmediately ? t('feed.homeworkSettings.yes') : t('feed.homeworkSettings.no')}
             />
           </SettingItem>
         )}

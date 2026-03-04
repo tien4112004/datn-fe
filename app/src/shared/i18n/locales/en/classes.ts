@@ -1139,8 +1139,6 @@ export default {
           shuffleQuestionsDescription: 'Randomize question order for each student',
           showCorrectAnswers: 'Show Correct Answers',
           showCorrectAnswersDescription: 'Students can see correct answers after submission',
-          showScoreImmediately: 'Show Score Immediately',
-          showScoreImmediatelyDescription: 'Display score right after submission',
         },
         submissionSettings: {
           allowRetakes: 'Allow Retakes',

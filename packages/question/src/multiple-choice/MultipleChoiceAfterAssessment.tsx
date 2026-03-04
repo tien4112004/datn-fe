@@ -12,6 +12,7 @@ interface MultipleChoiceAfterAssessmentProps {
   points?: number; // Points allocated for this question in the assignment
   grade?: Grade; // Grade for this question
   hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
+  showCorrectAnswers?: boolean; // Whether to reveal correct answers (default: true)
 }
 
 export const MultipleChoiceAfterAssessment = ({
@@ -20,6 +21,7 @@ export const MultipleChoiceAfterAssessment = ({
   points = 0,
   grade,
   hideHeader = false,
+  showCorrectAnswers = true,
 }: MultipleChoiceAfterAssessmentProps) => {
   const { t } = useTranslation('questions');
   const selectedOption = answer
@@ -38,7 +40,7 @@ export const MultipleChoiceAfterAssessment = ({
       </div>
 
       {/* Grade Feedback */}
-      {!hideHeader && (
+      {!hideHeader && showCorrectAnswers && (
         <GradeFeedback
           grade={grade}
           maxPoints={points}
@@ -52,21 +54,24 @@ export const MultipleChoiceAfterAssessment = ({
         {question.data.options.map((option, index) => {
           const isSelected = answer ? option.id === answer.selectedOptionId : false;
           const isCorrectOption = option.isCorrect;
+          const showAsCorrect = showCorrectAnswers && isCorrectOption;
+          const showAsWrong = showCorrectAnswers && isSelected && !isCorrectOption;
 
           return (
             <div
               key={option.id}
               className={cn(
                 'flex items-center gap-3 rounded-md border px-3 py-1.5',
-                isCorrectOption && 'border-green-200 bg-green-50 dark:bg-green-900/20',
-                isSelected && !isCorrectOption && 'border-red-200 bg-red-50 dark:bg-red-900/20'
+                showAsCorrect && 'border-green-200 bg-green-50 dark:bg-green-900/20',
+                showAsWrong && 'border-red-200 bg-red-50 dark:bg-red-900/20',
+                !showCorrectAnswers && isSelected && 'border-blue-200 bg-blue-50 dark:bg-blue-900/20'
               )}
             >
               <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center">
-                {isCorrectOption && <CheckCircle2 className="h-5 w-5 text-green-600" />}
-                {isSelected && !isCorrectOption && <XCircle className="h-5 w-5 text-red-600" />}
-                {!isSelected && !isCorrectOption && (
-                  <div className="bg-muted flex h-6 w-6 items-center justify-center rounded-full text-sm">
+                {showAsCorrect && <CheckCircle2 className="h-5 w-5 text-green-600" />}
+                {showAsWrong && <XCircle className="h-5 w-5 text-red-600" />}
+                {!showAsCorrect && !showAsWrong && (
+                  <div className={cn('flex h-6 w-6 items-center justify-center rounded-full text-sm', isSelected ? 'bg-blue-600 text-white' : 'bg-muted')}>
                     {String.fromCharCode(65 + index)}
                   </div>
                 )}
@@ -87,7 +92,7 @@ export const MultipleChoiceAfterAssessment = ({
       </div>
 
       {/* Explanation */}
-      {question.explanation && (
+      {showCorrectAnswers && question.explanation && (
         <div className="bg-muted/50 rounded-md p-4">
           <h4 className="mb-2 font-semibold">{t('common.explanation')}:</h4>
           <MarkdownPreview content={question.explanation} />

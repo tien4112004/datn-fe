@@ -93,9 +93,7 @@ export const SubmissionResultPage = () => {
   );
 
   const isGraded = submission?.status === 'graded';
-  const showScore = isGraded || assignment?.showScoreImmediately !== false;
   const showCorrectAnswers = isGraded || assignment?.showCorrectAnswers !== false;
-  const questionViewMode = showCorrectAnswers ? VIEW_MODE.AFTER_ASSESSMENT : VIEW_MODE.VIEWING;
   const passed =
     assignment?.passingScore !== undefined && submission?.score !== undefined && submission?.maxScore
       ? percentage >= assignment.passingScore
@@ -161,17 +159,15 @@ export const SubmissionResultPage = () => {
         </Button>
         <h1 className="truncate text-lg font-semibold">{assignment.title}</h1>
         <div className="mt-2 flex items-center gap-4">
-          {showScore && submission.score !== undefined && submission.maxScore !== undefined ? (
+          {submission.score !== undefined && submission.maxScore !== undefined ? (
             <>
               <span className={`text-2xl font-bold ${getScoreColor(submission.score, submission.maxScore)}`}>
                 {submission.score}/{submission.maxScore}
               </span>
               <span className="text-muted-foreground text-sm">({percentage}%)</span>
             </>
-          ) : showScore ? (
-            <span className="text-muted-foreground text-sm">{t('notGraded')}</span>
           ) : (
-            <span className="text-muted-foreground text-sm">{t('scoreHidden')}</span>
+            <span className="text-muted-foreground text-sm">{t('notGraded')}</span>
           )}
         </div>
       </div>
@@ -194,9 +190,9 @@ export const SubmissionResultPage = () => {
 
         {/* Score Card */}
         <div
-          className={`m-6 rounded-lg border p-6 ${showScore && submission.score !== undefined && submission.maxScore !== undefined ? getScoreBgColor(submission.score, submission.maxScore) : 'bg-gray-50 dark:bg-gray-950/20'}`}
+          className={`m-6 rounded-lg border p-6 ${submission.score !== undefined && submission.maxScore !== undefined ? getScoreBgColor(submission.score, submission.maxScore) : 'bg-gray-50 dark:bg-gray-950/20'}`}
         >
-          {showScore && submission.score !== undefined && submission.maxScore !== undefined ? (
+          {submission.score !== undefined && submission.maxScore !== undefined ? (
             <>
               <div className="mb-4 flex items-center justify-center">
                 <div
@@ -236,15 +232,10 @@ export const SubmissionResultPage = () => {
                 )}
               </div>
             </>
-          ) : showScore ? (
+          ) : (
             <div className="mb-4 py-4 text-center">
               <p className="text-muted-foreground font-medium">{t('notGraded')}</p>
               <p className="text-muted-foreground mt-1 text-xs">{t('pendingGrading')}</p>
-            </div>
-          ) : (
-            <div className="mb-4 py-4 text-center">
-              <p className="text-muted-foreground text-sm">{t('scoreHidden')}</p>
-              <p className="text-muted-foreground mt-1 text-xs">{t('scoreHiddenDesc')}</p>
             </div>
           )}
 
@@ -314,13 +305,15 @@ export const SubmissionResultPage = () => {
                       'flex h-10 min-w-[40px] items-center justify-center rounded-lg border-2 text-sm font-medium transition-colors',
                       isCurrent
                         ? 'border-blue-600 bg-blue-600 text-white'
-                        : isCorrect
+                        : showCorrectAnswers && isCorrect
                           ? 'border-green-600 bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300'
-                          : 'border-yellow-600 bg-yellow-50 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300'
+                          : showCorrectAnswers && !isCorrect && grade
+                            ? 'border-yellow-600 bg-yellow-50 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300'
+                            : 'border-gray-300 bg-gray-50 text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300'
                     )}
                   >
                     {index + 1}
-                    {!isCurrent && (
+                    {!isCurrent && showCorrectAnswers && (
                       <>
                         {isCorrect ? (
                           <CheckCircle2 className="ml-1 h-3 w-3" />
@@ -361,11 +354,12 @@ export const SubmissionResultPage = () => {
                     <div className="rounded-lg border bg-white p-6 dark:bg-gray-900">
                       <QuestionRenderer
                         question={currentQuestion.question as Question}
-                        viewMode={questionViewMode}
+                        viewMode={VIEW_MODE.AFTER_ASSESSMENT}
                         answer={answer}
                         points={currentQuestion.points}
                         grade={grade}
                         number={currentQuestionIndex + 1}
+                        showCorrectAnswers={showCorrectAnswers}
                       />
                     </div>
                   </div>

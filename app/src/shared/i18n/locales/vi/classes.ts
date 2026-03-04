@@ -1161,6 +1161,11 @@ export default {
         },
       },
     },
+    homeworkSettings: {
+      title: 'Cài đặt',
+      yes: 'Có',
+      no: 'Không',
+    },
     resourceSelector: {
       title: 'Liên Kết Tài Nguyên',
       searchPlaceholder: 'Tìm kiếm tài nguyên...',
@@ -1334,6 +1339,7 @@ export default {
       continue: 'Tiếp tục',
       retake: 'Làm lại',
       viewResult: 'Xem kết quả',
+      viewSubmission: 'Xem bài nộp',
       pending: 'Đang chờ',
     },
     score: 'Điểm:',

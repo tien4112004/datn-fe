@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@ui/button';
 import { useSubmissionsByPost } from '@/features/assignment/hooks';
+import { useAssignmentByPost } from '@/features/assignment/hooks/useAssignmentApi';
 import { useAuth } from '@/context/auth';
 import { useFormattedDistance } from '@/shared/lib/date-utils';
 import type { Submission } from '@aiprimary/core';
@@ -29,7 +30,11 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
   const { t } = useTranslation('classes', { keyPrefix: 'studentAssignmentActions' });
   const { formatDistanceToNow } = useFormattedDistance();
   const { data: submissions = [] } = useSubmissionsByPost(postId);
+  const { data: assignment } = useAssignmentByPost(postId);
   const [showHistory, setShowHistory] = useState(false);
+
+  const allowRetake = assignment?.allowRetake !== false; // Default true if not set
+  const maxSubmissions = assignment?.maxSubmissions;
 
   // Find current student's submissions
   const mySubmissions = useMemo(() => {
@@ -150,12 +155,21 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
               </Button>
             )}
 
-            {status === 'submitted' && (
-              <Button onClick={handleStartAssignment} size="sm" variant="outline">
-                <PlayCircle className="mr-2 h-4 w-4" />
-                {t('actions.retake')}
+            {status === 'submitted' && mySubmissions.length === 1 && (
+              <Button onClick={handleViewResult} size="sm" variant="outline">
+                <Eye className="mr-2 h-4 w-4" />
+                {t('actions.viewSubmission')}
               </Button>
             )}
+
+            {status === 'submitted' &&
+              allowRetake &&
+              (!maxSubmissions || mySubmissions.length < maxSubmissions) && (
+                <Button onClick={handleStartAssignment} size="sm" variant="outline">
+                  <PlayCircle className="mr-2 h-4 w-4" />
+                  {t('actions.retake')}
+                </Button>
+              )}
 
             {status === 'graded' && (
               <>
@@ -163,9 +177,11 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
                   <CheckCircle2 className="mr-2 h-4 w-4" />
                   {t('actions.viewResult')}
                 </Button>
-                <Button onClick={handleStartAssignment} size="sm" variant="outline">
-                  {t('actions.retake')}
-                </Button>
+                {allowRetake && (!maxSubmissions || mySubmissions.length < maxSubmissions) && (
+                  <Button onClick={handleStartAssignment} size="sm" variant="outline">
+                    {t('actions.retake')}
+                  </Button>
+                )}
               </>
             )}
 
@@ -207,7 +223,7 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
                       </span>
                     );
                   }
-                  if (s.status === 'submitted') {
+                  if (s.status === 'submitted' || s.status === 'pending') {
                     return (
                       <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
                         <FileCheck className="h-3 w-3" />
@@ -282,14 +298,23 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
                       )}
                     </TableCell>
                     <TableCell className="text-right">
-                      {submission.status === 'graded' ? (
+                      {submission.status === 'graded' ||
+                      submission.status === 'submitted' ||
+                      submission.status === 'pending' ? (
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => navigate(`/student/submissions/${submission.id}/result`)}
                         >
                           <Eye className="mr-2 h-4 w-4" />
-                          {t('actions.viewResult')}
+                          {submission.status === 'graded'
+                            ? t('actions.viewResult')
+                            : t('actions.viewSubmission')}
+                        </Button>
+                      ) : submission.status === 'in_progress' ? (
+                        <Button variant="outline" size="sm" onClick={handleStartAssignment}>
+                          <PlayCircle className="mr-2 h-4 w-4" />
+                          {t('actions.continue')}
                         </Button>
                       ) : (
                         <Button variant="outline" size="sm" disabled>

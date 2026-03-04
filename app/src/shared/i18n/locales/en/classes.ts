@@ -1160,6 +1160,11 @@ export default {
         },
       },
     },
+    homeworkSettings: {
+      title: 'Settings',
+      yes: 'Yes',
+      no: 'No',
+    },
     resourceSelector: {
       title: 'Link Resources',
       searchPlaceholder: 'Search resources...',
@@ -1333,6 +1338,7 @@ export default {
       continue: 'Continue',
       retake: 'Retake',
       viewResult: 'View Result',
+      viewSubmission: 'View Submission',
       pending: 'Pending',
     },
     score: 'Score:',

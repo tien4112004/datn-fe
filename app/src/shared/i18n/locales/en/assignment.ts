@@ -1574,6 +1574,12 @@ export default {
       youEarned: 'You earned:',
       teacherFeedback: 'Teacher Feedback',
       overallFeedback: 'Overall Feedback from Teacher',
+      passed: 'Passed',
+      failed: 'Not passed',
+      scoreHidden: 'Score not available yet',
+      scoreHiddenDesc: 'Score will be shown after grading',
+      yourSubmission: 'Your Submission',
+      pendingGrading: 'Waiting to be graded by teacher',
     },
 
     // Assignment doing page (student doing assignment)

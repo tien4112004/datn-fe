@@ -58,6 +58,14 @@ export default class ClassFeedService implements ClassFeedApiService {
       assignmentId: request.assignmentId,
       dueDate: request.dueDate,
       allowComments: request.allowComments,
+      shuffleQuestions: request.shuffleQuestions,
+      showCorrectAnswers: request.showCorrectAnswers,
+      showScoreImmediately: request.showScoreImmediately,
+      allowRetake: request.allowRetake,
+      maxSubmissions: request.maxSubmissions,
+      passingScore: request.passingScore,
+      availableFrom: request.availableFrom,
+      availableUntil: request.availableUntil,
     };
 
     const response = await this.apiClient.post<ApiResponse<Post>>(

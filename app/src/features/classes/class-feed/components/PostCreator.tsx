@@ -179,7 +179,7 @@ export const PostCreator = ({
       setAllowRetake(true);
       setShuffleQuestions(false);
       setShowCorrectAnswers(false);
-      setShowScoreImmediately(true);
+      setAutoGraded(true);
       setPassingScore(undefined);
       setAvailableFrom('');
       setAvailableUntil('');

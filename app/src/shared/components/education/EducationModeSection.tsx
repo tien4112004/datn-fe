@@ -18,7 +18,8 @@ interface EducationModeSectionProps<T extends Record<string, unknown>> {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const EducationModeSection = ({ control, setValue, ns, keyPrefix }: EducationModeSectionProps<any>) => {
-  const { t, i18n } = useTranslation(ns, { keyPrefix });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { t, i18n } = useTranslation(ns as any, { keyPrefix });
   const grades = getAllGrades();
   const subjects = getAllSubjects();
 

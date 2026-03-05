@@ -20,6 +20,9 @@ export interface Presentation {
   createdAt?: Date | string;
   updatedAt?: Date | string;
   permission?: Permission;
+  grade?: string;
+  subject?: string;
+  chapter?: string;
 }
 
 export interface PresentationCollectionRequest {

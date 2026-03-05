@@ -9,6 +9,7 @@ export default {
     general: 'Chung',
     appearance: 'Giao diện',
     devtools: 'DevTools',
+    aiPrompt: 'Câu lệnh AI',
   },
   profile: {
     title: 'Ảnh đại diện',
@@ -63,6 +64,25 @@ export default {
   language: {
     title: 'Ngôn ngữ',
     subtitle: 'Chọn ngôn ngữ ưa thích của bạn',
+  },
+  teacherSystemPrompt: {
+    title: 'Câu lệnh hệ thống AI',
+    subtitle: 'Tùy chỉnh hành vi AI cho tất cả các yêu cầu tạo nội dung của bạn',
+    label: 'Câu lệnh hệ thống',
+    placeholder:
+      'Ví dụ: Luôn sử dụng ngôn ngữ đơn giản phù hợp với học sinh lớp 3. Ưu tiên câu ngắn và tránh thuật ngữ kỹ thuật.',
+    loading: 'Đang tải câu lệnh của bạn...',
+    save: 'Lưu câu lệnh',
+    saving: 'Đang lưu...',
+    delete: 'Xóa câu lệnh',
+    deleting: 'Đang xóa...',
+    success: 'Câu lệnh hệ thống đã được lưu thành công',
+    deleteSuccess: 'Câu lệnh hệ thống đã được xóa',
+    error: 'Không thể lưu câu lệnh hệ thống. Vui lòng thử lại.',
+    validation: {
+      required: 'Câu lệnh không được để trống',
+      maxLength: 'Câu lệnh không được vượt quá {{max}} ký tự',
+    },
   },
   devtools: {
     title: 'Phát triển',

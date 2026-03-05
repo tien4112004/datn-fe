@@ -6,6 +6,7 @@ import { PageContainer } from '@/shared/components/common/PageContainer';
 import { Separator } from '@ui/separator';
 import LanguageSettings from '../components/LanguageSettings';
 import ChangePasswordForm from '../components/ChangePasswordForm';
+import TeacherSystemPromptForm from '../components/TeacherSystemPromptForm';
 import UserProfilePage from '@/features/user/components/UserProfile';
 
 function SettingsPage() {
@@ -52,6 +53,24 @@ function SettingsPage() {
             </div>
             <div className="lg:col-span-2">
               <ChangePasswordForm />
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'ai-prompt',
+      value: 'ai-prompt',
+      label: t('tabs.aiPrompt'),
+      content: (
+        <div className="space-y-6 py-4">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <div className="lg:col-span-1">
+              <h3 className="text-lg font-medium">{t('teacherSystemPrompt.title')}</h3>
+              <p className="text-muted-foreground text-sm">{t('teacherSystemPrompt.subtitle')}</p>
+            </div>
+            <div className="lg:col-span-2">
+              <TeacherSystemPromptForm />
             </div>
           </div>
         </div>

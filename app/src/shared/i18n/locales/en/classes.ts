@@ -1148,6 +1148,8 @@ export default {
           maxSubmissionsDescription: 'Leave empty for unlimited attempts',
         },
         grading: {
+          autoGraded: 'Auto-grade Submissions',
+          autoGradedDescription: 'Automatically grade submissions using AI and answer keys',
           passingScore: 'Passing Score (%)',
           passingScorePlaceholder: 'None',
           passingScoreDescription: 'Minimum percentage to pass',

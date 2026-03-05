@@ -84,6 +84,7 @@ export const PostCreator = ({
   const [passingScore, setPassingScore] = useState<number | undefined>(undefined);
   const [availableFrom, setAvailableFrom] = useState<string>('');
   const [availableUntil, setAvailableUntil] = useState<string>('');
+  const [autoGraded, setAutoGraded] = useState(true);
   const [attachmentErrors, setAttachmentErrors] = useState<string[]>([]);
 
   // Sync type with initialType when it changes (e.g., when filter switches to Exercise)
@@ -158,6 +159,7 @@ export const PostCreator = ({
           passingScore,
           availableFrom: availableFrom || undefined,
           availableUntil: availableUntil || undefined,
+          autoGraded,
         }),
       };
 
@@ -422,6 +424,23 @@ export const PostCreator = ({
 
                   {/* Grading and Timing */}
                   <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <Label htmlFor="autoGraded" className="text-sm">
+                          {t('feed.creator.assignmentSettings.grading.autoGraded')}
+                        </Label>
+                        <p className="text-xs text-gray-500">
+                          {t('feed.creator.assignmentSettings.grading.autoGradedDescription')}
+                        </p>
+                      </div>
+                      <Switch
+                        id="autoGraded"
+                        checked={autoGraded}
+                        onCheckedChange={setAutoGraded}
+                        className="cursor-pointer"
+                      />
+                    </div>
+
                     <div>
                       <Label htmlFor="passingScore" className="text-xs text-gray-600">
                         {t('feed.creator.assignmentSettings.grading.passingScore')}

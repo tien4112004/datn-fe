@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Settings2, Eye, RefreshCw, Hash, Trophy, Calendar } from 'lucide-react';
+import { Settings2, Eye, RefreshCw, Hash, Trophy, Calendar, Bot } from 'lucide-react';
 import { useAssignmentByPost } from '@/features/assignment';
 import type { Post } from '../types';
 
@@ -49,8 +49,15 @@ export const HomeworkSettingsCard = ({ post }: HomeworkSettingsCardProps) => {
 
   if (!assignment) return null;
 
-  const { allowRetake, showCorrectAnswers, maxSubmissions, passingScore, availableFrom, availableUntil } =
-    assignment;
+  const {
+    allowRetake,
+    showCorrectAnswers,
+    maxSubmissions,
+    passingScore,
+    availableFrom,
+    availableUntil,
+    autoGraded,
+  } = assignment;
 
   const hasSettings =
     allowRetake !== undefined ||
@@ -58,7 +65,8 @@ export const HomeworkSettingsCard = ({ post }: HomeworkSettingsCardProps) => {
     maxSubmissions !== undefined ||
     passingScore !== undefined ||
     availableFrom !== undefined ||
-    availableUntil !== undefined;
+    availableUntil !== undefined ||
+    autoGraded !== undefined;
 
   if (!hasSettings) return null;
 
@@ -70,6 +78,15 @@ export const HomeworkSettingsCard = ({ post }: HomeworkSettingsCardProps) => {
       </div>
 
       <div className="space-y-2">
+        {autoGraded !== undefined && (
+          <SettingItem icon={Bot} label={t('feed.creator.assignmentSettings.grading.autoGraded')}>
+            <BooleanChip
+              value={autoGraded}
+              label={autoGraded ? t('feed.homeworkSettings.yes') : t('feed.homeworkSettings.no')}
+            />
+          </SettingItem>
+        )}
+
         {showCorrectAnswers !== undefined && (
           <SettingItem
             icon={Eye}

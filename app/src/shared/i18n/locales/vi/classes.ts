@@ -1149,6 +1149,8 @@ export default {
           maxSubmissionsDescription: 'Để trống để không giới hạn số lần làm',
         },
         grading: {
+          autoGraded: 'Tự động chấm bài',
+          autoGradedDescription: 'Tự động chấm điểm bài nộp bằng AI và đáp án',
           passingScore: 'Điểm đạt (%)',
           passingScorePlaceholder: 'Không có',
           passingScoreDescription: 'Phần trăm tối thiểu để đạt',

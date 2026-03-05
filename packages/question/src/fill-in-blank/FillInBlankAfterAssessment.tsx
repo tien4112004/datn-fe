@@ -12,6 +12,7 @@ interface FillInBlankAfterAssessmentProps {
   points?: number; // Points allocated for this question in the assignment
   grade?: Grade; // Grade for this question
   hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
+  showCorrectAnswers?: boolean; // Whether to reveal correct answers (default: true)
 }
 
 export const FillInBlankAfterAssessment = ({
@@ -20,6 +21,7 @@ export const FillInBlankAfterAssessment = ({
   points = 0,
   grade,
   hideHeader = false,
+  showCorrectAnswers = true,
 }: FillInBlankAfterAssessmentProps) => {
   const { t } = useTranslation('questions');
   const blankSegments = question.data.segments.filter((s) => s.type === 'BLANK');
@@ -62,7 +64,7 @@ export const FillInBlankAfterAssessment = ({
       )}
 
       {/* Grade Feedback */}
-      {!hideHeader && (
+      {!hideHeader && showCorrectAnswers && (
         <GradeFeedback grade={grade} maxPoints={points} autoScore={score} isAutoCorrect={isFullyCorrect} />
       )}
 
@@ -85,12 +87,14 @@ export const FillInBlankAfterAssessment = ({
               <span
                 className={cn(
                   'inline-flex items-center gap-1 rounded px-2 py-1 font-mono',
-                  result.isCorrect
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-100'
-                    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-100'
+                  showCorrectAnswers
+                    ? result.isCorrect
+                      ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-100'
+                      : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-100'
+                    : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-100'
                 )}
               >
-                {result.isCorrect ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+                {showCorrectAnswers && (result.isCorrect ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />)}
                 <span>{result.studentAnswer || t('fillInBlank.afterAssessment.empty')}</span>
               </span>
             </span>
@@ -99,27 +103,29 @@ export const FillInBlankAfterAssessment = ({
       </div>
 
       {/* Correct Answers */}
-      <div className="space-y-2">
-        <h4 className="font-semibold">{t('fillInBlank.afterAssessment.correctAnswers')}</h4>
-        <div className="rounded-md border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
-          <div className="font-mono text-sm leading-relaxed">
-            {question.data.segments.map((segment) => (
-              <span key={segment.id}>
-                {segment.type === 'TEXT' ? (
-                  segment.content
-                ) : (
-                  <span className="mx-1 inline-block rounded bg-green-200 px-2 py-1 font-semibold dark:bg-green-800">
-                    {segment.content}
-                  </span>
-                )}
-              </span>
-            ))}
+      {showCorrectAnswers && (
+        <div className="space-y-2">
+          <h4 className="font-semibold">{t('fillInBlank.afterAssessment.correctAnswers')}</h4>
+          <div className="rounded-md border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
+            <div className="font-mono text-sm leading-relaxed">
+              {question.data.segments.map((segment) => (
+                <span key={segment.id}>
+                  {segment.type === 'TEXT' ? (
+                    segment.content
+                  ) : (
+                    <span className="mx-1 inline-block rounded bg-green-200 px-2 py-1 font-semibold dark:bg-green-800">
+                      {segment.content}
+                    </span>
+                  )}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Explanation */}
-      <ExplanationSection mode="afterAssessment" explanation={question.explanation} />
+      {showCorrectAnswers && <ExplanationSection mode="afterAssessment" explanation={question.explanation} />}
     </div>
   );
 };

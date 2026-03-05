@@ -7,6 +7,7 @@ import { PageContainer } from '@/shared/components/common/PageContainer';
 import { usePost, useDeletePost, usePinPost } from '../hooks/useApi';
 import { PostCard } from '../components/PostCard';
 import { CommentThread } from '../components/CommentThread';
+import { HomeworkSettingsCard } from '../components/HomeworkSettingsCard';
 import { SubmissionStatistics } from '../components/SubmissionStatistics';
 import { StudentAssignmentActions } from '../components/StudentAssignmentActions';
 import { usePostPermissions } from '../hooks/usePostPermissions';
@@ -115,6 +116,9 @@ export const PostDetailPage = () => {
         onPin={handlePin}
         onComment={() => setShowComments(true)}
       />
+
+      {/* Homework Settings (Exercise posts only) */}
+      {post.type === 'Exercise' && <HomeworkSettingsCard post={post} />}
 
       {/* Student Assignment Actions (Students only, Exercise posts only) */}
       {!isTeacher && post.type === 'Exercise' && post.assignmentId && (

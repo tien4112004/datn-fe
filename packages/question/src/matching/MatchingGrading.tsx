@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { MatchingQuestion, MatchingAnswer } from '@aiprimary/core';
 import { MarkdownPreview, QuestionTitle } from '../shared';
@@ -25,9 +25,6 @@ export const MatchingGrading = ({
   const { t } = useTranslation('questions');
   const { t: tGrading } = useTranslation('questions', { keyPrefix: 'submissionsGrading' });
 
-  const [awardedPoints, setAwardedPoints] = useState<number>(grade?.points ?? 0);
-  const [feedback, setFeedback] = useState<string>(grade?.feedback || '');
-
   // Calculate score: each correct match gets equal points
   const pointsPerPair = points / question.data.pairs.length;
   let correctMatches = 0;
@@ -44,6 +41,14 @@ export const MatchingGrading = ({
   });
 
   const autoScore = correctMatches * pointsPerPair;
+
+  const [awardedPoints, setAwardedPoints] = useState<number>(grade?.points ?? autoScore);
+  const [feedback, setFeedback] = useState<string>(grade?.feedback || '');
+
+  useEffect(() => {
+    onGradeChange?.({ points: awardedPoints, feedback });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const isMatchCorrect = (leftId: string, rightId: string) => {
     // A match is correct if both IDs belong to the same pair

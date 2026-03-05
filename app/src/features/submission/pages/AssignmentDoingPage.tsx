@@ -225,12 +225,8 @@ export const AssignmentDoingPage = () => {
   }, [currentQuestionId, questionGroups]);
 
   const handleSubmitAttempt = useCallback(() => {
-    if (!allQuestionsAnswered) {
-      toast.warning(t('answerAllQuestions'));
-      return;
-    }
     setShowSubmitDialog(true);
-  }, [allQuestionsAnswered, t]);
+  }, []);
 
   const handleSubmitConfirm = useCallback(async () => {
     if (!postId) {
@@ -586,6 +582,14 @@ export const AssignmentDoingPage = () => {
               <span className="text-muted-foreground">{t('submitDialog.totalPoints')}</span>
               <span className="font-medium">{totalPoints}</span>
             </div>
+            {!allQuestionsAnswered && (
+              <div className="flex items-start gap-2 rounded bg-yellow-100 px-3 py-2 text-xs text-yellow-800 dark:bg-yellow-950 dark:text-yellow-200">
+                <AlertCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+                <span>
+                  {t('submitDialog.unansweredWarning', { count: questions.length - answeredCount })}
+                </span>
+              </div>
+            )}
             {!postId && (
               <div className="rounded bg-yellow-100 px-3 py-2 text-xs text-yellow-800 dark:bg-yellow-950 dark:text-yellow-200">
                 {t('submitDialog.previewMode')}

@@ -92,6 +92,13 @@ export const SubmissionResultPage = () => {
     [submission?.maxScore, submission?.score]
   );
 
+  const isGraded = submission?.status === 'graded';
+  const showCorrectAnswers = isGraded || assignment?.showCorrectAnswers !== false;
+  const passed =
+    assignment?.passingScore !== undefined && submission?.score !== undefined && submission?.maxScore
+      ? percentage >= assignment.passingScore
+      : null;
+
   const totalPoints = useMemo(
     () => assignment?.totalPoints || questions.reduce((sum, q) => sum + (q.points || 0), 0),
     [assignment?.totalPoints, questions]
@@ -152,15 +159,15 @@ export const SubmissionResultPage = () => {
         </Button>
         <h1 className="truncate text-lg font-semibold">{assignment.title}</h1>
         <div className="mt-2 flex items-center gap-4">
-          <span
-            className={`text-2xl font-bold ${submission.score !== undefined && submission.maxScore !== undefined ? getScoreColor(submission.score, submission.maxScore) : ''}`}
-          >
-            {submission.score !== undefined && submission.maxScore !== undefined
-              ? `${submission.score}/${submission.maxScore}`
-              : t('notGraded')}
-          </span>
-          {submission.score !== undefined && (
-            <span className="text-muted-foreground text-sm">({percentage}%)</span>
+          {submission.score !== undefined && submission.maxScore !== undefined ? (
+            <>
+              <span className={`text-2xl font-bold ${getScoreColor(submission.score, submission.maxScore)}`}>
+                {submission.score}/{submission.maxScore}
+              </span>
+              <span className="text-muted-foreground text-sm">({percentage}%)</span>
+            </>
+          ) : (
+            <span className="text-muted-foreground text-sm">{t('notGraded')}</span>
           )}
         </div>
       </div>
@@ -175,7 +182,9 @@ export const SubmissionResultPage = () => {
           </Button>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">{assignment.title}</h1>
-            <p className="text-muted-foreground mt-1 text-sm">{t('yourGradedSubmission')}</p>
+            <p className="text-muted-foreground mt-1 text-sm">
+              {isGraded ? t('yourGradedSubmission') : t('yourSubmission')}
+            </p>
           </div>
         </div>
 
@@ -183,34 +192,52 @@ export const SubmissionResultPage = () => {
         <div
           className={`m-6 rounded-lg border p-6 ${submission.score !== undefined && submission.maxScore !== undefined ? getScoreBgColor(submission.score, submission.maxScore) : 'bg-gray-50 dark:bg-gray-950/20'}`}
         >
-          <div className="mb-4 flex items-center justify-center">
-            <div
-              className={`flex h-24 w-24 items-center justify-center rounded-full ${
-                percentage >= 70 ? 'bg-green-600' : 'bg-red-600'
-              } text-white`}
-            >
-              <span className="text-3xl font-bold">{percentage}%</span>
-            </div>
-          </div>
+          {submission.score !== undefined && submission.maxScore !== undefined ? (
+            <>
+              <div className="mb-4 flex items-center justify-center">
+                <div
+                  className={`flex h-24 w-24 items-center justify-center rounded-full ${
+                    percentage >= 70 ? 'bg-green-600' : 'bg-red-600'
+                  } text-white`}
+                >
+                  <span className="text-3xl font-bold">{percentage}%</span>
+                </div>
+              </div>
 
-          <div className="mb-4 text-center">
-            <p
-              className={`text-3xl font-bold ${submission.score !== undefined && submission.maxScore !== undefined ? getScoreColor(submission.score, submission.maxScore) : ''}`}
-            >
-              {submission.score !== undefined && submission.maxScore !== undefined
-                ? `${submission.score}/${submission.maxScore}`
-                : t('notGraded')}
-            </p>
-            <p className="text-muted-foreground mt-1 text-sm">
-              {percentage >= 90
-                ? t('excellent')
-                : percentage >= 80
-                  ? t('greatJob')
-                  : percentage >= 70
-                    ? t('goodWork')
-                    : t('keepPracticing')}
-            </p>
-          </div>
+              <div className="mb-4 text-center">
+                <p className={`text-3xl font-bold ${getScoreColor(submission.score, submission.maxScore)}`}>
+                  {submission.score}/{submission.maxScore}
+                </p>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  {percentage >= 90
+                    ? t('excellent')
+                    : percentage >= 80
+                      ? t('greatJob')
+                      : percentage >= 70
+                        ? t('goodWork')
+                        : t('keepPracticing')}
+                </p>
+                {passed !== null && (
+                  <div className="mt-3 flex justify-center">
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold ${
+                        passed
+                          ? 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300'
+                          : 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300'
+                      }`}
+                    >
+                      {passed ? t('passed') : t('failed')}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="mb-4 py-4 text-center">
+              <p className="text-muted-foreground font-medium">{t('notGraded')}</p>
+              <p className="text-muted-foreground mt-1 text-xs">{t('pendingGrading')}</p>
+            </div>
+          )}
 
           <Separator className="my-4" />
 
@@ -248,12 +275,14 @@ export const SubmissionResultPage = () => {
               </span>
             </div>
           )}
-          <div className="text-muted-foreground flex items-center gap-2">
-            <User className="h-4 w-4" />
-            <span>
-              {t('gradedBy')} {teacher.firstName} {teacher.lastName}
-            </span>
-          </div>
+          {isGraded && submission.gradedBy && (
+            <div className="text-muted-foreground flex items-center gap-2">
+              <User className="h-4 w-4" />
+              <span>
+                {t('gradedBy')} {teacher.firstName} {teacher.lastName}
+              </span>
+            </div>
+          )}
         </div>
       </aside>
 
@@ -276,13 +305,15 @@ export const SubmissionResultPage = () => {
                       'flex h-10 min-w-[40px] items-center justify-center rounded-lg border-2 text-sm font-medium transition-colors',
                       isCurrent
                         ? 'border-blue-600 bg-blue-600 text-white'
-                        : isCorrect
+                        : showCorrectAnswers && isCorrect
                           ? 'border-green-600 bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300'
-                          : 'border-yellow-600 bg-yellow-50 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300'
+                          : showCorrectAnswers && !isCorrect && grade
+                            ? 'border-yellow-600 bg-yellow-50 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300'
+                            : 'border-gray-300 bg-gray-50 text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300'
                     )}
                   >
                     {index + 1}
-                    {!isCurrent && (
+                    {!isCurrent && showCorrectAnswers && (
                       <>
                         {isCorrect ? (
                           <CheckCircle2 className="ml-1 h-3 w-3" />
@@ -328,6 +359,7 @@ export const SubmissionResultPage = () => {
                         points={currentQuestion.points}
                         grade={grade}
                         number={currentQuestionIndex + 1}
+                        showCorrectAnswers={showCorrectAnswers}
                       />
                     </div>
                   </div>

@@ -81,10 +81,10 @@ export const PostCreator = ({
   const [allowRetake, setAllowRetake] = useState(true);
   const [shuffleQuestions, setShuffleQuestions] = useState(false);
   const [showCorrectAnswers, setShowCorrectAnswers] = useState(false);
-  const [showScoreImmediately, setShowScoreImmediately] = useState(true);
   const [passingScore, setPassingScore] = useState<number | undefined>(undefined);
   const [availableFrom, setAvailableFrom] = useState<string>('');
   const [availableUntil, setAvailableUntil] = useState<string>('');
+  const [autoGrade, setAutoGrade] = useState(true);
   const [attachmentErrors, setAttachmentErrors] = useState<string[]>([]);
 
   // Sync type with initialType when it changes (e.g., when filter switches to Exercise)
@@ -156,10 +156,10 @@ export const PostCreator = ({
           allowRetake,
           shuffleQuestions,
           showCorrectAnswers,
-          showScoreImmediately,
           passingScore,
           availableFrom: availableFrom || undefined,
           availableUntil: availableUntil || undefined,
+          autoGrade,
         }),
       };
 
@@ -179,7 +179,7 @@ export const PostCreator = ({
       setAllowRetake(true);
       setShuffleQuestions(false);
       setShowCorrectAnswers(false);
-      setShowScoreImmediately(true);
+      setAutoGrade(true);
       setPassingScore(undefined);
       setAvailableFrom('');
       setAvailableUntil('');
@@ -372,25 +372,6 @@ export const PostCreator = ({
                         className="cursor-pointer"
                       />
                     </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <Label htmlFor="showScore" className="text-sm">
-                          {t('feed.creator.assignmentSettings.displaySettings.showScoreImmediately')}
-                        </Label>
-                        <p className="text-xs text-gray-500">
-                          {t(
-                            'feed.creator.assignmentSettings.displaySettings.showScoreImmediatelyDescription'
-                          )}
-                        </p>
-                      </div>
-                      <Switch
-                        id="showScore"
-                        checked={showScoreImmediately}
-                        onCheckedChange={setShowScoreImmediately}
-                        className="cursor-pointer"
-                      />
-                    </div>
                   </div>
 
                   <Separator />
@@ -443,6 +424,23 @@ export const PostCreator = ({
 
                   {/* Grading and Timing */}
                   <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <Label htmlFor="autoGrade" className="text-sm">
+                          {t('feed.creator.assignmentSettings.grading.autoGrade')}
+                        </Label>
+                        <p className="text-xs text-gray-500">
+                          {t('feed.creator.assignmentSettings.grading.autoGradeDescription')}
+                        </p>
+                      </div>
+                      <Switch
+                        id="autoGrade"
+                        checked={autoGrade}
+                        onCheckedChange={setAutoGrade}
+                        className="cursor-pointer"
+                      />
+                    </div>
+
                     <div>
                       <Label htmlFor="passingScore" className="text-xs text-gray-600">
                         {t('feed.creator.assignmentSettings.grading.passingScore')}

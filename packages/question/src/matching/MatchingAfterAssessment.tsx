@@ -12,6 +12,7 @@ interface MatchingAfterAssessmentProps {
   points?: number; // Points allocated for this question in the assignment
   grade?: Grade; // Grade for this question
   hideHeader?: boolean; // Hide type label and difficulty badge when used as sub-question
+  showCorrectAnswers?: boolean; // Whether to reveal correct answers (default: true)
 }
 
 export const MatchingAfterAssessment = ({
@@ -20,6 +21,7 @@ export const MatchingAfterAssessment = ({
   points = 0,
   grade,
   hideHeader = false,
+  showCorrectAnswers = true,
 }: MatchingAfterAssessmentProps) => {
   const { t } = useTranslation('questions');
   const answerMap = new Map(answer?.matches.map((m) => [m.rightId, m.leftId]) || []);
@@ -55,7 +57,7 @@ export const MatchingAfterAssessment = ({
       </div>
 
       {/* Grade Feedback */}
-      {!hideHeader && (
+      {!hideHeader && showCorrectAnswers && (
         <GradeFeedback grade={grade} maxPoints={points} autoScore={score} isAutoCorrect={isFullyCorrect} />
       )}
 
@@ -67,20 +69,24 @@ export const MatchingAfterAssessment = ({
             key={result.correctPair.id}
             className={cn(
               'rounded-md border px-4 py-2',
-              result.isCorrect
+              showCorrectAnswers && result.isCorrect
                 ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
-                : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
+                : showCorrectAnswers && !result.isCorrect
+                  ? 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
+                  : 'border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/20'
             )}
           >
             <div className="flex items-center gap-3">
               {/* Result Icon */}
-              <div className="flex-shrink-0">
-                {result.isCorrect ? (
-                  <CheckCircle2 className="h-5 w-5 text-green-600" />
-                ) : (
-                  <XCircle className="h-5 w-5 text-red-600" />
-                )}
-              </div>
+              {showCorrectAnswers && (
+                <div className="flex-shrink-0">
+                  {result.isCorrect ? (
+                    <CheckCircle2 className="h-5 w-5 text-green-600" />
+                  ) : (
+                    <XCircle className="h-5 w-5 text-red-600" />
+                  )}
+                </div>
+              )}
 
               {/* Student's Match */}
               <div className="flex-1 space-y-2">
@@ -115,7 +121,7 @@ export const MatchingAfterAssessment = ({
                 </div>
 
                 {/* Show correct match if wrong */}
-                {!result.isCorrect && (
+                {showCorrectAnswers && !result.isCorrect && (
                   <div className="text-muted-foreground border-t pl-7 pt-2 text-sm">
                     <strong>{t('matching.afterAssessment.correctMatch')}</strong>
                     <div className="mt-1 inline-block rounded bg-white px-2 py-1 dark:bg-gray-900">
@@ -133,7 +139,7 @@ export const MatchingAfterAssessment = ({
       </div>
 
       {/* Explanation */}
-      {question.explanation && (
+      {showCorrectAnswers && question.explanation && (
         <div className="bg-muted/50 rounded-md px-4 py-2">
           <h4 className="mb-2 font-semibold">{t('common.explanation')}:</h4>
           <MarkdownPreview content={question.explanation} />

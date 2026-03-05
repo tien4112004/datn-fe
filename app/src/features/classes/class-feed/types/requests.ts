@@ -18,10 +18,10 @@ export interface PostCreateRequest {
   allowRetake?: boolean;
   shuffleQuestions?: boolean;
   showCorrectAnswers?: boolean;
-  showScoreImmediately?: boolean;
   passingScore?: number;
   availableFrom?: string;
   availableUntil?: string;
+  autoGrade?: boolean;
 }
 
 export interface PostUpdateRequest {

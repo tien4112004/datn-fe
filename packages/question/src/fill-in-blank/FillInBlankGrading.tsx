@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { FillInBlankQuestion, FillInBlankAnswer } from '@aiprimary/core';
 import { QuestionTitle } from '../shared';
@@ -24,9 +24,6 @@ export const FillInBlankGrading = ({
 }: FillInBlankGradingProps) => {
   const { t } = useTranslation('questions');
   const { t: tGrading } = useTranslation('questions', { keyPrefix: 'submissionsGrading' });
-
-  const [awardedPoints, setAwardedPoints] = useState<number>(grade?.points ?? 0);
-  const [feedback, setFeedback] = useState<string>(grade?.feedback || '');
 
   // Calculate score: each correct blank gets equal points
   const blankSegments = question.data.segments.filter((s) => s.type === 'BLANK');
@@ -70,6 +67,14 @@ export const FillInBlankGrading = ({
     }
   });
   const autoScore = correctBlanks * pointsPerBlank;
+
+  const [awardedPoints, setAwardedPoints] = useState<number>(grade?.points ?? autoScore);
+  const [feedback, setFeedback] = useState<string>(grade?.feedback || '');
+
+  useEffect(() => {
+    onGradeChange?.({ points: awardedPoints, feedback });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const getStudentAnswer = (segmentId: string): string => {
     const blank = answer?.blanks.find((b) => b.segmentId === segmentId);

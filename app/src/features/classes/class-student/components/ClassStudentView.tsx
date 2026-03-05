@@ -65,7 +65,7 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
               }`}
             >
               <List className="h-4 w-4" />
-              List
+              {t('students.listView')}
             </button>
             <button
               onClick={() => setViewMode('seating-chart')}
@@ -76,7 +76,7 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
               }`}
             >
               <LayoutGrid className="h-4 w-4" />
-              Chart
+              {t('students.seatingChartView')}
             </button>
           </div>
         </div>

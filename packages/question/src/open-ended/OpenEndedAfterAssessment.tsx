@@ -10,6 +10,7 @@ interface OpenEndedAfterAssessmentProps {
   answer?: OpenEndedAnswer;
   points?: number; // Points allocated for this question in the assignment
   grade?: Grade; // Grade for this question
+  showCorrectAnswers?: boolean; // Whether to reveal expected answer (default: true)
 }
 
 export const OpenEndedAfterAssessment = ({
@@ -17,6 +18,7 @@ export const OpenEndedAfterAssessment = ({
   answer,
   points = 0,
   grade,
+  showCorrectAnswers = true,
 }: OpenEndedAfterAssessmentProps) => {
   const { t } = useTranslation('questions');
 
@@ -64,7 +66,7 @@ export const OpenEndedAfterAssessment = ({
       </div>
 
       {/* Expected Answer (if provided) */}
-      {question.data.expectedAnswer && (
+      {showCorrectAnswers && question.data.expectedAnswer && (
         <div className="space-y-2">
           <h4 className="font-semibold">{t('common.expectedAnswer')}:</h4>
           <div className="rounded-md border border-blue-200 bg-blue-50 px-4 py-2 dark:border-blue-800 dark:bg-blue-900/20">
@@ -74,7 +76,7 @@ export const OpenEndedAfterAssessment = ({
       )}
 
       {/* Explanation */}
-      {question.explanation && (
+      {showCorrectAnswers && question.explanation && (
         <div className="bg-muted/50 rounded-md px-4 py-2">
           <h4 className="mb-2 font-semibold">{t('common.explanation')}:</h4>
           <MarkdownPreview content={question.explanation} />

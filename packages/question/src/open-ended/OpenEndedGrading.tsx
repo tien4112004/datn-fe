@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { OpenEndedQuestion, OpenEndedAnswer } from '@aiprimary/core';
 import { MarkdownPreview, QuestionTitle } from '../shared';
@@ -26,6 +26,11 @@ export const OpenEndedGrading = ({
 
   const [awardedPoints, setAwardedPoints] = useState<number>(grade?.points ?? 0);
   const [feedback, setFeedback] = useState<string>(grade?.feedback || '');
+
+  useEffect(() => {
+    onGradeChange?.({ points: awardedPoints, feedback });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="space-y-4">

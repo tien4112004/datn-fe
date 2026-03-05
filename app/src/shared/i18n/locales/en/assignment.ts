@@ -1574,6 +1574,10 @@ export default {
       youEarned: 'You earned:',
       teacherFeedback: 'Teacher Feedback',
       overallFeedback: 'Overall Feedback from Teacher',
+      passed: 'Passed',
+      failed: 'Not passed',
+      yourSubmission: 'Your Submission',
+      pendingGrading: 'Waiting to be graded by teacher',
     },
 
     // Assignment doing page (student doing assignment)
@@ -1599,6 +1603,7 @@ export default {
         totalQuestions: 'Total Questions:',
         answered: 'Answered:',
         totalPoints: 'Total Points:',
+        unansweredWarning: '{{count}} question(s) left unanswered. You can still submit.',
         previewMode: 'Preview mode: Access through class homework to submit',
       },
     },

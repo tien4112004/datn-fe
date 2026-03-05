@@ -97,8 +97,8 @@ export interface Assignment {
   maxSubmissions?: number;
   allowRetake?: boolean;
   showCorrectAnswers?: boolean;
-  showScoreImmediately?: boolean;
   passingScore?: number;
   availableFrom?: string;
   availableUntil?: string;
+  autoGrade?: boolean;
 }

@@ -1562,6 +1562,10 @@ export default {
       youEarned: 'Bạn đạt:',
       teacherFeedback: 'Nhận xét của giáo viên',
       overallFeedback: 'Nhận xét chung từ giáo viên',
+      passed: 'Đạt',
+      failed: 'Không đạt',
+      yourSubmission: 'Bài nộp của bạn',
+      pendingGrading: 'Đang chờ giáo viên chấm bài',
     },
 
     // Trang làm bài (học sinh làm bài)
@@ -1587,6 +1591,7 @@ export default {
         totalQuestions: 'Tổng số câu hỏi:',
         answered: 'Đã trả lời:',
         totalPoints: 'Tổng điểm:',
+        unansweredWarning: 'Còn {{count}} câu hỏi chưa được trả lời. Bạn vẫn có thể nộp bài.',
         previewMode: 'Chế độ xem trước: Truy cập qua bài tập của lớp để nộp',
       },
     },

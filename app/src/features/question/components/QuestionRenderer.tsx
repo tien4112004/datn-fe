@@ -52,6 +52,7 @@ interface QuestionRendererProps {
   validationErrors?: { errors: string[]; warnings: string[] }; // Validation errors for this question (EDITING mode)
   number?: number;
   compact?: boolean;
+  showCorrectAnswers?: boolean; // Whether to reveal correct answers (default: true)
 }
 
 export const QuestionRenderer = ({
@@ -69,6 +70,7 @@ export const QuestionRenderer = ({
   validationErrors,
   number,
   compact,
+  showCorrectAnswers = true,
 }: QuestionRendererProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'context' });
 
@@ -111,6 +113,7 @@ export const QuestionRenderer = ({
             answer={answer as any}
             points={points}
             grade={grade}
+            showCorrectAnswers={showCorrectAnswers}
           />
         );
       }
@@ -148,6 +151,7 @@ export const QuestionRenderer = ({
             answer={answer as any}
             points={points}
             grade={grade}
+            showCorrectAnswers={showCorrectAnswers}
           />
         );
       }
@@ -187,6 +191,7 @@ export const QuestionRenderer = ({
             answer={answer as any}
             points={points}
             grade={grade}
+            showCorrectAnswers={showCorrectAnswers}
           />
         );
       }
@@ -230,6 +235,7 @@ export const QuestionRenderer = ({
             answer={answer as any}
             points={points}
             grade={grade}
+            showCorrectAnswers={showCorrectAnswers}
           />
         );
       }

@@ -1139,8 +1139,6 @@ export default {
           shuffleQuestionsDescription: 'Randomize question order for each student',
           showCorrectAnswers: 'Show Correct Answers',
           showCorrectAnswersDescription: 'Students can see correct answers after submission',
-          showScoreImmediately: 'Show Score Immediately',
-          showScoreImmediatelyDescription: 'Display score right after submission',
         },
         submissionSettings: {
           allowRetakes: 'Allow Retakes',
@@ -1150,6 +1148,8 @@ export default {
           maxSubmissionsDescription: 'Leave empty for unlimited attempts',
         },
         grading: {
+          autoGrade: 'Auto-grade Submissions',
+          autoGradeDescription: 'Automatically grade submissions using AI and answer keys',
           passingScore: 'Passing Score (%)',
           passingScorePlaceholder: 'None',
           passingScoreDescription: 'Minimum percentage to pass',
@@ -1159,6 +1159,11 @@ export default {
           availableUntil: 'Available Until',
         },
       },
+    },
+    homeworkSettings: {
+      title: 'Settings',
+      yes: 'Yes',
+      no: 'No',
     },
     resourceSelector: {
       title: 'Link Resources',
@@ -1333,6 +1338,7 @@ export default {
       continue: 'Continue',
       retake: 'Retake',
       viewResult: 'View Result',
+      viewSubmission: 'View Submission',
       pending: 'Pending',
     },
     score: 'Score:',

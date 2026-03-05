@@ -5,7 +5,6 @@ import { CardTitle } from '@ui/card';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Controller } from 'react-hook-form';
-import { getAllGrades, getAllSubjects } from '@aiprimary/core';
 
 import { LANGUAGE_OPTIONS } from '@/features/presentation/types';
 import type { UnifiedFormData } from '@/features/presentation/contexts/PresentationFormContext';
@@ -18,9 +17,7 @@ interface AdvancedOptionsProps {
 }
 
 const AdvancedOptions = ({ control, isOpen, onToggle }: AdvancedOptionsProps) => {
-  const { t, i18n } = useTranslation('presentation', { keyPrefix: 'createOutline' });
-  const grades = getAllGrades();
-  const subjects = getAllSubjects();
+  const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
 
   const toggleOptions = () => {
     onToggle(!isOpen);
@@ -49,9 +46,9 @@ const AdvancedOptions = ({ control, isOpen, onToggle }: AdvancedOptionsProps) =>
             transition={{ type: 'spring', stiffness: 300, damping: 30, duration: 0.4 }}
             style={{ overflow: 'hidden' }}
           >
-            <div className="mt-4 px-1">
-              <div className="grid grid-cols-3 gap-4">
-                {/* Language */}
+            <div className="mt-4 space-y-4 px-1">
+              {/* Language */}
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>{t('language.label')}</Label>
                   <Controller
@@ -66,60 +63,6 @@ const AdvancedOptions = ({ control, isOpen, onToggle }: AdvancedOptionsProps) =>
                           {LANGUAGE_OPTIONS.map((opt) => (
                             <SelectItem key={opt.value} value={opt.value}>
                               {t(`language.${opt.labelKey.split('.')[1]}` as never)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </div>
-
-                {/* Grade */}
-                <div className="space-y-2">
-                  <Label>{t('grade.label')}</Label>
-                  <Controller
-                    name="grade"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        value={field.value || 'none'}
-                        onValueChange={(val) => field.onChange(val === 'none' ? '' : val)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder={t('grade.placeholder')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">{t('grade.none')}</SelectItem>
-                          {grades.map((g) => (
-                            <SelectItem key={g.code} value={g.code}>
-                              {i18n.language === 'vi' ? g.name : g.nameEn}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </div>
-
-                {/* Subject */}
-                <div className="space-y-2">
-                  <Label>{t('subject.label')}</Label>
-                  <Controller
-                    name="subject"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        value={field.value || 'none'}
-                        onValueChange={(val) => field.onChange(val === 'none' ? '' : val)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder={t('subject.placeholder')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">{t('subject.none')}</SelectItem>
-                          {subjects.map((s) => (
-                            <SelectItem key={s.code} value={s.code}>
-                              {s.name}
                             </SelectItem>
                           ))}
                         </SelectContent>

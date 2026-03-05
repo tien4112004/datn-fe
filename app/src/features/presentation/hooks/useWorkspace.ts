@@ -47,6 +47,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
       model: getValues().model,
       grade: getValues().grade || undefined,
       subject: getValues().subject || undefined,
+      chapter: getValues().chapter || undefined,
     },
     setOutlines,
     { manual: true }
@@ -83,6 +84,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
       model: data.model,
       grade: data.grade || undefined,
       subject: data.subject || undefined,
+      chapter: data.chapter || undefined,
     };
     restartStream(outlineData);
   }, [attachedFiles, getValues, trigger, restartStream]);
@@ -109,6 +111,9 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
         viewport: { width: 1000, height: 562.5 },
       },
       topic: data.topic,
+      grade: data.grade || undefined,
+      subject: data.subject || undefined,
+      chapter: data.chapter || undefined,
     };
     try {
       const result = await draftPresentation.mutateAsync(generationRequest);
@@ -120,6 +125,9 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
         slideCount: data.slideCount,
         language: data.language,
         topic: data.topic,
+        grade: data.grade || undefined,
+        subject: data.subject || undefined,
+        chapter: data.chapter || undefined,
 
         generationOptions: {
           // Default artStyle to empty string (allowed option) if not set

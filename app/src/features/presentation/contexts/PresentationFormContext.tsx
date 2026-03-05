@@ -38,8 +38,10 @@ export type UnifiedFormData = {
   // Image generation fields (optional)
   negativePrompt?: string;
   // Metadata fields (optional)
+  educationMode?: boolean;
   grade?: string;
   subject?: string;
+  chapter?: string;
 };
 
 interface PresentationFormContextValue {
@@ -103,9 +105,10 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
             provider: z.string().min(1),
           })
           .optional(),
-        negativePrompt: z.string().optional(),
+        educationMode: z.boolean().optional(),
         grade: z.string().max(50).optional(),
         subject: z.string().max(100).optional(),
+        chapter: z.string().max(255).optional(),
       }),
     []
   );
@@ -127,9 +130,10 @@ export const PresentationFormProvider = ({ children }: PresentationFormProviderP
         name: '',
         provider: '',
       },
-      negativePrompt: '',
+      educationMode: false,
       grade: '',
       subject: '',
+      chapter: '',
       ...persistedData,
     },
   });

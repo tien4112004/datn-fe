@@ -12,6 +12,7 @@ import ExamplePrompts from '@/features/projects/components/ExamplePrompts';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
 import ResourceTypeSwitcher from '@/features/projects/components/ResourceTypeSwitcher';
 import AdvancedOptions from './AdvancedOptions';
+import EducationModeSection from '@/shared/components/education/EducationModeSection';
 import { SLIDE_COUNT_OPTIONS } from '@/features/presentation/types';
 import { MODEL_TYPES, useModels } from '@/features/model';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
@@ -33,6 +34,7 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
     setValue,
     watch,
     trigger,
+    getValues,
     attachedFiles,
     setAttachedFiles,
     isUploadingFiles,
@@ -77,9 +79,16 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
     const hasFiles = attachedFiles.length > 0;
     if (!hasTopic && !hasFiles) return;
     const isValid = await trigger(['slideCount', 'language', 'model']);
-    if (isValid) {
-      onCreateOutline();
+    if (!isValid) return;
+
+    const values = getValues();
+    if (values.educationMode) {
+      if (!values.grade || !values.subject || !values.chapter) {
+        return;
+      }
     }
+
+    onCreateOutline();
   };
 
   return (
@@ -201,6 +210,7 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
               title={t('examples.title')}
             />
 
+            <EducationModeSection control={control} setValue={setValue} ns="presentation" keyPrefix="createOutline" />
             <AdvancedOptions control={control} isOpen={isAdvancedOpen} onToggle={toggleAdvancedOptions} />
           </CardContent>
         </Card>

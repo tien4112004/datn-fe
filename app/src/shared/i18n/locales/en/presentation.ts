@@ -61,6 +61,17 @@ export default {
       placeholder: 'Select subject',
       none: 'None',
     },
+    educationMode: {
+      label: 'Education Mode',
+      description: 'AI will use curriculum-aligned content for your grade, subject, and chapter.',
+    },
+    chapter: {
+      label: 'Chapter',
+      placeholder: 'Select chapter',
+      selectGradeSubjectFirst: 'Select grade & subject first',
+      loading: 'Loading chapters...',
+      noChapters: 'No chapters found',
+    },
     targetAge: {
       placeholder: 'For which age group?',
       label: 'Target Age',

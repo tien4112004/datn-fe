@@ -32,11 +32,17 @@ export interface PresentationGenerationRequest {
   presentation?: PresentationConfig;
   generationOptions?: ImageOptions;
   topic?: string;
+  grade?: string;
+  subject?: string;
+  chapter?: string;
 }
 
 export interface PresentationGenerateDraftRequest {
   presentation: PresentationConfig;
   topic?: string;
+  grade?: string;
+  subject?: string;
+  chapter?: string;
 }
 
 export interface PresentationGenerationResponse {

@@ -5,7 +5,6 @@ import { CardTitle } from '@ui/card';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Controller } from 'react-hook-form';
-import { getAllGrades, getAllSubjects } from '@aiprimary/core';
 
 import { LANGUAGE_OPTIONS, MAX_DEPTH_OPTIONS, MAX_BRANCHES_OPTIONS } from '@/features/mindmap/types/form';
 import type { CreateMindmapFormData } from '@/features/mindmap/types/form';
@@ -18,9 +17,7 @@ interface AdvancedOptionsProps {
 }
 
 const AdvancedOptions = ({ control, isOpen, onToggle }: AdvancedOptionsProps) => {
-  const { t, i18n } = useTranslation('mindmap', { keyPrefix: 'create' });
-  const grades = getAllGrades();
-  const subjects = getAllSubjects();
+  const { t } = useTranslation('mindmap', { keyPrefix: 'create' });
 
   const toggleOptions = () => {
     onToggle(!isOpen);
@@ -100,9 +97,8 @@ const AdvancedOptions = ({ control, isOpen, onToggle }: AdvancedOptionsProps) =>
                 </div>
               </div>
 
-              {/* 1x2 Grid for Max Branches and Grade */}
+              {/* Max Branches Per Node */}
               <div className="grid grid-cols-2 gap-4">
-                {/* Max Branches Per Node */}
                 <div className="space-y-2">
                   <Label>{t('maxBranches.label')}</Label>
                   <Controller
@@ -124,63 +120,6 @@ const AdvancedOptions = ({ control, isOpen, onToggle }: AdvancedOptionsProps) =>
                     )}
                   />
                   <p className="text-muted-foreground text-xs">{t('maxBranches.description')}</p>
-                </div>
-
-                {/* Grade */}
-                <div className="space-y-2">
-                  <Label>{t('grade.label')}</Label>
-                  <Controller
-                    name="grade"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        value={field.value || 'none'}
-                        onValueChange={(val) => field.onChange(val === 'none' ? '' : val)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder={t('grade.placeholder')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">{t('grade.none')}</SelectItem>
-                          {grades.map((g) => (
-                            <SelectItem key={g.code} value={g.code}>
-                              {i18n.language === 'vi' ? g.name : g.nameEn}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </div>
-              </div>
-
-              {/* Subject Row */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* Subject */}
-                <div className="space-y-2">
-                  <Label>{t('subject.label')}</Label>
-                  <Controller
-                    name="subject"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        value={field.value || 'none'}
-                        onValueChange={(val) => field.onChange(val === 'none' ? '' : val)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder={t('subject.placeholder')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">{t('subject.none')}</SelectItem>
-                          {subjects.map((s) => (
-                            <SelectItem key={s.code} value={s.code}>
-                              {s.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
                 </div>
               </div>
             </div>

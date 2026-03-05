@@ -21,7 +21,7 @@ export interface PostCreateRequest {
   passingScore?: number;
   availableFrom?: string;
   availableUntil?: string;
-  autoGraded?: boolean;
+  autoGrade?: boolean;
 }
 
 export interface PostUpdateRequest {

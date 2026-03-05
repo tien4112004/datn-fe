@@ -65,6 +65,7 @@ export default class ClassFeedService implements ClassFeedApiService {
       passingScore: request.passingScore,
       availableFrom: request.availableFrom,
       availableUntil: request.availableUntil,
+      autoGrade: request.autoGrade,
     };
 
     const response = await this.apiClient.post<ApiResponse<Post>>(

@@ -56,7 +56,7 @@ export const HomeworkSettingsCard = ({ post }: HomeworkSettingsCardProps) => {
     passingScore,
     availableFrom,
     availableUntil,
-    autoGraded,
+    autoGrade,
   } = assignment;
 
   const hasSettings =
@@ -66,7 +66,7 @@ export const HomeworkSettingsCard = ({ post }: HomeworkSettingsCardProps) => {
     passingScore !== undefined ||
     availableFrom !== undefined ||
     availableUntil !== undefined ||
-    autoGraded !== undefined;
+    autoGrade !== undefined;
 
   if (!hasSettings) return null;
 
@@ -78,11 +78,11 @@ export const HomeworkSettingsCard = ({ post }: HomeworkSettingsCardProps) => {
       </div>
 
       <div className="space-y-2">
-        {autoGraded !== undefined && (
-          <SettingItem icon={Bot} label={t('feed.creator.assignmentSettings.grading.autoGraded')}>
+        {autoGrade !== undefined && (
+          <SettingItem icon={Bot} label={t('feed.creator.assignmentSettings.grading.autoGrade')}>
             <BooleanChip
-              value={autoGraded}
-              label={autoGraded ? t('feed.homeworkSettings.yes') : t('feed.homeworkSettings.no')}
+              value={autoGrade}
+              label={autoGrade ? t('feed.homeworkSettings.yes') : t('feed.homeworkSettings.no')}
             />
           </SettingItem>
         )}

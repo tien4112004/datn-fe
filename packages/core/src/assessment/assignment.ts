@@ -100,5 +100,5 @@ export interface Assignment {
   passingScore?: number;
   availableFrom?: string;
   availableUntil?: string;
-  autoGraded?: boolean;
+  autoGrade?: boolean;
 }

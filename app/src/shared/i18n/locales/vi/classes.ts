@@ -1305,7 +1305,7 @@ export default {
     title: 'Bài nộp',
     hideTable: 'Ẩn',
     showTable: 'Hiện',
-    table: 'Bảng',
+    table: 'bảng',
     tableHeaders: {
       student: 'Học sinh',
       attempts: 'Số lần nộp',

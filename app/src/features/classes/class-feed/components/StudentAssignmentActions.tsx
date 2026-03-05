@@ -52,13 +52,14 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
     return graded.reduce((best, s) => (s.score! / s.maxScore! > best.score! / best.maxScore! ? s : best));
   }, [mySubmissions]);
 
-  // Determine status
+  // Determine status based on best submission, falling back to latest
   const status = useMemo(() => {
     if (!latestSubmission) return 'not_started';
-    if (latestSubmission.status === 'graded') return 'graded';
+    const reference = bestSubmission ?? latestSubmission;
+    if (reference.status === 'graded') return 'graded';
     if (latestSubmission.status === 'submitted' || latestSubmission.status === 'pending') return 'submitted';
     return 'in_progress';
-  }, [latestSubmission]);
+  }, [latestSubmission, bestSubmission]);
 
   const handleStartAssignment = () => {
     if (assignmentId) {
@@ -67,8 +68,9 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
   };
 
   const handleViewResult = () => {
-    if (latestSubmission) {
-      navigate(`/student/submissions/${latestSubmission.id}/result`);
+    const target = bestSubmission ?? latestSubmission;
+    if (target) {
+      navigate(`/student/submissions/${target.id}/result`);
     }
   };
 

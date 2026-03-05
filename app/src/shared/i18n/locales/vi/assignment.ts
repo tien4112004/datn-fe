@@ -1591,6 +1591,7 @@ export default {
         totalQuestions: 'Tổng số câu hỏi:',
         answered: 'Đã trả lời:',
         totalPoints: 'Tổng điểm:',
+        unansweredWarning: 'Còn {{count}} câu hỏi chưa được trả lời. Bạn vẫn có thể nộp bài.',
         previewMode: 'Chế độ xem trước: Truy cập qua bài tập của lớp để nộp',
       },
     },

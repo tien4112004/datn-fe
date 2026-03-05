@@ -1603,6 +1603,7 @@ export default {
         totalQuestions: 'Total Questions:',
         answered: 'Answered:',
         totalPoints: 'Total Points:',
+        unansweredWarning: '{{count}} question(s) left unanswered. You can still submit.',
         previewMode: 'Preview mode: Access through class homework to submit',
       },
     },

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { MultipleChoiceQuestion, MultipleChoiceAnswer } from '@aiprimary/core';
 import { MarkdownPreview, QuestionTitle } from '../shared';
@@ -25,14 +25,19 @@ export const MultipleChoiceGrading = ({
   const { t } = useTranslation('questions');
   const { t: tGrading } = useTranslation('questions', { keyPrefix: 'submissionsGrading' });
 
-  const [awardedPoints, setAwardedPoints] = useState<number>(grade?.points ?? 0);
-  const [feedback, setFeedback] = useState<string>(grade?.feedback || '');
-
   const selectedOption = answer
     ? question.data.options.find((o) => o.id === answer.selectedOptionId)
     : undefined;
   const isCorrect = selectedOption?.isCorrect || false;
   const autoScore = isCorrect ? points : 0;
+
+  const [awardedPoints, setAwardedPoints] = useState<number>(grade?.points ?? autoScore);
+  const [feedback, setFeedback] = useState<string>(grade?.feedback || '');
+
+  useEffect(() => {
+    onGradeChange?.({ points: awardedPoints, feedback });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="space-y-4">

@@ -56,6 +56,7 @@ export default class ClassFeedService implements ClassFeedApiService {
       linkedResources: request.linkedResources,
       linkedLessonId: request.linkedLessonId,
       assignmentId: request.assignmentId,
+      assignmentTitle: request.assignmentTitle,
       dueDate: request.dueDate,
       allowComments: request.allowComments,
       shuffleQuestions: request.shuffleQuestions,

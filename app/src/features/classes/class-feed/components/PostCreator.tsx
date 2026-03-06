@@ -73,6 +73,7 @@ export const PostCreator = ({
   const [linkedResources, setLinkedResources] = useState<Array<LinkedResource>>([]);
   const [resourceSelectorOpen, setResourceSelectorOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
+  const [assignmentTitle, setAssignmentTitle] = useState<string>('');
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [allowComments, setAllowComments] = useState(true);
 
@@ -148,6 +149,10 @@ export const PostCreator = ({
               }))
             : undefined,
         assignmentId: type === PostType.Exercise && selectedAssignment ? selectedAssignment.id : undefined,
+        assignmentTitle:
+          type === PostType.Exercise && selectedAssignment
+            ? assignmentTitle || selectedAssignment.title
+            : undefined,
         dueDate: type === PostType.Exercise && dueDate ? dueDate.toISOString() : undefined,
         allowComments,
         // Include assignment settings for Exercise type
@@ -171,6 +176,7 @@ export const PostCreator = ({
       clearAttachments();
       setLinkedResources([]);
       setSelectedAssignment(null);
+      setAssignmentTitle('');
       setDueDate(undefined);
       setType(initialType);
       setAllowComments(true);
@@ -233,7 +239,16 @@ export const PostCreator = ({
       : t('feed.creator.actions.createPost');
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) {
+          setSelectedAssignment(null);
+          setAssignmentTitle('');
+        }
+        setOpen(next);
+      }}
+    >
       <DialogTrigger asChild>
         <Button className={className}>
           <Plus className="mr-2 h-4 w-4" />
@@ -297,9 +312,24 @@ export const PostCreator = ({
                 <Label className="text-sm font-medium">{t('feed.creator.labels.selectAssignment')}</Label>
                 <AssignmentListCommand
                   classId={classId}
-                  onAssignmentSelect={(assignment) => setSelectedAssignment(assignment)}
+                  parentOpen={open}
+                  onAssignmentSelect={(assignment) => {
+                    setSelectedAssignment(assignment);
+                    setAssignmentTitle(assignment?.title ?? '');
+                  }}
                 />
               </div>
+
+              {selectedAssignment && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">{t('feed.creator.labels.assignmentTitle')}</Label>
+                  <Input
+                    value={assignmentTitle}
+                    onChange={(e) => setAssignmentTitle(e.target.value)}
+                    placeholder={selectedAssignment.title}
+                  />
+                </div>
+              )}
 
               {selectedAssignment && (
                 <div className="space-y-2">

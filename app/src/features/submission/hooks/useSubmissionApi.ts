@@ -95,6 +95,20 @@ export const useGradeSubmission = () => {
 };
 
 /**
+ * Hook to fetch all submissions for a student (teacher view)
+ */
+export const useStudentSubmissions = (studentId: string | undefined) => {
+  const service = useSubmissionApiService();
+
+  return useQuery({
+    queryKey: [...submissionKeys.all, 'student', studentId] as const,
+    queryFn: () => service.getStudentSubmissions(studentId!),
+    enabled: !!studentId,
+    staleTime: 30000,
+  });
+};
+
+/**
  * Hook to delete a submission
  */
 export const useDeleteSubmission = () => {

@@ -1,5 +1,6 @@
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@ui/button';
+import { useTranslation } from 'react-i18next';
 
 interface PageHeaderProps {
   title: string;
@@ -8,34 +9,29 @@ interface PageHeaderProps {
   action?: React.ReactNode;
 }
 
-/**
- * Reusable page header component with breadcrumb navigation
- * Follows Swiss Modernism: Clean hierarchy, clear structure
- */
 export function PageHeader({ title, description, onBack, action }: PageHeaderProps) {
-  return (
-    <div className="space-y-4">
-      {/* Back Button */}
-      {onBack && (
-        <Button
-          variant="ghost"
-          onClick={onBack}
-          className="hover:bg-muted group -ml-2 transition-colors"
-          aria-label="Go back"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-          Back
-        </Button>
-      )}
+  const { t } = useTranslation('classes', { keyPrefix: 'studentDetail.actions' });
 
-      {/* Title Section */}
+  return (
+    <div className="space-y-1">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
+        <div className="flex items-center gap-2">
+          {onBack && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onBack}
+              className="hover:bg-muted group shrink-0 transition-colors"
+              aria-label={t('goBack')}
+            >
+              <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+            </Button>
+          )}
           <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
-          {description && <p className="text-muted-foreground text-sm sm:text-base">{description}</p>}
         </div>
         {action && <div className="flex items-center gap-2">{action}</div>}
       </div>
+      {description && <p className="text-muted-foreground pl-10 text-sm sm:text-base">{description}</p>}
     </div>
   );
 }

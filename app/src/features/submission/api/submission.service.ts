@@ -1,5 +1,6 @@
 import type { ApiClient, ApiResponse } from '@aiprimary/api';
 import type { Submission, Answer, Grade } from '@aiprimary/core';
+import type { StudentSubmission } from '@/features/students/types';
 
 export interface SubmissionCreateRequest {
   postId: string;
@@ -19,6 +20,7 @@ export interface SubmissionApiService {
   getSubmissionById(submissionId: string): Promise<Submission>;
   gradeSubmission(submissionId: string, request: SubmissionGradeRequest): Promise<Submission>;
   deleteSubmission(submissionId: string): Promise<void>;
+  getStudentSubmissions(studentId: string): Promise<StudentSubmission[]>;
 }
 
 /** Backend AnswerData DTO shape (each question entry in submission.questions) */
@@ -70,6 +72,9 @@ interface SubmissionDto {
   feedback?: string;
   gradedAt?: string;
   gradedBy?: string;
+  // Enriched fields returned by the student submissions endpoint
+  assignmentTitle?: string;
+  className?: string;
 }
 
 /**
@@ -276,5 +281,23 @@ export default class SubmissionService implements SubmissionApiService {
 
   async deleteSubmission(submissionId: string): Promise<void> {
     await this.apiClient.delete(`${this.baseUrl}/api/submissions/${submissionId}`);
+  }
+
+  async getStudentSubmissions(studentId: string): Promise<StudentSubmission[]> {
+    const response = await this.apiClient.get<ApiResponse<SubmissionDto[]>>(
+      `${this.baseUrl}/api/students/${studentId}/submissions`
+    );
+    return response.data.data.map((s) => ({
+      id: s.id,
+      assignmentId: s.assignmentId,
+      postId: s.postId,
+      assignmentTitle: s.assignmentTitle,
+      className: s.className,
+      score: s.score,
+      maxScore: s.maxScore,
+      status: s.status,
+      submittedAt: s.submittedAt,
+      feedback: s.feedback,
+    }));
   }
 }

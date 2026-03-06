@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
@@ -10,8 +10,9 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { Button } from '@ui/button';
+import { Input } from '@ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Eye, Pencil, Search, Trash2 } from 'lucide-react';
 import { useAuth } from '@/shared/context/auth';
 import type { Student } from '../../types';
 import { StudentFormDialog } from './StudentFormDialog';
@@ -26,20 +27,26 @@ import TablePagination from '@/components/table/TablePagination';
 
 interface StudentListViewProps {
   students: Student[];
+  allStudents?: Student[];
   classId: string;
   isLoading?: boolean;
   pagination: PaginationState;
   setPagination: (updaterOrValue: Updater<PaginationState>) => void;
   totalItems: number;
+  search?: string;
+  onSearchChange?: (value: string) => void;
 }
 
 export const StudentListView = ({
   students,
+  allStudents = [],
   classId,
   isLoading = false,
   pagination,
   setPagination,
   totalItems,
+  search: searchProp = '',
+  onSearchChange,
 }: StudentListViewProps) => {
   const { t } = useTranslation('classes', { keyPrefix: 'roster' });
   const { user } = useAuth();
@@ -49,8 +56,27 @@ export const StudentListView = ({
   const [credentialsToShow, setCredentialsToShow] = useState<StudentCredential[]>([]);
   const [isCredentialsModalOpen, setIsCredentialsModalOpen] = useState(false);
 
+  const search = searchProp;
+
   const isStudent = user?.role === 'student';
   const isTeacher = !isStudent;
+
+  // When search is active, filter allStudents client-side with client-side pagination.
+  // When search is empty, fall back to server-paginated students.
+  const isSearching = search.trim().length > 0;
+
+  const filteredStudents = useMemo(() => {
+    if (!isSearching) return null;
+    const q = search.trim().toLowerCase();
+    return allStudents.filter((s) => {
+      const name = (s.fullName || `${s.firstName || ''} ${s.lastName || ''}`).toLowerCase();
+      const parent = (s.parentName || '').toLowerCase();
+      const phone = (s.parentPhone || '').toLowerCase();
+      return name.includes(q) || parent.includes(q) || phone.includes(q);
+    });
+  }, [isSearching, search, allStudents]);
+
+  const displayTotal = isSearching ? (filteredStudents ?? []).length : totalItems;
 
   // Delete confirmation dialog state
   const deleteConfirmation = useConfirmDialog<Student>();
@@ -99,7 +125,10 @@ export const StudentListView = ({
       accessorKey: 'fullName',
       header: t('table.fullName'),
       cell: ({ row }) => (
-        <Link to={`/students/${row.original.id}`} className="font-medium hover:underline">
+        <Link
+          to={`/classes/${classId}/students/${row.original.id}?tab=students`}
+          className="font-medium hover:underline"
+        >
           {row.getValue('fullName')}
         </Link>
       ),
@@ -125,7 +154,15 @@ export const StudentListView = ({
       header: t('form.gender'),
       cell: ({ row }) => {
         const gender = row.getValue('gender') as string | null | undefined;
-        return <div className="text-sm capitalize">{gender || '-'}</div>;
+        const genderLabel =
+          gender === 'male'
+            ? t('form.genderMale')
+            : gender === 'female'
+              ? t('form.genderFemale')
+              : gender === 'other'
+                ? t('form.genderOther')
+                : null;
+        return <div className="text-sm">{genderLabel ?? '-'}</div>;
       },
     },
     {
@@ -179,6 +216,14 @@ export const StudentListView = ({
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link
+                      to={`/classes/${classId}/students/${student.id}?tab=students`}
+                      aria-label={t('table.view', { studentName: student.fullName })}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Link>
+                  </Button>
                 </div>
               );
             },
@@ -187,30 +232,51 @@ export const StudentListView = ({
       : []),
   ];
 
+  const [clientPagination, setClientPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: pagination.pageSize,
+  });
+
+  const handleSearchChange = (value: string) => {
+    onSearchChange?.(value);
+    setClientPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  };
+
+  const activePagination = isSearching ? clientPagination : pagination;
+  const activeSetPagination = isSearching ? setClientPagination : setPagination;
+
+  const displayStudents = isSearching
+    ? (filteredStudents ?? []).slice(
+        clientPagination.pageIndex * clientPagination.pageSize,
+        (clientPagination.pageIndex + 1) * clientPagination.pageSize
+      )
+    : students;
+
   const table = useReactTable({
-    data: students,
+    data: displayStudents,
     columns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
-    rowCount: totalItems,
-    state: { pagination },
-    onPaginationChange: setPagination,
+    rowCount: displayTotal,
+    state: { pagination: activePagination },
+    onPaginationChange: activeSetPagination,
   });
-
-  if (isLoading) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="text-muted-foreground">{t('loadingRoster')}</div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4">
-      {/* Header with Add button */}
+      {/* Header with Search + Add button */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-muted-foreground text-sm">{t('studentCount', { count: totalItems })}</p>
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <Search className="text-muted-foreground absolute left-2.5 top-2.5 h-4 w-4" />
+            <Input
+              placeholder={t('table.searchPlaceholder')}
+              value={search}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="w-64 pl-8"
+            />
+          </div>
+          <p className="text-muted-foreground text-sm">{t('studentCount', { count: displayTotal })}</p>
         </div>
         {isTeacher && (
           <div className="flex items-center gap-2">
@@ -236,10 +302,61 @@ export const StudentListView = ({
       </div>
 
       {/* Table */}
-      {totalItems === 0 ? (
+      {isLoading ? (
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {['w-36', 'w-24', 'w-20', 'w-28', 'w-28', 'w-36', ...(isTeacher ? ['w-20'] : [])].map(
+                  (w, i) => (
+                    <TableHead key={i}>
+                      <div className={`bg-muted h-4 animate-pulse rounded ${w}`} />
+                    </TableHead>
+                  )
+                )}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {Array.from({ length: 5 }).map((_, rowIdx) => (
+                <TableRow key={rowIdx}>
+                  <TableCell>
+                    <div className="bg-muted h-4 w-32 animate-pulse rounded" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="bg-muted h-4 w-20 animate-pulse rounded" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="bg-muted h-4 w-14 animate-pulse rounded" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="bg-muted h-4 w-28 animate-pulse rounded" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="bg-muted h-4 w-24 animate-pulse rounded" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="bg-muted h-4 w-32 animate-pulse rounded" />
+                  </TableCell>
+                  {isTeacher && (
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <div className="bg-muted h-8 w-8 animate-pulse rounded-md" />
+                        <div className="bg-muted h-8 w-8 animate-pulse rounded-md" />
+                        <div className="bg-muted h-8 w-8 animate-pulse rounded-md" />
+                      </div>
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      ) : displayTotal === 0 ? (
         <div className="flex h-64 flex-col items-center justify-center rounded-lg border">
-          <p className="text-muted-foreground mb-4">{t('noStudents')}</p>
-          {isTeacher && <Button onClick={handleOpenAddDialog}>{t('addFirstStudent')}</Button>}
+          <p className="text-muted-foreground mb-4">
+            {isSearching ? t('table.noSearchResults') : t('noStudents')}
+          </p>
+          {isTeacher && !isSearching && <Button onClick={handleOpenAddDialog}>{t('addFirstStudent')}</Button>}
         </div>
       ) : (
         <div className="rounded-md border">
@@ -273,7 +390,7 @@ export const StudentListView = ({
       )}
 
       {/* Pagination */}
-      {totalItems > 0 && <TablePagination table={table} />}
+      {displayTotal > 0 && <TablePagination table={table} />}
 
       {/* Student Form Dialog */}
       {isTeacher && (

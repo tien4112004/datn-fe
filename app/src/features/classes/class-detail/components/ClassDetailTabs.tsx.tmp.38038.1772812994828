@@ -1,4 +1,4 @@
-import { useSearchParams, useOutlet, useNavigate } from 'react-router-dom';
+import { useSearchParams, useOutlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Users, Settings, MessageSquare, GraduationCap, Calendar, Edit, FolderOpen } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
@@ -28,13 +28,14 @@ const tabs = [
 export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDetailTabsProps) => {
   const { t } = useTranslation('classes', { keyPrefix: 'detail' });
 
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const currentTab = (searchParams.get('tab') || 'feed') as ClassTabs;
   const outlet = useOutlet();
-  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const activeTab = pathname.includes('/students/') ? 'students' : currentTab;
 
   const handleTabChange = (tab: ClassTabs) => {
-    navigate(`/classes/${classId}?tab=${tab}`);
+    setSearchParams({ tab }, { replace: true });
   };
 
   return (
@@ -61,7 +62,7 @@ export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDet
           <div className="flex min-w-max gap-1 p-2">
             {tabs.map((tab) => {
               const Icon = tab.icon;
-              const isActive = currentTab === tab.value;
+              const isActive = activeTab === tab.value;
 
               return (
                 <button

@@ -6,8 +6,10 @@ import { Alert, AlertDescription, AlertTitle } from '@ui/alert';
 import { useStudent, useStudentPerformance } from '../hooks/useApi';
 import { StudentInfoSection } from '../components/StudentInfoSection';
 import { StudentPerformanceSection } from '../components/StudentPerformanceSection';
+import { StudentSubmissionsSection } from '../components/StudentSubmissionsSection';
 import { StudentDetailSkeleton } from '../components/StudentDetailSkeleton';
 import { PageHeader } from '../components/PageHeader';
+import { useStudentSubmissions } from '@/features/submission/hooks';
 
 /**
  * Student Detail Page
@@ -42,6 +44,10 @@ export default function StudentDetailPage() {
     error: performanceError,
     refetch: refetchPerformance,
   } = useStudentPerformance(student?.userId);
+
+  const { data: submissions, isLoading: isLoadingSubmissions } = useStudentSubmissions(
+    student ? studentId : undefined
+  );
 
   // Handler functions
   const handleBack = () => navigate(-1);
@@ -135,6 +141,11 @@ export default function StudentDetailPage() {
             <StudentPerformanceSection performance={performance} />
           </div>
         )}
+      </section>
+
+      {/* Submission History Section */}
+      <section aria-label={t('studentDetail.sections.submissionHistory')}>
+        <StudentSubmissionsSection submissions={submissions ?? []} isLoading={isLoadingSubmissions} />
       </section>
     </div>
   );

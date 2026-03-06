@@ -1303,6 +1303,11 @@ export default {
 
   submissionStatistics: {
     title: 'Bài nộp',
+    noSubmissions: 'Chưa có bài nộp',
+    tabs: {
+      analysis: 'Phân tích',
+      table: 'Bài nộp',
+    },
     hideTable: 'Ẩn',
     showTable: 'Hiện',
     table: 'bảng',

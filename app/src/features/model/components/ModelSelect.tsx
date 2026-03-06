@@ -10,6 +10,7 @@ import {
 import { type Model } from '@/features/model';
 import { MODEL_PROVIDERS_LOGO } from '@/features/presentation/types';
 import { useTranslation } from 'react-i18next';
+import { cx } from 'class-variance-authority';
 
 interface ModelValue {
   name: string;
@@ -35,7 +36,7 @@ export const ModelSelect = ({
   onValueChange,
   placeholder,
   label,
-  className = 'bg-card w-fit',
+  className,
   disabled = false,
   showProviderLogo = true,
   isLoading = false,
@@ -60,7 +61,7 @@ export const ModelSelect = ({
       }
       disabled={disabled || isLoading || isError}
     >
-      <SelectTrigger className={className}>
+      <SelectTrigger className={cx(className, 'bg-card w-fit')}>
         <SelectValue placeholder={getPlaceholderText()} />
       </SelectTrigger>
       <SelectContent>

@@ -200,6 +200,7 @@ const CreateImagePage = () => {
                     render={({ field }) => (
                       <ModelSelect
                         models={models}
+                        className="ml-auto"
                         value={field.value}
                         onValueChange={field.onChange}
                         placeholder={t('create.model.placeholder')}

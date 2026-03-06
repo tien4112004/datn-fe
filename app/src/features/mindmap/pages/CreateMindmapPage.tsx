@@ -183,6 +183,7 @@ const CreateMindmapPage = () => {
                         placeholder={t('create.model.placeholder')}
                         label={t('create.model.label')}
                         showProviderLogo={true}
+                        className="ml-auto"
                       />
                     )}
                   />

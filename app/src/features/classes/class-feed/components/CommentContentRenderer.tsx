@@ -39,11 +39,13 @@ export function CommentContentRenderer({ content, className }: CommentContentRen
       );
     }
 
-    // Determine the correct path (student or teacher mode)
+    // Determine the correct path (student or teacher mode), strip ?preview param
     const isStudentMode = window.location.pathname.includes('/student/');
     const postPath = isStudentMode
       ? `/student/classes/${ref.classId}/posts/${ref.postId}`
       : `/classes/${ref.classId}/posts/${ref.postId}`;
+
+    const label = ref.preview ?? t('feed.comments.postReference');
 
     // Add the post reference link
     elements.push(
@@ -53,17 +55,15 @@ export function CommentContentRenderer({ content, className }: CommentContentRen
         className="inline-flex items-center gap-1 rounded bg-blue-50 px-1.5 py-0.5 text-sm font-medium text-blue-700 hover:bg-blue-100 hover:underline dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900"
         title={t('feed.comments.postReferenceTooltip')}
         onClick={(e: React.MouseEvent) => {
-          // Allow opening in new tab with cmd/ctrl+click
           if (e.metaKey || e.ctrlKey) {
             return;
           }
-          // Otherwise prevent bubbling so clicking the link doesn't trigger parent click handlers
           e.stopPropagation();
         }}
       >
         <FileText className="h-3 w-3" />
         <span className="max-w-[200px] truncate" title={ref.url}>
-          {t('feed.comments.postReference')}
+          {label}
         </span>
       </Link>
     );

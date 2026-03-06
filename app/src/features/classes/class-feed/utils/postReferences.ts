@@ -7,6 +7,7 @@ export interface PostReference {
   postId: string;
   classId: string;
   url: string;
+  preview?: string;
   startIndex: number;
   endIndex: number;
 }
@@ -15,8 +16,10 @@ export interface PostReference {
  * Regex pattern for detecting post URLs
  * Matches: /classes/{classId}/posts/{postId} or /student/classes/{classId}/posts/{postId}
  */
-const POST_URL_PATTERN = /https?:\/\/[^\s]+\/(student\/)?classes\/([a-zA-Z0-9-]+)\/posts\/([a-zA-Z0-9-]+)/g;
-const RELATIVE_POST_URL_PATTERN = /\/(student\/)?classes\/([a-zA-Z0-9-]+)\/posts\/([a-zA-Z0-9-]+)/g;
+const POST_URL_PATTERN =
+  /https?:\/\/[^\s]+\/(student\/)?classes\/([a-zA-Z0-9-]+)\/posts\/([a-zA-Z0-9-]+)(?:\?preview=([^&\s]*))?/g;
+const RELATIVE_POST_URL_PATTERN =
+  /\/(student\/)?classes\/([a-zA-Z0-9-]+)\/posts\/([a-zA-Z0-9-]+)(?:\?preview=([^&\s]*))?/g;
 
 /**
  * Parse post URL references from comment text
@@ -33,6 +36,7 @@ export function parsePostReferences(text: string): PostReference[] {
       postId: match[3],
       classId: match[2],
       url: match[0],
+      preview: match[4] ? decodeURIComponent(match[4]) : undefined,
       startIndex: match.index,
       endIndex: match.index + match[0].length,
     });
@@ -42,7 +46,7 @@ export function parsePostReferences(text: string): PostReference[] {
   const relativeRegex = new RegExp(RELATIVE_POST_URL_PATTERN);
   while ((match = relativeRegex.exec(text)) !== null) {
     // Skip if this position was already matched by absolute URL
-    const currentMatch = match; // Store match to avoid null check issues
+    const currentMatch = match;
     const alreadyMatched = references.some(
       (ref) => currentMatch.index >= ref.startIndex && currentMatch.index < ref.endIndex
     );
@@ -51,6 +55,7 @@ export function parsePostReferences(text: string): PostReference[] {
         postId: currentMatch[3],
         classId: currentMatch[2],
         url: currentMatch[0],
+        preview: currentMatch[4] ? decodeURIComponent(currentMatch[4]) : undefined,
         startIndex: currentMatch.index,
         endIndex: currentMatch.index + currentMatch[0].length,
       });

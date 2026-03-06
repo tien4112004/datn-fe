@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FileText, Loader2, AtSign } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -16,8 +16,26 @@ interface PostMentionInputProps {
 }
 
 /**
- * Textarea input with @ button to reference posts
- * Click @ button or press @ key to show dropdown of posts
+ * Serializes the contenteditable div into a plain-text string.
+ * Chip elements (data-post-url) become their URL; text nodes become their text.
+ */
+function serializeContent(el: HTMLElement): string {
+  let result = '';
+  el.childNodes.forEach((node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      result += node.textContent ?? '';
+    } else if (node instanceof HTMLElement && node.dataset.postUrl) {
+      result += node.dataset.postUrl;
+    } else if (node instanceof HTMLElement) {
+      result += node.textContent ?? '';
+    }
+  });
+  return result;
+}
+
+/**
+ * Rich comment input that renders selected post references as inline chips.
+ * Serializes to plain text (with relative URLs) for submission.
  */
 export function PostMentionInput({
   value,
@@ -29,61 +47,67 @@ export function PostMentionInput({
   className = '',
 }: PostMentionInputProps) {
   const { t } = useTranslation('classes');
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  // Track whether the editor is empty for placeholder visibility
+  const [isEmpty, setIsEmpty] = useState(!value);
 
-  // Fetch posts for the current class (fetch all posts without pagination for autocomplete)
   const classFeedApi = useClassFeedApiService();
   const { data: postsResponse, isLoading: loadingPosts } = useQuery({
     queryKey: ['posts-autocomplete', classId],
     queryFn: () => classFeedApi.getPosts(classId, { type: 'all' }, 1, 100),
-    enabled: !!classId, // Only fetch if classId is defined
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!classId,
+    staleTime: 5 * 60 * 1000,
   });
 
   const posts = postsResponse?.data || [];
 
-  // Open dropdown when @ button is clicked
-  const handleOpenDropdown = () => {
+  // Sync external empty-reset (e.g. after submit parent sets value to '')
+  useEffect(() => {
+    if (value === '' && editorRef.current) {
+      editorRef.current.innerHTML = '';
+      setIsEmpty(true);
+    }
+  }, [value]);
+
+  const openDropdown = () => {
     setShowDropdown(true);
     setSelectedIndex(0);
-    textareaRef.current?.focus();
+    editorRef.current?.focus();
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onChange(e.target.value);
-  };
+  const handleInput = useCallback(() => {
+    if (!editorRef.current) return;
+    const serialized = serializeContent(editorRef.current);
+    setIsEmpty(serialized.trim() === '');
+    onChange(serialized);
+  }, [onChange]);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // @ key opens dropdown (acts as hotkey)
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === '@' && !showDropdown) {
       e.preventDefault();
-      handleOpenDropdown();
+      openDropdown();
       return;
     }
 
-    // Dropdown navigation
     if (showDropdown && posts.length > 0) {
       if (e.key === 'ArrowDown') {
         e.preventDefault();
         setSelectedIndex((prev) => (prev + 1) % posts.length);
         return;
       }
-
       if (e.key === 'ArrowUp') {
         e.preventDefault();
         setSelectedIndex((prev) => (prev - 1 + posts.length) % posts.length);
         return;
       }
-
       if (e.key === 'Enter') {
         e.preventDefault();
-        insertPostUrl(posts[selectedIndex]);
+        insertPostChip(posts[selectedIndex]);
         return;
       }
-
       if (e.key === 'Escape') {
         e.preventDefault();
         setShowDropdown(false);
@@ -91,74 +115,129 @@ export function PostMentionInput({
       }
     }
 
-    // Submit on Cmd/Ctrl + Enter
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       onSubmit(e as unknown as React.FormEvent);
     }
+
+    // Prevent Enter from creating a new block element in contenteditable
+    if (e.key === 'Enter' && !e.metaKey && !e.ctrlKey && !showDropdown) {
+      e.preventDefault();
+    }
   };
 
-  const insertPostUrl = (post: Post) => {
-    if (!textareaRef.current) return;
+  const insertPostChip = (post: Post) => {
+    if (!editorRef.current) return;
 
-    // Build the post URL
     const isStudentMode = window.location.pathname.includes('/student/');
-    const postUrl = isStudentMode
-      ? `${window.location.origin}/student/classes/${post.classId}/posts/${post.id}`
-      : `${window.location.origin}/classes/${post.classId}/posts/${post.id}`;
+    const preview = post.content.substring(0, 40) + (post.content.length > 40 ? '…' : '');
+    const basePath = isStudentMode
+      ? `/student/classes/${post.classId}/posts/${post.id}`
+      : `/classes/${post.classId}/posts/${post.id}`;
+    const postUrl = `${basePath}?preview=${encodeURIComponent(preview)}`;
 
-    // Insert URL at current cursor position
-    const cursorPos = textareaRef.current.selectionStart || 0;
-    const newValue = value.substring(0, cursorPos) + postUrl + ' ' + value.substring(cursorPos);
+    const label = preview;
 
-    onChange(newValue);
-    setShowDropdown(false);
+    // Build chip element
+    const chip = document.createElement('span');
+    chip.dataset.postUrl = postUrl;
+    chip.contentEditable = 'false';
+    chip.className =
+      'inline-flex items-center gap-1 rounded bg-blue-50 px-1.5 py-0.5 text-sm font-medium text-blue-700 mx-0.5 select-none';
+    chip.title = postUrl;
 
-    // Focus back on textarea and set cursor after inserted URL
-    setTimeout(() => {
-      if (textareaRef.current) {
-        const newCursorPos = cursorPos + postUrl.length + 1;
-        textareaRef.current.focus();
-        textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
+    const icon = document.createElement('span');
+    icon.innerHTML =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><polyline points="14 2 14 8 20 8"/></svg>';
+    icon.className = 'flex-shrink-0';
+
+    const text = document.createElement('span');
+    text.className = 'max-w-[160px] truncate';
+    text.textContent = label;
+
+    chip.appendChild(icon);
+    chip.appendChild(text);
+
+    // Insert chip at current caret position
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0);
+      // Ensure caret is inside the editor
+      if (editorRef.current.contains(range.commonAncestorContainer)) {
+        range.deleteContents();
+        range.insertNode(chip);
+        // Move caret after chip
+        range.setStartAfter(chip);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      } else {
+        editorRef.current.appendChild(chip);
       }
-    }, 0);
+    } else {
+      editorRef.current.appendChild(chip);
+    }
+
+    // Insert trailing space text node so caret lands after chip
+    const space = document.createTextNode('\u00A0');
+    chip.after(space);
+    const newRange = document.createRange();
+    newRange.setStartAfter(space);
+    newRange.collapse(true);
+    sel?.removeAllRanges();
+    sel?.addRange(newRange);
+
+    setShowDropdown(false);
+    editorRef.current.focus();
+
+    const serialized = serializeContent(editorRef.current);
+    setIsEmpty(serialized.trim() === '');
+    onChange(serialized);
   };
 
-  // Close dropdown when clicking outside
+  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(e.target as Node) &&
-        textareaRef.current &&
-        !textareaRef.current.contains(e.target as Node)
+        editorRef.current &&
+        !editorRef.current.contains(e.target as Node)
       ) {
         setShowDropdown(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   return (
     <div className="relative">
-      <div className="relative">
-        <textarea
-          ref={textareaRef}
-          value={value}
-          onChange={handleChange}
+      <div
+        className={`relative min-h-[38px] w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 focus-within:border-transparent focus-within:ring-2 focus-within:ring-blue-500 ${disabled ? 'pointer-events-none opacity-50' : ''} ${className}`}
+      >
+        {/* Placeholder */}
+        {isEmpty && (
+          <span className="pointer-events-none absolute left-3 top-2 select-none text-sm text-gray-400">
+            {placeholder}
+          </span>
+        )}
+
+        {/* Contenteditable editor */}
+        <div
+          ref={editorRef}
+          contentEditable={!disabled}
+          suppressContentEditableWarning
+          onInput={handleInput}
           onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          disabled={disabled}
-          className={`w-full resize-none rounded-lg border border-gray-300 px-3 py-2 pr-10 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
-          rows={1}
+          className="min-h-[22px] w-full text-sm text-gray-900 outline-none"
+          style={{ wordBreak: 'break-word' }}
         />
 
         {/* @ Button */}
         <button
           type="button"
-          onClick={handleOpenDropdown}
+          onClick={openDropdown}
           disabled={disabled}
           className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 disabled:opacity-50"
           title={t('feed.comments.mentionPost')}
@@ -189,7 +268,11 @@ export function PostMentionInput({
                   className={`flex w-full items-start gap-2 px-3 py-2 text-left hover:bg-gray-100 ${
                     index === selectedIndex ? 'bg-gray-100' : ''
                   }`}
-                  onClick={() => insertPostUrl(post)}
+                  onMouseDown={(e) => {
+                    // Prevent blur on editor before inserting
+                    e.preventDefault();
+                    insertPostChip(post);
+                  }}
                 >
                   <FileText className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-600" />
                   <div className="min-w-0 flex-1">

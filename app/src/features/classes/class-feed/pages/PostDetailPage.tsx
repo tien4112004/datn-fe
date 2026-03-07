@@ -134,7 +134,7 @@ export const PostDetailPage = () => {
       {showComments && post.allowComments && (
         <div className="mt-6">
           <h3 className="mb-4 text-lg font-semibold">{t('feed.comments.title')}</h3>
-          <CommentThread postId={postId!} />
+          <CommentThread postId={postId!} classId={classId || post.classId} />
         </div>
       )}
     </PageContainer>

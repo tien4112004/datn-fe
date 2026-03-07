@@ -130,7 +130,7 @@ export const PostList = ({
                 style={{ transformOrigin: 'top' }}
                 className="bg-muted/10 border-b border-t px-3 py-4 pl-9 md:px-6 md:py-6 md:pl-14"
               >
-                <CommentThread postId={post.id} />
+                <CommentThread postId={post.id} classId={post.classId} />
               </motion.div>
             )}
           </AnimatePresence>

@@ -1253,6 +1253,13 @@ export default {
       title: 'Bình luận',
       loading: 'Đang tải bình luận...',
       empty: 'Chưa có bình luận nào',
+      postReference: 'Bài viết',
+      postReferenceTooltip: 'Nhấp để xem bài viết được tham chiếu',
+      loadingPosts: 'Đang tải bài viết...',
+      noPostsFound: 'Không tìm thấy bài viết',
+      unknownAuthor: 'Không rõ',
+      mentionHint: 'Nhập @ để tham chiếu bài viết',
+      mentionPost: 'Tham chiếu bài viết (Nhấn phím @)',
     },
     errors: {
       loadFailed: 'Không thể tải bài viết',

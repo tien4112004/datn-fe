@@ -155,6 +155,7 @@ export function useCreatePost() {
   const queryClient = useQueryClient();
   const classFeedApi = useClassFeedApiService();
   const { t } = useTranslation('classes');
+  const { user: currentUser } = useAuth();
 
   return useMutation({
     mutationFn: (request: PostCreateRequest) => classFeedApi.createPost(request),
@@ -167,7 +168,16 @@ export function useCreatePost() {
       const optimisticPost: Post = {
         id: `temp-${Date.now()}`,
         classId: request.classId,
-        authorId: 'current-user',
+        authorId: currentUser?.id || 'current-user',
+        author: currentUser
+          ? {
+              id: currentUser.id,
+              firstName: currentUser.firstName || '',
+              lastName: currentUser.lastName || '',
+              email: currentUser.email,
+              avatarUrl: currentUser.avatarUrl || currentUser.avatar || null,
+            }
+          : undefined,
         type: request.type,
         content: request.content,
         attachments: request.attachments?.map((url) => ({ name: url.split('/').pop() ?? url, url })),
@@ -187,9 +197,12 @@ export function useCreatePost() {
 
       queryClient.setQueriesData<ApiResponse<Post[]>>({ queryKey: feedQueryKeys.all }, (oldData) => {
         if (!oldData) return oldData;
+        const data = oldData.data || [];
+        const lastPinnedIndex = data.reduce((last, post, i) => (post.isPinned ? i : last), -1);
+        const insertAt = lastPinnedIndex + 1;
         return {
           ...oldData,
-          data: [optimisticPost, ...(oldData.data || [])],
+          data: [...data.slice(0, insertAt), optimisticPost, ...data.slice(insertAt)],
         };
       });
 

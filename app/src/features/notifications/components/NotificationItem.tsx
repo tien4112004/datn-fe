@@ -24,6 +24,7 @@ interface NotificationItemProps {
 const typeIcons: Record<NotificationType, React.ElementType> = {
   POST: FileText,
   ASSIGNMENT: ClipboardList,
+  ASSIGNMENT_DEADLINE: Clock,
   COMMENT: MessageSquare,
   GRADE: GraduationCap,
   ANNOUNCEMENT: Megaphone,
@@ -36,6 +37,7 @@ const typeIcons: Record<NotificationType, React.ElementType> = {
 const typeColors: Record<NotificationType, string> = {
   POST: 'text-blue-500 bg-blue-100 dark:bg-blue-900/30',
   ASSIGNMENT: 'text-orange-500 bg-orange-100 dark:bg-orange-900/30',
+  ASSIGNMENT_DEADLINE: 'text-yellow-500 bg-yellow-100 dark:bg-yellow-900/30',
   COMMENT: 'text-green-500 bg-green-100 dark:bg-green-900/30',
   GRADE: 'text-purple-500 bg-purple-100 dark:bg-purple-900/30',
   ANNOUNCEMENT: 'text-red-500 bg-red-100 dark:bg-red-900/30',

@@ -79,7 +79,8 @@ export default {
     },
     educationMode: {
       label: 'Chế Độ Giáo Dục',
-      description: 'AI sẽ sử dụng nội dung phù hợp với chương trình học theo lớp, môn học và chương bạn chọn.',
+      description:
+        'AI sẽ sử dụng nội dung phù hợp với chương trình học theo lớp, môn học và chương bạn chọn.',
     },
     chapter: {
       label: 'Chương',

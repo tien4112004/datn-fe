@@ -12,6 +12,7 @@ export interface SendNotificationRequest {
 export type NotificationType =
   | 'POST'
   | 'ASSIGNMENT'
+  | 'ASSIGNMENT_DEADLINE'
   | 'COMMENT'
   | 'GRADE'
   | 'ANNOUNCEMENT'
@@ -26,6 +27,7 @@ export interface AppNotification {
   body: string;
   type: NotificationType;
   referenceId?: string;
+  data?: Record<string, string>;
   isRead: boolean;
   createdAt: string;
 }

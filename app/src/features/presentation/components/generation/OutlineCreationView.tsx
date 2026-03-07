@@ -210,7 +210,12 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
               title={t('examples.title')}
             />
 
-            <EducationModeSection control={control} setValue={setValue} ns="presentation" keyPrefix="createOutline" />
+            <EducationModeSection
+              control={control}
+              setValue={setValue}
+              ns="presentation"
+              keyPrefix="createOutline"
+            />
             <AdvancedOptions control={control} isOpen={isAdvancedOpen} onToggle={toggleAdvancedOptions} />
           </CardContent>
         </Card>

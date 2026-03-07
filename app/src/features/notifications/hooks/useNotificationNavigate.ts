@@ -16,7 +16,8 @@ export function useNotificationNavigate() {
     }
 
     if (notification.referenceId) {
-      const url = getNotificationUrl(notification.type, notification.referenceId, role);
+      const classId = notification.data?.classId;
+      const url = getNotificationUrl(notification.type, notification.referenceId, role, classId);
       navigate(url);
     }
   };

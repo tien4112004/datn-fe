@@ -74,7 +74,7 @@ export const useAssignmentByPost = (postId?: string) => {
   return useQuery({
     queryKey: postId ? [...assignmentKeys.detail('post'), postId] : [...assignmentKeys.details(), 'post'],
     queryFn: async () => {
-      if (!postId) throw new Error('Missing post id');
+      if (!postId) return;
       return service.getAssignmentByPostId(postId);
     },
     staleTime: 60 * 1000, // 1 minute

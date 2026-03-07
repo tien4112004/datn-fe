@@ -82,10 +82,7 @@ const EducationModeSection = ({ control, setValue, ns, keyPrefix }: EducationMod
                     name="grade"
                     control={control}
                     render={({ field }) => (
-                      <Select
-                        value={field.value || ''}
-                        onValueChange={field.onChange}
-                      >
+                      <Select value={field.value || ''} onValueChange={field.onChange}>
                         <SelectTrigger>
                           <SelectValue placeholder={t('grade.placeholder')} />
                         </SelectTrigger>
@@ -109,10 +106,7 @@ const EducationModeSection = ({ control, setValue, ns, keyPrefix }: EducationMod
                     name="subject"
                     control={control}
                     render={({ field }) => (
-                      <Select
-                        value={field.value || ''}
-                        onValueChange={field.onChange}
-                      >
+                      <Select value={field.value || ''} onValueChange={field.onChange}>
                         <SelectTrigger>
                           <SelectValue placeholder={t('subject.placeholder')} />
                         </SelectTrigger>

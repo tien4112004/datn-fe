@@ -67,7 +67,9 @@ export const PostCard = ({
   };
 
   // Fetch assignment details if this is an Exercise post with an assignmentId
-  const { data: assignment, isLoading: isAssignmentLoading } = useAssignmentByPost(post.id);
+  const { data: assignment, isLoading: isAssignmentLoading } = useAssignmentByPost(
+    post.assignmentId ? post.id : undefined
+  );
 
   // Determine the appropriate link path based on whether we're in student or teacher mode
   const getPostDetailPath = () => {

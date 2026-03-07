@@ -2,10 +2,11 @@ import { DataTable, TablePagination } from '@/components/table';
 import { ThemePreviewCard } from '@/components/theme';
 import { Button } from '@ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
+import { Input } from '@ui/input';
 import { useSlideThemes } from '@/hooks';
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { Edit, Plus } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { Edit, Plus, Search } from 'lucide-react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import type { Gradient, SlideTheme } from '@aiprimary/core';
@@ -22,8 +23,24 @@ export function SlideThemesPage() {
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
   const pageSize = 10;
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  const { data, isLoading } = useSlideThemes({ page, pageSize });
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchQuery(value);
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(() => {
+      setDebouncedSearch(value);
+      setPage(1);
+    }, 300);
+  }, []);
+
+  const { data, isLoading } = useSlideThemes({
+    page,
+    pageSize,
+    ...(debouncedSearch && { search: debouncedSearch }),
+  });
 
   const themes = data?.data || [];
   const pagination = data?.pagination;
@@ -177,7 +194,16 @@ export function SlideThemesPage() {
             {pagination ? `${pagination.totalItems} total themes` : 'Loading...'}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <div className="relative max-w-sm">
+            <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+            <Input
+              placeholder="Search themes..."
+              value={searchQuery}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="pl-9"
+            />
+          </div>
           <DataTable
             table={table}
             isLoading={isLoading}

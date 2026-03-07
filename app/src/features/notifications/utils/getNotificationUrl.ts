@@ -5,7 +5,8 @@ type UserRole = 'student' | 'teacher' | 'admin';
 export function getNotificationUrl(
   type: NotificationType | string,
   referenceId: string | undefined,
-  role: UserRole
+  role: UserRole,
+  classId?: string | null
 ): string {
   const isStudent = role === 'student';
   const prefix = isStudent ? '/student' : '';
@@ -15,9 +16,13 @@ export function getNotificationUrl(
 
   switch (type) {
     case 'POST':
+      if (classId) return `${prefix}/classes/${classId}/posts/${referenceId}`;
+      return `${prefix}/classes/${referenceId}`;
     case 'ANNOUNCEMENT':
       return `${prefix}/classes/${referenceId}`;
     case 'ASSIGNMENT':
+      if (classId) return `${prefix}/classes/${classId}/posts/${referenceId}`;
+      return isStudent ? `/student/assignments/${referenceId}/submissions` : `/assignment/${referenceId}`;
     case 'GRADE':
       return isStudent ? `/student/assignments/${referenceId}/submissions` : `/assignment/${referenceId}`;
     case 'SHARED_PRESENTATION':

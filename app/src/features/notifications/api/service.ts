@@ -32,6 +32,7 @@ export default class NotificationService implements NotificationApiService {
     const response = await this.apiClient.get<ApiResponse<any>>(`${this.baseUrl}/api/notifications`, {
       params: { page, size },
     });
+    console.log(response.data.data);
     return {
       data: response.data.data ?? [],
       pagination: response.data.pagination ?? {

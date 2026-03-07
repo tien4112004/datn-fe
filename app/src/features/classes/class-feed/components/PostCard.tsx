@@ -137,7 +137,7 @@ export const PostCard = ({
                   <Badge variant="outline" className="gap-1 text-[10px] md:text-xs">
                     <Clock className="h-3 w-3" />
                     {t('feed.post.badges.dueDate')}:{' '}
-                    {format(parseDateSafe(post.dueDate), 'PP', { locale: getLocaleDateFns() })}
+                    {format(parseDateSafe(post.dueDate), 'P, HH:mm:ss', { locale: getLocaleDateFns() })}
                   </Badge>
                 )}
 

@@ -66,7 +66,7 @@ interface Props {
   selectedStyle: string;
   matchSlideTheme: boolean;
   isProcessing: boolean;
-  artStyleOptions: Array<{ value: string; label: string }>;
+  artStyleOptions: Array<{ value: string; label: string; visual?: string }>;
 }
 
 interface Emits {

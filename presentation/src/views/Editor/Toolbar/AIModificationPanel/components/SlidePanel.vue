@@ -108,9 +108,14 @@ async function handleChatSubmit() {
 .slide-tabs {
   display: flex;
   gap: 4px;
-  padding: 4px;
-  background: var(--presentation-muted, rgba(0, 0, 0, 0.04));
   border-radius: var(--presentation-radius, 6px);
+  position: sticky;
+  top: -1rem;
+  z-index: 1;
+  margin: -1rem -1rem 0;
+  padding: 0.75rem 1rem;
+  background: var(--presentation-card, #fff);
+  border-bottom: 1px solid var(--presentation-border);
 }
 
 .slide-tab {
@@ -122,6 +127,7 @@ async function handleChatSubmit() {
   text-align: center;
   cursor: pointer;
   color: var(--presentation-muted-foreground);
+  background: var(--presentation-muted, rgba(0, 0, 0, 0.04));
   transition: all 0.15s;
   user-select: none;
 
@@ -130,9 +136,9 @@ async function handleChatSubmit() {
   }
 
   &.active {
-    background: var(--presentation-card, #fff);
-    color: var(--presentation-foreground);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    background: var(--presentation-primary);
+    color: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
 }
 

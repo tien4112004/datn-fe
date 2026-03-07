@@ -265,6 +265,8 @@ export default {
         tabRefine: 'Refine',
         tabGenerate: 'Generate',
         title: 'Generate Slides',
+        sectionText: 'Text',
+        sectionImage: 'Image',
         prompt: 'PROMPT',
         promptPlaceholder: 'Describe what you want to generate...',
         slideCount: 'SLIDE COUNT',
@@ -333,6 +335,7 @@ export default {
       },
       // Art Styles
       artStyles: {
+        none: 'None',
         photorealistic: 'Photorealistic',
         digitalArt: 'Digital Art',
         minimalist: 'Minimalist',

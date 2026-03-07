@@ -54,7 +54,7 @@ const { t } = useI18n();
 
 const modelStore = useModelStore();
 const { currentContext } = useAIModificationState();
-const { fetchArtStyles } = useArtStyles();
+useArtStyles();
 
 // Fetch default TEXT model and sync to store
 const { data: defaultTextModel } = useDefaultModel('TEXT');
@@ -105,23 +105,17 @@ watch(
   },
   { immediate: true }
 );
-
-// Fetch art styles on component mount
-fetchArtStyles();
 </script>
 
 <style lang="scss" scoped>
 .ai-modification-panel {
   display: flex;
   flex-direction: column;
-  height: 100%;
 }
 
 .panel-content {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  @include overflow-overlay();
 }
 </style>

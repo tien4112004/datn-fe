@@ -10,15 +10,16 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { DataTable, TablePagination } from '@/components/table';
 import { Button } from '@ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
+import { Input } from '@ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
 import type { SlideTemplate } from '@aiprimary/core';
-import { Edit, FileJson, Plus, RefreshCw, Trash2 } from 'lucide-react';
+import { Edit, FileJson, Plus, RefreshCw, Search, Trash2 } from 'lucide-react';
 import * as frontendDataTemplates from '@aiprimary/frontend-data';
 import { toast } from 'sonner';
 import { getAvailableLayouts } from '@/utils/defaultTemplates';
@@ -33,11 +34,24 @@ export function SlideTemplatesPage() {
   const [pageSize, setPageSize] = useState(10);
   const [layoutFilter, setLayoutFilter] = useState<string | 'ALL'>('ALL');
   const [isSyncing, setIsSyncing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchQuery(value);
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(() => {
+      setDebouncedSearch(value);
+      setPage(1);
+    }, 300);
+  }, []);
 
   const { data, isLoading, refetch } = useSlideTemplates({
     page,
     pageSize,
     ...(layoutFilter !== 'ALL' && { layout: layoutFilter }),
+    ...(debouncedSearch && { search: debouncedSearch }),
   });
   const updateTemplate = useUpdateSlideTemplate();
   const createTemplate = useCreateSlideTemplate();
@@ -278,6 +292,15 @@ export function SlideTemplatesPage() {
               </CardDescription>
             </div>
             <div className="flex items-center gap-4">
+              <div className="relative">
+                <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+                <Input
+                  placeholder="Search templates..."
+                  value={searchQuery}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  className="w-48 pl-9"
+                />
+              </div>
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground text-sm">Layout:</span>
                 <Select

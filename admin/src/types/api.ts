@@ -56,8 +56,13 @@ export interface UserQueryParams extends PaginationParams {
   search?: string;
 }
 
+export interface SlideThemeParams extends PaginationParams {
+  search?: string;
+}
+
 export interface SlideTemplateParams extends PaginationParams {
   layout?: string;
+  search?: string;
 }
 
 export interface Pagination {
@@ -83,7 +88,7 @@ export interface MatrixDimensions {
 
 export interface MatrixTemplate {
   id: string;
-  title: string;
+  name: string;
   grade: string | null;
   subject: string | null;
   createdAt: string;
@@ -96,4 +101,7 @@ export interface MatrixTemplate {
 
 export interface MatrixTemplateParams extends PaginationParams {
   search?: string;
+  bankType?: 'public' | 'personal';
+  subject?: string[];
+  grade?: string[];
 }

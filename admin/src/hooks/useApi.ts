@@ -6,6 +6,7 @@ import type {
   FAQPost,
   PaginationParams,
   UserQueryParams,
+  SlideThemeParams,
   SlideTemplateParams,
   MatrixTemplate,
   MatrixTemplateParams,
@@ -223,7 +224,7 @@ export function useUserById(id: string) {
 
 // ============= SLIDE THEMES =============
 
-export function useSlideThemes(params?: PaginationParams) {
+export function useSlideThemes(params?: SlideThemeParams) {
   return useQuery({
     queryKey: adminKeys.themes.list(params),
     queryFn: () => getAdminApiService().getSlideThemes(params),

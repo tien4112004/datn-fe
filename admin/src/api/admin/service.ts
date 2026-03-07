@@ -7,6 +7,7 @@ import type {
   MatrixTemplateParams,
   Pagination,
   PaginationParams,
+  SlideThemeParams,
   SlideTemplateParams,
   UserQueryParams,
 } from '@/types/api';
@@ -185,7 +186,7 @@ export default class AdminRealApiService implements AdminApiService {
   }
 
   // Slide Themes
-  async getSlideThemes(params?: PaginationParams): Promise<ApiResponse<SlideTheme[]>> {
+  async getSlideThemes(params?: SlideThemeParams): Promise<ApiResponse<SlideTheme[]>> {
     const response = await api.get<ApiResponse<SlideTheme[]>>(`${this.baseUrl}/api/slide-themes`, {
       params: {
         ...params,

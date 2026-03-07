@@ -27,7 +27,6 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from 'vue';
 import type { PPTImageElement } from '@/types/slides';
 import { useImageGeneration } from '../composables/useImageGeneration';
 import { useArtStyles } from '../composables/useArtStyles';
@@ -51,12 +50,7 @@ const {
   cancelGeneration,
 } = useImageGeneration();
 
-const { artStyleOptions, availableArtStyles, fetchArtStyles } = useArtStyles();
-
-// Fetch art styles on component mount
-onMounted(() => {
-  fetchArtStyles();
-});
+const { artStyleOptions, availableArtStyles } = useArtStyles();
 
 async function handleGenerateImage() {
   // Pass available art styles (with modifiers) to include artDescription in the request

@@ -265,6 +265,8 @@ export default {
         tabRefine: 'Tinh chỉnh',
         tabGenerate: 'Tạo mới',
         title: 'Tạo trang chiếu',
+        sectionText: 'Văn bản',
+        sectionImage: 'Hình ảnh',
         prompt: 'NỘI DUNG',
         promptPlaceholder: 'Mô tả nội dung bạn muốn tạo...',
         slideCount: 'SỐ TRANG',
@@ -333,6 +335,7 @@ export default {
       },
       // Phong cách nghệ thuật
       artStyles: {
+        none: 'Không có',
         photorealistic: 'Chân thực ảnh',
         digitalArt: 'Nghệ thuật kỹ thuật số',
         minimalist: 'Tối giản',

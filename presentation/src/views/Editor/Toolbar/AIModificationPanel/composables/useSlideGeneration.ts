@@ -27,7 +27,6 @@ export function useSlideGeneration() {
   const prompt = ref('');
   const slideCount = ref(2);
   const selectedArtStyle = ref('');
-  const negativePrompt = ref('');
 
   // Processing state
   const isProcessing = ref(false);
@@ -65,7 +64,6 @@ export function useSlideGeneration() {
           themeDescription: currentTheme.modifiers || undefined,
           artStyle: selectedArtStyle.value || undefined,
           artStyleModifiers,
-          negativePrompt: negativePrompt.value || undefined,
           documentId,
         },
       });
@@ -122,7 +120,6 @@ export function useSlideGeneration() {
           artStyle: selectedArtStyle.value || undefined,
           imageModel: modelStore.selectedImageModel.name,
           imageProvider: modelStore.selectedImageModel.provider,
-          negativePrompt: negativePrompt.value || undefined,
           context: buildContext(slidesStore.slides, slidesStore.slideIndex),
           language: 'vi',
           presentationId: presentationId.value || undefined,
@@ -199,7 +196,6 @@ export function useSlideGeneration() {
     prompt,
     slideCount,
     selectedArtStyle,
-    negativePrompt,
     isProcessing,
     feedbackMessage,
     feedbackType,

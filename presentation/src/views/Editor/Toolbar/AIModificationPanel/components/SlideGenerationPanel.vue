@@ -1,6 +1,11 @@
 <template>
   <div class="slide-generation-panel">
-    <!-- Prompt -->
+    <!-- Text Section -->
+    <div class="section-header">
+      <Type :size="13" />
+      <span>{{ t('panels.aiModification.slideGeneration.sectionText') }}</span>
+    </div>
+
     <InputGroup :label="t('panels.aiModification.slideGeneration.prompt')">
       <textarea
         v-model="prompt"
@@ -11,14 +16,12 @@
       />
     </InputGroup>
 
-    <!-- Slide count -->
     <InputGroup :label="t('panels.aiModification.slideGeneration.slideCount')">
       <select v-model="slideCount" class="slide-count-select" :disabled="isProcessing">
         <option v-for="n in 10" :key="n" :value="n">{{ n }}</option>
       </select>
     </InputGroup>
 
-    <!-- LLM Model -->
     <ModelSelector
       v-model="modelStore.selectedModel"
       :models="modelStore.textModels"
@@ -26,31 +29,24 @@
       :label="t('panels.aiModification.textGenerationModel.label')"
     />
 
-    <!-- Art Style -->
+    <!-- Image Section -->
+    <div class="section-header">
+      <ImageIcon :size="13" />
+      <span>{{ t('panels.aiModification.slideGeneration.sectionImage') }}</span>
+    </div>
+
     <ArtStyleSelector
       v-model="selectedArtStyle"
       :art-style-options="artStyleOptions"
       :disabled="isProcessing"
     />
 
-    <!-- Image Model -->
     <ModelSelector
       v-model="modelStore.selectedImageModel"
       :models="modelStore.imageModels"
       :is-processing="isProcessing"
       :label="t('panels.aiModification.imageGenerationModel.label')"
     />
-
-    <!-- Negative Prompt -->
-    <InputGroup :label="t('panels.aiModification.slideGeneration.negativePrompt')">
-      <input
-        v-model="negativePrompt"
-        type="text"
-        class="negative-prompt-input"
-        :placeholder="t('panels.aiModification.slideGeneration.negativePromptPlaceholder')"
-        :disabled="isProcessing"
-      />
-    </InputGroup>
 
     <!-- Feedback -->
     <FeedbackMessage v-if="feedbackMessage" :type="feedbackType">
@@ -72,6 +68,7 @@
 
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n';
+import { Type, Image as ImageIcon } from 'lucide-vue-next';
 import { useModelStore } from '@/stores/modelStore';
 import { useSlideGeneration } from '../composables/useSlideGeneration';
 import { useArtStyles } from '../composables/useArtStyles';
@@ -87,7 +84,6 @@ const {
   prompt,
   slideCount,
   selectedArtStyle,
-  negativePrompt,
   isProcessing,
   feedbackMessage,
   feedbackType,
@@ -103,6 +99,29 @@ const { artStyleOptions } = useArtStyles();
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--presentation-muted-foreground);
+  margin-top: 4px;
+
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--presentation-border);
+  }
+
+  &:first-child {
+    margin-top: 0;
+  }
 }
 
 .prompt-textarea {
@@ -148,27 +167,6 @@ const { artStyleOptions } = useArtStyles();
   &:focus {
     outline: none;
     border-color: var(--presentation-primary);
-  }
-}
-
-.negative-prompt-input {
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid var(--presentation-border);
-  border-radius: 6px;
-  background: var(--presentation-input);
-  color: var(--presentation-foreground);
-  font-size: 13px;
-  font-family: inherit;
-
-  &:focus {
-    outline: none;
-    border-color: var(--presentation-primary);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
   }
 }
 

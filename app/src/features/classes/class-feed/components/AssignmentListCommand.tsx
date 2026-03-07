@@ -5,22 +5,30 @@ import { Button } from '@ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/popover';
 import { Check, Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface AssignmentListCommandProps {
   classId?: string;
   selectedAssignmentId?: string;
   onAssignmentSelect: (assignment: Assignment | null) => void;
+  parentOpen?: boolean;
 }
 
 export const AssignmentListCommand = ({
   classId,
   selectedAssignmentId,
   onAssignmentSelect,
+  parentOpen,
 }: AssignmentListCommandProps) => {
   const { t } = useTranslation('classes');
   const [assignmentSearchOpen, setAssignmentSearchOpen] = useState(false);
+
+  useEffect(() => {
+    if (parentOpen === false) {
+      setAssignmentSearchOpen(false);
+    }
+  }, [parentOpen]);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
 
   // Fetch assignments from API

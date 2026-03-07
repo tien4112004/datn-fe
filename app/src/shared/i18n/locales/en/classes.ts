@@ -1094,6 +1094,7 @@ export default {
         linkLessons: 'Link Lessons',
         linkResources: 'Link Resources',
         selectAssignment: 'Select Assignment',
+        assignmentTitle: 'Assignment Title',
         deadline: 'Deadline',
         allowComments: 'Allow Comments',
       },

@@ -1095,6 +1095,7 @@ export default {
         linkLessons: 'Liên kết bài học',
         linkResources: 'Liên kết tài nguyên',
         selectAssignment: 'Chọn bài tập',
+        assignmentTitle: 'Tên bài tập',
         deadline: 'Hạn chót',
         allowComments: 'Cho Phép Bình Luận',
       },

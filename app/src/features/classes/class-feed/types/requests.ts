@@ -10,6 +10,7 @@ export interface PostCreateRequest {
   linkedResources?: LinkedResourceRequest[];
   linkedLessonId?: string; // Note: singular, not plural
   assignmentId?: string; // For Exercise type posts
+  assignmentTitle?: string; // Title of the selected assignment (for Exercise type posts)
   dueDate?: string; // ISO string for Exercise type posts
   allowComments?: boolean;
 

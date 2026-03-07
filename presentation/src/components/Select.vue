@@ -2,7 +2,7 @@
   <div v-if="disabled">
     <div
       ref="selectRef"
-      class="tw-border-border tw-flex tw-h-8 tw-w-full tw-cursor-pointer tw-select-none tw-items-center tw-bg-gray-50 tw-text-sm tw-text-gray-500 tw-transition-colors tw-duration-200"
+      class="tw-flex tw-h-8 tw-w-full tw-cursor-not-allowed tw-select-none tw-items-center tw-rounded-md tw-border tw-border-gray-200 tw-bg-gray-50 tw-text-sm tw-text-gray-400 tw-opacity-60"
     >
       <div class="tw-flex-1 tw-truncate tw-pl-2.5">{{ value }}</div>
       <div class="tw-flex tw-w-8 tw-items-center tw-justify-center tw-text-gray-400">
@@ -18,7 +18,9 @@
     placement="bottom"
     :contentStyle="{
       padding: 0,
-      boxShadow: '0 6px 16px 0 rgba(0, 0, 0, 0.08)',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.12)',
+      border: '1px solid #e5e7eb',
+      borderRadius: '6px',
     }"
     :style="style"
     v-else
@@ -42,11 +44,11 @@
           v-for="option in showOptions"
           :key="option.value"
           :class="{
-            'tw-text-gray-500': option.disabled,
-            'tw-text-blue-600 font-bold': option.value === value && !option.disabled,
-            'hover:tw-bg-blue-50 cursor-pointer': !option.disabled && option.value !== value,
+            'tw-text-gray-400 tw-cursor-not-allowed': option.disabled,
+            'tw-bg-blue-50/60 tw-text-blue-600 tw-font-semibold': option.value === value && !option.disabled,
+            'hover:tw-bg-blue-50 tw-cursor-pointer': !option.disabled && option.value !== value,
           }"
-          class="tw-h-8 tw-truncate tw-rounded-md tw-px-1.5 tw-leading-8"
+          class="tw-h-8 tw-truncate tw-rounded-md tw-px-1.5 tw-leading-8 tw-transition-colors tw-duration-100"
           @click="handleSelect(option)"
         >
           {{ option.label }}
@@ -55,12 +57,21 @@
     </template>
     <div
       ref="selectRef"
-      class="tw-flex tw-h-8 tw-w-full tw-cursor-pointer tw-select-none tw-items-center tw-rounded-md tw-border tw-border-gray-300 tw-bg-white tw-text-sm tw-transition-colors tw-duration-200 hover:tw-border-blue-500"
+      class="tw-flex tw-h-8 tw-w-full tw-cursor-pointer tw-select-none tw-items-center tw-rounded-md tw-border tw-bg-white tw-text-sm tw-transition-[border-color,box-shadow] tw-duration-150"
+      :class="
+        popoverVisible
+          ? 'tw-border-blue-500 tw-shadow-[0_0_0_3px_rgba(59,130,246,0.15)]'
+          : 'tw-border-gray-300 hover:tw-border-blue-500'
+      "
     >
-      <div class="tw-flex-1 tw-truncate tw-pl-2.5">{{ showLabel }}</div>
+      <div class="tw-flex-1 tw-truncate tw-pl-2.5 tw-text-gray-700">{{ showLabel }}</div>
       <div class="tw-flex tw-w-8 tw-items-center tw-justify-center tw-text-gray-400">
         <slot name="icon">
-          <IconDown :size="14" />
+          <IconDown
+            :size="14"
+            class="tw-transition-transform tw-duration-150"
+            :class="{ 'tw-rotate-180': popoverVisible }"
+          />
         </slot>
       </div>
     </div>
@@ -82,6 +93,7 @@ import Divider from './Divider.vue';
 import { useI18n } from 'vue-i18n';
 import Popover from './Popover.vue';
 import Input from './Input.vue';
+import { ChevronDown as IconDown } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

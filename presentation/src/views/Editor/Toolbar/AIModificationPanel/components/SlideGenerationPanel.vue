@@ -17,9 +17,7 @@
     </InputGroup>
 
     <InputGroup :label="t('panels.aiModification.slideGeneration.slideCount')">
-      <select v-model="slideCount" class="slide-count-select" :disabled="isProcessing">
-        <option v-for="n in 10" :key="n" :value="n">{{ n }}</option>
-      </select>
+      <Select v-model:value="slideCount" :options="slideCountOptions" :disabled="isProcessing" />
     </InputGroup>
 
     <ModelSelector
@@ -76,6 +74,12 @@ import ModelSelector from './common/ModelSelector.vue';
 import ArtStyleSelector from './common/ArtStyleSelector.vue';
 import InputGroup from './common/InputGroup.vue';
 import FeedbackMessage from './common/FeedbackMessage.vue';
+import Select from '@/components/Select.vue';
+
+const slideCountOptions = Array.from({ length: 10 }, (_, i) => ({
+  value: i + 1,
+  label: String(i + 1),
+}));
 
 const { t } = useI18n();
 const modelStore = useModelStore();
@@ -145,28 +149,6 @@ const { artStyleOptions } = useArtStyles();
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-  }
-}
-
-.slide-count-select {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid var(--presentation-border);
-  border-radius: 6px;
-  background: var(--presentation-input);
-  color: var(--presentation-foreground);
-  font-size: 14px;
-  cursor: pointer;
-  font-family: inherit;
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  &:focus {
-    outline: none;
-    border-color: var(--presentation-primary);
   }
 }
 

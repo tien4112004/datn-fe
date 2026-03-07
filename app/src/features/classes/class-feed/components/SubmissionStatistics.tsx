@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FileQuestion, Clock, Eye, Edit, Trophy, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
+import { FileQuestion, Clock, Eye, Edit, Trophy, ChevronRight } from 'lucide-react';
 import { Button } from '@ui/button';
 import { Skeleton } from '@ui/skeleton';
 import { useSubmissionsByPost } from '@/features/assignment/hooks';
@@ -9,6 +9,8 @@ import { SubmissionStatusBadge } from '@/features/assignment/components/Submissi
 import { useFormattedDistance } from '@/shared/lib/date-utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
 import type { Submission } from '@aiprimary/core';
+import { SubmissionAnalysisSection } from '@/features/submission/components/SubmissionAnalysisSection';
+import CommonTabs, { type TabItem } from '@/shared/components/common/CommonTabs';
 
 interface SubmissionStatisticsProps {
   postId: string;
@@ -63,8 +65,8 @@ export const SubmissionStatistics = ({ postId }: SubmissionStatisticsProps) => {
   const { t } = useTranslation('classes', { keyPrefix: 'submissionStatistics' });
   const { formatDistanceToNow } = useFormattedDistance();
   const { data: submissions = [], isLoading } = useSubmissionsByPost(postId);
-  const [showTable, setShowTable] = useState(true);
   const [expandedStudents, setExpandedStudents] = useState<Set<string>>(new Set());
+  const [activeTab, setActiveTab] = useState('analysis');
 
   const studentGroups = useMemo(() => groupByStudent(submissions), [submissions]);
 
@@ -131,142 +133,169 @@ export const SubmissionStatistics = ({ postId }: SubmissionStatisticsProps) => {
     </div>
   );
 
-  return (
-    <div className="mt-6">
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <FileQuestion className="text-muted-foreground h-5 w-5" />
-          <h3 className="text-lg font-semibold">{t('title')}</h3>
+  const tabItems: TabItem[] = [
+    {
+      key: 'analysis',
+      value: 'analysis',
+      label: t('tabs.analysis'),
+      content: (
+        <div className="py-4">
+          {submissions.length > 0 ? (
+            <SubmissionAnalysisSection submissions={submissions} />
+          ) : (
+            <p className="text-muted-foreground text-sm">{t('noSubmissions')}</p>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'table',
+      value: 'table',
+      label: (
+        <span className="flex items-center gap-1.5">
+          {t('tabs.table')}
           {studentGroups.length > 0 && (
-            <span className="bg-muted rounded-full px-2 py-0.5 text-xs font-medium">
+            <span className="bg-muted rounded-full px-1.5 py-0.5 text-xs font-medium">
               {studentGroups.length}
             </span>
           )}
+        </span>
+      ),
+      content: (
+        <div className="pt-2">
+          {studentGroups.length === 0 ? (
+            <p className="text-muted-foreground py-4 text-sm">{t('noSubmissions')}</p>
+          ) : (
+            <div className="overflow-hidden rounded-lg border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-8" />
+                    <TableHead>{t('tableHeaders.student')}</TableHead>
+                    <TableHead>{t('tableHeaders.attempts')}</TableHead>
+                    <TableHead>{t('tableHeaders.submitted')}</TableHead>
+                    <TableHead>{t('tableHeaders.status')}</TableHead>
+                    <TableHead>{t('tableHeaders.score')}</TableHead>
+                    <TableHead className="text-right">{t('tableHeaders.actions')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {studentGroups.map((group) => {
+                    const rep = group.representative;
+                    const isExpanded = expandedStudents.has(group.studentId);
+                    const hasMultiple = group.submissions.length > 1;
+
+                    return (
+                      <React.Fragment key={group.studentId}>
+                        <TableRow
+                          className="hover:bg-muted/50 cursor-pointer"
+                          onClick={() => hasMultiple && toggleExpand(group.studentId)}
+                        >
+                          <TableCell className="w-8 pr-0">
+                            {hasMultiple && (
+                              <ChevronRight
+                                className={`text-muted-foreground h-4 w-4 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
+                              />
+                            )}
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {group.studentName ? (
+                              <div>
+                                <p className="font-semibold">{group.studentName}</p>
+                                <p className="text-muted-foreground text-xs">{group.studentEmail}</p>
+                              </div>
+                            ) : (
+                              <p className="text-muted-foreground">{t('unknownStudent')}</p>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <span className="bg-muted rounded-full px-2 py-0.5 text-xs font-medium">
+                              {group.submissions.length}{' '}
+                              {group.submissions.length === 1 ? t('attemptSingular') : t('attemptPlural')}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Clock className="text-muted-foreground h-4 w-4" />
+                              <span className="text-sm">
+                                {formatDistanceToNow(new Date(rep.submittedAt), { addSuffix: true })}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <SubmissionStatusBadge status={rep.status} />
+                          </TableCell>
+                          <TableCell>{renderScore(rep)}</TableCell>
+                          <TableCell className="text-right">{renderActions(rep)}</TableCell>
+                        </TableRow>
+
+                        {isExpanded &&
+                          group.submissions.map((sub, idx) => {
+                            const attemptNumber = group.submissions.length - idx;
+                            const isBest = sub.id === rep.id;
+                            return (
+                              <TableRow key={sub.id} className="bg-muted/40 hover:bg-muted/60">
+                                <TableCell />
+                                <TableCell className="py-2 pl-8">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-muted-foreground text-xs">
+                                      {t('attemptNumber', { number: attemptNumber })}
+                                    </span>
+                                    {isBest && (
+                                      <span className="rounded-full bg-yellow-100 px-1.5 py-0.5 text-xs font-medium text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">
+                                        {t('best')}
+                                      </span>
+                                    )}
+                                    {idx === 0 && !isBest && (
+                                      <span className="rounded-full bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                                        {t('latest')}
+                                      </span>
+                                    )}
+                                  </div>
+                                </TableCell>
+                                <TableCell />
+                                <TableCell className="py-2">
+                                  <div className="flex items-center gap-2">
+                                    <Clock className="text-muted-foreground h-3 w-3" />
+                                    <span className="text-xs">
+                                      {formatDistanceToNow(new Date(sub.submittedAt), { addSuffix: true })}
+                                    </span>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="py-2">
+                                  <SubmissionStatusBadge status={sub.status} />
+                                </TableCell>
+                                <TableCell className="py-2">{renderScore(sub)}</TableCell>
+                                <TableCell className="py-2 text-right">{renderActions(sub)}</TableCell>
+                              </TableRow>
+                            );
+                          })}
+                      </React.Fragment>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </div>
-        {studentGroups.length > 0 && (
-          <Button variant="outline" size="sm" onClick={() => setShowTable(!showTable)}>
-            {showTable ? <ChevronUp className="mr-2 h-4 w-4" /> : <ChevronDown className="mr-2 h-4 w-4" />}
-            {showTable ? t('hideTable') : t('showTable')} {t('table')}
-          </Button>
-        )}
+      ),
+    },
+  ];
+
+  return (
+    <div className="mt-6">
+      <div className="mb-4 flex items-center gap-2">
+        <FileQuestion className="text-muted-foreground h-5 w-5" />
+        <h3 className="text-lg font-semibold">{t('title')}</h3>
       </div>
 
-      {showTable && studentGroups.length > 0 && (
-        <div className="mt-4 overflow-hidden rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-8" />
-                <TableHead>{t('tableHeaders.student')}</TableHead>
-                <TableHead>{t('tableHeaders.attempts')}</TableHead>
-                <TableHead>{t('tableHeaders.submitted')}</TableHead>
-                <TableHead>{t('tableHeaders.status')}</TableHead>
-                <TableHead>{t('tableHeaders.score')}</TableHead>
-                <TableHead className="text-right">{t('tableHeaders.actions')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {studentGroups.map((group) => {
-                const rep = group.representative;
-                const isExpanded = expandedStudents.has(group.studentId);
-                const hasMultiple = group.submissions.length > 1;
-
-                return (
-                  <React.Fragment key={group.studentId}>
-                    {/* Summary row */}
-                    <TableRow
-                      className="hover:bg-muted/50 cursor-pointer"
-                      onClick={() => hasMultiple && toggleExpand(group.studentId)}
-                    >
-                      <TableCell className="w-8 pr-0">
-                        {hasMultiple && (
-                          <ChevronRight
-                            className={`text-muted-foreground h-4 w-4 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
-                          />
-                        )}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {group.studentName ? (
-                          <div>
-                            <p className="font-semibold">{group.studentName}</p>
-                            <p className="text-muted-foreground text-xs">{group.studentEmail}</p>
-                          </div>
-                        ) : (
-                          <p className="text-muted-foreground">{t('unknownStudent')}</p>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <span className="bg-muted rounded-full px-2 py-0.5 text-xs font-medium">
-                          {group.submissions.length}{' '}
-                          {group.submissions.length === 1 ? t('attemptSingular') : t('attemptPlural')}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Clock className="text-muted-foreground h-4 w-4" />
-                          <span className="text-sm">
-                            {formatDistanceToNow(new Date(rep.submittedAt), { addSuffix: true })}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <SubmissionStatusBadge status={rep.status} />
-                      </TableCell>
-                      <TableCell>{renderScore(rep)}</TableCell>
-                      <TableCell className="text-right">{renderActions(rep)}</TableCell>
-                    </TableRow>
-
-                    {/* Expanded attempt rows */}
-                    {isExpanded &&
-                      group.submissions.map((sub, idx) => {
-                        const attemptNumber = group.submissions.length - idx;
-                        const isBest = sub.id === rep.id;
-                        return (
-                          <TableRow key={sub.id} className="bg-muted/40 hover:bg-muted/60">
-                            <TableCell />
-                            <TableCell className="py-2 pl-8">
-                              <div className="flex items-center gap-2">
-                                <span className="text-muted-foreground text-xs">
-                                  {t('attemptNumber', { number: attemptNumber })}
-                                </span>
-                                {isBest && (
-                                  <span className="rounded-full bg-yellow-100 px-1.5 py-0.5 text-xs font-medium text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">
-                                    {t('best')}
-                                  </span>
-                                )}
-                                {idx === 0 && !isBest && (
-                                  <span className="rounded-full bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                                    {t('latest')}
-                                  </span>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell />
-                            <TableCell className="py-2">
-                              <div className="flex items-center gap-2">
-                                <Clock className="text-muted-foreground h-3 w-3" />
-                                <span className="text-xs">
-                                  {formatDistanceToNow(new Date(sub.submittedAt), {
-                                    addSuffix: true,
-                                  })}
-                                </span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="py-2">
-                              <SubmissionStatusBadge status={sub.status} />
-                            </TableCell>
-                            <TableCell className="py-2">{renderScore(sub)}</TableCell>
-                            <TableCell className="py-2 text-right">{renderActions(sub)}</TableCell>
-                          </TableRow>
-                        );
-                      })}
-                  </React.Fragment>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+      <CommonTabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        items={tabItems}
+        tabsListClassName="bg-card flex w-full flex-row justify-start rounded-none border-b p-0"
+        tabsClassName="w-full"
+      />
     </div>
   );
 };

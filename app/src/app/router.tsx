@@ -224,12 +224,6 @@ const router = createBrowserRouter([
         loader: (await import('@/features/assignment/hooks/loaders')).getAssignmentById,
       },
       {
-        path: 'assignments/:id/submissions',
-        lazy: async () => ({
-          Component: (await import('@/features/submission/pages')).AssignmentSubmissionsPage,
-        }),
-      },
-      {
         path: 'demo/question-renderer',
         lazy: async () => ({
           Component: (await import('@/features/assignment/pages/QuestionRendererDemoPage'))

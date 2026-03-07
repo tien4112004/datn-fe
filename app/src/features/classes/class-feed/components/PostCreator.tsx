@@ -75,6 +75,7 @@ export const PostCreator = ({
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [assignmentTitle, setAssignmentTitle] = useState<string>('');
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
+  const [dueTime, setDueTime] = useState<string>('00:00:00');
   const [allowComments, setAllowComments] = useState(true);
 
   // Assignment settings (for Exercise type)
@@ -83,14 +84,14 @@ export const PostCreator = ({
   const [shuffleQuestions, setShuffleQuestions] = useState(false);
   const [showCorrectAnswers, setShowCorrectAnswers] = useState(false);
   const [passingScore, setPassingScore] = useState<number | undefined>(undefined);
-  const [availableFrom, setAvailableFrom] = useState<string>('');
-  const [availableUntil, setAvailableUntil] = useState<string>('');
   const [autoGrade, setAutoGrade] = useState(true);
   const [attachmentErrors, setAttachmentErrors] = useState<string[]>([]);
+  const [assignmentError, setAssignmentError] = useState<string | null>(null);
 
   // Sync type with initialType when it changes (e.g., when filter switches to Exercise)
   useEffect(() => {
     setType(initialType);
+    setAssignmentError(null);
   }, [initialType]);
 
   // Form for content validation
@@ -128,6 +129,11 @@ export const PostCreator = ({
   }, [editor, handleEditorChange]);
 
   const onSubmit = handleFormSubmit(async (data) => {
+    if (type === PostType.Exercise && !selectedAssignment) {
+      setAssignmentError(t('feed.creator.validation.assignmentRequired'));
+      return;
+    }
+
     // Upload pending attachments first (needed before building request)
     let attachmentUrls: string[] = [];
     try {
@@ -165,8 +171,6 @@ export const PostCreator = ({
         shuffleQuestions,
         showCorrectAnswers,
         passingScore,
-        availableFrom: availableFrom || undefined,
-        availableUntil: availableUntil || undefined,
         autoGrade,
       }),
     };
@@ -179,6 +183,7 @@ export const PostCreator = ({
     setSelectedAssignment(null);
     setAssignmentTitle('');
     setDueDate(undefined);
+    setDueTime('00:00:00');
     setType(initialType);
     setAllowComments(true);
     setMaxSubmissions(undefined);
@@ -187,8 +192,6 @@ export const PostCreator = ({
     setShowCorrectAnswers(false);
     setAutoGrade(true);
     setPassingScore(undefined);
-    setAvailableFrom('');
-    setAvailableUntil('');
     setOpen(false);
     onPostCreated?.();
 
@@ -244,6 +247,7 @@ export const PostCreator = ({
         if (!next) {
           setSelectedAssignment(null);
           setAssignmentTitle('');
+          setAssignmentError(null);
         }
         setOpen(next);
       }}
@@ -265,7 +269,10 @@ export const PostCreator = ({
             <Label className="text-sm font-medium">{t('feed.creator.labels.postType')}</Label>
             <RadioGroup
               value={type}
-              onValueChange={(value) => setType(value as PostType)}
+              onValueChange={(value) => {
+                setType(value as PostType);
+                setAssignmentError(null);
+              }}
               className="flex gap-6"
             >
               <div className="flex items-center gap-2">
@@ -315,8 +322,10 @@ export const PostCreator = ({
                   onAssignmentSelect={(assignment) => {
                     setSelectedAssignment(assignment);
                     setAssignmentTitle(assignment?.title ?? '');
+                    setAssignmentError(null);
                   }}
                 />
+                {assignmentError && <p className="text-sm text-red-600">{assignmentError}</p>}
               </div>
 
               {selectedAssignment && (
@@ -344,7 +353,7 @@ export const PostCreator = ({
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {dueDate
-                          ? format(dueDate, 'PPPP', { locale: getLocaleDateFns() })
+                          ? format(dueDate, 'PPPP, HH:mm:ss', { locale: getLocaleDateFns() })
                           : t('feed.creator.labels.deadline')}
                       </Button>
                     </PopoverTrigger>
@@ -352,10 +361,33 @@ export const PostCreator = ({
                       <Calendar
                         mode="single"
                         selected={dueDate}
-                        onSelect={setDueDate}
+                        onSelect={(date) => {
+                          if (date) {
+                            const [h, m, s] = dueTime.split(':').map(Number);
+                            date.setHours(h, m, s ?? 0, 0);
+                          }
+                          setDueDate(date);
+                        }}
                         disabled={(date: Date) => date < new Date()}
                         locale={getLocaleDateFns()}
                       />
+                      <div className="border-t p-3">
+                        <Input
+                          type="time"
+                          step="1"
+                          value={dueTime}
+                          onChange={(e) => {
+                            setDueTime(e.target.value);
+                            if (dueDate) {
+                              const [h, m, s] = e.target.value.split(':').map(Number);
+                              const updated = new Date(dueDate);
+                              updated.setHours(h, m, s ?? 0, 0);
+                              setDueDate(updated);
+                            }
+                          }}
+                          className="h-8"
+                        />
+                      </div>
                     </PopoverContent>
                   </Popover>
                 </div>
@@ -489,34 +521,6 @@ export const PostCreator = ({
                       <p className="mt-1 text-xs text-gray-500">
                         {t('feed.creator.assignmentSettings.grading.passingScoreDescription')}
                       </p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label htmlFor="availFrom" className="text-xs text-gray-600">
-                        {t('feed.creator.assignmentSettings.timing.availableFrom')}
-                      </Label>
-                      <Input
-                        id="availFrom"
-                        type="datetime-local"
-                        value={availableFrom}
-                        onChange={(e) => setAvailableFrom(e.target.value)}
-                        className="mt-1 h-8"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="availUntil" className="text-xs text-gray-600">
-                        {t('feed.creator.assignmentSettings.timing.availableUntil')}
-                      </Label>
-                      <Input
-                        id="availUntil"
-                        type="datetime-local"
-                        value={availableUntil}
-                        onChange={(e) => setAvailableUntil(e.target.value)}
-                        className="mt-1 h-8"
-                      />
                     </div>
                   </div>
                 </div>

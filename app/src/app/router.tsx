@@ -124,6 +124,14 @@ const router = createBrowserRouter([
         shouldRevalidate: ({ currentUrl, nextUrl }) => {
           return currentUrl.pathname !== nextUrl.pathname;
         },
+        children: [
+          {
+            path: 'students/:studentId',
+            lazy: async () => ({
+              Component: (await import('@/features/students/pages/StudentDetailPage')).default,
+            }),
+          },
+        ],
       },
       {
         path: 'classes/:id/feed',
@@ -133,12 +141,6 @@ const router = createBrowserRouter([
         path: 'classes/:classId/posts/:postId',
         lazy: async () => ({
           Component: (await import('@/features/classes/class-feed')).PostDetailPage,
-        }),
-      },
-      {
-        path: 'students/:studentId',
-        lazy: async () => ({
-          Component: (await import('@/features/students/pages/StudentDetailPage')).default,
         }),
       },
       {

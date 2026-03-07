@@ -728,6 +728,9 @@ export default {
       actions: 'Actions',
       edit: 'Edit',
       delete: 'Delete',
+      view: 'View',
+      searchPlaceholder: 'Search students...',
+      noSearchResults: 'No students match your search',
       statusActive: 'Active',
       statusTransferred: 'Transferred',
       statusGraduated: 'Graduated',
@@ -1377,6 +1380,7 @@ export default {
     sections: {
       studentInformation: 'Student Information',
       performanceAnalytics: 'Performance Analytics',
+      submissionHistory: 'Submission History',
     },
     performance: {
       unavailable: 'Performance Data Unavailable',
@@ -1422,6 +1426,18 @@ export default {
         title: 'Performance by Class',
         subtitle: 'Detailed breakdown across {{count}} class',
         subtitle_other: 'Detailed breakdown across {{count}} classes',
+      },
+    },
+    submissions: {
+      title: 'Submission History',
+      empty: 'No submissions yet',
+      columns: {
+        assignment: 'Assignment',
+        class: 'Class',
+        submitted: 'Submitted',
+        score: 'Score',
+        status: 'Status',
+        actions: 'Actions',
       },
     },
   },

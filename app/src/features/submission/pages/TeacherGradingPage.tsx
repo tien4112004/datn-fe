@@ -7,6 +7,7 @@ import { Label } from '@ui/label';
 
 import { cn } from '@/shared/lib/utils';
 import {
+  ArrowLeft,
   ChevronLeft,
   ChevronRight,
   Save,
@@ -228,7 +229,18 @@ export const TeacherGradingPage = () => {
     <div className="flex h-full flex-col md:h-[calc(100vh-4rem)] md:flex-row">
       {/* Mobile Header */}
       <div className="border-b px-6 py-4 md:hidden">
-        <h1 className="text-lg font-semibold">{t('title')}</h1>
+        <div className="mb-1 flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate(-1)}
+            className="hover:bg-muted group shrink-0 transition-colors"
+            aria-label={tActions('goBack')}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-lg font-semibold">{t('title')}</h1>
+        </div>
         <p className="text-muted-foreground mt-1 text-sm">{assignment.title}</p>
         <div className="mt-2 flex items-center justify-between">
           <span className="text-muted-foreground text-sm">
@@ -245,8 +257,19 @@ export const TeacherGradingPage = () => {
         {/* Header */}
         <div className="space-y-4 border-b p-6">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
-            <p className="text-muted-foreground mt-1 text-sm">{assignment.title}</p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate(-1)}
+                className="hover:bg-muted group shrink-0 transition-colors"
+                aria-label={tActions('goBack')}
+              >
+                <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+              </Button>
+              <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+            </div>
+            <p className="text-muted-foreground mt-1 pl-10 text-sm">{assignment.title}</p>
           </div>
         </div>
 

@@ -16,6 +16,7 @@ interface ClassStudentListProps {
 export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
   const { t } = useTranslation('classes', { keyPrefix: 'detail' });
   const [viewMode, setViewMode] = useState('list');
+  const [search, setSearch] = useState('');
 
   // Fetch students from /classes/:id/students endpoint
   const {
@@ -25,7 +26,10 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
     setPagination,
     totalItems,
   } = useClassStudents(classData.id);
-  const { data: allStudents = [], isLoading: isLoadingAllStudents } = useAllClassStudents(classData.id);
+  const { data: allStudents = [], isLoading: isLoadingAllStudents } = useAllClassStudents(
+    classData.id,
+    viewMode === 'seating-chart' || search.length > 0
+  );
   const { data: initialLayout, isLoading: isLoadingLayout, isError } = useSeatingChart(classData.id);
 
   // Auto-initialize layout if none exists
@@ -87,11 +91,14 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
         {viewMode === 'list' && (
           <StudentListView
             students={students}
+            allStudents={allStudents}
             classId={classData.id}
             isLoading={isLoadingStudents}
             pagination={pagination}
             setPagination={setPagination}
             totalItems={totalItems}
+            search={search}
+            onSearchChange={setSearch}
           />
         )}
         {viewMode === 'seating-chart' && (

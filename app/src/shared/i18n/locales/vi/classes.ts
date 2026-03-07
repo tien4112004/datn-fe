@@ -728,6 +728,9 @@ export default {
       actions: 'Thao tác',
       edit: 'Chỉnh sửa',
       delete: 'Xóa',
+      view: 'Xem',
+      searchPlaceholder: 'Tìm kiếm học sinh...',
+      noSearchResults: 'Không tìm thấy học sinh phù hợp',
       statusActive: 'Đang học',
       statusTransferred: 'Chuyển trường',
       statusGraduated: 'Tốt nghiệp',
@@ -1378,6 +1381,7 @@ export default {
     sections: {
       studentInformation: 'Thông tin học sinh',
       performanceAnalytics: 'Phân tích hiệu suất',
+      submissionHistory: 'Lịch sử nộp bài',
     },
     performance: {
       unavailable: 'Dữ liệu hiệu suất không khả dụng',
@@ -1423,6 +1427,18 @@ export default {
         title: 'Hiệu suất theo lớp',
         subtitle: 'Phân tích chi tiết cho {{count}} lớp',
         subtitle_other: 'Phân tích chi tiết cho {{count}} lớp',
+      },
+    },
+    submissions: {
+      title: 'Lịch sử nộp bài',
+      empty: 'Chưa có bài nộp nào',
+      columns: {
+        assignment: 'Bài tập',
+        class: 'Lớp',
+        submitted: 'Ngày nộp',
+        score: 'Điểm',
+        status: 'Trạng thái',
+        actions: 'Thao tác',
       },
     },
   },

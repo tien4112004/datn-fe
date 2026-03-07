@@ -409,9 +409,9 @@ export function usePresentationProcessor(
     // Use inline SVG error icon (no external fetch needed, avoids CORS issues)
     const errorIconSrc = 'https://storage.huy-devops.site/ai-primary/error.svg';
 
+    // Recalculate clip for error icon so it matches TemplatePanel (which calls convertToSlide with current src)
     const updatedElement = {
-      ...element,
-      src: errorIconSrc,
+      ...(await updateImageSource(element, errorIconSrc)),
       hasError: true, // Error flag
     } as any;
 

@@ -35,6 +35,20 @@ export default {
       placeholder: 'Select subject',
       none: 'None',
     },
+    educationMode: {
+      label: 'Education Mode',
+      description: 'AI will use curriculum-aligned content for your grade, subject, and chapter.',
+      gradeRequired: 'Please select a grade level.',
+      subjectRequired: 'Please select a subject.',
+      chapterRequired: 'Please select a chapter.',
+    },
+    chapter: {
+      label: 'Chapter',
+      placeholder: 'Select chapter',
+      selectGradeSubjectFirst: 'Select grade & subject first',
+      loading: 'Loading chapters...',
+      noChapters: 'No chapters found',
+    },
     examples: {
       title: 'Example Mindmap Topics',
       prompt1: 'Machine Learning Fundamentals',

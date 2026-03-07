@@ -7,8 +7,10 @@ export interface CreateMindmapFormData {
   language: 'en' | 'vi';
   maxDepth: number;
   maxBranchesPerNode: number;
+  educationMode?: boolean;
   grade?: string;
   subject?: string;
+  chapter?: string;
 }
 
 /**
@@ -25,6 +27,7 @@ export interface MindmapMobileGenerationRequest {
   maxBranchesPerNode: number;
   grade?: string;
   subject?: string;
+  chapter?: string;
 }
 
 export const LANGUAGE_OPTIONS = [

@@ -316,6 +316,9 @@ export const useDraftPresentation = () => {
         isParsed: false,
         slides: [],
         ...request.presentation,
+        grade: request.grade,
+        subject: request.subject,
+        chapter: request.chapter,
       });
       return draftPresentation;
     },

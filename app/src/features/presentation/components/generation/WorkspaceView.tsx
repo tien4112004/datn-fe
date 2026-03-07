@@ -13,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@ui/select';
-import { getAllGrades, getAllSubjects } from '@aiprimary/core';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { LANGUAGE_OPTIONS, SLIDE_COUNT_OPTIONS } from '@/features/presentation/types';
 import { MODEL_TYPES, useModels } from '@/features/model';
@@ -106,12 +105,10 @@ interface OutlineFormSectionProps {
 const FILE_ACCEPT = '.pdf,.docx,.doc,.txt,.jpg,.jpeg,.png,.gif,.webp,.bmp';
 
 const OutlineFormSection = memo(({ isFetching, onRegenerateOutline }: OutlineFormSectionProps) => {
-  const { t, i18n } = useTranslation('presentation', { keyPrefix: 'createOutline' });
+  const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
   const { models } = useModels(MODEL_TYPES.TEXT);
   const { control, attachedFiles, setAttachedFiles, isUploadingFiles, uploadFiles } = usePresentationForm();
   const disabled = useOutlineStore((state) => state.isStreaming);
-  const grades = getAllGrades();
-  const subjects = getAllSubjects();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -184,7 +181,7 @@ const OutlineFormSection = memo(({ isFetching, onRegenerateOutline }: OutlineFor
 
         {/* Controls grid */}
         <div className="flex flex-col gap-4 p-4">
-          {/* Row 1: Slides (1) + Model (2) */}
+          {/* Row 1: Slides + Model */}
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>{t('slideCountLabel')}</Label>
@@ -234,7 +231,7 @@ const OutlineFormSection = memo(({ isFetching, onRegenerateOutline }: OutlineFor
             </div>
           </div>
 
-          {/* Row 2: Language + Grade + Subject */}
+          {/* Row 2: Language */}
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>{t('language.label')}</Label>
@@ -252,66 +249,6 @@ const OutlineFormSection = memo(({ isFetching, onRegenerateOutline }: OutlineFor
                         {LANGUAGE_OPTIONS.map((languageOption) => (
                           <SelectItem key={languageOption.value} value={languageOption.value}>
                             {t(languageOption.labelKey as never)}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>{t('grade.label')}</Label>
-              <Controller
-                name="grade"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value || 'none'}
-                    onValueChange={(val) => field.onChange(val === 'none' ? '' : val)}
-                    disabled={disabled}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t('grade.placeholder')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>{t('grade.label')}</SelectLabel>
-                        <SelectItem value="none">{t('grade.none')}</SelectItem>
-                        {grades.map((g) => (
-                          <SelectItem key={g.code} value={g.code}>
-                            {i18n.language === 'vi' ? g.name : g.nameEn}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>{t('subject.label')}</Label>
-              <Controller
-                name="subject"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value || 'none'}
-                    onValueChange={(val) => field.onChange(val === 'none' ? '' : val)}
-                    disabled={disabled}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t('subject.placeholder')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>{t('subject.label')}</SelectLabel>
-                        <SelectItem value="none">{t('subject.none')}</SelectItem>
-                        {subjects.map((s) => (
-                          <SelectItem key={s.code} value={s.code}>
-                            {s.name}
                           </SelectItem>
                         ))}
                       </SelectGroup>

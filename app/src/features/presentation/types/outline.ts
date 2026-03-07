@@ -14,4 +14,5 @@ export type OutlineData = {
   };
   grade?: string;
   subject?: string;
+  chapter?: string;
 };

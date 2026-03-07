@@ -77,6 +77,17 @@ export default {
       placeholder: 'Chọn môn học',
       none: 'Không',
     },
+    educationMode: {
+      label: 'Chế Độ Giáo Dục',
+      description: 'AI sẽ sử dụng nội dung phù hợp với chương trình học theo lớp, môn học và chương bạn chọn.',
+    },
+    chapter: {
+      label: 'Chương',
+      placeholder: 'Chọn chương',
+      selectGradeSubjectFirst: 'Chọn lớp và môn học trước',
+      loading: 'Đang tải chương...',
+      noChapters: 'Không tìm thấy chương',
+    },
     targetAge: {
       placeholder: 'Cho độ tuổi nào?',
       label: 'Độ tuổi',

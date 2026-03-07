@@ -84,6 +84,9 @@ export interface MindmapCreateInput {
   metadata?: MindmapMetadata;
   nodes: MindMapNode[];
   edges: MindMapEdge[];
+  grade?: string;
+  subject?: string;
+  chapter?: string;
 }
 
 /**
@@ -129,4 +132,6 @@ export type MindmapGenerateRequest = {
   subject?: string;
   /** CDN URLs of uploaded files to use as source material */
   fileUrls?: string[];
+  /** The chapter name for the content (max 255 chars) */
+  chapter?: string;
 };

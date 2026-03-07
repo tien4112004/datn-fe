@@ -42,6 +42,9 @@ export const useGenerateMindmapFlow = () => {
         description: '',
         nodes,
         edges,
+        grade: request.grade,
+        subject: request.subject,
+        chapter: request.chapter,
       });
 
       setIsGenerating(false);

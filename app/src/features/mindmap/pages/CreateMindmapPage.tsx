@@ -9,6 +9,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useMemo, useState } from 'react';
 import AdvancedOptions from '@/features/mindmap/components/generate/AdvancedOptions';
+import EducationModeSection from '@/shared/components/education/EducationModeSection';
 import type { CreateMindmapFormData } from '@/features/mindmap/types';
 import { useGenerateMindmapFlow } from '../hooks/useGenerateMindmapFlow';
 import useFormPersist from 'react-hook-form-persist';
@@ -45,8 +46,10 @@ const CreateMindmapPage = () => {
       language: 'vi',
       maxDepth: 3,
       maxBranchesPerNode: 5,
+      educationMode: false,
       grade: '',
       subject: '',
+      chapter: '',
       ...persistedData,
     },
   });
@@ -101,6 +104,7 @@ const CreateMindmapPage = () => {
       maxBranchesPerNode: formData.maxBranchesPerNode,
       grade: formData.grade || undefined,
       subject: formData.subject || undefined,
+      chapter: formData.chapter || undefined,
     };
   };
 
@@ -110,6 +114,22 @@ const CreateMindmapPage = () => {
     if (!hasTopic && !hasFiles) return;
 
     setError(null);
+
+    // Education Mode validation
+    if (data.educationMode) {
+      if (!data.grade) {
+        setError(t('create.educationMode.gradeRequired'));
+        return;
+      }
+      if (!data.subject) {
+        setError(t('create.educationMode.subjectRequired'));
+        return;
+      }
+      if (!data.chapter) {
+        setError(t('create.educationMode.chapterRequired'));
+        return;
+      }
+    }
 
     try {
       const apiRequest = transformToApiRequest(data);
@@ -197,6 +217,7 @@ const CreateMindmapPage = () => {
               title={t('create.examples.title')}
             />
 
+            <EducationModeSection control={control} setValue={setValue} ns="mindmap" keyPrefix="create" />
             <AdvancedOptions control={control} isOpen={isAdvancedOpen} onToggle={toggleAdvancedOptions} />
           </CardContent>
         </Card>

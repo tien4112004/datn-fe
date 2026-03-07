@@ -30,6 +30,9 @@ export interface PresentationGenerationRequest {
   language: string;
   presentation: PresentationConfig;
   generationOptions?: Omit<ImageGenerationParams, 'prompt' | 'slideId'>;
+  grade?: string;
+  subject?: string;
+  chapter?: string;
 }
 
 export interface PresentationGenerationStartResponse {

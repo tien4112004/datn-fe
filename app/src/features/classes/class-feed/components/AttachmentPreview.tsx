@@ -3,26 +3,14 @@ import { useState } from 'react';
 import { ImageLightbox } from '../../../image/components/ImageLightbox';
 
 interface AttachmentPreviewProps {
+  name: string;
   url: string;
   className?: string;
 }
 
-export const AttachmentPreview = ({ url, className = '' }: AttachmentPreviewProps) => {
-  // Extract filename from URL
-  const getFileName = (urlString: string): string => {
-    try {
-      const urlObj = new URL(urlString);
-      const pathname = urlObj.pathname;
-      const filename = pathname.substring(pathname.lastIndexOf('/') + 1);
-      return decodeURIComponent(filename) || 'attachment';
-    } catch {
-      return 'attachment';
-    }
-  };
-
-  // Determine file type from URL extension
-  const getFileType = (urlString: string): string => {
-    const filename = getFileName(urlString);
+export const AttachmentPreview = ({ name, url, className = '' }: AttachmentPreviewProps) => {
+  // Determine file type from filename extension
+  const getFileType = (filename: string): string => {
     const ext = filename.substring(filename.lastIndexOf('.')).toLowerCase();
 
     const mimeTypes: Record<string, string> = {
@@ -71,8 +59,8 @@ export const AttachmentPreview = ({ url, className = '' }: AttachmentPreviewProp
 
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
-  const fileName = getFileName(url);
-  const fileType = getFileType(url);
+  const fileName = name;
+  const fileType = getFileType(name);
   const isImage = fileType.startsWith('image/');
 
   if (isImage) {

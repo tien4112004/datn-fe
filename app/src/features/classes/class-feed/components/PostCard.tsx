@@ -67,7 +67,9 @@ export const PostCard = ({
   };
 
   // Fetch assignment details if this is an Exercise post with an assignmentId
-  const { data: assignment, isLoading: isAssignmentLoading } = useAssignmentByPost(post.id);
+  const { data: assignment, isLoading: isAssignmentLoading } = useAssignmentByPost(
+    post.assignmentId ? post.id : undefined
+  );
 
   // Determine the appropriate link path based on whether we're in student or teacher mode
   const getPostDetailPath = () => {
@@ -202,8 +204,12 @@ export const PostCard = ({
       {/* Attachments */}
       {post.attachments && post.attachments.length > 0 && (
         <div className="mb-2 ml-9 space-y-1.5 md:mb-3 md:ml-[52px] md:space-y-2">
-          {post.attachments.map((url, index) => (
-            <AttachmentPreview key={`${post.id}-attachment-${index}`} url={url} />
+          {post.attachments.map((attachment, index) => (
+            <AttachmentPreview
+              key={`${post.id}-attachment-${index}`}
+              name={attachment.name}
+              url={attachment.url}
+            />
           ))}
         </div>
       )}

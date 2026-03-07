@@ -24,7 +24,7 @@ export interface Post {
   author?: UserMinimalInfo; // User info from backend
   type: PostType;
   content: string;
-  attachments?: string[]; // Array of URLs from backend
+  attachments?: { name: string; url: string }[]; // Array of attachment objects from backend
   linkedResources?: LinkedResourceResponse[];
   linkedLessonId?: string;
   assignmentId?: string;

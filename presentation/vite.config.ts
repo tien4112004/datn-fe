@@ -9,23 +9,14 @@ import tailwindcss from 'tailwindcss';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
+  process.env = { ...env, ...process.env };
   const port = env.PORT ? parseInt(env.PORT, 10) : 5174;
 
-  // Configure URLs with production fallbacks
-  const apiUrl =
-    env.NODE_ENV === 'production'
-      ? 'https://api.huy-devops.site'
-      : env.VITE_API_URL || 'http://localhost:3000';
-
-  const presentationUrl =
-    env.NODE_ENV === 'production' ? 'https://presentation.huy-devops.site/' : `http://localhost:${port}/`;
-
-  const getBaseUrl = () => {
-    return presentationUrl;
-  };
+  const apiUrl = process.env.VITE_API_URL;
+  const presentationUrl = process.env.VITE_PRESENTATION_URL || `http://localhost:${port}/`;
 
   return {
-    base: getBaseUrl(),
+    base: presentationUrl,
     plugins: [
       vue(),
       federation({
@@ -51,21 +42,28 @@ export default defineConfig(({ mode }) => {
         allow: ['.', '../shared'],
       },
       port: port,
-      cors: true,
+      cors: {
+        origin: '*',
+        credentials: true,
+      },
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+        'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
       },
     },
 
     preview: {
       port: port,
-      cors: true,
+      allowedHosts: ['*'],
+      cors: {
+        origin: '*',
+        credentials: true,
+      },
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+        'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
       },
     },
     css: {
@@ -95,6 +93,7 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       'import.meta.env.VITE_API_URL': JSON.stringify(apiUrl),
+      'import.meta.env.VITE_PRESENTATION_URL': JSON.stringify(presentationUrl),
     },
   };
 });

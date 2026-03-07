@@ -5,6 +5,7 @@ import type { Context } from '@/types/context';
 import { getAllSubjects, getSubjectName, getElementaryGrades } from '@aiprimary/core';
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { Button } from '@ui/button';
+import { Badge } from '@ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
 import { Checkbox } from '@ui/checkbox';
 import {
@@ -22,6 +23,36 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const columnHelper = createColumnHelper<Context>();
+
+const getSubjectBadgeClass = (subject: string) => {
+  switch (subject) {
+    case 'T':
+      return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800';
+    case 'TV':
+      return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800';
+    case 'TA':
+      return 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800';
+  }
+};
+
+const getGradeBadgeClass = (grade: string) => {
+  switch (grade) {
+    case '1':
+      return 'bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-900/30 dark:text-sky-300 dark:border-sky-800';
+    case '2':
+      return 'bg-teal-100 text-teal-800 border-teal-200 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-800';
+    case '3':
+      return 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800';
+    case '4':
+      return 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800';
+    case '5':
+      return 'bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/30 dark:text-rose-300 dark:border-rose-800';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800';
+  }
+};
 
 export function ContextsPage() {
   const [page, setPage] = useState(1);
@@ -106,11 +137,29 @@ export function ContextsPage() {
       }),
       columnHelper.accessor('grade', {
         header: 'Grade',
-        cell: (info) => info.getValue() || '-',
+        cell: (info) => {
+          const value = info.getValue();
+          return value ? (
+            <Badge variant="outline" className={getGradeBadgeClass(value)}>
+              Grade {value}
+            </Badge>
+          ) : (
+            '-'
+          );
+        },
       }),
       columnHelper.accessor('subject', {
         header: 'Subject',
-        cell: (info) => info.getValue() || '-',
+        cell: (info) => {
+          const value = info.getValue();
+          return value ? (
+            <Badge variant="outline" className={getSubjectBadgeClass(value)}>
+              {getSubjectName(value)}
+            </Badge>
+          ) : (
+            '-'
+          );
+        },
       }),
       columnHelper.accessor('author', {
         header: 'Author',

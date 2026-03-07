@@ -34,7 +34,7 @@ export function SlideThemesPage() {
         id: 'preview',
         header: 'Preview',
         cell: (info) => (
-          <div className="w-60">
+          <div className="w-full">
             <ThemePreviewCard theme={info.row.original} title={info.row.original.name || 'Theme'} />
           </div>
         ),
@@ -74,12 +74,14 @@ export function SlideThemesPage() {
         cell: (info) => {
           const modifiers = info.getValue();
           if (!modifiers || modifiers.trim() === '') {
-            return <span className="text-destructive font-medium">Not set - Update required</span>;
+            return <span className="text-destructive font-medium">Not set</span>;
           }
           return (
-            <span className="text-muted-foreground text-sm" title={modifiers}>
-              {modifiers.length > 30 ? `${modifiers.substring(0, 30)}...` : modifiers}
-            </span>
+            <div className="max-w-xs overflow-hidden">
+              <span className="text-muted-foreground truncate text-sm" title={modifiers}>
+                {modifiers}
+              </span>
+            </div>
           );
         },
       }),
@@ -106,6 +108,7 @@ export function SlideThemesPage() {
       }),
       columnHelper.display({
         id: 'actions',
+        size: 60,
         header: () => <div className="text-right">Actions</div>,
         cell: (info) => (
           <div className="text-right">

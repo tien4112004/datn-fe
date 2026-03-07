@@ -170,7 +170,7 @@ export function useCreatePost() {
         authorId: 'current-user',
         type: request.type,
         content: request.content,
-        attachments: request.attachments,
+        attachments: request.attachments?.map((url) => ({ name: url.split('/').pop() ?? url, url })),
         assignmentId: request.assignmentId,
         dueDate: request.dueDate,
         isPinned: false,
@@ -245,7 +245,12 @@ export function useUpdatePost() {
                   ...post,
                   ...(request.content !== undefined && { content: request.content }),
                   ...(request.type !== undefined && { type: request.type }),
-                  ...(request.attachments !== undefined && { attachments: request.attachments }),
+                  ...(request.attachments !== undefined && {
+                    attachments: request.attachments.map((url) => ({
+                      name: url.split('/').pop() ?? url,
+                      url,
+                    })),
+                  }),
                   updatedAt: new Date(),
                 }
               : post

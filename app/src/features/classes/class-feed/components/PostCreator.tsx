@@ -128,73 +128,72 @@ export const PostCreator = ({
   }, [editor, handleEditorChange]);
 
   const onSubmit = handleFormSubmit(async (data) => {
+    // Upload pending attachments first (needed before building request)
+    let attachmentUrls: string[] = [];
     try {
-      // Upload pending attachments first
-      let attachmentUrls: string[] = [];
       if (type === PostType.Post && (pendingFiles.length > 0 || uploadedUrls.length > 0)) {
         attachmentUrls = await uploadAll();
       }
-
-      const request: PostCreateRequest = {
-        classId,
-        type,
-        content: data.content,
-        attachments: attachmentUrls.length > 0 ? attachmentUrls : undefined,
-        linkedResources:
-          type === PostType.Post && linkedResources.length > 0
-            ? linkedResources.map((r) => ({
-                type: r.type,
-                id: r.id,
-                permissionLevel: r.permissionLevel || 'view',
-              }))
-            : undefined,
-        assignmentId: type === PostType.Exercise && selectedAssignment ? selectedAssignment.id : undefined,
-        assignmentTitle:
-          type === PostType.Exercise && selectedAssignment
-            ? assignmentTitle || selectedAssignment.title
-            : undefined,
-        dueDate: type === PostType.Exercise && dueDate ? dueDate.toISOString() : undefined,
-        allowComments,
-        // Include assignment settings for Exercise type
-        ...(type === PostType.Exercise && {
-          maxSubmissions,
-          allowRetake,
-          shuffleQuestions,
-          showCorrectAnswers,
-          passingScore,
-          availableFrom: availableFrom || undefined,
-          availableUntil: availableUntil || undefined,
-          autoGrade,
-        }),
-      };
-
-      await createPost.mutateAsync(request);
-
-      // Reset form and UI
-      editor.replaceBlocks(editor.document, []);
-      form.reset({ content: '' });
-      clearAttachments();
-      setLinkedResources([]);
-      setSelectedAssignment(null);
-      setAssignmentTitle('');
-      setDueDate(undefined);
-      setType(initialType);
-      setAllowComments(true);
-      // Reset assignment settings
-      setMaxSubmissions(undefined);
-      setAllowRetake(true);
-      setShuffleQuestions(false);
-      setShowCorrectAnswers(false);
-      setAutoGrade(true);
-      setPassingScore(undefined);
-      setAvailableFrom('');
-      setAvailableUntil('');
-      setOpen(false);
-
-      onPostCreated?.();
-    } catch (err) {
-      // Error is handled by the hook
+    } catch {
+      return; // Upload failed, stay in dialog
     }
+
+    const request: PostCreateRequest = {
+      classId,
+      type,
+      content: data.content,
+      attachments: attachmentUrls.length > 0 ? attachmentUrls : undefined,
+      linkedResources:
+        type === PostType.Post && linkedResources.length > 0
+          ? linkedResources.map((r) => ({
+              type: r.type,
+              id: r.id,
+              permissionLevel: r.permissionLevel || 'view',
+            }))
+          : undefined,
+      assignmentId: type === PostType.Exercise && selectedAssignment ? selectedAssignment.id : undefined,
+      assignmentTitle:
+        type === PostType.Exercise && selectedAssignment
+          ? assignmentTitle || selectedAssignment.title
+          : undefined,
+      dueDate: type === PostType.Exercise && dueDate ? dueDate.toISOString() : undefined,
+      allowComments,
+      // Include assignment settings for Exercise type
+      ...(type === PostType.Exercise && {
+        maxSubmissions,
+        allowRetake,
+        shuffleQuestions,
+        showCorrectAnswers,
+        passingScore,
+        availableFrom: availableFrom || undefined,
+        availableUntil: availableUntil || undefined,
+        autoGrade,
+      }),
+    };
+
+    // Close dialog and reset state immediately (optimistic)
+    editor.replaceBlocks(editor.document, []);
+    form.reset({ content: '' });
+    clearAttachments();
+    setLinkedResources([]);
+    setSelectedAssignment(null);
+    setAssignmentTitle('');
+    setDueDate(undefined);
+    setType(initialType);
+    setAllowComments(true);
+    setMaxSubmissions(undefined);
+    setAllowRetake(true);
+    setShuffleQuestions(false);
+    setShowCorrectAnswers(false);
+    setAutoGrade(true);
+    setPassingScore(undefined);
+    setAvailableFrom('');
+    setAvailableUntil('');
+    setOpen(false);
+    onPostCreated?.();
+
+    // Fire mutation — optimistic post already shown, errors handled by onError toast
+    createPost.mutate(request);
   });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

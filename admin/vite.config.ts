@@ -7,17 +7,10 @@ import path from 'path';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
+  process.env = { ...env, ...process.env };
 
-  // Configure URLs with production fallbacks
-  const apiUrl =
-    env.NODE_ENV === 'production'
-      ? 'https://api.huy-devops.site'
-      : env.VITE_API_URL || 'http://localhost:3000';
-
-  const presentationUrl =
-    env.NODE_ENV === 'production'
-      ? 'https://presentation.huy-devops.site'
-      : env.VITE_PRESENTATION_URL || 'http://localhost:5174';
+  const apiUrl = process.env.VITE_API_URL;
+  const presentationUrl = process.env.VITE_PRESENTATION_URL || 'http://localhost:5174';
 
   return {
     plugins: [
@@ -52,9 +45,20 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: 5175,
+      allowedHosts: ['nitro15.tail5769d8.ts.net'],
+      cors: {
+        origin: '*',
+        credentials: true,
+      },
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+        'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
+      },
     },
     preview: {
       port: 5175,
+      allowedHosts: ['*'],
     },
     resolve: {
       alias: {
@@ -74,6 +78,7 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       'import.meta.env.VITE_API_URL': JSON.stringify(apiUrl),
+      'import.meta.env.VITE_PRESENTATION_URL': JSON.stringify(presentationUrl),
     },
   };
 });

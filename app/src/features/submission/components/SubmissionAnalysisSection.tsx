@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, PieChart, Pie, Cell } from '@ui/chart';
+import type { ChartConfig } from '@ui/chart';
 import type { Submission } from '@aiprimary/core';
 
 interface SubmissionAnalysisSectionProps {
@@ -34,8 +36,6 @@ export const SubmissionAnalysisSection = ({ submissions, maxScore }: SubmissionA
       scores.filter((s) => s >= 90).length,
     ];
 
-    const maxDistributionCount = Math.max(...distributionCounts, 1);
-
     return {
       total,
       graded,
@@ -45,7 +45,6 @@ export const SubmissionAnalysisSection = ({ submissions, maxScore }: SubmissionA
       highestScore,
       lowestScore,
       distributionCounts,
-      maxDistributionCount,
       displayMaxScore: maxScore ?? gradedWithScore[0]?.maxScore ?? null,
     };
   }, [submissions, maxScore]);
@@ -60,118 +59,126 @@ export const SubmissionAnalysisSection = ({ submissions, maxScore }: SubmissionA
       key: 'below70',
       label: t('submissions.analysis.distribution.below70') as string,
       count: stats.distributionCounts[0],
-      barColor: 'bg-destructive/70',
+      color: '#ef4444',
     },
     {
-      key: '7079',
+      key: 'range7079',
       label: t('submissions.analysis.distribution.range7079') as string,
       count: stats.distributionCounts[1],
-      barColor: 'bg-yellow-500/70',
+      color: '#eab308',
     },
     {
-      key: '8089',
+      key: 'range8089',
       label: t('submissions.analysis.distribution.range8089') as string,
       count: stats.distributionCounts[2],
-      barColor: 'bg-primary/70',
+      color: '#3b82f6',
     },
     {
-      key: '90100',
+      key: 'range90100',
       label: t('submissions.analysis.distribution.range90100') as string,
       count: stats.distributionCounts[3],
-      barColor: 'bg-primary',
+      color: '#22c55e',
     },
   ];
 
+  const chartConfig = {
+    below70: { label: distributionItems[0].label, color: '#ef4444' },
+    range7079: { label: distributionItems[1].label, color: '#eab308' },
+    range8089: { label: distributionItems[2].label, color: '#3b82f6' },
+    range90100: { label: distributionItems[3].label, color: '#22c55e' },
+  } satisfies ChartConfig;
+
+  const pieData = distributionItems.map((d) => ({ ...d, fill: d.color }));
+  const hasScoreData = stats.distributionCounts.some((c) => c > 0);
+
   return (
-    <div className="divide-y">
-      {/* Overview */}
-      <div className="pb-4">
+    <div className="grid grid-cols-1 gap-0 sm:grid-cols-2 sm:divide-x">
+      {/* Left column: Overview + Score stats */}
+      <div className="sm:pr-6">
+        {/* Overview */}
         <p className="text-muted-foreground mb-2 text-xs font-medium uppercase tracking-wide">
           {t('submissions.analysis.overview.title')}
         </p>
-        <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 sm:grid-cols-3">
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground text-sm">{t('submissions.analysis.overview.total')}</span>
-            <span className="font-semibold">{stats.total}</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground text-sm">{t('submissions.analysis.overview.graded')}</span>
-            <span className="font-semibold">{stats.graded}</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground text-sm">
-              {t('submissions.analysis.overview.pending')}
-            </span>
-            <span className="font-semibold">{stats.pending}</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground text-sm">
-              {t('submissions.analysis.overview.inProgress')}
-            </span>
-            <span className="font-semibold">{stats.inProgress}</span>
-          </div>
-          {stats.displayMaxScore !== null && (
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground text-sm">
-                {t('submissions.analysis.overview.maxScore')}
-              </span>
-              <span className="font-semibold">{stats.displayMaxScore}</span>
+        <div className="overflow-hidden rounded-md border">
+          {[
+            { label: t('submissions.analysis.overview.total'), value: stats.total },
+            { label: t('submissions.analysis.overview.graded'), value: stats.graded },
+            { label: t('submissions.analysis.overview.pending'), value: stats.pending },
+            { label: t('submissions.analysis.overview.inProgress'), value: stats.inProgress },
+            ...(stats.displayMaxScore !== null
+              ? [{ label: t('submissions.analysis.overview.maxScore'), value: stats.displayMaxScore }]
+              : []),
+          ].map((row, i) => (
+            <div
+              key={i}
+              className={`flex items-center justify-between px-3 py-1.5 text-sm ${i % 2 === 0 ? 'bg-muted/40' : ''}`}
+            >
+              <span className="text-muted-foreground">{row.label}</span>
+              <span className="font-semibold tabular-nums">{row.value}</span>
             </div>
-          )}
+          ))}
         </div>
-      </div>
 
-      {/* Score Statistics */}
-      <div className="py-4">
-        <p className="text-muted-foreground mb-2 text-xs font-medium uppercase tracking-wide">
+        {/* Score stats */}
+        <p className="text-muted-foreground mb-2 mt-4 text-xs font-medium uppercase tracking-wide">
           {t('submissions.analysis.scoreStats.title')}
         </p>
-        <div className="grid grid-cols-3 divide-x text-center">
-          <div className="pr-4">
-            <p className="text-2xl font-bold">{formatScore(stats.avgScore)}</p>
-            <p className="text-muted-foreground mt-0.5 text-xs">
-              {t('submissions.analysis.scoreStats.average')}
-            </p>
-          </div>
-          <div className="px-4">
-            <p className="text-2xl font-bold">{formatScore(stats.highestScore)}</p>
-            <p className="text-muted-foreground mt-0.5 text-xs">
-              {t('submissions.analysis.scoreStats.highest')}
-            </p>
-          </div>
-          <div className="pl-4">
-            <p className="text-2xl font-bold">{formatScore(stats.lowestScore)}</p>
-            <p className="text-muted-foreground mt-0.5 text-xs">
-              {t('submissions.analysis.scoreStats.lowest')}
-            </p>
-          </div>
+        <div className="overflow-hidden rounded-md border">
+          {[
+            { label: t('submissions.analysis.scoreStats.average'), value: formatScore(stats.avgScore) },
+            { label: t('submissions.analysis.scoreStats.highest'), value: formatScore(stats.highestScore) },
+            { label: t('submissions.analysis.scoreStats.lowest'), value: formatScore(stats.lowestScore) },
+          ].map((row, i) => (
+            <div
+              key={i}
+              className={`flex items-center justify-between px-3 py-1.5 text-sm ${i % 2 === 0 ? 'bg-muted/40' : ''}`}
+            >
+              <span className="text-muted-foreground">{row.label}</span>
+              <span className="font-semibold tabular-nums">{row.value}</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Score Distribution */}
-      <div className="pt-4">
+      {/* Right column: Pie chart */}
+      <div className="mt-5 sm:mt-0 sm:pl-6">
         <p className="text-muted-foreground mb-2 text-xs font-medium uppercase tracking-wide">
           {t('submissions.analysis.distribution.title')}
         </p>
-        <div className="space-y-2.5">
-          {distributionItems.map((item) => {
-            const pct = (item.count / stats.maxDistributionCount) * 100;
-            return (
-              <div key={item.key}>
-                <div className="mb-1 flex items-center justify-between">
-                  <span className="text-sm">{item.label}</span>
-                  <span className="text-muted-foreground text-xs font-semibold">{item.count}</span>
+        {hasScoreData ? (
+          <div className="flex items-center gap-4">
+            <ChartContainer config={chartConfig} className="aspect-square min-w-0 max-w-[300px] flex-1">
+              <PieChart>
+                <ChartTooltip content={<ChartTooltipContent nameKey="label" hideLabel />} />
+                <Pie
+                  data={pieData}
+                  dataKey="count"
+                  nameKey="label"
+                  innerRadius="38%"
+                  outerRadius="70%"
+                  strokeWidth={1}
+                >
+                  {pieData.map((entry) => (
+                    <Cell key={entry.key} fill={entry.color} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ChartContainer>
+            <div className="space-y-2">
+              {distributionItems.map((item) => (
+                <div key={item.key} className="flex items-center gap-2">
+                  <span className="h-3 w-3 shrink-0 rounded-sm" style={{ backgroundColor: item.color }} />
+                  <span className="text-xs">{item.label}</span>
+                  <span className="text-muted-foreground ml-auto pl-3 text-xs font-semibold">
+                    {item.count}
+                  </span>
                 </div>
-                <div className="bg-muted h-1.5 w-full overflow-hidden rounded-full">
-                  <div
-                    className={`h-1.5 rounded-full transition-all duration-500 ${item.barColor}`}
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p className="text-muted-foreground text-sm">—</p>
+        )}
       </div>
     </div>
   );

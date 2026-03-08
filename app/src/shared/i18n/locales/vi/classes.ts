@@ -2,7 +2,7 @@ export default {
   navigation: {
     classes: 'Lớp học',
     backToPeriod: 'Quay lại tiết học',
-    goToClasses: 'Đến lớp học',
+    goToClasses: 'Đến danh sách lớp',
     goBack: 'Quay lại',
   },
 
@@ -1382,6 +1382,7 @@ export default {
   },
 
   studentDetail: {
+    title: 'Chi tiết học sinh',
     loading: 'Đang tải...',
     studentNotFound: 'Không tìm thấy học sinh',
     unableToLoad: 'Không thể tải thông tin học sinh',
@@ -1396,7 +1397,6 @@ export default {
       goBack: 'Quay lại',
       tryAgain: 'Thử lại',
     },
-    pageDescription: 'Xem hiệu suất học tập, tiến độ và thông tin chi tiết của {{fullName}}',
     sections: {
       studentInformation: 'Thông tin học sinh',
       performanceAnalytics: 'Phân tích hiệu suất',

@@ -58,7 +58,7 @@ export default function StudentDetailPage() {
   if (isLoadingStudent) {
     return (
       <div className="space-y-6 p-4 sm:p-6">
-        <PageHeader title={t('studentDetail.loading')} onBack={handleBack} />
+        <PageHeader title={t('studentDetail.title')} onBack={handleBack} />
         <StudentDetailSkeleton />
       </div>
     );
@@ -68,7 +68,7 @@ export default function StudentDetailPage() {
   if (studentError || !student) {
     return (
       <div className="space-y-6 p-4 sm:p-6">
-        <PageHeader title={t('studentDetail.studentNotFound')} onBack={handleBack} />
+        <PageHeader title={t('studentDetail.title')} onBack={handleBack} />
 
         <Alert variant="destructive" className="border-red-200 dark:border-red-800">
           <AlertCircle className="h-5 w-5" />
@@ -97,12 +97,11 @@ export default function StudentDetailPage() {
 
   // Success State: Display student information and performance
   const fullName = student.fullName || `${student.firstName || ''} ${student.lastName || ''}`.trim();
-  const pageDescription = t('studentDetail.pageDescription', { fullName });
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
       {/* Page Header with Breadcrumb */}
-      <PageHeader title={fullName} description={pageDescription} onBack={handleBack} />
+      <PageHeader title={t('studentDetail.title')} onBack={handleBack} />
 
       {/* Student Information Card */}
       <section aria-label={t('studentDetail.sections.studentInformation')}>

@@ -1,11 +1,13 @@
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 import { PostCreator } from './PostCreator';
 import { PostList } from './PostList';
 import { usePosts } from '../hooks/useApi';
 import type { FeedFilter } from '../types';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, X } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useAuth } from '@/shared/context/auth';
+import { useState, useEffect } from 'react';
 
 interface FeedPageProps {
   classId: string;
@@ -20,6 +22,20 @@ export const FeedTab = ({ classId, initialFilter, onNavigateToFeed }: FeedPagePr
     classId,
     initialFilter
   );
+  const location = useLocation();
+
+  const [banner, setBanner] = useState<string | null>(location.state?.banner ?? null);
+
+  useEffect(() => {
+    if (location.state?.banner) {
+      setBanner(location.state.banner);
+      // Clear from history state so it doesn't reappear on re-render
+      window.history.replaceState(
+        { ...window.history.state, usr: { ...location.state, banner: undefined } },
+        ''
+      );
+    }
+  }, [location.state?.banner]);
 
   const isStudent = user?.role === 'student';
   const isTeacher = !isStudent;
@@ -77,6 +93,21 @@ export const FeedTab = ({ classId, initialFilter, onNavigateToFeed }: FeedPagePr
         {/* Content Area */}
         <div className="flex-1 overflow-y-auto bg-white">
           <div className="container mx-auto max-w-4xl">
+            {/* Deleted Content Banner */}
+            {banner && (
+              <div className="bg-destructive/10 border-destructive mt-4 flex items-center gap-3 border-l-4 px-5 py-4 md:mt-6">
+                <AlertCircle className="text-destructive h-5 w-5 shrink-0" />
+                <p className="text-destructive flex-1 text-base font-medium">{banner}</p>
+                <button
+                  onClick={() => setBanner(null)}
+                  className="text-destructive/70 hover:text-destructive ml-2 shrink-0"
+                  aria-label="Dismiss"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            )}
+
             {/* Error State */}
             {error && (
               <div className="border-destructive bg-destructive/10 mt-4 border-l-4 p-3 md:mt-6 md:p-4">

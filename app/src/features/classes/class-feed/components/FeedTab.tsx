@@ -9,12 +9,16 @@ import { useAuth } from '@/shared/context/auth';
 
 interface FeedPageProps {
   classId: string;
+  initialFilter?: FeedFilter['type'];
 }
 
-export const FeedTab = ({ classId }: FeedPageProps) => {
+export const FeedTab = ({ classId, initialFilter }: FeedPageProps) => {
   const { t } = useTranslation('classes');
   const { user } = useAuth();
-  const { posts, loading, error, hasMore, loadMore, refresh, filter, updateFilter } = usePosts(classId);
+  const { posts, loading, error, hasMore, loadMore, refresh, filter, updateFilter } = usePosts(
+    classId,
+    initialFilter
+  );
 
   const isStudent = user?.role === 'student';
   const isTeacher = !isStudent;

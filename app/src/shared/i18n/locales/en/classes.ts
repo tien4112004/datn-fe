@@ -88,6 +88,7 @@ export default {
     },
     tabs: {
       feed: 'Feed',
+      exercise: 'Exercises',
       teaching: 'Teaching',
       schedule: 'Schedule',
       overview: 'Overview',

@@ -88,6 +88,7 @@ export default {
     },
     tabs: {
       feed: 'Bảng tin',
+      exercise: 'Bài tập',
       teaching: 'Giảng dạy',
       schedule: 'Lịch biểu',
       overview: 'Tổng quan',

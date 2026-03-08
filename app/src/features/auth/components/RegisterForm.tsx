@@ -30,12 +30,12 @@ export function RegisterForm() {
             .string()
             .min(1, t('validation.firstNameRequired'))
             .max(50, t('validation.firstNameMaxLength', { max: 50 }))
-            .regex(/^[a-zA-Z\s]+$/, t('validation.nameAlphabetOnly')),
+            .regex(/^[\p{L}\s]+$/u, t('validation.nameAlphabetOnly')),
           lastName: z
             .string()
             .min(1, t('validation.lastNameRequired'))
             .max(50, t('validation.lastNameMaxLength', { max: 50 }))
-            .regex(/^[a-zA-Z\s]+$/, t('validation.nameAlphabetOnly')),
+            .regex(/^[\p{L}\s]+$/u, t('validation.nameAlphabetOnly')),
           dateOfBirth: z.date({
             required_error: t('validation.dateOfBirthRequired'),
             invalid_type_error: t('validation.dateOfBirthInvalid'),

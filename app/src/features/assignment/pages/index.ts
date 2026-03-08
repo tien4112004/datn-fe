@@ -10,6 +10,5 @@ export { GeneratedQuestionsPage } from '@/features/question-bank/pages/Generated
 // Re-export from submission feature for backward compatibility
 export { AssignmentDoingPage } from '@/features/submission/pages/AssignmentDoingPage';
 export { StudentSubmissionsPage } from '@/features/submission/pages/StudentSubmissionsPage';
-export { AssignmentSubmissionsPage } from '@/features/submission/pages/AssignmentSubmissionsPage';
 export { TeacherGradingPage } from '@/features/submission/pages/TeacherGradingPage';
 export { SubmissionResultPage } from '@/features/submission/pages/SubmissionResultPage';

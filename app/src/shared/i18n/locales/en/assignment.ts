@@ -1555,6 +1555,31 @@ export default {
       previewMode: 'Preview mode: Access through a specific homework post to see submissions',
     },
 
+    // Submission analysis section
+    analysis: {
+      overview: {
+        title: 'Overview',
+        total: 'Total',
+        graded: 'Graded',
+        pending: 'Pending',
+        inProgress: 'In progress',
+        maxScore: 'Max score',
+      },
+      scoreStats: {
+        title: 'Score statistics',
+        average: 'Average',
+        highest: 'Highest',
+        lowest: 'Lowest',
+      },
+      distribution: {
+        title: 'Score distribution',
+        below70: 'Below 70%',
+        range7079: '70–79%',
+        range8089: '80–89%',
+        range90100: '90–100%',
+      },
+    },
+
     // Submission result page (student view)
     result: {
       notFound: 'Submission not found',

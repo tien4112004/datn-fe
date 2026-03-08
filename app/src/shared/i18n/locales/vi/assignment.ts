@@ -1543,6 +1543,31 @@ export default {
       previewMode: 'Chế độ xem trước: Truy cập qua bài đăng cụ thể để xem bài nộp',
     },
 
+    // Phần phân tích bài nộp
+    analysis: {
+      overview: {
+        title: 'Tổng quan',
+        total: 'Tổng số',
+        graded: 'Đã chấm',
+        pending: 'Chờ chấm',
+        inProgress: 'Đang làm',
+        maxScore: 'Điểm tối đa',
+      },
+      scoreStats: {
+        title: 'Thống kê điểm',
+        average: 'Trung bình',
+        highest: 'Cao nhất',
+        lowest: 'Thấp nhất',
+      },
+      distribution: {
+        title: 'Phân bố điểm',
+        below70: 'Dưới 70%',
+        range7079: '70–79%',
+        range8089: '80–89%',
+        range90100: '90–100%',
+      },
+    },
+
     // Trang kết quả bài nộp (học sinh xem)
     result: {
       notFound: 'Không tìm thấy bài nộp',

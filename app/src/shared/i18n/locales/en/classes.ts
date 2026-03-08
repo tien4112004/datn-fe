@@ -1318,6 +1318,11 @@ export default {
 
   submissionStatistics: {
     title: 'Submissions',
+    noSubmissions: 'No submissions yet',
+    tabs: {
+      analysis: 'Analysis',
+      table: 'Submissions',
+    },
     hideTable: 'Hide',
     showTable: 'Show',
     table: 'Table',

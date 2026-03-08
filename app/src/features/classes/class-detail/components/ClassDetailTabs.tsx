@@ -180,7 +180,13 @@ export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDet
           <>
             {currentTab === 'feed' && <FeedTab classId={classId} />}
 
-            {currentTab === 'exercise' && <FeedTab classId={classId} initialFilter="Exercise" />}
+            {currentTab === 'exercise' && (
+              <FeedTab
+                classId={classId}
+                initialFilter="Exercise"
+                onNavigateToFeed={() => handleTabChange('feed')}
+              />
+            )}
 
             {currentTab === 'students' && (
               <div className="p-6">

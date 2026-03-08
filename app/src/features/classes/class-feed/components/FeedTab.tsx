@@ -10,9 +10,10 @@ import { useAuth } from '@/shared/context/auth';
 interface FeedPageProps {
   classId: string;
   initialFilter?: FeedFilter['type'];
+  onNavigateToFeed?: () => void;
 }
 
-export const FeedTab = ({ classId, initialFilter }: FeedPageProps) => {
+export const FeedTab = ({ classId, initialFilter, onNavigateToFeed }: FeedPageProps) => {
   const { t } = useTranslation('classes');
   const { user } = useAuth();
   const { posts, loading, error, hasMore, loadMore, refresh, filter, updateFilter } = usePosts(
@@ -24,6 +25,10 @@ export const FeedTab = ({ classId, initialFilter }: FeedPageProps) => {
   const isTeacher = !isStudent;
 
   const handleFilterChange = (type: FeedFilter['type']) => {
+    if (type === 'all' && onNavigateToFeed) {
+      onNavigateToFeed();
+      return;
+    }
     updateFilter({ type });
   };
 

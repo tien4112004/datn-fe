@@ -119,6 +119,9 @@ export default class PresentationService implements PresentationApiService {
           pageSize: request.pageSize,
           sort: request.sort,
           filter: request.filter,
+          grade: request.grade,
+          subject: request.subject,
+          chapter: request.chapter,
         },
       }
     );

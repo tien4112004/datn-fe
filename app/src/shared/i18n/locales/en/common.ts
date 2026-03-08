@@ -187,6 +187,7 @@ export default {
   grade: 'Grade',
   subject: 'Subject',
   topics: 'Topics',
+  selectGradeAndSubject: 'Select a grade and subject to view chapters',
   characters: 'characters',
   aiDisclaimer: 'AI-generated content may be inaccurate. Please review carefully before use.',
 };

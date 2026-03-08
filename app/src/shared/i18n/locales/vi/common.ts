@@ -187,6 +187,7 @@ export default {
   grade: 'Lớp',
   subject: 'Môn học',
   topics: 'Chủ đề',
+  selectGradeAndSubject: 'Chọn lớp và môn học để xem chương',
   characters: 'ký tự',
   aiDisclaimer: 'Nội dung do AI tạo có thể không chính xác. Vui lòng kiểm tra kỹ trước khi sử dụng.',
 };

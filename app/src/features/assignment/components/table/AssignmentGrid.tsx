@@ -11,7 +11,7 @@ import {
 import { Button } from '@ui/button';
 import { MoreHorizontal, ClipboardList } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@ui/dropdown-menu';
-import { SearchBar } from '@/shared/components/common/SearchBar';
+import { DocumentFilters, type DocumentFilterValues } from '@/features/projects/components/DocumentFilters';
 import TablePagination from '@/shared/components/table/TablePagination';
 import { ActionContent } from '@/features/presentation/components';
 import { RenameFileDialog } from '@/shared/components/modals/RenameFileDialog';
@@ -36,6 +36,7 @@ const AssignmentGrid = () => {
   const [isEditChapterOpen, setIsEditChapterOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [search, setSearch] = useState('');
+  const [documentFilters, setDocumentFilters] = useState<DocumentFilterValues>({});
   const [pagination, setPagination] = useState<any>({
     pageIndex: 0,
     pageSize: 20,
@@ -56,6 +57,9 @@ const AssignmentGrid = () => {
     searchText: search,
     page: pagination.pageIndex + 1,
     size: pagination.pageSize,
+    grade: documentFilters.grade,
+    subject: documentFilters.subject,
+    chapter: documentFilters.chapter,
   });
   const deleteAssignment = useDeleteAssignment();
   const updateAssignmentChapter = useUpdateAssignmentChapter();
@@ -200,15 +204,14 @@ const AssignmentGrid = () => {
   if (isLoading) {
     return (
       <div className="w-full space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          <SearchBar
-            value={search}
-            onChange={setSearch}
-            placeholder={t('assignment.searchPlaceholder')}
-            className="flex-1 rounded-lg border-2 border-slate-200"
-          />
-          <ViewToggle value={viewMode} onValueChange={setViewMode} />
-        </div>
+        <DocumentFilters
+          filters={documentFilters}
+          onChange={setDocumentFilters}
+          searchQuery={search}
+          onSearchChange={setSearch}
+          searchPlaceholder={t('assignment.searchPlaceholder')}
+          RightComponent={<ViewToggle value={viewMode} onValueChange={setViewMode} />}
+        />
         <div className="grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-6">
           {Array.from({ length: 10 }).map((_, index) => (
             <div key={index} className="w-full animate-pulse">
@@ -224,15 +227,14 @@ const AssignmentGrid = () => {
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <SearchBar
-          value={search}
-          onChange={setSearch}
-          placeholder={t('assignment.searchPlaceholder')}
-          className="flex-1 rounded-lg border-2 border-slate-200"
-        />
-        <ViewToggle value={viewMode} onValueChange={setViewMode} />
-      </div>
+      <DocumentFilters
+        filters={documentFilters}
+        onChange={setDocumentFilters}
+        searchQuery={search}
+        onSearchChange={setSearch}
+        searchPlaceholder={t('assignment.searchPlaceholder')}
+        RightComponent={<ViewToggle value={viewMode} onValueChange={setViewMode} />}
+      />
 
       {data && data.length > 0 ? (
         <>

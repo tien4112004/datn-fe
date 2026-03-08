@@ -10,7 +10,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import DataTable from '@/components/table/DataTable';
-import { SearchBar } from '@/shared/components/common/SearchBar';
+import { DocumentFilters } from '@/features/projects/components/DocumentFilters';
 import {
   useMindmaps,
   useUpdateMindmapTitle,
@@ -51,8 +51,19 @@ const MindmapTable = () => {
   };
 
   // Use the new hook
-  const { data, isLoading, sorting, setSorting, pagination, setPagination, search, setSearch, totalItems } =
-    useMindmaps();
+  const {
+    data,
+    isLoading,
+    sorting,
+    setSorting,
+    pagination,
+    setPagination,
+    search,
+    setSearch,
+    totalItems,
+    documentFilters,
+    setDocumentFilters,
+  } = useMindmaps();
 
   const updateMindmapTitleMutation = useUpdateMindmapTitle();
   const deleteMindmapMutation = useDeleteMindmap();
@@ -219,15 +230,14 @@ const MindmapTable = () => {
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <SearchBar
-          value={search}
-          onChange={handleSearchChange}
-          placeholder={t('mindmap.searchPlaceholder')}
-          className="flex-1 rounded-lg border-2 border-slate-200"
-        />
-        <ViewToggle value={viewMode} onValueChange={setViewMode} />
-      </div>
+      <DocumentFilters
+        filters={documentFilters}
+        onChange={setDocumentFilters}
+        searchQuery={search}
+        onSearchChange={handleSearchChange}
+        searchPlaceholder={t('mindmap.searchPlaceholder')}
+        RightComponent={<ViewToggle value={viewMode} onValueChange={setViewMode} />}
+      />
 
       <DataTable
         table={table}

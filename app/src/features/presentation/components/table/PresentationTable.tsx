@@ -6,8 +6,8 @@ import { usePresentationManager } from '../../hooks/usePresentationManager';
 import { useUpdatePresentationChapter } from '../../hooks/useApi';
 import DataTable from '@/components/table/DataTable';
 import ActionButton, { ActionContent } from './ActionButton';
-import { SearchBar } from '../../../../shared/components/common/SearchBar';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { DocumentFilters } from '@/features/projects/components/DocumentFilters';
 import { ThumbnailWrapperV2 } from '../others/ThumbnailWrapper';
 import { RenameFileDialog } from '@/components/modals/RenameFileDialog';
 import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfirmationDialog';
@@ -142,6 +142,8 @@ const PresentationTable = () => {
     handleConfirmDelete,
     handleCancelDelete,
     isDeletePending,
+    documentFilters,
+    setDocumentFilters,
   } = usePresentationManager();
 
   const [isEditChapterOpen, setIsEditChapterOpen] = useState(false);
@@ -170,15 +172,14 @@ const PresentationTable = () => {
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <SearchBar
-          value={search}
-          onChange={setSearch}
-          placeholder={t('presentation.searchPlaceholder')}
-          className="flex-1 rounded-lg border-2 border-slate-200"
-        />
-        <ViewToggle value={viewMode} onValueChange={setViewMode} />
-      </div>
+      <DocumentFilters
+        filters={documentFilters}
+        onChange={setDocumentFilters}
+        searchQuery={search}
+        onSearchChange={setSearch}
+        searchPlaceholder={t('presentation.searchPlaceholder')}
+        RightComponent={<ViewToggle value={viewMode} onValueChange={setViewMode} />}
+      />
       <DataTable
         className="w-full"
         table={table}

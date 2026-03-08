@@ -49,6 +49,10 @@ export default class MindmapService implements MindmapApiService {
           page: (request.page || 0) + 1,
           pageSize: request.pageSize,
           sort: request.sort,
+          filter: request.filter,
+          grade: request.grade,
+          subject: request.subject,
+          chapter: request.chapter,
         },
       }
     );

@@ -21,6 +21,9 @@ export interface MindmapCollectionRequest {
   pageSize?: number;
   sort?: 'asc' | 'desc';
   filter?: string;
+  grade?: string;
+  subject?: string;
+  chapter?: string;
 }
 
 export interface MindmapApiService {

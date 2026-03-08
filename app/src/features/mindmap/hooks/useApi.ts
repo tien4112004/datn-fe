@@ -11,6 +11,7 @@ import { getTreeLayoutType, getTreeForceLayout } from '../services/utils';
 import { t } from 'i18next';
 import { toast } from 'sonner';
 import { getExamplePromptsApiService, type UpdateChapterPayload } from '@/features/projects/api';
+import type { DocumentFilterValues } from '@/features/projects/components/DocumentFilters';
 
 /**
  * Convert data URL (base64) to Blob for multipart upload
@@ -37,6 +38,8 @@ export interface UseMindmapsReturn extends Omit<UseQueryResult<ApiResponse<Mindm
   search: string;
   setSearch: (search: string) => void;
   totalItems: number;
+  documentFilters: DocumentFilterValues;
+  setDocumentFilters: (filters: DocumentFilterValues) => void;
 }
 
 export const useMindmaps = (): UseMindmapsReturn => {
@@ -48,15 +51,19 @@ export const useMindmaps = (): UseMindmapsReturn => {
     pageSize: 20,
   });
   const [search, setSearch] = useState<string>('');
+  const [documentFilters, setDocumentFilters] = useState<DocumentFilterValues>({});
 
   const { data, ...query } = useQuery<ApiResponse<Mindmap[]>>({
-    queryKey: [mindmapApiService.getType(), 'mindmaps', sorting, pagination, search],
+    queryKey: [mindmapApiService.getType(), 'mindmaps', sorting, pagination, search, documentFilters],
     queryFn: async (): Promise<ApiResponse<Mindmap[]>> => {
       const data = await mindmapApiService.getMindmaps({
         page: pagination.pageIndex,
         pageSize: pagination.pageSize,
         sort: sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined,
         filter: search.trim() || undefined,
+        grade: documentFilters.grade,
+        subject: documentFilters.subject,
+        chapter: documentFilters.chapter,
       });
       return data;
     },
@@ -78,18 +85,17 @@ export const useMindmaps = (): UseMindmapsReturn => {
   const handleSortingChange = (updaterOrValue: Updater<SortingState>) => {
     const newSorting = typeof updaterOrValue === 'function' ? updaterOrValue(sorting) : updaterOrValue;
     setSorting(newSorting);
-    setPagination((prev) => ({
-      ...prev,
-      pageIndex: 0,
-    }));
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
   const handleSearchChange = (newSearch: string) => {
     setSearch(newSearch);
-    setPagination((prev) => ({
-      ...prev,
-      pageIndex: 0,
-    }));
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  };
+
+  const handleFiltersChange = (filters: DocumentFilterValues) => {
+    setDocumentFilters(filters);
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
   return {
@@ -101,6 +107,8 @@ export const useMindmaps = (): UseMindmapsReturn => {
     search,
     setSearch: handleSearchChange,
     totalItems: data?.pagination?.totalItems || 0,
+    documentFilters,
+    setDocumentFilters: handleFiltersChange,
     ...query,
   };
 };

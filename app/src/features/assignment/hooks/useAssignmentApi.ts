@@ -20,6 +20,9 @@ type AssignmentListFilters = {
   searchText?: string;
   page?: number;
   size?: number;
+  grade?: string;
+  subject?: string;
+  chapter?: string;
 };
 
 export const useAssignmentList = (filters?: AssignmentListFilters) => {
@@ -33,6 +36,9 @@ export const useAssignmentList = (filters?: AssignmentListFilters) => {
         search: filters?.searchText,
         page: filters?.page,
         size: filters?.size,
+        grade: filters?.grade,
+        subject: filters?.subject,
+        chapter: filters?.chapter,
       });
       return {
         assignments: response.data,

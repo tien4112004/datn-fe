@@ -9,7 +9,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import DataTable from '@/components/table/DataTable';
-import { SearchBar } from '@/shared/components/common/SearchBar';
+import { DocumentFilters, type DocumentFilterValues } from '@/features/projects/components/DocumentFilters';
 import {
   useAssignmentList,
   useDeleteAssignment,
@@ -39,6 +39,7 @@ const AssignmentTable = () => {
   const [isEditChapterOpen, setIsEditChapterOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [search, setSearch] = useState('');
+  const [documentFilters, setDocumentFilters] = useState<DocumentFilterValues>({});
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -59,6 +60,9 @@ const AssignmentTable = () => {
     searchText: search,
     page: pagination.pageIndex + 1,
     size: pagination.pageSize,
+    grade: documentFilters.grade,
+    subject: documentFilters.subject,
+    chapter: documentFilters.chapter,
   });
   const deleteAssignment = useDeleteAssignment();
   const updateAssignmentChapter = useUpdateAssignmentChapter();
@@ -213,15 +217,14 @@ const AssignmentTable = () => {
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <SearchBar
-          value={search}
-          onChange={handleSearchChange}
-          placeholder={t('assignment.searchPlaceholder')}
-          className="flex-1 rounded-lg border-2 border-slate-200"
-        />
-        <ViewToggle value={viewMode} onValueChange={setViewMode} />
-      </div>
+      <DocumentFilters
+        filters={documentFilters}
+        onChange={setDocumentFilters}
+        searchQuery={search}
+        onSearchChange={handleSearchChange}
+        searchPlaceholder={t('assignment.searchPlaceholder')}
+        RightComponent={<ViewToggle value={viewMode} onValueChange={setViewMode} />}
+      />
 
       <DataTable
         table={table}

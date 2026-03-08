@@ -12,8 +12,19 @@ export const usePresentationManager = () => {
   const updatePresentationTitle = useUpdatePresentationTitle();
   const deletePresentation = useDeletePresentation();
 
-  const { data, isLoading, sorting, setSorting, pagination, setPagination, totalItems, search, setSearch } =
-    usePresentations();
+  const {
+    data,
+    isLoading,
+    sorting,
+    setSorting,
+    pagination,
+    setPagination,
+    totalItems,
+    search,
+    setSearch,
+    documentFilters,
+    setDocumentFilters,
+  } = usePresentations();
 
   const handleRename = (presentation: Presentation) => {
     setSelectedPresentation(presentation);
@@ -55,6 +66,8 @@ export const usePresentationManager = () => {
     totalItems,
     search,
     setSearch,
+    documentFilters,
+    setDocumentFilters,
     // Sorting & Pagination
     sorting,
     setSorting,

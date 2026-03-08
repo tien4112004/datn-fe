@@ -16,6 +16,9 @@ export interface AssignmentCollectionRequest {
   classId?: string;
   sort?: 'asc' | 'desc';
   search?: string;
+  grade?: string;
+  subject?: string;
+  chapter?: string;
 }
 
 export interface AssignmentApiService {

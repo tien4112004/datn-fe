@@ -49,7 +49,6 @@ export function DocumentFilters({
   const { chapters, isLoading: chaptersLoading } = useChapters(filters.grade, filters.subject);
 
   const hasActiveFilters = !!(filters.grade || filters.subject || filters.chapter);
-  const showChapters = true;
 
   const handleGradeToggle = (code: string) => {
     const newGrade = filters.grade === code ? undefined : code;

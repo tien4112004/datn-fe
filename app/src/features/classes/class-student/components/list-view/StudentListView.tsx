@@ -181,14 +181,6 @@ export const StudentListView = ({
         return <div className="text-sm">{parentPhone || '-'}</div>;
       },
     },
-    {
-      accessorKey: 'parentContactEmail',
-      header: t('table.parentEmail'),
-      cell: ({ row }) => {
-        const email = row.getValue('parentContactEmail') as string | null | undefined;
-        return <div className="max-w-xs truncate text-sm">{email || '-'}</div>;
-      },
-    },
     ...(isTeacher
       ? [
           {

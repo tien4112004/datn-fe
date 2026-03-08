@@ -131,17 +131,17 @@ const router = createBrowserRouter([
               Component: (await import('@/features/students/pages/StudentDetailPage')).default,
             }),
           },
+          {
+            path: 'posts/:postId',
+            lazy: async () => ({
+              Component: (await import('@/features/classes/class-feed')).PostDetailPage,
+            }),
+          },
         ],
       },
       {
         path: 'classes/:id/feed',
         Component: () => <FeedTab classId="class1" />,
-      },
-      {
-        path: 'classes/:classId/posts/:postId',
-        lazy: async () => ({
-          Component: (await import('@/features/classes/class-feed')).PostDetailPage,
-        }),
       },
       {
         path: 'settings',

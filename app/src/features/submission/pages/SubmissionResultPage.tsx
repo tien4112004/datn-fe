@@ -162,7 +162,8 @@ export const SubmissionResultPage = () => {
           {submission.score !== undefined && submission.maxScore !== undefined ? (
             <>
               <span className={`text-2xl font-bold ${getScoreColor(submission.score, submission.maxScore)}`}>
-                {submission.score}/{submission.maxScore}
+                {submission.score % 1 === 0 ? submission.score : submission.score.toFixed(1)}/
+                {submission.maxScore}
               </span>
               <span className="text-muted-foreground text-sm">({percentage}%)</span>
             </>
@@ -206,7 +207,8 @@ export const SubmissionResultPage = () => {
 
               <div className="mb-4 text-center">
                 <p className={`text-3xl font-bold ${getScoreColor(submission.score, submission.maxScore)}`}>
-                  {submission.score}/{submission.maxScore}
+                  {submission.score % 1 === 0 ? submission.score : submission.score.toFixed(1)}/
+                  {submission.maxScore}
                 </p>
                 <p className="text-muted-foreground mt-1 text-sm">
                   {percentage >= 90

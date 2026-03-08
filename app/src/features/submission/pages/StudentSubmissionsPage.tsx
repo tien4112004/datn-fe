@@ -138,7 +138,7 @@ export const StudentSubmissionsPage = () => {
           </span>
           {bestScore > 0 && (
             <span className={`text-lg font-bold ${getScoreColor(bestScore, totalPoints)}`}>
-              {tStudent('best')} {bestScore}/{totalPoints}
+              {tStudent('best')} {bestScore % 1 === 0 ? bestScore : bestScore.toFixed(1)}/{totalPoints}
             </span>
           )}
         </div>
@@ -205,7 +205,7 @@ export const StudentSubmissionsPage = () => {
                 <span className="text-sm font-semibold">{tStudent('bestScore')}</span>
               </div>
               <p className={`text-2xl font-bold ${getScoreColor(bestScore, totalPoints)}`}>
-                {bestScore}/{totalPoints}
+                {bestScore % 1 === 0 ? bestScore : bestScore.toFixed(1)}/{totalPoints}
               </p>
               <p className="text-muted-foreground mt-1 text-xs">
                 {Math.round((bestScore / totalPoints) * 100)}%
@@ -222,7 +222,11 @@ export const StudentSubmissionsPage = () => {
               <div className="mt-2">{getStatusBadge(latestSubmission.status)}</div>
               {latestSubmission.score !== undefined && (
                 <p className="text-muted-foreground mt-1 text-xs">
-                  {tStudent('score')} {latestSubmission.score}/{latestSubmission.maxScore}
+                  {tStudent('score')}{' '}
+                  {latestSubmission.score! % 1 === 0
+                    ? latestSubmission.score
+                    : latestSubmission.score!.toFixed(1)}
+                  /{latestSubmission.maxScore}
                 </p>
               )}
             </div>
@@ -335,7 +339,10 @@ export const StudentSubmissionsPage = () => {
                                 <span
                                   className={`font-semibold ${getScoreColor(submission.score, submission.maxScore)}`}
                                 >
-                                  {submission.score}/{submission.maxScore}
+                                  {submission.score! % 1 === 0
+                                    ? submission.score
+                                    : submission.score!.toFixed(1)}
+                                  /{submission.maxScore}
                                 </span>
                                 <span className="text-muted-foreground text-xs">
                                   ({Math.round((submission.score / submission.maxScore) * 100)}%)

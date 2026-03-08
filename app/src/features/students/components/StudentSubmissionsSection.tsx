@@ -46,7 +46,7 @@ export const StudentSubmissionsSection = ({
         if (score == null) return <div className="text-muted-foreground text-sm">-</div>;
         return (
           <div className="text-sm font-medium">
-            {score}
+            {score % 1 === 0 ? score : score.toFixed(1)}
             {maxScore != null && <span className="text-muted-foreground">/{maxScore}</span>}
           </div>
         );

@@ -8,6 +8,7 @@ import {
   Calendar,
   Edit,
   FolderOpen,
+  ArrowLeft,
   BookOpen,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
@@ -37,6 +38,7 @@ const tabs = [
 
 export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDetailTabsProps) => {
   const { t } = useTranslation('classes', { keyPrefix: 'detail' });
+  const { t: tNav } = useTranslation('classes');
 
   const [searchParams] = useSearchParams();
   const currentTab = (searchParams.get('tab') || 'feed') as ClassTabs;
@@ -47,12 +49,18 @@ export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDet
     navigate(`/classes/${classId}?tab=${tab}`);
   };
 
+  const handleGoToClassList = () => navigate('/classes');
+
   return (
-    <div className="flex h-full flex-col md:h-[calc(100vh-4rem)] md:flex-row">
-      {/* Mobile Horizontal Tabs - Hidden on Desktop */}
-      <div className="bg-background border-b md:hidden">
+    <div className="flex h-full flex-col overflow-hidden lg:h-[calc(100vh-4rem)] lg:flex-row">
+      {/* Mobile/Tablet Header - Hidden on Desktop */}
+      <div className="bg-background shrink-0 border-b lg:hidden">
         {/* Compact Class Info */}
         <div className="border-b px-4 py-3">
+          <Button onClick={handleGoToClassList} variant="ghost" size="sm" className="-ml-2 mb-2 gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            {tNav('navigation.goToClasses')}
+          </Button>
           <h1 className="truncate text-lg font-semibold">{currentClass.name}</h1>
           <div className="mt-1 flex items-center gap-2">
             <Badge variant={currentClass.isActive ? 'default' : 'secondary'} className="text-xs">
@@ -66,33 +74,48 @@ export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDet
           </div>
         </div>
 
-        {/* Horizontal Scrollable Tabs */}
-        <nav className="overflow-x-auto">
-          <div className="flex min-w-max gap-1 p-2">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = currentTab === tab.value;
+        {/* Horizontal Scrollable Tabs — hidden when a sub-page outlet is active */}
+        {!outlet && (
+          <nav className="overflow-x-auto">
+            <div className="flex min-w-max gap-1 p-2">
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = currentTab === tab.value;
 
-              return (
-                <button
-                  key={tab.value}
-                  onClick={() => handleTabChange(tab.value as ClassTabs)}
-                  className={cn(
-                    'flex items-center gap-2 whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-colors',
-                    isActive ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'
-                  )}
-                >
-                  <Icon className="h-4 w-4 shrink-0" />
-                  <span>{t(tab.labelKey)}</span>
-                </button>
-              );
-            })}
-          </div>
-        </nav>
+                return (
+                  <button
+                    key={tab.value}
+                    onClick={() => handleTabChange(tab.value as ClassTabs)}
+                    className={cn(
+                      'flex items-center gap-2 whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+                      isActive ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'
+                    )}
+                  >
+                    <Icon className="h-4 w-4 shrink-0" />
+                    <span>{t(tab.labelKey)}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
+        )}
       </div>
 
       {/* Vertical Sidebar with Class Info */}
-      <aside className="bg-muted/10 hidden overflow-y-auto border-r md:block md:w-64 lg:w-80">
+      <aside className="bg-muted/10 hidden shrink-0 overflow-y-auto border-r lg:block lg:w-72 xl:w-80">
+        {/* Back to Class List */}
+        <div className="border-b px-4 py-3">
+          <Button
+            onClick={handleGoToClassList}
+            variant="ghost"
+            size="sm"
+            className="-ml-2 flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {tNav('navigation.goToClasses')}
+          </Button>
+        </div>
+
         {/* Class Information Section */}
         <div className="space-y-4 border-b p-6">
           {/* Title and Status */}
@@ -106,8 +129,7 @@ export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDet
 
             {/* Edit Button */}
             <Button onClick={() => onEditClick(currentClass)} variant="outline" size="sm">
-              <Edit className="mr-2 h-4 w-4" />
-              {t('actions.edit')}
+              <Edit className="h-4 w-4" />
             </Button>
           </div>
 
@@ -175,7 +197,7 @@ export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDet
       </aside>
 
       {/* Content Area - Scrollable */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="min-h-0 flex-1 overflow-y-auto">
         {outlet ?? (
           <>
             {currentTab === 'feed' && <FeedTab classId={classId} />}
@@ -189,19 +211,19 @@ export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDet
             )}
 
             {currentTab === 'students' && (
-              <div className="p-6">
+              <div className="p-3 sm:p-6">
                 <ClassStudentView classData={currentClass} />
               </div>
             )}
 
             {currentTab === 'resources' && (
-              <div className="p-6">
+              <div className="p-3 sm:p-6">
                 <ClassResourcesTab classId={classId} />
               </div>
             )}
 
             {currentTab === 'settings' && (
-              <div className="p-6">
+              <div className="p-3 sm:p-6">
                 <ClassSettings classData={currentClass} />
               </div>
             )}

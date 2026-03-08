@@ -57,7 +57,7 @@ export default function StudentDetailPage() {
   // Loading State: Use skeleton screen (UX best practice)
   if (isLoadingStudent) {
     return (
-      <div className="container mx-auto max-w-6xl space-y-6 p-4 sm:p-6 lg:p-8">
+      <div className="space-y-6 p-4 sm:p-6">
         <PageHeader title={t('studentDetail.loading')} onBack={handleBack} />
         <StudentDetailSkeleton />
       </div>
@@ -67,7 +67,7 @@ export default function StudentDetailPage() {
   // Error State: Clear message with retry action
   if (studentError || !student) {
     return (
-      <div className="container mx-auto max-w-4xl space-y-6 p-4 sm:p-6 lg:p-8">
+      <div className="space-y-6 p-4 sm:p-6">
         <PageHeader title={t('studentDetail.studentNotFound')} onBack={handleBack} />
 
         <Alert variant="destructive" className="border-red-200 dark:border-red-800">
@@ -100,7 +100,7 @@ export default function StudentDetailPage() {
   const pageDescription = t('studentDetail.pageDescription', { fullName });
 
   return (
-    <div className="container mx-auto max-w-6xl space-y-6 p-4 sm:p-6 lg:p-8">
+    <div className="space-y-6 p-4 sm:p-6">
       {/* Page Header with Breadcrumb */}
       <PageHeader title={fullName} description={pageDescription} onBack={handleBack} />
 

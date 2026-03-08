@@ -4,8 +4,10 @@ import { DeleteConfirmation } from '@/shared/components/common/DeleteConfirmatio
 import { SpinnerIcon } from '@/shared/components/common/GlobalSpinner';
 import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
-import { useDeletePost, usePinPost, useUpdatePost } from '../hooks/useApi';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCreatePost, useDeletePost, usePinPost, useUpdatePost, feedQueryKeys } from '../hooks/useApi';
 import { PostType, type Post } from '../types';
+import type { ApiResponse } from '@aiprimary/api';
 import { CommentThread } from './CommentThread';
 import { PostCard } from './PostCard';
 
@@ -30,6 +32,8 @@ export const PostList = ({
   const pinPost = usePinPost();
   const deletePost = useDeletePost();
   const updatePost = useUpdatePost();
+  const createPost = useCreatePost();
+  const queryClient = useQueryClient();
 
   const handleEditPost = async (postId: string, content: string) => {
     try {
@@ -51,6 +55,22 @@ export const PostList = ({
 
   const handleDeletePost = (postId: string) => {
     openDialog(postId);
+  };
+
+  const handleRetryPost = (post: Post) => {
+    if (!post._failedRequest) return;
+    queryClient.setQueriesData<ApiResponse<Post[]>>({ queryKey: feedQueryKeys.all }, (oldData) => {
+      if (!oldData?.data) return oldData;
+      return { ...oldData, data: oldData.data.filter((p) => p.id !== post.id) };
+    });
+    createPost.mutate(post._failedRequest);
+  };
+
+  const handleDismissFailedPost = (postId: string) => {
+    queryClient.setQueriesData<ApiResponse<Post[]>>({ queryKey: feedQueryKeys.all }, (oldData) => {
+      if (!oldData?.data) return oldData;
+      return { ...oldData, data: oldData.data.filter((p) => p.id !== postId) };
+    });
   };
 
   const handleConfirmDelete = async () => {
@@ -112,10 +132,12 @@ export const PostList = ({
         <div key={post.id}>
           <PostCard
             post={post}
-            onUpdate={(newContent) => handleEditPost(post.id, newContent)}
-            onPin={(pinned) => handlePinPost(post.id, pinned)}
-            onDelete={() => handleDeletePost(post.id)}
-            onComment={() => toggleComments(post.id)}
+            onUpdate={post._isFailed ? undefined : (newContent) => handleEditPost(post.id, newContent)}
+            onPin={post._isFailed ? undefined : (pinned) => handlePinPost(post.id, pinned)}
+            onDelete={post._isFailed ? undefined : () => handleDeletePost(post.id)}
+            onComment={post._isFailed ? undefined : () => toggleComments(post.id)}
+            onRetry={post._isFailed ? () => handleRetryPost(post) : undefined}
+            onDismiss={post._isFailed ? () => handleDismissFailedPost(post.id) : undefined}
             className={index === 0 ? '' : 'border-t'}
           />
 

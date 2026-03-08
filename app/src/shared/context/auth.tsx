@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import type { User, AuthContextType } from '../types/auth';
 import { useProfile } from '@/features/auth/hooks/useAuth';
 
@@ -26,6 +27,7 @@ const USER_SPECIFIC_STORAGE_KEYS = [
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
+  const queryClient = useQueryClient();
 
   // Always fetch profile on mount to check authentication status
   const { data: profileData, isLoading: isLoadingProfile } = useProfile(true);
@@ -64,6 +66,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     // Clear user state
     setUser(null);
+
+    // Clear all React Query cached data so the next user doesn't see stale data
+    queryClient.clear();
 
     // Clear user data from localStorage
     // Note: HttpOnly cookies will be cleared by calling backend logout endpoint

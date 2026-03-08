@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -113,7 +113,6 @@ const AssignmentTable = () => {
               })
             : '',
         minSize: 100,
-        meta: { isGrow: true },
       }),
       columnHelper.display({
         id: 'actions',

@@ -4,7 +4,14 @@ import { Button } from '@ui/button';
 import { Checkbox } from '@ui/checkbox';
 import { Label } from '@ui/label';
 import { X, Filter, ChevronDown } from 'lucide-react';
-import { getAllGrades, getAllSubjects } from '@aiprimary/core';
+import {
+  getAllGrades,
+  getAllSubjects,
+  getSubjectName,
+  getGradeName,
+  getSubjectBadgeClass,
+} from '@aiprimary/core';
+import { Badge } from '@ui/badge';
 import { useChapters } from '@/shared/hooks/useChapters';
 import { SearchBar } from '@/shared/components/common/SearchBar';
 
@@ -57,13 +64,6 @@ export function DocumentFilters({
   const handleChapterToggle = (name: string) => {
     onChange({ ...filters, chapter: filters.chapter === name ? undefined : name });
   };
-
-  const gradeName = (code: string) => {
-    const g = grades.find((g) => g.code === code);
-    return g ? (i18n.language === 'vi' ? g.name : g.nameEn) : code;
-  };
-
-  const subjectName = (code: string) => subjects.find((s) => s.code === code)?.name ?? code;
 
   return (
     <div className="space-y-3">
@@ -177,31 +177,31 @@ export function DocumentFilters({
       {hasActiveFilters && (
         <div className="flex flex-wrap items-center gap-2">
           {filters.grade && (
-            <span className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium">
-              {tCommon('grade')}: {gradeName(filters.grade)}
+            <Badge variant="outline" className="cursor-pointer gap-1 pr-1.5">
+              {getGradeName(filters.grade)}
               <X
-                className="h-3 w-3 cursor-pointer"
+                className="h-3 w-3"
                 onClick={() => onChange({ ...filters, grade: undefined, chapter: undefined })}
               />
-            </span>
+            </Badge>
           )}
           {filters.subject && (
-            <span className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium">
-              {tCommon('subject')}: {subjectName(filters.subject)}
+            <Badge
+              variant="outline"
+              className={`cursor-pointer gap-1 pr-1.5 ${getSubjectBadgeClass(filters.subject)}`}
+            >
+              {getSubjectName(filters.subject)}
               <X
-                className="h-3 w-3 cursor-pointer"
+                className="h-3 w-3"
                 onClick={() => onChange({ ...filters, subject: undefined, chapter: undefined })}
               />
-            </span>
+            </Badge>
           )}
           {filters.chapter && (
-            <span className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium">
-              {tCommon('table.presentation.chapter')}: {filters.chapter}
-              <X
-                className="h-3 w-3 cursor-pointer"
-                onClick={() => onChange({ ...filters, chapter: undefined })}
-              />
-            </span>
+            <Badge variant="outline" className="cursor-pointer gap-1 pr-1.5">
+              {filters.chapter}
+              <X className="h-3 w-3" onClick={() => onChange({ ...filters, chapter: undefined })} />
+            </Badge>
           )}
           <Button variant="ghost" size="sm" onClick={() => onChange({})} className="h-6 gap-1 px-2 text-xs">
             <X className="h-3 w-3" />

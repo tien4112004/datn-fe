@@ -26,6 +26,8 @@ import { ActionButton, ActionContent } from '@/features/presentation/components'
 import { formatDistance } from 'date-fns';
 import { BrainCircuit } from 'lucide-react';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
+import { Badge } from '@ui/badge';
+import { getSubjectName, getGradeName, getSubjectBadgeClass } from '@aiprimary/core';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 
 const columnHelper = createColumnHelper<Mindmap>();
@@ -104,13 +106,29 @@ const MindmapTable = () => {
       }),
       columnHelper.accessor('grade', {
         header: t('mindmap.grade'),
-        cell: (info) => info.getValue() ?? '---',
+        cell: (info) => {
+          const grade = info.getValue();
+          return grade ? (
+            <Badge variant="outline">{getGradeName(grade)}</Badge>
+          ) : (
+            <span className="text-muted-foreground text-xs">-</span>
+          );
+        },
         size: 120,
         enableSorting: false,
       }),
       columnHelper.accessor('subject', {
         header: t('mindmap.subject'),
-        cell: (info) => info.getValue() ?? '---',
+        cell: (info) => {
+          const subject = info.getValue();
+          return subject ? (
+            <Badge variant="outline" className={getSubjectBadgeClass(subject)}>
+              {getSubjectName(subject)}
+            </Badge>
+          ) : (
+            <span className="text-muted-foreground text-xs">-</span>
+          );
+        },
         size: 150,
         enableSorting: false,
       }),

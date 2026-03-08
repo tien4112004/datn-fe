@@ -23,6 +23,8 @@ import { formatDistance } from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 import { SkeletonGrid } from '@ui/skeleton-card';
+import { Badge } from '@ui/badge';
+import { getSubjectName, getGradeName, getSubjectBadgeClass } from '@aiprimary/core';
 
 const MindmapGrid = () => {
   const { t } = useTranslation('common', { keyPrefix: 'table' });
@@ -198,14 +200,14 @@ const MindmapGrid = () => {
         >
           {mindmap.title || t('mindmap.untitled')}
         </h3>
-        <div className="flex flex-col text-xs text-gray-500">
-          <div className="flex gap-x-3">
-            <span>
-              {t('mindmap.grade')}: {mindmap.grade ?? '---'}
-            </span>
-            <span>
-              {t('mindmap.subject')}: {mindmap.subject ?? '---'}
-            </span>
+        <div className="flex flex-col gap-1 text-xs text-gray-500">
+          <div className="flex flex-wrap gap-1.5">
+            {mindmap.grade ? <Badge variant="outline">{getGradeName(mindmap.grade)}</Badge> : null}
+            {mindmap.subject ? (
+              <Badge variant="outline" className={getSubjectBadgeClass(mindmap.subject)}>
+                {getSubjectName(mindmap.subject)}
+              </Badge>
+            ) : null}
           </div>
           <div className="flex min-w-0 gap-x-1">
             <span className="shrink-0">{t('mindmap.chapter')}:</span>

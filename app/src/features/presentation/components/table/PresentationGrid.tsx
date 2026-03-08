@@ -19,6 +19,8 @@ import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfi
 import EditChapterDialog from '@/features/projects/components/EditChapterDialog';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 import { SkeletonGrid } from '@ui/skeleton-card';
+import { Badge } from '@ui/badge';
+import { getSubjectName, getGradeName, getSubjectBadgeClass } from '@aiprimary/core';
 
 const PresentationGrid = () => {
   const { t } = useTranslation('common', { keyPrefix: 'table' });
@@ -136,14 +138,14 @@ const PresentationGrid = () => {
         >
           {presentation.title || t('presentation.untitled')}
         </h3>
-        <div className="flex flex-col text-xs text-gray-500">
-          <div className="flex gap-x-3">
-            <span>
-              {t('presentation.grade')}: {presentation.grade ?? '---'}
-            </span>
-            <span>
-              {t('presentation.subject')}: {presentation.subject ?? '---'}
-            </span>
+        <div className="flex flex-col gap-1 text-xs text-gray-500">
+          <div className="flex flex-wrap gap-1.5">
+            {presentation.grade ? <Badge variant="outline">{getGradeName(presentation.grade)}</Badge> : null}
+            {presentation.subject ? (
+              <Badge variant="outline" className={getSubjectBadgeClass(presentation.subject)}>
+                {getSubjectName(presentation.subject)}
+              </Badge>
+            ) : null}
           </div>
           <div className="flex min-w-0 gap-x-1">
             <span className="shrink-0">{t('presentation.chapter')}:</span>

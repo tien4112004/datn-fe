@@ -144,7 +144,7 @@ export function MatrixTemplateFormPage() {
   useEffect(() => {
     if (templateData?.data) {
       const t = templateData.data;
-      setTitle(t.title || '');
+      setTitle(t.name || '');
       setGrade(t.grade || '');
       setSubject(t.subject || '');
       const { topics: loadedTopics, cells: loadedCells } = templateToEditorData(t);

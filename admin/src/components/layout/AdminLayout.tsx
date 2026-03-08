@@ -20,7 +20,6 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { getBackendUrl } from '@aiprimary/api';
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -47,7 +46,7 @@ export function AdminLayout() {
   };
 
   return (
-    <div className="bg-background flex min-h-screen">
+    <div className="bg-background flex h-screen overflow-hidden">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setSidebarOpen(false)} />
@@ -67,7 +66,7 @@ export function AdminLayout() {
           </Button>
         </div>
 
-        <nav className="flex-1 space-y-1 p-4">
+        <nav className="flex-1 space-y-1 overflow-y-auto p-4">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
@@ -110,7 +109,7 @@ export function AdminLayout() {
       </aside>
 
       {/* Main content */}
-      <div className="flex flex-1 flex-col">
+      <div className="flex min-h-0 flex-1 flex-col">
         {/* Mobile header */}
         <header className="bg-background flex h-16 items-center gap-4 border-b px-6 lg:hidden">
           <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
@@ -118,13 +117,6 @@ export function AdminLayout() {
           </Button>
           <h1 className="text-lg font-semibold">Admin Panel</h1>
         </header>
-
-        {/* Backend URL Display */}
-        <div className="bg-background flex items-center justify-end gap-4 border-b px-6 py-3">
-          <div className="text-muted-foreground text-sm">
-            Backend: <span className="font-mono">{import.meta.env.VITE_API_URL || getBackendUrl()}</span>
-          </div>
-        </div>
 
         <main className="flex-1 overflow-auto p-6">
           <Outlet />

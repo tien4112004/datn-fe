@@ -7,12 +7,15 @@ import {
 } from '@tanstack/react-query';
 import type { SortingState, PaginationState, Updater } from '@tanstack/react-table';
 import { usePresentationApiService, getPresentationApiService } from '../api';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import type { Presentation, PresentationGenerateDraftRequest } from '../types';
 import type { ApiResponse } from '@aiprimary/api';
 import type { SlideTheme } from '../types/slide';
 import { toast } from 'sonner';
 import { t } from 'i18next';
+import { getExamplePromptsApiService, type UpdateChapterPayload } from '@/features/projects/api';
+import type { DocumentFilterValues } from '@/features/projects/components/DocumentFilters';
+import { usePresentationListStore } from '../stores/usePresentationListStore';
 
 // Return types for the hooks
 export interface UsePresentationsReturn extends Omit<UseQueryResult<ApiResponse<Presentation[]>>, 'data'> {
@@ -24,59 +27,62 @@ export interface UsePresentationsReturn extends Omit<UseQueryResult<ApiResponse<
   search: string;
   setSearch: (search: string) => void;
   totalItems: number;
+  documentFilters: DocumentFilterValues;
+  setDocumentFilters: (filters: DocumentFilterValues) => void;
 }
 
 export const usePresentations = (): UsePresentationsReturn => {
   const presentationApiService = usePresentationApiService();
 
-  const [sorting, setSorting] = useState<SortingState>([{ id: 'createdAt', desc: true }]);
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 20,
-  });
-  const [search, setSearch] = useState<string>('');
+  const {
+    search,
+    sorting,
+    pagination,
+    documentFilters,
+    setSearch,
+    setSorting,
+    setPagination,
+    setDocumentFilters,
+  } = usePresentationListStore();
 
   const { data, ...query } = useQuery<ApiResponse<Presentation[]>>({
-    queryKey: [presentationApiService.getType(), 'presentations', sorting, pagination, search],
+    queryKey: [
+      presentationApiService.getType(),
+      'presentations',
+      sorting,
+      pagination,
+      search,
+      documentFilters,
+    ],
     queryFn: async (): Promise<ApiResponse<Presentation[]>> => {
       const data = await presentationApiService.getPresentations({
         page: pagination.pageIndex,
         pageSize: pagination.pageSize,
         sort: sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined,
         filter: search.trim() || undefined,
+        grade: documentFilters.grade,
+        subject: documentFilters.subject,
+        chapter: documentFilters.chapter,
       });
       return data;
     },
-    enabled: true, // Always enabled
-    staleTime: 30000, // Consider data fresh for 30 seconds
-    gcTime: 300000, // Keep in cache for 5 minutes
+    enabled: true,
+    staleTime: 30000,
+    gcTime: 300000,
   });
 
   useEffect(() => {
     if (data && data.pagination) {
-      setPagination((prev) => ({
-        ...prev,
+      setPagination({
         pageIndex: data.pagination?.currentPage ?? 0,
         pageSize: data.pagination?.pageSize ?? 20,
-      }));
+      });
     }
   }, [data?.pagination]);
 
   const handleSortingChange = (updaterOrValue: Updater<SortingState>) => {
     const newSorting = typeof updaterOrValue === 'function' ? updaterOrValue(sorting) : updaterOrValue;
     setSorting(newSorting);
-    setPagination((prev) => ({
-      ...prev,
-      pageIndex: 0,
-    }));
-  };
-
-  const handleSearchChange = (newSearch: string) => {
-    setSearch(newSearch);
-    setPagination((prev) => ({
-      ...prev,
-      pageIndex: 0,
-    }));
   };
 
   return {
@@ -86,8 +92,10 @@ export const usePresentations = (): UsePresentationsReturn => {
     pagination,
     setPagination,
     search,
-    setSearch: handleSearchChange,
+    setSearch,
     totalItems: data?.pagination?.totalItems || 0,
+    documentFilters,
+    setDocumentFilters,
     ...query,
   };
 };
@@ -341,6 +349,23 @@ export const useDeletePresentation = () => {
 
       queryClient.removeQueries({
         queryKey: [presentationApiService.getType(), 'presentation', deletedId],
+      });
+    },
+  });
+};
+
+export const useUpdatePresentationChapter = () => {
+  const presentationApiService = usePresentationApiService();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, ...payload }: { id: string } & UpdateChapterPayload) => {
+      await getExamplePromptsApiService().updateDocumentChapter('presentation', id, payload);
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [presentationApiService.getType(), 'presentations'],
       });
     },
   });

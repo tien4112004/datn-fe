@@ -1,18 +1,22 @@
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Presentation } from '../../types/presentation';
 import { usePresentationManager } from '../../hooks/usePresentationManager';
+import { useUpdatePresentationChapter } from '../../hooks/useApi';
 import DataTable from '@/components/table/DataTable';
-import { ActionContent } from './ActionButton';
-import { SearchBar } from '../../../../shared/components/common/SearchBar';
+import ActionButton, { ActionContent } from './ActionButton';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { DocumentFilters } from '@/features/projects/components/DocumentFilters';
 import { ThumbnailWrapperV2 } from '../others/ThumbnailWrapper';
 import { RenameFileDialog } from '@/components/modals/RenameFileDialog';
 import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfirmationDialog';
+import EditChapterDialog from '@/features/projects/components/EditChapterDialog';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
-import { format } from 'date-fns';
+import { formatDistance } from 'date-fns';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
+import { Badge } from '@ui/badge';
+import { getSubjectName, getGradeName, getSubjectBadgeClass } from '@aiprimary/core';
 
 const PresentationTable = () => {
   const { t } = useTranslation('common', { keyPrefix: 'table' });
@@ -39,9 +43,9 @@ const PresentationTable = () => {
           const presentation = info.row.original;
           return <ThumbnailWrapperV2 presentation={presentation} size={'auto'} visible={true} />;
         },
-        size: 180,
-        minSize: 180,
-        maxSize: 180,
+        size: 150,
+        minSize: 150,
+        maxSize: 150,
         enableResizing: false,
         enableSorting: false,
       }),
@@ -54,17 +58,67 @@ const PresentationTable = () => {
         },
         enableSorting: true,
       }),
-      columnHelper.accessor('createdAt', {
-        header: t('presentation.createdAt'),
-        cell: (info) =>
-          info.getValue() ? format(info.getValue() as Date, 'E, P', { locale: getLocaleDateFns() }) : '',
-        size: 200,
+      columnHelper.accessor('grade', {
+        header: t('presentation.grade'),
+        cell: (info) => {
+          const grade = info.getValue();
+          return grade ? (
+            <Badge variant="outline">{getGradeName(grade)}</Badge>
+          ) : (
+            <span className="text-muted-foreground text-xs">-</span>
+          );
+        },
+        size: 80,
+        enableSorting: false,
+      }),
+      columnHelper.accessor('subject', {
+        header: t('presentation.subject'),
+        cell: (info) => {
+          const subject = info.getValue();
+          return subject ? (
+            <Badge variant="outline" className={getSubjectBadgeClass(subject)}>
+              {getSubjectName(subject)}
+            </Badge>
+          ) : (
+            <span className="text-muted-foreground text-xs">-</span>
+          );
+        },
+        size: 110,
+        enableSorting: false,
       }),
       columnHelper.accessor('updatedAt', {
         header: t('presentation.updatedAt'),
         cell: (info) =>
-          info.getValue() ? format(info.getValue() as Date, 'E, P', { locale: getLocaleDateFns() }) : '',
-        size: 200,
+          info.getValue()
+            ? formatDistance(new Date(info.getValue() as Date), new Date(), {
+                addSuffix: true,
+                locale: getLocaleDateFns(),
+              })
+            : '',
+        minSize: 100,
+        enableSorting: false,
+      }),
+      columnHelper.display({
+        id: 'actions',
+        header: t('actions'),
+        cell: (info) => {
+          const presentation = info.row.original;
+          return (
+            <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
+              <ActionButton
+                onViewDetail={() => navigate(`/presentation/${presentation.id}`)}
+                onDelete={() => handleDelete(presentation)}
+                onRename={() => handleRename(presentation)}
+                onEditChapter={() => {
+                  setSelectedPresentation(presentation);
+                  setIsEditChapterOpen(true);
+                }}
+              />
+            </div>
+          );
+        },
+        size: 90,
+        enableResizing: false,
         enableSorting: false,
       }),
     ],
@@ -73,10 +127,12 @@ const PresentationTable = () => {
 
   const initialColumnSizing = useMemo(
     () => ({
-      thumbnail: 180,
+      thumbnail: 150,
       title: 400,
-      createdAt: 200,
-      updatedAt: 200,
+      grade: 80,
+      subject: 110,
+      updatedAt: 150,
+      actions: 50,
     }),
     []
   );
@@ -94,6 +150,7 @@ const PresentationTable = () => {
     isRenameOpen,
     setIsRenameOpen,
     selectedPresentation,
+    setSelectedPresentation,
     handleRename,
     handleConfirmRename,
     isRenamePending,
@@ -103,7 +160,12 @@ const PresentationTable = () => {
     handleConfirmDelete,
     handleCancelDelete,
     isDeletePending,
+    documentFilters,
+    setDocumentFilters,
   } = usePresentationManager();
+
+  const [isEditChapterOpen, setIsEditChapterOpen] = useState(false);
+  const updatePresentationChapter = useUpdatePresentationChapter();
 
   const table = useReactTable({
     data: [...data],
@@ -128,16 +190,16 @@ const PresentationTable = () => {
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <SearchBar
-          value={search}
-          onChange={setSearch}
-          placeholder={t('presentation.searchPlaceholder')}
-          className="flex-1 rounded-lg border-2 border-slate-200"
-        />
-        <ViewToggle value={viewMode} onValueChange={setViewMode} />
-      </div>
+      <DocumentFilters
+        filters={documentFilters}
+        onChange={setDocumentFilters}
+        searchQuery={search}
+        onSearchChange={setSearch}
+        searchPlaceholder={t('presentation.searchPlaceholder')}
+        RightComponent={<ViewToggle value={viewMode} onValueChange={setViewMode} />}
+      />
       <DataTable
+        className="w-full"
         table={table}
         isLoading={isLoading}
         onClickRow={(row) => {
@@ -155,6 +217,10 @@ const PresentationTable = () => {
             }}
             onRename={() => {
               handleRename(row.original);
+            }}
+            onEditChapter={() => {
+              setSelectedPresentation(row.original);
+              setIsEditChapterOpen(true);
             }}
           />
         )}
@@ -181,6 +247,23 @@ const PresentationTable = () => {
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
         isDeleting={isDeletePending}
+      />
+      <EditChapterDialog
+        open={isEditChapterOpen}
+        onOpenChange={setIsEditChapterOpen}
+        initialValues={{
+          grade: selectedPresentation?.grade,
+          subject: selectedPresentation?.subject,
+          chapter: selectedPresentation?.chapter,
+        }}
+        onSave={(values) => {
+          if (!selectedPresentation) return;
+          updatePresentationChapter.mutate(
+            { id: selectedPresentation.id, ...values },
+            { onSuccess: () => setIsEditChapterOpen(false) }
+          );
+        }}
+        isPending={updatePresentationChapter.isPending}
       />
     </div>
   );

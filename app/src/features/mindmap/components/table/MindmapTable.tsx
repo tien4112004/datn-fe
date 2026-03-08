@@ -10,16 +10,24 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import DataTable from '@/components/table/DataTable';
-import { SearchBar } from '@/shared/components/common/SearchBar';
-import { useMindmaps, useUpdateMindmapTitle, useDeleteMindmap } from '@/features/mindmap/hooks';
+import { DocumentFilters } from '@/features/projects/components/DocumentFilters';
+import {
+  useMindmaps,
+  useUpdateMindmapTitle,
+  useDeleteMindmap,
+  useUpdateMindmapChapter,
+} from '@/features/mindmap/hooks';
 import type { Mindmap } from '@/features/mindmap/types';
 import { RenameFileDialog } from '@/shared/components/modals/RenameFileDialog';
 import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfirmationDialog';
+import EditChapterDialog from '@/features/projects/components/EditChapterDialog';
 import { toast } from 'sonner';
-import { ActionContent } from '@/features/presentation/components';
-import { format } from 'date-fns';
+import { ActionButton, ActionContent } from '@/features/presentation/components';
+import { formatDistance } from 'date-fns';
 import { BrainCircuit } from 'lucide-react';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
+import { Badge } from '@ui/badge';
+import { getSubjectName, getGradeName, getSubjectBadgeClass } from '@aiprimary/core';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 
 const columnHelper = createColumnHelper<Mindmap>();
@@ -31,6 +39,7 @@ const MindmapTable = () => {
 
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isEditChapterOpen, setIsEditChapterOpen] = useState(false);
   const [selectedMindmap, setSelectedMindmap] = useState<Mindmap | null>(null);
 
   const viewMode = (searchParams.get('view') as ViewMode) || 'list';
@@ -44,11 +53,23 @@ const MindmapTable = () => {
   };
 
   // Use the new hook
-  const { data, isLoading, sorting, setSorting, pagination, setPagination, search, setSearch, totalItems } =
-    useMindmaps();
+  const {
+    data,
+    isLoading,
+    sorting,
+    setSorting,
+    pagination,
+    setPagination,
+    search,
+    setSearch,
+    totalItems,
+    documentFilters,
+    setDocumentFilters,
+  } = useMindmaps();
 
   const updateMindmapTitleMutation = useUpdateMindmapTitle();
   const deleteMindmapMutation = useDeleteMindmap();
+  const updateMindmapChapter = useUpdateMindmapChapter();
 
   const columns = useMemo(
     () => [
@@ -83,17 +104,71 @@ const MindmapTable = () => {
         meta: { isGrow: true },
         enableSorting: true,
       }),
-      columnHelper.accessor('createdAt', {
-        header: t('mindmap.createdAt'),
-        cell: (info) =>
-          info.getValue() ? format(info.getValue(), 'E, P', { locale: getLocaleDateFns() }) : '',
-        size: 280,
+      columnHelper.accessor('grade', {
+        header: t('mindmap.grade'),
+        cell: (info) => {
+          const grade = info.getValue();
+          return grade ? (
+            <Badge variant="outline">{getGradeName(grade)}</Badge>
+          ) : (
+            <span className="text-muted-foreground text-xs">-</span>
+          );
+        },
+        size: 120,
+        enableSorting: false,
+      }),
+      columnHelper.accessor('subject', {
+        header: t('mindmap.subject'),
+        cell: (info) => {
+          const subject = info.getValue();
+          return subject ? (
+            <Badge variant="outline" className={getSubjectBadgeClass(subject)}>
+              {getSubjectName(subject)}
+            </Badge>
+          ) : (
+            <span className="text-muted-foreground text-xs">-</span>
+          );
+        },
+        size: 150,
+        enableSorting: false,
       }),
       columnHelper.accessor('updatedAt', {
         header: t('mindmap.updatedAt'),
         cell: (info) =>
-          info.getValue() ? format(info.getValue(), 'E, P', { locale: getLocaleDateFns() }) : '',
-        size: 280,
+          info.getValue()
+            ? formatDistance(new Date(info.getValue()), new Date(), {
+                addSuffix: true,
+                locale: getLocaleDateFns(),
+              })
+            : '',
+        minSize: 100,
+        enableSorting: false,
+      }),
+      columnHelper.display({
+        id: 'actions',
+        header: t('actions'),
+        cell: (info) => {
+          const mindmap = info.row.original;
+          return (
+            <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
+              <ActionButton
+                onViewDetail={() => navigate(`/mindmap/${mindmap.id}`)}
+                onDelete={() => handleDelete(mindmap)}
+                onRename={() => {
+                  setSelectedMindmap(mindmap);
+                  setIsRenameOpen(true);
+                }}
+                onEditChapter={() => {
+                  setSelectedMindmap(mindmap);
+                  setIsEditChapterOpen(true);
+                }}
+              />
+            </div>
+          );
+        },
+        size: 90,
+        enableResizing: false,
+        enableSorting: false,
       }),
     ],
     [t]
@@ -173,15 +248,14 @@ const MindmapTable = () => {
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <SearchBar
-          value={search}
-          onChange={handleSearchChange}
-          placeholder={t('mindmap.searchPlaceholder')}
-          className="flex-1 rounded-lg border-2 border-slate-200"
-        />
-        <ViewToggle value={viewMode} onValueChange={setViewMode} />
-      </div>
+      <DocumentFilters
+        filters={documentFilters}
+        onChange={setDocumentFilters}
+        searchQuery={search}
+        onSearchChange={handleSearchChange}
+        searchPlaceholder={t('mindmap.searchPlaceholder')}
+        RightComponent={<ViewToggle value={viewMode} onValueChange={setViewMode} />}
+      />
 
       <DataTable
         table={table}
@@ -202,6 +276,10 @@ const MindmapTable = () => {
             onRename={() => {
               setSelectedMindmap(row.original);
               setIsRenameOpen(true);
+            }}
+            onEditChapter={() => {
+              setSelectedMindmap(row.original);
+              setIsEditChapterOpen(true);
             }}
           />
         )}
@@ -229,6 +307,23 @@ const MindmapTable = () => {
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
         isDeleting={deleteMindmapMutation.isPending}
+      />
+      <EditChapterDialog
+        open={isEditChapterOpen}
+        onOpenChange={setIsEditChapterOpen}
+        initialValues={{
+          grade: selectedMindmap?.grade,
+          subject: selectedMindmap?.subject,
+          chapter: selectedMindmap?.chapter,
+        }}
+        onSave={(values) => {
+          if (!selectedMindmap) return;
+          updateMindmapChapter.mutate(
+            { id: selectedMindmap.id, ...values },
+            { onSuccess: () => setIsEditChapterOpen(false) }
+          );
+        }}
+        isPending={updateMindmapChapter.isPending}
       />
     </div>
   );

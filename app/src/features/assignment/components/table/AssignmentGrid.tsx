@@ -3,19 +3,25 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { Assignment } from '../../types';
-import { useAssignmentList, useDeleteAssignment } from '@/features/assignment/hooks/useAssignmentApi';
+import {
+  useAssignmentList,
+  useDeleteAssignment,
+  useUpdateAssignmentChapter,
+} from '@/features/assignment/hooks/useAssignmentApi';
 import { Button } from '@ui/button';
 import { MoreHorizontal, ClipboardList } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@ui/dropdown-menu';
-import { SearchBar } from '@/shared/components/common/SearchBar';
+import { DocumentFilters } from '@/features/projects/components/DocumentFilters';
+import { useAssignmentListStore } from '@/features/assignment/stores/useAssignmentListStore';
 import TablePagination from '@/shared/components/table/TablePagination';
 import { ActionContent } from '@/features/presentation/components';
 import { RenameFileDialog } from '@/shared/components/modals/RenameFileDialog';
 import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfirmationDialog';
+import EditChapterDialog from '@/features/projects/components/EditChapterDialog';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 import { toast } from 'sonner';
 
-import { format } from 'date-fns';
+import { formatDistance } from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { Badge } from '@ui/badge';
 import { getSubjectName, getGradeName, getSubjectBadgeClass } from '@aiprimary/core';
@@ -28,12 +34,10 @@ const AssignmentGrid = () => {
 
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isEditChapterOpen, setIsEditChapterOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
-  const [search, setSearch] = useState('');
-  const [pagination, setPagination] = useState<any>({
-    pageIndex: 0,
-    pageSize: 20,
-  });
+  const { search, documentFilters, pagination, setSearch, setDocumentFilters, setPagination } =
+    useAssignmentListStore();
 
   const viewMode = (searchParams.get('view') as ViewMode) || 'grid';
 
@@ -50,15 +54,19 @@ const AssignmentGrid = () => {
     searchText: search,
     page: pagination.pageIndex + 1,
     size: pagination.pageSize,
+    grade: documentFilters.grade,
+    subject: documentFilters.subject,
+    chapter: documentFilters.chapter,
   });
   const deleteAssignment = useDeleteAssignment();
+  const updateAssignmentChapter = useUpdateAssignmentChapter();
 
   const data = useMemo(() => assignmentsResponse?.assignments || [], [assignmentsResponse]);
   const totalItems = assignmentsResponse?.total || 0;
 
   const formatDate = useCallback((date: Date | string | undefined): string => {
     if (!date) return '';
-    return format(new Date(date), 'E, P', { locale: getLocaleDateFns() });
+    return formatDistance(new Date(date), new Date(), { addSuffix: true, locale: getLocaleDateFns() });
   }, []);
 
   const columns = useMemo(
@@ -151,6 +159,10 @@ const AssignmentGrid = () => {
                 onViewDetail={() => navigate(`/assignment/${assignment.id}`)}
                 onDelete={() => handleDelete(assignment)}
                 onRename={() => handleRename(assignment)}
+                onEditChapter={() => {
+                  setSelectedAssignment(assignment);
+                  setIsEditChapterOpen(true);
+                }}
               />
             </DropdownMenuContent>
           </DropdownMenu>
@@ -189,15 +201,14 @@ const AssignmentGrid = () => {
   if (isLoading) {
     return (
       <div className="w-full space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          <SearchBar
-            value={search}
-            onChange={setSearch}
-            placeholder={t('assignment.searchPlaceholder')}
-            className="flex-1 rounded-lg border-2 border-slate-200"
-          />
-          <ViewToggle value={viewMode} onValueChange={setViewMode} />
-        </div>
+        <DocumentFilters
+          filters={documentFilters}
+          onChange={setDocumentFilters}
+          searchQuery={search}
+          onSearchChange={setSearch}
+          searchPlaceholder={t('assignment.searchPlaceholder')}
+          RightComponent={<ViewToggle value={viewMode} onValueChange={setViewMode} />}
+        />
         <div className="grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-6">
           {Array.from({ length: 10 }).map((_, index) => (
             <div key={index} className="w-full animate-pulse">
@@ -213,15 +224,14 @@ const AssignmentGrid = () => {
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <SearchBar
-          value={search}
-          onChange={setSearch}
-          placeholder={t('assignment.searchPlaceholder')}
-          className="flex-1 rounded-lg border-2 border-slate-200"
-        />
-        <ViewToggle value={viewMode} onValueChange={setViewMode} />
-      </div>
+      <DocumentFilters
+        filters={documentFilters}
+        onChange={setDocumentFilters}
+        searchQuery={search}
+        onSearchChange={setSearch}
+        searchPlaceholder={t('assignment.searchPlaceholder')}
+        RightComponent={<ViewToggle value={viewMode} onValueChange={setViewMode} />}
+      />
 
       {data && data.length > 0 ? (
         <>
@@ -262,6 +272,23 @@ const AssignmentGrid = () => {
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
         isDeleting={false}
+      />
+      <EditChapterDialog
+        open={isEditChapterOpen}
+        onOpenChange={setIsEditChapterOpen}
+        initialValues={{
+          grade: selectedAssignment?.grade,
+          subject: selectedAssignment?.subject,
+          chapter: selectedAssignment?.chapter,
+        }}
+        onSave={(values) => {
+          if (!selectedAssignment) return;
+          updateAssignmentChapter.mutate(
+            { id: selectedAssignment.id, ...values },
+            { onSuccess: () => setIsEditChapterOpen(false) }
+          );
+        }}
+        isPending={updateAssignmentChapter.isPending}
       />
     </div>
   );

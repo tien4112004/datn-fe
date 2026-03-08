@@ -146,4 +146,7 @@ export interface Mindmap {
   createdAt: string;
   updatedAt: string;
   permission?: Permission;
+  grade?: string;
+  subject?: string;
+  chapter?: string;
 }

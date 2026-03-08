@@ -3,20 +3,28 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { Mindmap } from '@/features/mindmap/types';
-import { useMindmaps, useUpdateMindmapTitle, useDeleteMindmap } from '@/features/mindmap/hooks';
+import {
+  useMindmaps,
+  useUpdateMindmapTitle,
+  useDeleteMindmap,
+  useUpdateMindmapChapter,
+} from '@/features/mindmap/hooks';
 import { Button } from '@ui/button';
 import { MoreHorizontal, BrainCircuit } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@ui/dropdown-menu';
-import { SearchBar } from '@/shared/components/common/SearchBar';
+import { DocumentFilters } from '@/features/projects/components/DocumentFilters';
 import TablePagination from '@/shared/components/table/TablePagination';
 import { ActionContent } from '@/features/presentation/components';
 import { RenameFileDialog } from '@/components/modals/RenameFileDialog';
 import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfirmationDialog';
+import EditChapterDialog from '@/features/projects/components/EditChapterDialog';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
+import { formatDistance } from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 import { SkeletonGrid } from '@ui/skeleton-card';
+import { Badge } from '@ui/badge';
+import { getSubjectName, getGradeName, getSubjectBadgeClass } from '@aiprimary/core';
 
 const MindmapGrid = () => {
   const { t } = useTranslation('common', { keyPrefix: 'table' });
@@ -26,6 +34,7 @@ const MindmapGrid = () => {
 
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isEditChapterOpen, setIsEditChapterOpen] = useState(false);
   const [selectedMindmap, setSelectedMindmap] = useState<Mindmap | null>(null);
 
   const viewMode = (searchParams.get('view') as ViewMode) || 'grid';
@@ -39,15 +48,27 @@ const MindmapGrid = () => {
   };
 
   // Use the same hook as MindmapTable
-  const { data, isLoading, sorting, setSorting, pagination, setPagination, search, setSearch, totalItems } =
-    useMindmaps();
+  const {
+    data,
+    isLoading,
+    sorting,
+    setSorting,
+    pagination,
+    setPagination,
+    search,
+    setSearch,
+    totalItems,
+    documentFilters,
+    setDocumentFilters,
+  } = useMindmaps();
 
   const updateMindmapTitleMutation = useUpdateMindmapTitle();
   const deleteMindmapMutation = useDeleteMindmap();
+  const updateMindmapChapter = useUpdateMindmapChapter();
 
   const formatDate = useCallback((date: Date | string | undefined): string => {
     if (!date) return '';
-    return format(new Date(date), 'E, P', { locale: getLocaleDateFns() });
+    return formatDistance(new Date(date), new Date(), { addSuffix: true, locale: getLocaleDateFns() });
   }, []);
 
   // Create dummy columns for table instance (required for pagination)
@@ -161,6 +182,10 @@ const MindmapGrid = () => {
                 onViewDetail={() => navigate(`/mindmap/${mindmap.id}`)}
                 onDelete={() => handleDelete(mindmap)}
                 onRename={() => handleOpenRename(mindmap)}
+                onEditChapter={() => {
+                  setSelectedMindmap(mindmap);
+                  setIsEditChapterOpen(true);
+                }}
               />
             </DropdownMenuContent>
           </DropdownMenu>
@@ -175,6 +200,20 @@ const MindmapGrid = () => {
         >
           {mindmap.title || t('mindmap.untitled')}
         </h3>
+        <div className="flex flex-col gap-1 text-xs text-gray-500">
+          <div className="flex flex-wrap gap-1.5">
+            {mindmap.grade ? <Badge variant="outline">{getGradeName(mindmap.grade)}</Badge> : null}
+            {mindmap.subject ? (
+              <Badge variant="outline" className={getSubjectBadgeClass(mindmap.subject)}>
+                {getSubjectName(mindmap.subject)}
+              </Badge>
+            ) : null}
+          </div>
+          <div className="flex min-w-0 gap-x-1">
+            <span className="shrink-0">{t('mindmap.chapter')}:</span>
+            <span className="truncate">{mindmap.chapter ?? '---'}</span>
+          </div>
+        </div>
         <p className="text-xs text-gray-500">
           {t('mindmap.lastModified')}: {formatDate(mindmap.updatedAt)}
         </p>
@@ -186,15 +225,14 @@ const MindmapGrid = () => {
   if (isLoading) {
     return (
       <div className="w-full space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          <SearchBar
-            value={search}
-            onChange={setSearch}
-            placeholder={t('mindmap.searchPlaceholder')}
-            className="flex-1 rounded-lg border-2 border-slate-200"
-          />
-          <ViewToggle value={viewMode} onValueChange={setViewMode} />
-        </div>
+        <DocumentFilters
+          filters={documentFilters}
+          onChange={setDocumentFilters}
+          searchQuery={search}
+          onSearchChange={setSearch}
+          searchPlaceholder={t('mindmap.searchPlaceholder')}
+          RightComponent={<ViewToggle value={viewMode} onValueChange={setViewMode} />}
+        />
         <SkeletonGrid count={10} />
       </div>
     );
@@ -202,15 +240,14 @@ const MindmapGrid = () => {
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <SearchBar
-          value={search}
-          onChange={handleSearchChange}
-          placeholder={t('mindmap.searchPlaceholder')}
-          className="flex-1 rounded-lg border-2 border-slate-200"
-        />
-        <ViewToggle value={viewMode} onValueChange={setViewMode} />
-      </div>
+      <DocumentFilters
+        filters={documentFilters}
+        onChange={setDocumentFilters}
+        searchQuery={search}
+        onSearchChange={handleSearchChange}
+        searchPlaceholder={t('mindmap.searchPlaceholder')}
+        RightComponent={<ViewToggle value={viewMode} onValueChange={setViewMode} />}
+      />
 
       {data && data.length > 0 ? (
         <>
@@ -251,6 +288,23 @@ const MindmapGrid = () => {
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
         isDeleting={deleteMindmapMutation.isPending}
+      />
+      <EditChapterDialog
+        open={isEditChapterOpen}
+        onOpenChange={setIsEditChapterOpen}
+        initialValues={{
+          grade: selectedMindmap?.grade,
+          subject: selectedMindmap?.subject,
+          chapter: selectedMindmap?.chapter,
+        }}
+        onSave={(values) => {
+          if (!selectedMindmap) return;
+          updateMindmapChapter.mutate(
+            { id: selectedMindmap.id, ...values },
+            { onSuccess: () => setIsEditChapterOpen(false) }
+          );
+        }}
+        isPending={updateMindmapChapter.isPending}
       />
     </div>
   );

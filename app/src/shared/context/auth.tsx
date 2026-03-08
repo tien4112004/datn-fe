@@ -22,6 +22,9 @@ const USER_SPECIFIC_STORAGE_KEYS = [
   'user-preferences', // User preferences like "don't ask again" flags
   'submission-drafts', // Assignment doing page draft answers (Zustand persist)
   'class-teacher', // Teacher info cached from class API
+  'presentation-list-store', // Presentation list filters/pagination (Zustand persist)
+  'mindmap-list-store', // Mindmap list filters/pagination (Zustand persist)
+  'assignment-list-store', // Assignment list filters/pagination (Zustand persist)
 ];
 
 export function AuthProvider({ children }: { children: ReactNode }) {

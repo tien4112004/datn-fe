@@ -31,6 +31,9 @@ export interface PresentationCollectionRequest {
   filter?: string;
   sortBy?: 'createdAt'; // API only supports sorting by createdAt for now
   sort?: 'asc' | 'desc';
+  grade?: string;
+  subject?: string;
+  chapter?: string;
 }
 
 export interface TwoColumnWithImageLayoutSchema {

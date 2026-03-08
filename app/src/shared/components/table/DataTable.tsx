@@ -85,6 +85,7 @@ function DataTable<TData>({
                       flex: (header.column.columnDef.meta as any)?.isGrow ? '1 1 auto' : '0 0 auto',
                       minWidth: header.column.columnDef.minSize,
                       maxWidth: header.column.columnDef.maxSize,
+                      overflow: 'hidden',
                     }}
                   >
                     {header.isPlaceholder

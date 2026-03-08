@@ -21,6 +21,7 @@ export default {
     edit: 'Chỉnh sửa',
     rename: 'Đổi tên',
     viewDetails: 'Xem chi tiết',
+    editChapter: 'Chỉnh sửa Lớp/Môn/Chương',
     goBack: 'Quay lại',
     goHome: 'Về trang chủ',
     tryAgain: 'Thử lại',

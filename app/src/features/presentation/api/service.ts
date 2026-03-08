@@ -119,6 +119,9 @@ export default class PresentationService implements PresentationApiService {
           pageSize: request.pageSize,
           sort: request.sort,
           filter: request.filter,
+          grade: request.grade,
+          subject: request.subject,
+          chapter: request.chapter,
         },
       }
     );
@@ -247,6 +250,9 @@ export default class PresentationService implements PresentationApiService {
       pageNumberSettings: data?.pageNumberSettings,
       createdAt: data?.createdAt,
       updatedAt: data?.updatedAt,
+      grade: data?.grade,
+      subject: data?.subject,
+      chapter: data?.chapter,
     };
   }
 

@@ -217,12 +217,70 @@ export const QuestionBankFilters = ({
         )}
       </AnimatePresence>
 
-      {/* Clear Filters Button */}
+      {/* Active filter badges + Clear button */}
       {hasActiveFilters() && (
-        <Button variant="outline" size="sm" onClick={clearFilters} className="w-full gap-2 font-semibold">
-          <X className="h-4 w-4" />
-          {t('questionBank.filters.clearFilters')}
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          {filters.type?.map((v) => (
+            <span
+              key={v}
+              className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium"
+            >
+              {t('questionBank.filters.type')}:{' '}
+              {getAllQuestionTypes().find((qt) => qt.value === v)?.label ?? v}
+              <X className="h-3 w-3 cursor-pointer" onClick={() => handleCheckboxChange('type', v, false)} />
+            </span>
+          ))}
+          {filters.difficulty?.map((v) => (
+            <span
+              key={v}
+              className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium"
+            >
+              {t('questionBank.filters.difficulty')}:{' '}
+              {getAllDifficulties().find((d) => d.value === v)?.label ?? v}
+              <X
+                className="h-3 w-3 cursor-pointer"
+                onClick={() => handleCheckboxChange('difficulty', v, false)}
+              />
+            </span>
+          ))}
+          {filters.subject?.map((v) => (
+            <span
+              key={v}
+              className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium"
+            >
+              {t('questionBank.filters.subject')}: {getSubjectName(v)}
+              <X
+                className="h-3 w-3 cursor-pointer"
+                onClick={() => handleCheckboxChange('subject', v, false)}
+              />
+            </span>
+          ))}
+          {filters.grade?.map((v) => (
+            <span
+              key={v}
+              className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium"
+            >
+              {t('questionBank.filters.grade')}: {getGradeName(v)}
+              <X className="h-3 w-3 cursor-pointer" onClick={() => handleCheckboxChange('grade', v, false)} />
+            </span>
+          ))}
+          {filters.chapter?.map((v) => (
+            <span
+              key={v}
+              className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium"
+            >
+              {t('questionBank.filters.chapter')}: {v}
+              <X
+                className="h-3 w-3 cursor-pointer"
+                onClick={() => handleCheckboxChange('chapter', v, false)}
+              />
+            </span>
+          ))}
+          <Button variant="ghost" size="sm" onClick={clearFilters} className="h-6 gap-1 px-2 text-xs">
+            <X className="h-3 w-3" />
+            {t('questionBank.filters.clearFilters')}
+          </Button>
+        </div>
       )}
     </div>
   );

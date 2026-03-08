@@ -1,6 +1,7 @@
 import { getBackendUrl } from '@/shared/utils/backend-url';
 import type { ExamplePromptsApiService } from './service';
 import ExamplePromptsService from './service';
+export type { UpdateChapterPayload } from './service';
 import { api, webviewApi, getApiClientMode, type ApiClient } from '@aiprimary/api';
 
 export const getExamplePromptsApiService = (apiClient?: ApiClient): ExamplePromptsApiService => {

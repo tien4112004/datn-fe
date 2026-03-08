@@ -7,6 +7,7 @@ import type {
   GenerateMatrixRequest,
   GenerateAssignmentFromMatrixRequest,
 } from '../types';
+import { getExamplePromptsApiService, type UpdateChapterPayload } from '@/features/projects/api';
 
 /**
  * Hook to fetch list of assignments with optional filters
@@ -19,6 +20,9 @@ type AssignmentListFilters = {
   searchText?: string;
   page?: number;
   size?: number;
+  grade?: string;
+  subject?: string;
+  chapter?: string;
 };
 
 export const useAssignmentList = (filters?: AssignmentListFilters) => {
@@ -32,6 +36,9 @@ export const useAssignmentList = (filters?: AssignmentListFilters) => {
         search: filters?.searchText,
         page: filters?.page,
         size: filters?.size,
+        grade: filters?.grade,
+        subject: filters?.subject,
+        chapter: filters?.chapter,
       });
       return {
         assignments: response.data,
@@ -162,5 +169,19 @@ export const useGenerateAssignmentFromMatrix = () => {
   return useMutation({
     mutationFn: (request: GenerateAssignmentFromMatrixRequest) =>
       service.generateAssignmentFromMatrix(request),
+  });
+};
+
+export const useUpdateAssignmentChapter = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, ...payload }: { id: string } & UpdateChapterPayload) => {
+      await getExamplePromptsApiService().updateDocumentChapter('assignment', id, payload);
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: assignmentKeys.lists() });
+    },
   });
 };

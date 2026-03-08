@@ -51,17 +51,20 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
   return (
     <div className="space-y-4">
       {/* Minimal Header with Segmented Control */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Users className="text-muted-foreground h-5 w-5" />
-          <h2 className="text-xl font-semibold">{t('tabs.students')}</h2>
-          <Badge variant="secondary">{totalItems}</Badge>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <Users className="text-muted-foreground h-5 w-5 shrink-0" />
+          <h2 className="truncate text-xl font-semibold">{t('tabs.students')}</h2>
+          <Badge variant="secondary" className="shrink-0">
+            {totalItems}
+          </Badge>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-3">
           {/* Segmented Control */}
           <div className="bg-muted inline-flex rounded-lg border p-1">
             <button
               onClick={() => setViewMode('list')}
+              title={t('students.listView')}
               className={`inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
                 viewMode === 'list'
                   ? 'bg-background text-foreground shadow-sm'
@@ -69,10 +72,11 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
               }`}
             >
               <List className="h-4 w-4" />
-              {t('students.listView')}
+              <span className="hidden sm:inline">{t('students.listView')}</span>
             </button>
             <button
               onClick={() => setViewMode('seating-chart')}
+              title={t('students.seatingChartView')}
               className={`inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
                 viewMode === 'seating-chart'
                   ? 'bg-background text-foreground shadow-sm'
@@ -80,7 +84,7 @@ export const ClassStudentView = ({ classData }: ClassStudentListProps) => {
               }`}
             >
               <LayoutGrid className="h-4 w-4" />
-              {t('students.seatingChartView')}
+              <span className="hidden sm:inline">{t('students.seatingChartView')}</span>
             </button>
           </div>
         </div>

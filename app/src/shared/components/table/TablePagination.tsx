@@ -33,43 +33,25 @@ function TablePagination({
   const totalPages = table.getPageCount();
   const totalItems = table.getRowCount();
 
-  const getPageNumbers = () => {
+  const getPageNumbers = (compact = false) => {
     const pages = [];
-    const showPages = 5;
-    const sidePages = 2; // Pages to show on each side of current page
+    const sidePages = compact ? 1 : 2;
+    const showPages = compact ? 3 : 5;
 
     if (totalPages <= showPages) {
-      // Show all pages if total is small
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
-      // Always show first page
       pages.push(1);
 
-      // Calculate start and end for middle pages
       const start = Math.max(2, currentPage - sidePages);
       const end = Math.min(totalPages - 1, currentPage + sidePages);
 
-      // Add ellipsis before middle pages if needed
-      if (start > 2) {
-        pages.push('ellipsis-start');
-      }
-
-      // Add middle pages
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-
-      // Add ellipsis after middle pages if needed
-      if (end < totalPages - 1) {
-        pages.push('ellipsis-end');
-      }
-
-      // Always show last page if more than 1 page
-      if (totalPages > 1) {
-        pages.push(totalPages);
-      }
+      if (start > 2) pages.push('ellipsis-start');
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (end < totalPages - 1) pages.push('ellipsis-end');
+      if (totalPages > 1) pages.push(totalPages);
     }
 
     return pages;
@@ -81,10 +63,14 @@ function TablePagination({
   return (
     <div
       data-slot="table-pagination"
-      className={cn('flex items-center justify-between px-4 py-4', className)}
+      className={cn(
+        'flex flex-col gap-3 px-4 py-4 lg:flex-row lg:items-center lg:justify-between',
+        className
+      )}
       {...props}
     >
-      <div className="flex items-center space-x-6">
+      {/* Left: rows per page + count */}
+      <div className="flex flex-wrap items-center gap-4">
         <div className="flex items-center space-x-2">
           <span className="text-muted-foreground text-sm">{t('rowsPerPage')}</span>
           <Select
@@ -107,15 +93,16 @@ function TablePagination({
           </Select>
         </div>
 
-        <span className="text-muted-foreground pl-2 text-sm">
+        <span className="text-muted-foreground text-sm">
           {t('showing')} {startItem} {t('to')} {endItem} {t('of')} {totalItems} {t('entries')}
         </span>
       </div>
 
-      <Pagination className="mx-0 flex w-auto items-center space-x-2">
-        <PaginationContent>
-          {/* First Page Button */}
-          <PaginationItem>
+      {/* Right: pagination controls */}
+      <Pagination className="mx-0 flex w-auto items-center">
+        <PaginationContent className="flex-wrap gap-y-1">
+          {/* First Page — hidden on mobile */}
+          <PaginationItem className="hidden lg:block">
             <PaginationStart
               onClick={() => table.firstPage()}
               className={cn(
@@ -127,7 +114,7 @@ function TablePagination({
             />
           </PaginationItem>
 
-          {/* Previous button */}
+          {/* Previous */}
           <PaginationItem>
             <PaginationPrevious
               onClick={() => table.previousPage()}
@@ -141,15 +128,14 @@ function TablePagination({
           </PaginationItem>
 
           {/* Page numbers */}
-          {getPageNumbers().map((page) => {
+          {getPageNumbers(false).map((page) => {
             if (typeof page === 'string') {
               return (
-                <PaginationItem key={page}>
+                <PaginationItem key={page} className="hidden lg:block">
                   <PaginationEllipsis />
                 </PaginationItem>
               );
             }
-
             return (
               <PaginationItem key={page}>
                 <PaginationLink
@@ -165,7 +151,7 @@ function TablePagination({
             );
           })}
 
-          {/* Next button */}
+          {/* Next */}
           <PaginationItem>
             <PaginationNext
               onClick={() => table.nextPage()}
@@ -178,8 +164,8 @@ function TablePagination({
             />
           </PaginationItem>
 
-          {/* End button */}
-          <PaginationItem>
+          {/* Last Page — hidden on mobile */}
+          <PaginationItem className="hidden lg:block">
             <PaginationEnd
               onClick={() => table.lastPage()}
               className={cn(

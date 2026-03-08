@@ -206,7 +206,7 @@ export function useCreatePost() {
         };
       });
 
-      return { previousPosts: previousData[0]?.[1] };
+      return { previousPosts: previousData[0]?.[1], optimisticPostId: optimisticPost.id };
     },
 
     onSuccess: () => {
@@ -215,9 +215,22 @@ export function useCreatePost() {
       toast.success(t('feed.success.postCreated'));
     },
 
-    onError: (error, _request, context) => {
-      // Rollback optimistic update on error
-      if (context?.previousPosts) {
+    onError: (error, request, context) => {
+      if (context?.optimisticPostId) {
+        // Mark the optimistic post as failed (keep it visible for retry)
+        queryClient.setQueriesData<ApiResponse<Post[]>>({ queryKey: feedQueryKeys.all }, (oldData) => {
+          if (!oldData?.data) return oldData;
+          return {
+            ...oldData,
+            data: oldData.data.map((post) =>
+              post.id === context.optimisticPostId
+                ? { ...post, _isFailed: true, _failedRequest: request }
+                : post
+            ),
+          };
+        });
+      } else if (context?.previousPosts) {
+        // Fallback: full rollback if we can't find the optimistic post
         queryClient.setQueriesData({ queryKey: feedQueryKeys.all }, context.previousPosts);
       }
       toast.error(t('feed.errors.createFailed'), {

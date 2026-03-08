@@ -1,4 +1,5 @@
 import type { LinkedResourceResponse } from '@/features/projects/types/resource';
+import type { PostCreateRequest } from './requests';
 
 // User minimal info from backend
 export interface UserMinimalInfo {
@@ -34,6 +35,9 @@ export interface Post {
   commentCount: number;
   createdAt: Date;
   updatedAt: Date;
+  // Client-side only fields for optimistic UI failure state
+  _isFailed?: boolean;
+  _failedRequest?: PostCreateRequest;
 }
 
 // Comment on Post

@@ -4,7 +4,7 @@ import { Button } from '@ui/button';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { parseDateSafe } from '@/shared/utils/date';
 import { format, formatDistanceToNow } from 'date-fns';
-import { ClipboardList, Clock, FileText, MessageCircleMore, Pin } from 'lucide-react';
+import { AlertCircle, ClipboardList, Clock, FileText, MessageCircleMore, Pin, X } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { ImageLightbox } from '../../../image/components/ImageLightbox';
 import { useTranslation } from 'react-i18next';
@@ -25,6 +25,8 @@ interface PostCardProps {
   onComment?: () => void;
   /** Called when edited content should be saved */
   onUpdate?: (content: string) => Promise<void> | void;
+  onRetry?: () => void;
+  onDismiss?: () => void;
   className?: string;
 }
 
@@ -35,6 +37,8 @@ export const PostCard = ({
   onPin,
   onComment,
   onUpdate,
+  onRetry,
+  onDismiss,
   className = '',
 }: PostCardProps) => {
   const { t } = useTranslation('classes');
@@ -81,7 +85,9 @@ export const PostCard = ({
   };
 
   return (
-    <article className={`hover:bg-muted/30 px-3 py-3 transition-colors md:px-6 md:py-4 ${className}`}>
+    <article
+      className={`hover:bg-muted/30 px-3 py-3 transition-colors md:px-6 md:py-4 ${post._isFailed ? 'opacity-75' : ''} ${className}`}
+    >
       {/* Header */}
       <div className="mb-2 flex items-start gap-2 md:mb-3 md:gap-3">
         {/* Small avatar on mobile */}
@@ -160,10 +166,36 @@ export const PostCard = ({
               </p>
             </div>
 
-            <PostActions post={post} onEdit={handleStartEdit} onDelete={onDelete} onPin={onPin} />
+            {!post._isFailed && (
+              <PostActions post={post} onEdit={handleStartEdit} onDelete={onDelete} onPin={onPin} />
+            )}
           </div>
         </div>
       </div>
+
+      {/* Failed state banner */}
+      {post._isFailed && (
+        <div className="mb-2 ml-9 flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 md:ml-[52px] dark:border-red-900 dark:bg-red-950/30 dark:text-red-400">
+          <AlertCircle className="h-4 w-4 flex-shrink-0" />
+          <span className="flex-1">{t('feed.post.failed.message')}</span>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-auto px-2 py-1 text-red-700 hover:bg-red-100 hover:text-red-800"
+            onClick={onRetry}
+          >
+            {t('feed.post.failed.retry')}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-auto px-2 py-1 text-red-500 hover:bg-red-100"
+            onClick={onDismiss}
+          >
+            <X className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      )}
 
       {/* Content */}
       {isEditing ? (

@@ -1248,6 +1248,11 @@ export default {
         questionCount: '{{count}} câu hỏi',
         totalPoints: '{{points}} điểm',
       },
+      failed: {
+        message: 'Đăng bài thất bại. Nội dung của bạn được giữ lại.',
+        retry: 'Thử lại',
+        dismiss: 'Bỏ qua',
+      },
     },
     comments: {
       title: 'Bình luận',

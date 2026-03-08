@@ -1247,6 +1247,11 @@ export default {
         questionCount: '{{count}} questions',
         totalPoints: '{{points}} points',
       },
+      failed: {
+        message: 'Failed to post. Your content is preserved.',
+        retry: 'Retry',
+        dismiss: 'Dismiss',
+      },
     },
     comments: {
       title: 'Comments',

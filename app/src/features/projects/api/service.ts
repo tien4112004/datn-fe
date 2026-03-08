@@ -1,8 +1,15 @@
 import type { ApiClient, ApiResponse } from '@aiprimary/api';
 import type { ExamplePromptType, ExamplePromptContent } from '../types/examplePrompt';
 
+export interface UpdateChapterPayload {
+  grade?: string;
+  subject?: string;
+  chapter?: string;
+}
+
 export interface ExamplePromptsApiService {
   getExamplePrompts(type: ExamplePromptType, language?: string): Promise<ExamplePromptContent[]>;
+  updateDocumentChapter(documentType: string, id: string, payload: UpdateChapterPayload): Promise<void>;
 }
 
 export default class ExamplePromptsService implements ExamplePromptsApiService {
@@ -26,5 +33,13 @@ export default class ExamplePromptsService implements ExamplePromptsApiService {
       }
     );
     return response.data.data;
+  }
+
+  async updateDocumentChapter(
+    documentType: string,
+    id: string,
+    payload: UpdateChapterPayload
+  ): Promise<void> {
+    await this.apiClient.patch(`${this.baseUrl}/api/documents/${documentType}/${id}/update-chapter`, payload);
   }
 }

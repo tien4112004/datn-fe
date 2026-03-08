@@ -13,6 +13,7 @@ import type { ApiResponse } from '@aiprimary/api';
 import type { SlideTheme } from '../types/slide';
 import { toast } from 'sonner';
 import { t } from 'i18next';
+import { getExamplePromptsApiService, type UpdateChapterPayload } from '@/features/projects/api';
 
 // Return types for the hooks
 export interface UsePresentationsReturn extends Omit<UseQueryResult<ApiResponse<Presentation[]>>, 'data'> {
@@ -341,6 +342,23 @@ export const useDeletePresentation = () => {
 
       queryClient.removeQueries({
         queryKey: [presentationApiService.getType(), 'presentation', deletedId],
+      });
+    },
+  });
+};
+
+export const useUpdatePresentationChapter = () => {
+  const presentationApiService = usePresentationApiService();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, ...payload }: { id: string } & UpdateChapterPayload) => {
+      await getExamplePromptsApiService().updateDocumentChapter('presentation', id, payload);
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [presentationApiService.getType(), 'presentations'],
       });
     },
   });

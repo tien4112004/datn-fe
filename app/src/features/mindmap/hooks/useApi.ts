@@ -10,6 +10,7 @@ import { useCoreStore } from '../stores/core';
 import { getTreeLayoutType, getTreeForceLayout } from '../services/utils';
 import { t } from 'i18next';
 import { toast } from 'sonner';
+import { getExamplePromptsApiService, type UpdateChapterPayload } from '@/features/projects/api';
 
 /**
  * Convert data URL (base64) to Blob for multipart upload
@@ -303,6 +304,23 @@ export const useGenerateMindmap = () => {
   return useMutation({
     mutationFn: async (request: import('../types/service').MindmapGenerateRequest) => {
       return await mindmapApiService.generateMindmap(request);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [mindmapApiService.getType(), 'mindmaps'],
+      });
+    },
+  });
+};
+
+export const useUpdateMindmapChapter = () => {
+  const mindmapApiService = useMindmapApiService();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, ...payload }: { id: string } & UpdateChapterPayload) => {
+      await getExamplePromptsApiService().updateDocumentChapter('mindmap', id, payload);
+      return id;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({

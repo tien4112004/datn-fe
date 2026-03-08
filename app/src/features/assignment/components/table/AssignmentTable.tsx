@@ -10,13 +10,18 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import DataTable from '@/components/table/DataTable';
 import { SearchBar } from '@/shared/components/common/SearchBar';
-import { useAssignmentList, useDeleteAssignment } from '@/features/assignment/hooks/useAssignmentApi';
+import {
+  useAssignmentList,
+  useDeleteAssignment,
+  useUpdateAssignmentChapter,
+} from '@/features/assignment/hooks/useAssignmentApi';
 import type { Assignment } from '../../types';
 import { RenameFileDialog } from '@/shared/components/modals/RenameFileDialog';
 import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfirmationDialog';
+import EditChapterDialog from '@/features/projects/components/EditChapterDialog';
 import { toast } from 'sonner';
-import { ActionContent } from '@/features/presentation/components';
-import { format } from 'date-fns';
+import { ActionButton, ActionContent } from '@/features/presentation/components';
+import { formatDistance } from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { Badge } from '@ui/badge';
 import { getSubjectName, getGradeName, getSubjectBadgeClass } from '@aiprimary/core';
@@ -31,6 +36,7 @@ const AssignmentTable = () => {
 
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isEditChapterOpen, setIsEditChapterOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [search, setSearch] = useState('');
   const [pagination, setPagination] = useState<PaginationState>({
@@ -55,6 +61,7 @@ const AssignmentTable = () => {
     size: pagination.pageSize,
   });
   const deleteAssignment = useDeleteAssignment();
+  const updateAssignmentChapter = useUpdateAssignmentChapter();
 
   const data = useMemo(() => assignmentsResponse?.assignments || [], [assignmentsResponse]);
   const totalItems = assignmentsResponse?.total || 0;
@@ -95,17 +102,43 @@ const AssignmentTable = () => {
         size: 100,
       }),
 
-      columnHelper.accessor('createdAt', {
-        header: t('assignment.createdAt'),
-        cell: (info) =>
-          info.getValue() ? format(new Date(info.getValue()!), 'E, P', { locale: getLocaleDateFns() }) : '',
-        size: 180,
-      }),
       columnHelper.accessor('updatedAt', {
         header: t('assignment.updatedAt'),
         cell: (info) =>
-          info.getValue() ? format(new Date(info.getValue()!), 'E, P', { locale: getLocaleDateFns() }) : '',
-        size: 180,
+          info.getValue()
+            ? formatDistance(new Date(info.getValue()!), new Date(), {
+                addSuffix: true,
+                locale: getLocaleDateFns(),
+              })
+            : '',
+        minSize: 100,
+        meta: { isGrow: true },
+      }),
+      columnHelper.display({
+        id: 'actions',
+        header: t('actions'),
+        cell: (info) => {
+          const assignment = info.row.original;
+          return (
+            <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
+              <ActionButton
+                onViewDetail={() => navigate(`/assignment/${assignment.id}`)}
+                onDelete={() => handleDelete(assignment)}
+                onRename={() => {
+                  setSelectedAssignment(assignment);
+                  setIsRenameOpen(true);
+                }}
+                onEditChapter={() => {
+                  setSelectedAssignment(assignment);
+                  setIsEditChapterOpen(true);
+                }}
+              />
+            </div>
+          );
+        },
+        size: 90,
+        enableResizing: false,
+        enableSorting: false,
       }),
     ],
     [t]
@@ -210,6 +243,10 @@ const AssignmentTable = () => {
               setSelectedAssignment(row.original);
               setIsRenameOpen(true);
             }}
+            onEditChapter={() => {
+              setSelectedAssignment(row.original);
+              setIsEditChapterOpen(true);
+            }}
           />
         )}
       />
@@ -236,6 +273,23 @@ const AssignmentTable = () => {
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
         isDeleting={false}
+      />
+      <EditChapterDialog
+        open={isEditChapterOpen}
+        onOpenChange={setIsEditChapterOpen}
+        initialValues={{
+          grade: selectedAssignment?.grade,
+          subject: selectedAssignment?.subject,
+          chapter: selectedAssignment?.chapter,
+        }}
+        onSave={(values) => {
+          if (!selectedAssignment) return;
+          updateAssignmentChapter.mutate(
+            { id: selectedAssignment.id, ...values },
+            { onSuccess: () => setIsEditChapterOpen(false) }
+          );
+        }}
+        isPending={updateAssignmentChapter.isPending}
       />
     </div>
   );

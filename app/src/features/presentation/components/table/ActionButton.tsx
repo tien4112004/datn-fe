@@ -1,22 +1,28 @@
 import { useTranslation } from 'react-i18next';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/popover';
-import { EllipsisVerticalIcon, Eye, Edit, Trash2 } from 'lucide-react';
+import { EllipsisVerticalIcon, Eye, Edit, Trash2, GraduationCap } from 'lucide-react';
 import { Button } from '@ui/button';
 
 type ActionButtonProps = {
   onViewDetail?: () => void;
   onDelete?: () => void;
   onRename?: () => void;
+  onEditChapter?: () => void;
 };
 
-const ActionButton = ({ onViewDetail, onDelete, onRename }: ActionButtonProps) => {
+const ActionButton = ({ onViewDetail, onDelete, onRename, onEditChapter }: ActionButtonProps) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
         <EllipsisVerticalIcon className="h-5 w-5 cursor-pointer text-gray-500 hover:text-gray-700" />
       </PopoverTrigger>
-      <PopoverContent className="w-48">
-        <ActionContent onDelete={onDelete} onViewDetail={onViewDetail} onRename={onRename} />
+      <PopoverContent className="w-fit p-1">
+        <ActionContent
+          onDelete={onDelete}
+          onViewDetail={onViewDetail}
+          onRename={onRename}
+          onEditChapter={onEditChapter}
+        />
       </PopoverContent>
     </Popover>
   );
@@ -24,7 +30,7 @@ const ActionButton = ({ onViewDetail, onDelete, onRename }: ActionButtonProps) =
 
 export default ActionButton;
 
-export const ActionContent = ({ onViewDetail, onDelete, onRename }: ActionButtonProps) => {
+export const ActionContent = ({ onViewDetail, onDelete, onRename, onEditChapter }: ActionButtonProps) => {
   const { t } = useTranslation('glossary');
 
   return (
@@ -45,6 +51,12 @@ export const ActionContent = ({ onViewDetail, onDelete, onRename }: ActionButton
         <Edit className="mr-2 h-4 w-4" />
         {t('actions.rename')}
       </Button>
+      {onEditChapter && (
+        <Button onClick={onEditChapter} className="justify-start" variant={'ghost'}>
+          <GraduationCap className="mr-2 h-4 w-4" />
+          {t('actions.editChapter')}
+        </Button>
+      )}
     </div>
   );
 };

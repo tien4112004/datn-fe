@@ -3,7 +3,12 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { Mindmap } from '@/features/mindmap/types';
-import { useMindmaps, useUpdateMindmapTitle, useDeleteMindmap } from '@/features/mindmap/hooks';
+import {
+  useMindmaps,
+  useUpdateMindmapTitle,
+  useDeleteMindmap,
+  useUpdateMindmapChapter,
+} from '@/features/mindmap/hooks';
 import { Button } from '@ui/button';
 import { MoreHorizontal, BrainCircuit } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@ui/dropdown-menu';
@@ -12,8 +17,9 @@ import TablePagination from '@/shared/components/table/TablePagination';
 import { ActionContent } from '@/features/presentation/components';
 import { RenameFileDialog } from '@/components/modals/RenameFileDialog';
 import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfirmationDialog';
+import EditChapterDialog from '@/features/projects/components/EditChapterDialog';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
+import { formatDistance } from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 import { SkeletonGrid } from '@ui/skeleton-card';
@@ -26,6 +32,7 @@ const MindmapGrid = () => {
 
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isEditChapterOpen, setIsEditChapterOpen] = useState(false);
   const [selectedMindmap, setSelectedMindmap] = useState<Mindmap | null>(null);
 
   const viewMode = (searchParams.get('view') as ViewMode) || 'grid';
@@ -44,10 +51,11 @@ const MindmapGrid = () => {
 
   const updateMindmapTitleMutation = useUpdateMindmapTitle();
   const deleteMindmapMutation = useDeleteMindmap();
+  const updateMindmapChapter = useUpdateMindmapChapter();
 
   const formatDate = useCallback((date: Date | string | undefined): string => {
     if (!date) return '';
-    return format(new Date(date), 'E, P', { locale: getLocaleDateFns() });
+    return formatDistance(new Date(date), new Date(), { addSuffix: true, locale: getLocaleDateFns() });
   }, []);
 
   // Create dummy columns for table instance (required for pagination)
@@ -161,6 +169,10 @@ const MindmapGrid = () => {
                 onViewDetail={() => navigate(`/mindmap/${mindmap.id}`)}
                 onDelete={() => handleDelete(mindmap)}
                 onRename={() => handleOpenRename(mindmap)}
+                onEditChapter={() => {
+                  setSelectedMindmap(mindmap);
+                  setIsEditChapterOpen(true);
+                }}
               />
             </DropdownMenuContent>
           </DropdownMenu>
@@ -175,6 +187,20 @@ const MindmapGrid = () => {
         >
           {mindmap.title || t('mindmap.untitled')}
         </h3>
+        <div className="flex flex-col text-xs text-gray-500">
+          <div className="flex gap-x-3">
+            <span>
+              {t('mindmap.grade')}: {mindmap.grade ?? '---'}
+            </span>
+            <span>
+              {t('mindmap.subject')}: {mindmap.subject ?? '---'}
+            </span>
+          </div>
+          <div className="flex min-w-0 gap-x-1">
+            <span className="shrink-0">{t('mindmap.chapter')}:</span>
+            <span className="truncate">{mindmap.chapter ?? '---'}</span>
+          </div>
+        </div>
         <p className="text-xs text-gray-500">
           {t('mindmap.lastModified')}: {formatDate(mindmap.updatedAt)}
         </p>
@@ -251,6 +277,23 @@ const MindmapGrid = () => {
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
         isDeleting={deleteMindmapMutation.isPending}
+      />
+      <EditChapterDialog
+        open={isEditChapterOpen}
+        onOpenChange={setIsEditChapterOpen}
+        initialValues={{
+          grade: selectedMindmap?.grade,
+          subject: selectedMindmap?.subject,
+          chapter: selectedMindmap?.chapter,
+        }}
+        onSave={(values) => {
+          if (!selectedMindmap) return;
+          updateMindmapChapter.mutate(
+            { id: selectedMindmap.id, ...values },
+            { onSuccess: () => setIsEditChapterOpen(false) }
+          );
+        }}
+        isPending={updateMindmapChapter.isPending}
       />
     </div>
   );

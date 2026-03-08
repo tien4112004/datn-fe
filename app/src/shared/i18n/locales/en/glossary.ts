@@ -21,6 +21,7 @@ export default {
     edit: 'Edit',
     rename: 'Rename',
     viewDetails: 'View Details',
+    editChapter: 'Edit Grade/Subject/Chapter',
     goBack: 'Go Back',
     goHome: 'Go Home',
     tryAgain: 'Try Again',

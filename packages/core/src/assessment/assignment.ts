@@ -87,6 +87,7 @@ export interface Assignment {
   description?: string;
   subject?: SubjectCode;
   grade?: Grade;
+  chapter?: string;
   topics?: AssignmentTopic[];
   contexts?: AssignmentContext[];
   questions?: (AssignmentQuestion | AssignmentQuestionWithTopic)[];

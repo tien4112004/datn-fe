@@ -1,9 +1,12 @@
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { formatDistance } from 'date-fns';
+import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { Presentation } from '@/features/presentation/types/presentation';
 import { usePresentationManager } from '@/features/presentation/hooks/usePresentationManager';
+import { useUpdatePresentationChapter } from '@/features/presentation/hooks/useApi';
 import { Button } from '@ui/button';
 import { MoreHorizontal } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@ui/dropdown-menu';
@@ -13,6 +16,7 @@ import TablePagination from '@/shared/components/table/TablePagination';
 import { ActionContent } from './ActionButton';
 import { RenameFileDialog } from '@/components/modals/RenameFileDialog';
 import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfirmationDialog';
+import EditChapterDialog from '@/features/projects/components/EditChapterDialog';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 import { SkeletonGrid } from '@ui/skeleton-card';
 
@@ -45,6 +49,7 @@ const PresentationGrid = () => {
     isRenameOpen,
     setIsRenameOpen,
     selectedPresentation,
+    setSelectedPresentation,
     handleRename,
     handleConfirmRename,
     isRenamePending,
@@ -56,9 +61,12 @@ const PresentationGrid = () => {
     isDeletePending,
   } = usePresentationManager();
 
+  const [isEditChapterOpen, setIsEditChapterOpen] = useState(false);
+  const updatePresentationChapter = useUpdatePresentationChapter();
+
   const formatDate = useCallback((date: Date | string | undefined): string => {
     if (!date) return '';
-    return new Date(date).toLocaleDateString();
+    return formatDistance(new Date(date), new Date(), { addSuffix: true, locale: getLocaleDateFns() });
   }, []);
 
   const columns = useMemo(
@@ -109,6 +117,10 @@ const PresentationGrid = () => {
                 onViewDetail={() => navigate(`/presentation/${presentation.id}`)}
                 onDelete={() => handleDelete(presentation)}
                 onRename={() => handleRename(presentation)}
+                onEditChapter={() => {
+                  setSelectedPresentation(presentation);
+                  setIsEditChapterOpen(true);
+                }}
               />
             </DropdownMenuContent>
           </DropdownMenu>
@@ -122,6 +134,20 @@ const PresentationGrid = () => {
         >
           {presentation.title || t('presentation.untitled')}
         </h3>
+        <div className="flex flex-col text-xs text-gray-500">
+          <div className="flex gap-x-3">
+            <span>
+              {t('presentation.grade')}: {presentation.grade ?? '---'}
+            </span>
+            <span>
+              {t('presentation.subject')}: {presentation.subject ?? '---'}
+            </span>
+          </div>
+          <div className="flex min-w-0 gap-x-1">
+            <span className="shrink-0">{t('presentation.chapter')}:</span>
+            <span className="truncate">{presentation.chapter ?? '---'}</span>
+          </div>
+        </div>
         <p className="text-xs text-gray-500">
           {t('presentation.lastModified')}: {formatDate(presentation.updatedAt)}
         </p>
@@ -197,6 +223,23 @@ const PresentationGrid = () => {
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
         isDeleting={isDeletePending}
+      />
+      <EditChapterDialog
+        open={isEditChapterOpen}
+        onOpenChange={setIsEditChapterOpen}
+        initialValues={{
+          grade: selectedPresentation?.grade,
+          subject: selectedPresentation?.subject,
+          chapter: selectedPresentation?.chapter,
+        }}
+        onSave={(values) => {
+          if (!selectedPresentation) return;
+          updatePresentationChapter.mutate(
+            { id: selectedPresentation.id, ...values },
+            { onSuccess: () => setIsEditChapterOpen(false) }
+          );
+        }}
+        isPending={updatePresentationChapter.isPending}
       />
     </div>
   );

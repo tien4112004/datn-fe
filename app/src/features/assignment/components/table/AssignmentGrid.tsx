@@ -3,7 +3,11 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { Assignment } from '../../types';
-import { useAssignmentList, useDeleteAssignment } from '@/features/assignment/hooks/useAssignmentApi';
+import {
+  useAssignmentList,
+  useDeleteAssignment,
+  useUpdateAssignmentChapter,
+} from '@/features/assignment/hooks/useAssignmentApi';
 import { Button } from '@ui/button';
 import { MoreHorizontal, ClipboardList } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@ui/dropdown-menu';
@@ -12,10 +16,11 @@ import TablePagination from '@/shared/components/table/TablePagination';
 import { ActionContent } from '@/features/presentation/components';
 import { RenameFileDialog } from '@/shared/components/modals/RenameFileDialog';
 import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfirmationDialog';
+import EditChapterDialog from '@/features/projects/components/EditChapterDialog';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
 import { toast } from 'sonner';
 
-import { format } from 'date-fns';
+import { formatDistance } from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { Badge } from '@ui/badge';
 import { getSubjectName, getGradeName, getSubjectBadgeClass } from '@aiprimary/core';
@@ -28,6 +33,7 @@ const AssignmentGrid = () => {
 
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isEditChapterOpen, setIsEditChapterOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [search, setSearch] = useState('');
   const [pagination, setPagination] = useState<any>({
@@ -52,13 +58,14 @@ const AssignmentGrid = () => {
     size: pagination.pageSize,
   });
   const deleteAssignment = useDeleteAssignment();
+  const updateAssignmentChapter = useUpdateAssignmentChapter();
 
   const data = useMemo(() => assignmentsResponse?.assignments || [], [assignmentsResponse]);
   const totalItems = assignmentsResponse?.total || 0;
 
   const formatDate = useCallback((date: Date | string | undefined): string => {
     if (!date) return '';
-    return format(new Date(date), 'E, P', { locale: getLocaleDateFns() });
+    return formatDistance(new Date(date), new Date(), { addSuffix: true, locale: getLocaleDateFns() });
   }, []);
 
   const columns = useMemo(
@@ -151,6 +158,10 @@ const AssignmentGrid = () => {
                 onViewDetail={() => navigate(`/assignment/${assignment.id}`)}
                 onDelete={() => handleDelete(assignment)}
                 onRename={() => handleRename(assignment)}
+                onEditChapter={() => {
+                  setSelectedAssignment(assignment);
+                  setIsEditChapterOpen(true);
+                }}
               />
             </DropdownMenuContent>
           </DropdownMenu>
@@ -262,6 +273,23 @@ const AssignmentGrid = () => {
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
         isDeleting={false}
+      />
+      <EditChapterDialog
+        open={isEditChapterOpen}
+        onOpenChange={setIsEditChapterOpen}
+        initialValues={{
+          grade: selectedAssignment?.grade,
+          subject: selectedAssignment?.subject,
+          chapter: selectedAssignment?.chapter,
+        }}
+        onSave={(values) => {
+          if (!selectedAssignment) return;
+          updateAssignmentChapter.mutate(
+            { id: selectedAssignment.id, ...values },
+            { onSuccess: () => setIsEditChapterOpen(false) }
+          );
+        }}
+        isPending={updateAssignmentChapter.isPending}
       />
     </div>
   );

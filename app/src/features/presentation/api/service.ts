@@ -247,6 +247,9 @@ export default class PresentationService implements PresentationApiService {
       pageNumberSettings: data?.pageNumberSettings,
       createdAt: data?.createdAt,
       updatedAt: data?.updatedAt,
+      grade: data?.grade,
+      subject: data?.subject,
+      chapter: data?.chapter,
     };
   }
 

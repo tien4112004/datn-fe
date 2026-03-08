@@ -44,28 +44,7 @@ export function BuyCoinsPage() {
             sessionStorage.setItem('pendingReferenceCode', data.referenceCode);
           }
 
-          if (data.gate === 'PAYOS') {
-            window.location.href = data.checkoutUrl;
-            return;
-          }
-
-          const formFields = data.formFields || {};
-          const form = document.createElement('form');
-          form.method = 'POST';
-          form.action = data.checkoutUrl;
-          form.acceptCharset = 'UTF-8';
-          form.style.display = 'none';
-
-          Object.keys(formFields).forEach((key) => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = key;
-            input.value = formFields[key] == null ? '' : String(formFields[key]);
-            form.appendChild(input);
-          });
-
-          document.body.appendChild(form);
-          form.submit();
+          window.location.href = data.checkoutUrl;
         },
       }
     );

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -9,7 +9,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import DataTable from '@/components/table/DataTable';
-import { DocumentFilters, type DocumentFilterValues } from '@/features/projects/components/DocumentFilters';
+import { DocumentFilters } from '@/features/projects/components/DocumentFilters';
+import { useAssignmentListStore } from '@/features/assignment/stores/useAssignmentListStore';
 import {
   useAssignmentList,
   useDeleteAssignment,
@@ -38,12 +39,8 @@ const AssignmentTable = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isEditChapterOpen, setIsEditChapterOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
-  const [search, setSearch] = useState('');
-  const [documentFilters, setDocumentFilters] = useState<DocumentFilterValues>({});
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
+  const { search, documentFilters, pagination, setSearch, setDocumentFilters, setPagination } =
+    useAssignmentListStore();
 
   const viewMode = (searchParams.get('view') as ViewMode) || 'list';
 

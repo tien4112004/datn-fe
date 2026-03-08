@@ -11,7 +11,8 @@ import {
 import { Button } from '@ui/button';
 import { MoreHorizontal, ClipboardList } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@ui/dropdown-menu';
-import { DocumentFilters, type DocumentFilterValues } from '@/features/projects/components/DocumentFilters';
+import { DocumentFilters } from '@/features/projects/components/DocumentFilters';
+import { useAssignmentListStore } from '@/features/assignment/stores/useAssignmentListStore';
 import TablePagination from '@/shared/components/table/TablePagination';
 import { ActionContent } from '@/features/presentation/components';
 import { RenameFileDialog } from '@/shared/components/modals/RenameFileDialog';
@@ -35,12 +36,8 @@ const AssignmentGrid = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isEditChapterOpen, setIsEditChapterOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
-  const [search, setSearch] = useState('');
-  const [documentFilters, setDocumentFilters] = useState<DocumentFilterValues>({});
-  const [pagination, setPagination] = useState<any>({
-    pageIndex: 0,
-    pageSize: 20,
-  });
+  const { search, documentFilters, pagination, setSearch, setDocumentFilters, setPagination } =
+    useAssignmentListStore();
 
   const viewMode = (searchParams.get('view') as ViewMode) || 'grid';
 

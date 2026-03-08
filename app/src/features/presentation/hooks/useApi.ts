@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-query';
 import type { SortingState, PaginationState, Updater } from '@tanstack/react-table';
 import { usePresentationApiService, getPresentationApiService } from '../api';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import type { Presentation, PresentationGenerateDraftRequest } from '../types';
 import type { ApiResponse } from '@aiprimary/api';
 import type { SlideTheme } from '../types/slide';
@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { t } from 'i18next';
 import { getExamplePromptsApiService, type UpdateChapterPayload } from '@/features/projects/api';
 import type { DocumentFilterValues } from '@/features/projects/components/DocumentFilters';
+import { usePresentationListStore } from '../stores/usePresentationListStore';
 
 // Return types for the hooks
 export interface UsePresentationsReturn extends Omit<UseQueryResult<ApiResponse<Presentation[]>>, 'data'> {
@@ -33,13 +34,16 @@ export interface UsePresentationsReturn extends Omit<UseQueryResult<ApiResponse<
 export const usePresentations = (): UsePresentationsReturn => {
   const presentationApiService = usePresentationApiService();
 
-  const [sorting, setSorting] = useState<SortingState>([{ id: 'createdAt', desc: true }]);
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 20,
-  });
-  const [search, setSearch] = useState<string>('');
-  const [documentFilters, setDocumentFilters] = useState<DocumentFilterValues>({});
+  const {
+    search,
+    sorting,
+    pagination,
+    documentFilters,
+    setSearch,
+    setSorting,
+    setPagination,
+    setDocumentFilters,
+  } = usePresentationListStore();
 
   const { data, ...query } = useQuery<ApiResponse<Presentation[]>>({
     queryKey: [
@@ -62,35 +66,23 @@ export const usePresentations = (): UsePresentationsReturn => {
       });
       return data;
     },
-    enabled: true, // Always enabled
-    staleTime: 30000, // Consider data fresh for 30 seconds
-    gcTime: 300000, // Keep in cache for 5 minutes
+    enabled: true,
+    staleTime: 30000,
+    gcTime: 300000,
   });
 
   useEffect(() => {
     if (data && data.pagination) {
-      setPagination((prev) => ({
-        ...prev,
+      setPagination({
         pageIndex: data.pagination?.currentPage ?? 0,
         pageSize: data.pagination?.pageSize ?? 20,
-      }));
+      });
     }
   }, [data?.pagination]);
 
   const handleSortingChange = (updaterOrValue: Updater<SortingState>) => {
     const newSorting = typeof updaterOrValue === 'function' ? updaterOrValue(sorting) : updaterOrValue;
     setSorting(newSorting);
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  };
-
-  const handleSearchChange = (newSearch: string) => {
-    setSearch(newSearch);
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  };
-
-  const handleFiltersChange = (filters: DocumentFilterValues) => {
-    setDocumentFilters(filters);
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
   return {
@@ -100,10 +92,10 @@ export const usePresentations = (): UsePresentationsReturn => {
     pagination,
     setPagination,
     search,
-    setSearch: handleSearchChange,
+    setSearch,
     totalItems: data?.pagination?.totalItems || 0,
     documentFilters,
-    setDocumentFilters: handleFiltersChange,
+    setDocumentFilters,
     ...query,
   };
 };

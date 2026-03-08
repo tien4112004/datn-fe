@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
 import type { SortingState, PaginationState, Updater } from '@tanstack/react-table';
 import { useMindmapApiService } from '../api';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import type { Mindmap } from '../types';
 import type { ApiResponse } from '@aiprimary/api';
 import { ExpectedError } from '@aiprimary/api';
@@ -12,6 +12,7 @@ import { t } from 'i18next';
 import { toast } from 'sonner';
 import { getExamplePromptsApiService, type UpdateChapterPayload } from '@/features/projects/api';
 import type { DocumentFilterValues } from '@/features/projects/components/DocumentFilters';
+import { useMindmapListStore } from '../stores/useMindmapListStore';
 
 /**
  * Convert data URL (base64) to Blob for multipart upload
@@ -45,13 +46,16 @@ export interface UseMindmapsReturn extends Omit<UseQueryResult<ApiResponse<Mindm
 export const useMindmaps = (): UseMindmapsReturn => {
   const mindmapApiService = useMindmapApiService();
 
-  const [sorting, setSorting] = useState<SortingState>([{ id: 'updatedAt', desc: true }]);
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 20,
-  });
-  const [search, setSearch] = useState<string>('');
-  const [documentFilters, setDocumentFilters] = useState<DocumentFilterValues>({});
+  const {
+    search,
+    sorting,
+    pagination,
+    documentFilters,
+    setSearch,
+    setSorting,
+    setPagination,
+    setDocumentFilters,
+  } = useMindmapListStore();
 
   const { data, ...query } = useQuery<ApiResponse<Mindmap[]>>({
     queryKey: [mindmapApiService.getType(), 'mindmaps', sorting, pagination, search, documentFilters],
@@ -67,35 +71,23 @@ export const useMindmaps = (): UseMindmapsReturn => {
       });
       return data;
     },
-    enabled: true, // Always enabled
-    staleTime: 30000, // Consider data fresh for 30 seconds
-    gcTime: 300000, // Keep in cache for 5 minutes
+    enabled: true,
+    staleTime: 30000,
+    gcTime: 300000,
   });
 
   useEffect(() => {
     if (data && data.pagination) {
-      setPagination((prev) => ({
-        ...prev,
+      setPagination({
         pageIndex: data.pagination?.currentPage ?? 0,
         pageSize: data.pagination?.pageSize ?? 20,
-      }));
+      });
     }
   }, [data?.pagination]);
 
   const handleSortingChange = (updaterOrValue: Updater<SortingState>) => {
     const newSorting = typeof updaterOrValue === 'function' ? updaterOrValue(sorting) : updaterOrValue;
     setSorting(newSorting);
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  };
-
-  const handleSearchChange = (newSearch: string) => {
-    setSearch(newSearch);
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  };
-
-  const handleFiltersChange = (filters: DocumentFilterValues) => {
-    setDocumentFilters(filters);
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
   return {
@@ -105,10 +97,10 @@ export const useMindmaps = (): UseMindmapsReturn => {
     pagination,
     setPagination,
     search,
-    setSearch: handleSearchChange,
+    setSearch,
     totalItems: data?.pagination?.totalItems || 0,
     documentFilters,
-    setDocumentFilters: handleFiltersChange,
+    setDocumentFilters,
     ...query,
   };
 };

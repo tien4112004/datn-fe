@@ -22,6 +22,7 @@ export default {
     rename: 'Đổi tên',
     viewDetails: 'Xem chi tiết',
     editChapter: 'Chỉnh sửa Lớp/Môn/Chương',
+    exportPdf: 'Xuất PDF',
     goBack: 'Quay lại',
     goHome: 'Về trang chủ',
     tryAgain: 'Thử lại',

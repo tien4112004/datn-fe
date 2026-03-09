@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/popover';
-import { EllipsisVerticalIcon, Eye, Edit, Trash2, GraduationCap } from 'lucide-react';
+import { EllipsisVerticalIcon, Eye, Edit, FileDown, Trash2, GraduationCap } from 'lucide-react';
 import { Button } from '@ui/button';
 
 type ActionButtonProps = {
@@ -8,9 +8,10 @@ type ActionButtonProps = {
   onDelete?: () => void;
   onRename?: () => void;
   onEditChapter?: () => void;
+  onExport?: () => void;
 };
 
-const ActionButton = ({ onViewDetail, onDelete, onRename, onEditChapter }: ActionButtonProps) => {
+const ActionButton = ({ onViewDetail, onDelete, onRename, onEditChapter, onExport }: ActionButtonProps) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -22,6 +23,7 @@ const ActionButton = ({ onViewDetail, onDelete, onRename, onEditChapter }: Actio
           onViewDetail={onViewDetail}
           onRename={onRename}
           onEditChapter={onEditChapter}
+          onExport={onExport}
         />
       </PopoverContent>
     </Popover>
@@ -30,7 +32,7 @@ const ActionButton = ({ onViewDetail, onDelete, onRename, onEditChapter }: Actio
 
 export default ActionButton;
 
-export const ActionContent = ({ onViewDetail, onDelete, onRename, onEditChapter }: ActionButtonProps) => {
+export const ActionContent = ({ onViewDetail, onDelete, onRename, onEditChapter, onExport }: ActionButtonProps) => {
   const { t } = useTranslation('glossary');
 
   return (
@@ -39,6 +41,12 @@ export const ActionContent = ({ onViewDetail, onDelete, onRename, onEditChapter 
         <Eye className="mr-2 h-4 w-4" />
         {t('actions.viewDetails')}
       </Button>
+      {onExport && (
+        <Button onClick={onExport} className="justify-start" variant={'ghost'}>
+          <FileDown className="mr-2 h-4 w-4" />
+          {t('actions.exportPdf')}
+        </Button>
+      )}
       <Button
         onClick={onDelete}
         className="justify-start text-red-600 hover:bg-red-50 hover:text-red-700"

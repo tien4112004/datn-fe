@@ -23,6 +23,8 @@ import EditChapterDialog from '@/features/projects/components/EditChapterDialog'
 import { toast } from 'sonner';
 import { ActionButton, ActionContent } from '@/features/presentation/components';
 import { formatDistance } from 'date-fns';
+import { ExportAssignmentPdfDialog } from '@/features/assignment/components/export/ExportAssignmentPdfDialog';
+import { format } from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { Badge } from '@ui/badge';
 import { getSubjectName, getGradeName, getSubjectBadgeClass } from '@aiprimary/core';
@@ -38,6 +40,7 @@ const AssignmentTable = () => {
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isEditChapterOpen, setIsEditChapterOpen] = useState(false);
+  const [isExportOpen, setIsExportOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const { search, documentFilters, pagination, setSearch, setDocumentFilters, setPagination } =
     useAssignmentListStore();
@@ -246,8 +249,19 @@ const AssignmentTable = () => {
               setSelectedAssignment(row.original);
               setIsEditChapterOpen(true);
             }}
+            onExport={() => {
+              setSelectedAssignment(row.original);
+              setIsExportOpen(true);
+            }}
           />
         )}
+      />
+
+      <ExportAssignmentPdfDialog
+        open={isExportOpen}
+        onOpenChange={setIsExportOpen}
+        assignmentId={selectedAssignment?.id || ''}
+        assignmentTitle={selectedAssignment?.title || ''}
       />
 
       <RenameFileDialog

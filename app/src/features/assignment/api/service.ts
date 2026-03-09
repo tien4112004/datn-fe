@@ -13,6 +13,7 @@ import type {
   GenerateMatrixResponse,
   GenerateAssignmentFromMatrixRequest,
   AssignmentDraft,
+  ExportAssignmentPdfOptions,
 } from '../types';
 import { createMatrixCellsForTopic } from '../utils/matrixHelpers';
 import { mergeApiMatrixIntoCells } from '../utils/matrixConversion';
@@ -102,6 +103,15 @@ export default class AssignmentService implements AssignmentApiService {
   async generateMatrix(request: GenerateMatrixRequest): Promise<GenerateMatrixResponse> {
     const response = await this.apiClient.post(`${this.baseUrl}/api/assignments/generate-matrix`, request);
     return response.data.data;
+  }
+
+  async exportPdf(id: string, options: ExportAssignmentPdfOptions = {}): Promise<Blob> {
+    const response = await this.apiClient.post(
+      `${this.baseUrl}/api/assignments/${id}/export-pdf`,
+      options,
+      { responseType: 'blob' }
+    );
+    return response.data;
   }
 
   async generateAssignmentFromMatrix(request: GenerateAssignmentFromMatrixRequest): Promise<AssignmentDraft> {

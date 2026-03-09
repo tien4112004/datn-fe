@@ -1356,9 +1356,40 @@ export default {
     actions: {
       title: 'Hành động',
       edit: 'Chỉnh sửa bài tập',
+      export: 'Xuất PDF',
       viewQuestionsList: 'Xem danh sách câu hỏi',
       delete: 'Xóa bài tập',
     },
+  },
+
+  exportPdf: {
+    title: 'Xuất file PDF',
+    theme: {
+      label: 'Kiểu chữ',
+      classic: 'Cổ điển (Times New Roman)',
+      friendly: 'Thân thiện (NotoSans lớn)',
+      compact: 'Thu gọn (NotoSans nhỏ)',
+    },
+    schoolName: {
+      label: 'Tên trường (tùy chọn)',
+      placeholder: 'VD: Trường Tiểu học Nguyễn Du',
+    },
+    header: {
+      label: 'Phần đầu',
+      showChapter: 'Hiện chương',
+      showDescription: 'Hiện mô tả',
+    },
+    content: {
+      label: 'Nội dung',
+      showQuestionPoints: 'Hiện điểm từng câu',
+      showAnswerKey: 'Đính kèm đáp án',
+      showExplanations: 'Đính kèm giải thích',
+    },
+    export: 'Xuất PDF',
+    exporting: 'Đang xuất…',
+    cancel: 'Hủy',
+    exportSuccess: 'Xuất PDF thành công',
+    exportError: 'Không thể xuất PDF',
   },
 
   view: {

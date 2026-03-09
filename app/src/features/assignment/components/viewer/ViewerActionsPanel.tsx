@@ -1,13 +1,14 @@
 import { Button } from '@ui/button';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, FileDown, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface ViewerActionsPanelProps {
   onEdit: () => void;
   onDelete: () => void;
+  onExport: () => void;
 }
 
-export const ViewerActionsPanel = ({ onEdit, onDelete }: ViewerActionsPanelProps) => {
+export const ViewerActionsPanel = ({ onEdit, onDelete, onExport }: ViewerActionsPanelProps) => {
   const { t } = useTranslation('assignment', { keyPrefix: 'viewer.actions' });
 
   return (
@@ -18,6 +19,11 @@ export const ViewerActionsPanel = ({ onEdit, onDelete }: ViewerActionsPanelProps
         <Button onClick={onEdit} variant="outline" size="sm" className="w-full">
           <Edit className="mr-2 h-4 w-4" />
           {t('edit')}
+        </Button>
+
+        <Button onClick={onExport} variant="outline" size="sm" className="w-full">
+          <FileDown className="mr-2 h-4 w-4" />
+          {t('export')}
         </Button>
 
         <Button onClick={onDelete} variant="outline" size="sm" className="text-destructive w-full">

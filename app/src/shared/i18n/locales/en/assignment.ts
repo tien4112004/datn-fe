@@ -1368,9 +1368,40 @@ export default {
     actions: {
       title: 'Actions',
       edit: 'Edit Assignment',
+      export: 'Export PDF',
       viewQuestionsList: 'View Questions List',
       delete: 'Delete Assignment',
     },
+  },
+
+  exportPdf: {
+    title: 'Export as PDF',
+    theme: {
+      label: 'Theme',
+      classic: 'Classic (Times New Roman)',
+      friendly: 'Friendly (Larger NotoSans)',
+      compact: 'Compact (Dense NotoSans)',
+    },
+    schoolName: {
+      label: 'School Name (optional)',
+      placeholder: 'e.g. Trường Tiểu học Nguyễn Du',
+    },
+    header: {
+      label: 'Header',
+      showChapter: 'Show chapter',
+      showDescription: 'Show description',
+    },
+    content: {
+      label: 'Content',
+      showQuestionPoints: 'Show question points',
+      showAnswerKey: 'Include answer key',
+      showExplanations: 'Include explanations',
+    },
+    export: 'Export PDF',
+    exporting: 'Exporting…',
+    cancel: 'Cancel',
+    exportSuccess: 'PDF exported successfully',
+    exportError: 'Failed to export PDF',
   },
 
   view: {

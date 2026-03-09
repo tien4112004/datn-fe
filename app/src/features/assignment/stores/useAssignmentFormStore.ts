@@ -277,6 +277,11 @@ export const useAssignmentFormStore = create<AssignmentFormStore>()(
 
             const q = question.question;
 
+            // Guard against duplicate question IDs
+            if (state.questions.some((existing) => existing.question.id === q.id)) {
+              return state;
+            }
+
             // Auto-expand: Add topic if not exists (cells will be created on demand)
             if (q.topicId && !newTopics.find((t) => t.id === q.topicId)) {
               const newTopic = { id: q.topicId, name: q.topicId }; // User should edit name

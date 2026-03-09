@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/shared/context/auth';
 import { LoginForm } from '../components/LoginForm';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
+import { AuthHero } from '../components/auth-hero/index.tsx';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { PageHeader } from '@/shared/components/common/PageHeader';
 import { Alert, AlertDescription } from '@ui/alert';
@@ -37,18 +38,9 @@ export function LoginPage() {
         <LanguageSwitcher />
       </div>
 
-      {/* Left side - Image */}
-      <div className="bg-muted relative hidden lg:block lg:w-2/3">
-        <img
-          src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80"
-          alt="Login"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <div className="from-background/80 via-background/50 to-background/30 absolute inset-0 bg-gradient-to-t" />
-        <div className="absolute bottom-0 left-0 right-0 p-12 text-black">
-          <h2 className="mb-4 text-4xl font-bold">{t('login.heroTitle')}</h2>
-          <p className="text-lg text-black/80">{t('login.heroSubtitle')}</p>
-        </div>
+      {/* Left side - Animated Hero */}
+      <div className="relative hidden lg:block lg:w-2/3">
+        <AuthHero />
       </div>
 
       {/* Right side - Form */}

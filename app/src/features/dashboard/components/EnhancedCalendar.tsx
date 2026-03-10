@@ -41,7 +41,7 @@ const getEventColor = (type: CalendarEventType, status?: string) => {
 export const EnhancedCalendar = () => {
   const { t } = useTranslation('dashboard');
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
   // Get calendar events for the current month
   const monthStart = startOfMonth(currentDate);
@@ -108,7 +108,9 @@ export const EnhancedCalendar = () => {
     setSelectedDate(isSameDay(date, selectedDate || new Date('1900-01-01')) ? null : date);
   };
 
-  const monthString = format(currentDate, 'MMMM yyyy', { locale: getLocaleDateFns() });
+  const monthString =
+    format(currentDate, 'MMMM y', { locale: getLocaleDateFns() }).charAt(0).toUpperCase() +
+    format(currentDate, 'MMMM y', { locale: getLocaleDateFns() }).slice(1);
 
   const weekdays = [
     t('calendar.weekdays.sunday'),
@@ -126,81 +128,96 @@ export const EnhancedCalendar = () => {
         <h3 className="text-base font-semibold sm:text-lg">{t('calendar.title')}</h3>
       </div>
 
-      <div className="bg-card rounded-lg border p-3 sm:p-4">
-        {/* Calendar Header */}
-        <div className="mb-3 flex items-center justify-between sm:mb-4">
-          <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={handlePrevMonth}>
-            <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-          </Button>
-          <span className="text-xs font-medium sm:text-sm">{monthString}</span>
-          <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={handleNextMonth}>
-            <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-          </Button>
-        </div>
-
-        {/* Calendar Grid */}
-        <div className="space-y-1.5 sm:space-y-2">
-          {/* Weekday headers */}
-          <div className="grid grid-cols-7 gap-0.5 text-center sm:gap-1">
-            {weekdays.map((day) => (
-              <div key={day} className="text-muted-foreground text-[10px] font-medium sm:text-xs">
-                {day}
-              </div>
-            ))}
+      <div className="flex flex-col gap-4 md:flex-row lg:flex-col">
+        <div className="bg-card rounded-lg border p-3 sm:p-4 md:flex-1">
+          {/* Calendar Header */}
+          <div className="mb-3 flex items-center justify-between sm:mb-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9"
+              onClick={handlePrevMonth}
+            >
+              <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            </Button>
+            <span className="text-xs font-semibold sm:text-sm md:text-base">{monthString}</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9"
+              onClick={handleNextMonth}
+            >
+              <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            </Button>
           </div>
 
-          {/* Calendar days */}
-          <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
-            {calendarDays.map((day, index) => {
-              const dateKey = format(day, 'yyyy-MM-dd');
-              const dayEvents = eventsByDate.get(dateKey) || [];
-              const isCurrentMonth = isSameMonth(day, currentDate);
-              const isSelected = selectedDate && isSameDay(day, selectedDate);
-              const isTodayDate = isToday(day);
-
-              return (
-                <button
-                  key={index}
-                  onClick={() => handleDateClick(day)}
-                  className={cn(
-                    'relative aspect-square rounded-md p-0 text-[10px] transition-colors sm:text-sm',
-                    !isCurrentMonth && 'text-muted-foreground/50',
-                    isCurrentMonth && 'hover:bg-muted',
-                    isSelected && 'bg-primary text-primary-foreground hover:bg-primary/90',
-                    isTodayDate && !isSelected && 'border-primary border-2 font-bold'
-                  )}
+          {/* Calendar Grid */}
+          <div className="space-y-1 sm:space-y-1.5 md:space-y-2">
+            {/* Weekday headers */}
+            <div className="grid grid-cols-7 gap-0.5 text-center sm:gap-1">
+              {weekdays.map((day) => (
+                <div
+                  key={day}
+                  className="text-muted-foreground text-[10px] font-medium sm:text-xs md:text-sm"
                 >
-                  <span>{format(day, 'd')}</span>
-                  {/* Event indicators */}
-                  {dayEvents.length > 0 && (
-                    <div className="absolute bottom-0.5 left-1/2 flex -translate-x-1/2 gap-0.5">
-                      {dayEvents.slice(0, 3).map((event, idx) => (
-                        <div
-                          key={idx}
-                          className={cn(
-                            'h-1 w-1 rounded-full',
-                            getEventColor(event.type as CalendarEventType, event.status)
-                          )}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </button>
-              );
-            })}
+                  {day}
+                </div>
+              ))}
+            </div>
+
+            {/* Calendar days */}
+            <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
+              {calendarDays.map((day, index) => {
+                const dateKey = format(day, 'yyyy-MM-dd');
+                const dayEvents = eventsByDate.get(dateKey) || [];
+                const isCurrentMonth = isSameMonth(day, currentDate);
+                const isSelected = selectedDate && isSameDay(day, selectedDate);
+                const isTodayDate = isToday(day);
+
+                return (
+                  <button
+                    key={index}
+                    onClick={() => handleDateClick(day)}
+                    className={cn(
+                      'relative aspect-square rounded-md p-0 text-[10px] transition-colors sm:text-xs md:text-sm',
+                      !isCurrentMonth && 'text-muted-foreground/40',
+                      isCurrentMonth && 'hover:bg-muted',
+                      isSelected && 'bg-primary text-primary-foreground hover:bg-primary/90',
+                      isTodayDate && !isSelected && 'border-primary border-2 font-bold'
+                    )}
+                  >
+                    <span>{format(day, 'd')}</span>
+                    {/* Event indicators */}
+                    {dayEvents.length > 0 && (
+                      <div className="absolute bottom-0.5 left-1/2 flex -translate-x-1/2 gap-0.5">
+                        {dayEvents.slice(0, 3).map((event, idx) => (
+                          <div
+                            key={idx}
+                            className={cn(
+                              'h-1 w-1 rounded-full md:h-1.5 md:w-1.5',
+                              getEventColor(event.type as CalendarEventType, event.status)
+                            )}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        {/* Selected Date Events */}
+        {/* Selected Date Events - Desktop Sidebar */}
         {selectedDate && (
-          <div className="mt-4 border-t pt-4">
-            <h4 className="mb-2 text-sm font-semibold">
+          <div className="bg-card hidden rounded-lg border p-3 sm:p-4 md:flex md:flex-1 md:flex-col">
+            <h4 className="mb-2 text-xs font-semibold sm:text-sm">
               {format(selectedDate, 'PPPP', { locale: getLocaleDateFns() })}
             </h4>
             {selectedDateEvents.length === 0 ? (
               <p className="text-muted-foreground text-xs">{t('calendar.noEvents')}</p>
             ) : (
-              <div className="space-y-2">
+              <div className="max-h-96 space-y-1.5 overflow-y-auto sm:space-y-2">
                 {selectedDateEvents.map((event) => (
                   <div key={event.id} className="flex items-start gap-2 rounded-md border p-2 text-xs">
                     <div
@@ -223,14 +240,46 @@ export const EnhancedCalendar = () => {
           </div>
         )}
 
-        {/* Loading State */}
-        {isLoading && (
-          <div className="text-muted-foreground mt-4 flex items-center justify-center py-2 text-xs">
-            <Clock className="mr-2 h-3 w-3 animate-spin" />
-            {t('calendar.loading')}
+        {/* Selected Date Events - Mobile */}
+        {selectedDate && (
+          <div className="md:hidden">
+            <h4 className="mb-2 text-xs font-semibold sm:text-sm">
+              {format(selectedDate, 'PPPP', { locale: getLocaleDateFns() })}
+            </h4>
+            {selectedDateEvents.length === 0 ? (
+              <p className="text-muted-foreground text-xs">{t('calendar.noEvents')}</p>
+            ) : (
+              <div className="max-h-36 space-y-1.5 overflow-y-auto sm:max-h-48 sm:space-y-2">
+                {selectedDateEvents.map((event) => (
+                  <div key={event.id} className="flex items-start gap-2 rounded-md border p-2 text-xs">
+                    <div
+                      className={cn(
+                        'mt-0.5 h-2 w-2 flex-shrink-0 rounded-full',
+                        getEventColor(event.type as CalendarEventType, event.status)
+                      )}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium">{event.title}</p>
+                      <p className="text-muted-foreground truncate text-[10px]">{event.className}</p>
+                    </div>
+                    {event.status === 'overdue' && (
+                      <AlertCircle className="h-3 w-3 flex-shrink-0 text-red-500" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
+
+      {/* Loading State */}
+      {isLoading && (
+        <div className="text-muted-foreground mt-4 flex items-center justify-center py-2 text-xs">
+          <Clock className="mr-2 h-3 w-3 animate-spin" />
+          {t('calendar.loading')}
+        </div>
+      )}
     </div>
   );
 };

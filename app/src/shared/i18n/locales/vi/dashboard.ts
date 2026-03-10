@@ -26,6 +26,7 @@ export default {
     table: {
       columns: {
         className: 'Tên lớp',
+        grade: 'Khối lớp',
         status: 'Trạng thái',
         createdAt: 'Ngày tạo',
       },

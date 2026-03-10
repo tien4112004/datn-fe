@@ -26,6 +26,7 @@ export default {
     table: {
       columns: {
         className: 'Class Name',
+        grade: 'Grade',
         status: 'Status',
         createdAt: 'Created At',
       },

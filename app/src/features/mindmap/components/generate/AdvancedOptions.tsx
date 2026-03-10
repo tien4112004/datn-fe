@@ -6,7 +6,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Controller } from 'react-hook-form';
 
-import { LANGUAGE_OPTIONS, MAX_DEPTH_OPTIONS, MAX_BRANCHES_OPTIONS } from '@/features/mindmap/types/form';
+import { MAX_DEPTH_OPTIONS, MAX_BRANCHES_OPTIONS } from '@/features/mindmap/types/form';
 import type { CreateMindmapFormData } from '@/features/mindmap/types/form';
 import type { Control } from 'react-hook-form';
 
@@ -47,54 +47,28 @@ const AdvancedOptions = ({ control, isOpen, onToggle }: AdvancedOptionsProps) =>
             style={{ overflow: 'hidden' }}
           >
             <div className="mt-4 space-y-4 px-1">
-              {/* 1x2 Grid for Language and Max Depth */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* Language */}
-                <div className="space-y-2">
-                  <Label>{t('language.label')}</Label>
-                  <Controller
-                    name="language"
-                    control={control}
-                    render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger>
-                          <SelectValue placeholder={t('language.placeholder')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {LANGUAGE_OPTIONS.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>
-                              {t(`language.${opt.labelKey}` as never)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </div>
-
-                {/* Max Depth */}
-                <div className="space-y-2">
-                  <Label>{t('maxDepth.label')}</Label>
-                  <Controller
-                    name="maxDepth"
-                    control={control}
-                    render={({ field }) => (
-                      <Select value={String(field.value)} onValueChange={(v) => field.onChange(Number(v))}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {MAX_DEPTH_OPTIONS.map((depth) => (
-                            <SelectItem key={depth} value={String(depth)}>
-                              {depth}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  <p className="text-muted-foreground text-xs">{t('maxDepth.description')}</p>
-                </div>
+              {/* Max Depth */}
+              <div className="space-y-2">
+                <Label>{t('maxDepth.label')}</Label>
+                <Controller
+                  name="maxDepth"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={String(field.value)} onValueChange={(v) => field.onChange(Number(v))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {MAX_DEPTH_OPTIONS.map((depth) => (
+                          <SelectItem key={depth} value={String(depth)}>
+                            {depth}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                <p className="text-muted-foreground text-xs">{t('maxDepth.description')}</p>
               </div>
 
               {/* Max Branches Per Node */}

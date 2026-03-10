@@ -11,9 +11,8 @@ import { useRef } from 'react';
 import ExamplePrompts from '@/features/projects/components/ExamplePrompts';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
 import ResourceTypeSwitcher from '@/features/projects/components/ResourceTypeSwitcher';
-import AdvancedOptions from './AdvancedOptions';
 import EducationModeSection from '@/shared/components/education/EducationModeSection';
-import { SLIDE_COUNT_OPTIONS } from '@/features/presentation/types';
+import { SLIDE_COUNT_OPTIONS, LANGUAGE_OPTIONS } from '@/features/presentation/types';
 import { MODEL_TYPES, useModels } from '@/features/model';
 import { ModelSelect } from '@/features/model/components/ModelSelect';
 import { EXAMPLE_PROMPT_TYPE } from '@/features/projects/types/examplePrompt';
@@ -44,21 +43,7 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { models } = useModels(MODEL_TYPES.TEXT);
 
-  // Read advanced options state directly from URL
-  const isAdvancedOpen = searchParams.get('advanced') === 'true';
-
-  // Update URL when advanced options state changes
-  const toggleAdvancedOptions = (open: boolean) => {
-    const newParams = new URLSearchParams(searchParams);
-    if (open) {
-      newParams.set('advanced', 'true');
-    } else {
-      newParams.delete('advanced');
-    }
-    setSearchParams(newParams, { replace: true });
-  };
-
-  const showExamplePrompts = watch('topic') === '' && attachedFiles.length === 0 && !isAdvancedOpen;
+  const showExamplePrompts = watch('topic') === '' && attachedFiles.length === 0;
 
   // Presentation-specific example prompts
   const presentationExamplePrompts = [
@@ -132,7 +117,7 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
                   )}
                 />
 
-                {/* Bottom toolbar: file button + slide count + model */}
+                {/* Bottom toolbar: file button + slide count + language + model */}
                 <div className="my-2 flex flex-row gap-1">
                   <input
                     ref={fileInputRef}
@@ -186,6 +171,24 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
                     )}
                   />
                   <Controller
+                    name="language"
+                    control={control}
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="w-fit">
+                          <SelectValue placeholder={t('language.placeholder')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {LANGUAGE_OPTIONS.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {t(`language.${opt.labelKey.split('.')[1]}` as never)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  <Controller
                     name="model"
                     control={control}
                     render={({ field }) => (
@@ -216,7 +219,6 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
               ns="presentation"
               keyPrefix="createOutline"
             />
-            <AdvancedOptions control={control} isOpen={isAdvancedOpen} onToggle={toggleAdvancedOptions} />
           </CardContent>
         </Card>
 

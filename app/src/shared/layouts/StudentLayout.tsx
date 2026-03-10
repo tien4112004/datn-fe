@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useNavigate, useNavigation, useRouteError, useLocation } from 'react-router-dom';
 import GlobalSpinner from '@/components/common/GlobalSpinner';
 import { useTranslation } from 'react-i18next';
-import { Toaster } from 'sonner';
+import { Toaster } from '@ui/sonner';
 import ErrorBoundary, { ErrorPageFallback } from '@/components/common/ErrorBoundary';
 import type { AppError } from '@aiprimary/api';
 import { useAuth } from '@/shared/context/auth';
@@ -14,7 +14,7 @@ export default function StudentLayout() {
 
   return (
     <>
-      <Toaster richColors />
+      <Toaster />
       <div className="min-h-screen bg-white">
         {isLoading && <GlobalSpinner text={t('page')} />}
         <ErrorBoundary pathname={location.pathname}>

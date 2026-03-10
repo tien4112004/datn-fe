@@ -5,7 +5,7 @@ import { AppSidebar } from '../components/navigation/AppSidebar';
 import { subscribe, unsubscribe } from '@/shared/lib/event';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Toaster } from 'sonner';
+import { Toaster } from '@ui/sonner';
 import ErrorBoundary, { ErrorPageFallback } from '@/components/common/ErrorBoundary';
 import type { AppError } from '@aiprimary/api';
 import { NotificationBell } from '@/features/notifications/components';

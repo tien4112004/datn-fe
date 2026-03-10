@@ -1,14 +1,15 @@
 import { AutosizeTextarea } from '@ui/autosize-textarea';
 import { Card, CardContent, CardTitle } from '@ui/card';
+import { Label } from '@ui/label';
 import ExamplePrompts from '@/features/projects/components/ExamplePrompts';
 import ResourceTypeSwitcher from '@/features/projects/components/ResourceTypeSwitcher';
 import { Sparkles } from 'lucide-react';
 import { Button } from '@ui/button';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
+import { useNavigate } from 'react-router-dom';
 import { useMemo, useState } from 'react';
-import AdvancedOptions from '@/features/mindmap/components/generate/AdvancedOptions';
 import EducationModeSection from '@/shared/components/education/EducationModeSection';
 import type { CreateMindmapFormData } from '@/features/mindmap/types';
 import { useGenerateMindmapFlow } from '../hooks/useGenerateMindmapFlow';
@@ -20,12 +21,12 @@ import { EXAMPLE_PROMPT_TYPE } from '@/features/projects/types/examplePrompt';
 import { AiDisclaimer } from '@/shared/components/common/AiDisclaimer';
 import { FileChips, FileAttachButton } from '@/shared/components/FileAttachmentInput';
 import { useFileUpload } from '@/shared/hooks/useFileUpload';
+import { LANGUAGE_OPTIONS, MAX_DEPTH_OPTIONS, MAX_BRANCHES_OPTIONS } from '@/features/mindmap/types/form';
 
 const MINDMAP_FORM_PERSIST = 'create-mindmap-form';
 
 const CreateMindmapPage = () => {
   const { t } = useTranslation('mindmap');
-  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { generateMindmap, isGenerating: isFlowGenerating } = useGenerateMindmapFlow();
   const { models } = useModels(MODEL_TYPES.TEXT);
@@ -62,21 +63,7 @@ const CreateMindmapPage = () => {
     storage: window.localStorage,
   });
 
-  // Read advanced options state directly from URL
-  const isAdvancedOpen = searchParams.get('advanced') === 'true';
-
-  // Update URL when advanced options state changes
-  const toggleAdvancedOptions = (open: boolean) => {
-    const newParams = new URLSearchParams(searchParams);
-    if (open) {
-      newParams.set('advanced', 'true');
-    } else {
-      newParams.delete('advanced');
-    }
-    setSearchParams(newParams, { replace: true });
-  };
-
-  const showExamplePrompts = watch('topic').trim() === '' && attachedFiles.length === 0 && !isAdvancedOpen;
+  const showExamplePrompts = watch('topic').trim() === '' && attachedFiles.length === 0;
 
   // Mindmap-specific example prompts
   const mindmapExamplePrompts = [
@@ -184,13 +171,31 @@ const CreateMindmapPage = () => {
                   )}
                 />
 
-                {/* Bottom toolbar: file button + model */}
+                {/* Bottom toolbar: file button + language + model */}
                 <div className="my-2 flex flex-row gap-1">
                   <FileAttachButton
                     onFilesSelected={uploadFiles}
                     isUploading={isUploadingFiles}
                     buttonLabel={t('generate.fileUpload.attachFiles')}
                     uploadingLabel={t('generate.fileUpload.uploading')}
+                  />
+                  <Controller
+                    name="language"
+                    control={control}
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="ml-auto w-fit">
+                          <SelectValue placeholder={t('create.language.placeholder')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {LANGUAGE_OPTIONS.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {t(`create.language.${opt.labelKey}` as never)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   />
                   <Controller
                     name="model"
@@ -203,7 +208,6 @@ const CreateMindmapPage = () => {
                         placeholder={t('create.model.placeholder')}
                         label={t('create.model.label')}
                         showProviderLogo={true}
-                        className="ml-auto"
                       />
                     )}
                   />
@@ -218,8 +222,56 @@ const CreateMindmapPage = () => {
               title={t('create.examples.title')}
             />
 
+            {/* Advanced Options - Max Depth and Max Branches */}
+            <div className="mt-4 grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>{t('create.maxDepth.label')}</Label>
+                <Controller
+                  name="maxDepth"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={String(field.value)} onValueChange={(v) => field.onChange(Number(v))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {MAX_DEPTH_OPTIONS.map((depth) => (
+                          <SelectItem key={depth} value={String(depth)}>
+                            {depth}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                <p className="text-muted-foreground text-xs">{t('create.maxDepth.description')}</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>{t('create.maxBranches.label')}</Label>
+                <Controller
+                  name="maxBranchesPerNode"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={String(field.value)} onValueChange={(v) => field.onChange(Number(v))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {MAX_BRANCHES_OPTIONS.map((branches) => (
+                          <SelectItem key={branches} value={String(branches)}>
+                            {branches}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                <p className="text-muted-foreground text-xs">{t('create.maxBranches.description')}</p>
+              </div>
+            </div>
+
             <EducationModeSection control={control} setValue={setValue} ns="mindmap" keyPrefix="create" />
-            <AdvancedOptions control={control} isOpen={isAdvancedOpen} onToggle={toggleAdvancedOptions} />
           </CardContent>
         </Card>
 

@@ -38,6 +38,7 @@ export default {
     markAllAsRead: 'Đánh dấu tất cả đã đọc',
     loading: 'Đang tải thông báo...',
     empty: 'Chưa có thông báo nào',
+    contentDeleted: 'Nội dung này không còn tồn tại',
   },
   dropdown: {
     title: 'Thông báo',

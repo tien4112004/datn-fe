@@ -29,11 +29,11 @@ const USER_SPECIFIC_STORAGE_KEYS = [
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isInitializing, setIsInitializing] = useState(true);
+  const [mightBeAuthenticated] = useState(() => Boolean(localStorage.getItem(USER_KEY)));
+  const [isInitializing, setIsInitializing] = useState(mightBeAuthenticated);
   const queryClient = useQueryClient();
 
-  // Always fetch profile on mount to check authentication status
-  const { data: profileData, isLoading: isLoadingProfile } = useProfile(true);
+  const { data: profileData, isLoading: isLoadingProfile } = useProfile(mightBeAuthenticated);
 
   // Update user when profile data changes or loading completes
   useEffect(() => {
@@ -56,7 +56,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Listen for unauthorized events from API (401 responses)
   useEffect(() => {
     const handleUnauthorized = () => {
-      logout();
+      setUser(null);
+      localStorage.removeItem(USER_KEY);
+      USER_SPECIFIC_STORAGE_KEYS.forEach((key) => {
+        localStorage.removeItem(key);
+      });
     };
 
     window.addEventListener('auth:unauthorized', handleUnauthorized);
@@ -86,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextType = {
     user,
     isAuthenticated: Boolean(user),
-    isLoading: isInitializing || isLoadingProfile,
+    isLoading: isInitializing,
     logout,
     setUser,
   };

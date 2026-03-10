@@ -37,6 +37,7 @@ export default {
     markAllAsRead: 'Mark all as read',
     loading: 'Loading notifications...',
     empty: 'No notifications yet',
+    contentDeleted: 'This content is no longer available',
   },
   dropdown: {
     title: 'Notifications',

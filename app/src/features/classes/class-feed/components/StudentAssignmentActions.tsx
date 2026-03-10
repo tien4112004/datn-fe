@@ -128,7 +128,11 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
               <p className="text-muted-foreground text-xs">
                 {bestSubmission && bestSubmission.score !== undefined && bestSubmission.maxScore && (
                   <span>
-                    {t('bestScore')} {bestSubmission.score}/{bestSubmission.maxScore} (
+                    {t('bestScore')}{' '}
+                    {bestSubmission.score! % 1 === 0
+                      ? bestSubmission.score
+                      : bestSubmission.score!.toFixed(1)}
+                    /{bestSubmission.maxScore} (
                     {Math.round((bestSubmission.score / bestSubmission.maxScore) * 100)}%)
                   </span>
                 )}
@@ -289,7 +293,8 @@ export const StudentAssignmentActions = ({ postId, assignmentId }: StudentAssign
                           <span
                             className={`font-semibold ${getScoreColor(submission.score, submission.maxScore)}`}
                           >
-                            {submission.score}/{submission.maxScore}
+                            {submission.score! % 1 === 0 ? submission.score : submission.score!.toFixed(1)}/
+                            {submission.maxScore}
                           </span>
                           <span className="text-muted-foreground text-xs">
                             ({Math.round((submission.score / submission.maxScore) * 100)}%)

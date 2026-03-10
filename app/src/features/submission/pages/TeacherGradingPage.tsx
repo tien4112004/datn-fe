@@ -247,7 +247,7 @@ export const TeacherGradingPage = () => {
             {gradedCount}/{questions.length} {t('graded')}
           </span>
           <span className="text-lg font-bold">
-            {totalScore}/{totalPoints}
+            {totalScore % 1 === 0 ? totalScore : totalScore.toFixed(1)}/{totalPoints}
           </span>
         </div>
       </div>
@@ -317,7 +317,7 @@ export const TeacherGradingPage = () => {
               <span className="text-sm font-semibold">{t('currentScore')}</span>
             </div>
             <p className="text-2xl font-bold text-blue-600">
-              {totalScore}/{totalPoints}
+              {totalScore % 1 === 0 ? totalScore : totalScore.toFixed(1)}/{totalPoints}
             </p>
             <p className="text-muted-foreground mt-1 text-xs">
               {Math.round((totalScore / totalPoints) * 100)}%

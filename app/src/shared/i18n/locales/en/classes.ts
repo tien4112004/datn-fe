@@ -1381,6 +1381,7 @@ export default {
   },
 
   studentDetail: {
+    title: 'Student Detail',
     loading: 'Loading...',
     studentNotFound: 'Student Not Found',
     unableToLoad: 'Unable to Load Student',
@@ -1395,7 +1396,6 @@ export default {
       goBack: 'Go Back',
       tryAgain: 'Try Again',
     },
-    pageDescription: "View {{fullName}}'s academic performance, progress, and detailed information",
     sections: {
       studentInformation: 'Student Information',
       performanceAnalytics: 'Performance Analytics',

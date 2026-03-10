@@ -181,14 +181,6 @@ export const StudentListView = ({
         return <div className="text-sm">{parentPhone || '-'}</div>;
       },
     },
-    {
-      accessorKey: 'parentContactEmail',
-      header: t('table.parentEmail'),
-      cell: ({ row }) => {
-        const email = row.getValue('parentContactEmail') as string | null | undefined;
-        return <div className="max-w-xs truncate text-sm">{email || '-'}</div>;
-      },
-    },
     ...(isTeacher
       ? [
           {
@@ -265,18 +257,20 @@ export const StudentListView = ({
   return (
     <div className="space-y-4">
       {/* Header with Search + Add button */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-2">
-          <div className="relative">
+          <div className="relative min-w-0 flex-1 lg:flex-none">
             <Search className="text-muted-foreground absolute left-2.5 top-2.5 h-4 w-4" />
             <Input
               placeholder={t('table.searchPlaceholder')}
               value={search}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-64 pl-8"
+              className="w-full pl-8 lg:w-56"
             />
           </div>
-          <p className="text-muted-foreground text-sm">{t('studentCount', { count: displayTotal })}</p>
+          <p className="text-muted-foreground shrink-0 text-sm">
+            {t('studentCount', { count: displayTotal })}
+          </p>
         </div>
         {isTeacher && (
           <div className="flex items-center gap-2">
@@ -301,56 +295,64 @@ export const StudentListView = ({
         )}
       </div>
 
-      {/* Table */}
+      {/* Table / Card List */}
       {isLoading ? (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {['w-36', 'w-24', 'w-20', 'w-28', 'w-28', 'w-36', ...(isTeacher ? ['w-20'] : [])].map(
-                  (w, i) => (
+        <>
+          {/* Mobile skeleton cards */}
+          <div className="space-y-2 lg:hidden">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="rounded-lg border p-3">
+                <div className="bg-muted mb-2 h-4 w-36 animate-pulse rounded" />
+                <div className="bg-muted mb-1 h-3 w-48 animate-pulse rounded" />
+                <div className="bg-muted h-3 w-32 animate-pulse rounded" />
+              </div>
+            ))}
+          </div>
+          {/* Desktop skeleton table */}
+          <div className="hidden overflow-x-auto rounded-md border lg:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {['w-36', 'w-24', 'w-20', 'w-28', 'w-28', ...(isTeacher ? ['w-20'] : [])].map((w, i) => (
                     <TableHead key={i}>
                       <div className={`bg-muted h-4 animate-pulse rounded ${w}`} />
                     </TableHead>
-                  )
-                )}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {Array.from({ length: 5 }).map((_, rowIdx) => (
-                <TableRow key={rowIdx}>
-                  <TableCell>
-                    <div className="bg-muted h-4 w-32 animate-pulse rounded" />
-                  </TableCell>
-                  <TableCell>
-                    <div className="bg-muted h-4 w-20 animate-pulse rounded" />
-                  </TableCell>
-                  <TableCell>
-                    <div className="bg-muted h-4 w-14 animate-pulse rounded" />
-                  </TableCell>
-                  <TableCell>
-                    <div className="bg-muted h-4 w-28 animate-pulse rounded" />
-                  </TableCell>
-                  <TableCell>
-                    <div className="bg-muted h-4 w-24 animate-pulse rounded" />
-                  </TableCell>
-                  <TableCell>
-                    <div className="bg-muted h-4 w-32 animate-pulse rounded" />
-                  </TableCell>
-                  {isTeacher && (
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <div className="bg-muted h-8 w-8 animate-pulse rounded-md" />
-                        <div className="bg-muted h-8 w-8 animate-pulse rounded-md" />
-                        <div className="bg-muted h-8 w-8 animate-pulse rounded-md" />
-                      </div>
-                    </TableCell>
-                  )}
+                  ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {Array.from({ length: 5 }).map((_, rowIdx) => (
+                  <TableRow key={rowIdx}>
+                    <TableCell>
+                      <div className="bg-muted h-4 w-32 animate-pulse rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <div className="bg-muted h-4 w-20 animate-pulse rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <div className="bg-muted h-4 w-14 animate-pulse rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <div className="bg-muted h-4 w-28 animate-pulse rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <div className="bg-muted h-4 w-24 animate-pulse rounded" />
+                    </TableCell>
+                    {isTeacher && (
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <div className="bg-muted h-8 w-8 animate-pulse rounded-md" />
+                          <div className="bg-muted h-8 w-8 animate-pulse rounded-md" />
+                          <div className="bg-muted h-8 w-8 animate-pulse rounded-md" />
+                        </div>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </>
       ) : displayTotal === 0 ? (
         <div className="flex h-64 flex-col items-center justify-center rounded-lg border">
           <p className="text-muted-foreground mb-4">
@@ -359,34 +361,97 @@ export const StudentListView = ({
           {isTeacher && !isSearching && <Button onClick={handleOpenAddDialog}>{t('addFirstStudent')}</Button>}
         </div>
       ) : (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <>
+          {/* Mobile card list */}
+          <div className="space-y-2 lg:hidden">
+            {displayStudents.map((student) => {
+              const dob = student.dateOfBirth
+                ? format(new Date(student.dateOfBirth), 'P', { locale: getLocaleDateFns() })
+                : null;
+              const gender =
+                student.gender === 'male'
+                  ? t('form.genderMale')
+                  : student.gender === 'female'
+                    ? t('form.genderFemale')
+                    : student.gender === 'other'
+                      ? t('form.genderOther')
+                      : null;
+              return (
+                <div key={student.id} className="rounded-lg border p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <Link
+                      to={`/classes/${classId}/students/${student.id}?tab=students`}
+                      className="font-medium hover:underline"
+                    >
+                      {student.fullName}
+                    </Link>
+                    {isTeacher && (
+                      <div className="flex shrink-0 items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEdit(student)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(student)}
+                          className="h-8 w-8 p-0 text-red-600 hover:bg-red-50 hover:text-red-700"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0">
+                          <Link to={`/classes/${classId}/students/${student.id}?tab=students`}>
+                            <Eye className="h-3.5 w-3.5" />
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-muted-foreground mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs">
+                    {dob && <span>{dob}</span>}
+                    {gender && <span>{gender}</span>}
+                    {student.parentName && <span>{student.parentName}</span>}
+                    {student.parentPhone && <span>{student.parentPhone}</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden overflow-x-auto rounded-md border lg:block">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </>
       )}
 
       {/* Pagination */}

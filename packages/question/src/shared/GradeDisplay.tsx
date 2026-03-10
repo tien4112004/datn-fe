@@ -25,7 +25,7 @@ export const GradeDisplay = ({ grade, maxPoints, className }: GradeDisplayProps)
               : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300'
           }`}
         >
-          {t('youEarned')} {grade.points}/{maxPoints}
+          {t('youEarned')} {grade.points % 1 === 0 ? grade.points : grade.points.toFixed(1)}/{maxPoints}
         </span>
       </div>
 

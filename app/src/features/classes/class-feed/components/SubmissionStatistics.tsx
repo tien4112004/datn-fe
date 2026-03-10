@@ -101,7 +101,7 @@ export const SubmissionStatistics = ({ postId }: SubmissionStatisticsProps) => {
         <div className="flex items-center gap-2">
           <Trophy className="h-4 w-4" />
           <span className={`font-semibold ${getScoreColor((sub.score / sub.maxScore) * 100)}`}>
-            {sub.score}/{sub.maxScore}
+            {sub.score % 1 === 0 ? sub.score : sub.score.toFixed(1)}/{sub.maxScore}
           </span>
           <span className="text-muted-foreground text-xs">
             ({Math.round((sub.score / sub.maxScore) * 100)}%)

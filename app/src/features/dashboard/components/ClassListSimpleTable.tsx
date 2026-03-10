@@ -2,12 +2,12 @@ import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/re
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Badge } from '@ui/badge';
 
 import DataTable from '@/shared/components/table/DataTable';
 import { useClasses } from '@/features/classes/shared/hooks';
 import { useClassStore } from '@/features/classes/shared/stores';
 import type { Class } from '@/features/classes/shared/types';
+import { Badge } from '@ui/badge';
 
 export const ClassListSimpleTable = () => {
   const { t } = useTranslation('dashboard');
@@ -30,10 +30,18 @@ export const ClassListSimpleTable = () => {
       columnHelper.accessor('name', {
         header: t('myClasses.table.columns.className'),
         cell: (info) => {
-          return <span className="truncate text-sm font-medium sm:text-base">{info.getValue()}</span>;
+          return <span className="truncate font-medium">{info.getValue()}</span>;
         },
         enableSorting: false,
       }),
+      // columnHelper.accessor('settings.grade', {
+      //   header: t('myClasses.table.columns.grade'),
+      //   cell: (info) => {
+      //     const grade = info.getValue();
+      //     return <span>{grade}</span>;
+      //   },
+      //   enableSorting: false,
+      // }),
       columnHelper.display({
         header: t('myClasses.table.columns.status'),
         cell: (info) => {
@@ -69,6 +77,7 @@ export const ClassListSimpleTable = () => {
         onClickRow={handleRowClick}
         rowStyle="cursor-pointer hover:bg-muted/50"
         showPagination={false}
+        className="w-full"
       />
     </div>
   );

@@ -1,9 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@ui/button';
 import { Skeleton } from '@ui/skeleton';
-import { PageContainer } from '@/shared/components/common/PageContainer';
+import { PageHeader } from '@/features/students/components/PageHeader';
 import { usePost, useDeletePost, usePinPost } from '../hooks/useApi';
 import { PostCard } from '../components/PostCard';
 import { CommentThread } from '../components/CommentThread';
@@ -14,7 +12,7 @@ import { usePostPermissions } from '../hooks/usePostPermissions';
 import { useState } from 'react';
 
 export const PostDetailPage = () => {
-  const { postId, classId } = useParams<{ postId: string; classId: string }>();
+  const { postId, id: classId } = useParams<{ postId: string; id: string }>();
   const { t } = useTranslation('classes');
   const navigate = useNavigate();
   const { post, loading, error, refetch } = usePost(postId!);
@@ -56,57 +54,47 @@ export const PostDetailPage = () => {
 
   if (loading) {
     return (
-      <PageContainer>
-        <div className="space-y-6">
-          <Skeleton className="h-10 w-32" />
-          <Skeleton className="h-48 w-full" />
-          <Skeleton className="h-64 w-full" />
-        </div>
-      </PageContainer>
+      <div className="space-y-6 p-4 sm:p-6">
+        <Skeleton className="h-10 w-32" />
+        <Skeleton className="h-48 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
     );
   }
 
   if (error) {
     return (
-      <PageContainer>
-        <Button onClick={handleBack} variant="ghost" size="sm" className="mb-6 gap-2">
-          <ArrowLeft className="h-4 w-4" />
-          {t('navigation.goBack')}
-        </Button>
+      <div className="space-y-6 p-4 sm:p-6">
+        <PageHeader title={t('errors.general')} onBack={handleBack} />
         <div className="flex h-full items-center justify-center">
           <div className="text-center">
-            <h2 className="text-lg font-semibold">{t('errors.general')}</h2>
             <p className="text-muted-foreground">{t('feed.errors.loadFailed')}</p>
           </div>
         </div>
-      </PageContainer>
+      </div>
     );
   }
 
   if (!post) {
     return (
-      <PageContainer>
-        <Button onClick={handleBack} variant="ghost" size="sm" className="mb-6 gap-2">
-          <ArrowLeft className="h-4 w-4" />
-          {t('navigation.goBack')}
-        </Button>
+      <div className="space-y-6 p-4 sm:p-6">
+        <PageHeader title={t('feed.list.empty.all.title')} onBack={handleBack} />
         <div className="flex h-full items-center justify-center">
           <div className="text-center">
-            <h2 className="text-lg font-semibold">{t('feed.list.empty.all.title')}</h2>
             <p className="text-muted-foreground">{t('feed.list.empty.all.description')}</p>
           </div>
         </div>
-      </PageContainer>
+      </div>
     );
   }
 
   return (
-    <PageContainer>
-      {/* Back Button */}
-      <Button onClick={handleBack} variant="ghost" size="sm" className="mb-6 gap-2">
-        <ArrowLeft className="h-4 w-4" />
-        {t('navigation.goBack')}
-      </Button>
+    <div className="space-y-6 p-4 sm:p-6">
+      {/* Page Header */}
+      <PageHeader
+        title={post.type === 'Exercise' ? t('feed.header.filters.homework') : t('feed.header.filters.posts')}
+        onBack={handleBack}
+      />
 
       {/* Post Content */}
       <PostCard
@@ -137,6 +125,6 @@ export const PostDetailPage = () => {
           <CommentThread postId={postId!} classId={classId || post.classId} />
         </div>
       )}
-    </PageContainer>
+    </div>
   );
 };

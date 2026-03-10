@@ -50,11 +50,11 @@ function updatePostCommentCount(
 /**
  * Hook for managing posts query with filter and pagination state
  */
-export function usePosts(classId: string) {
+export function usePosts(classId: string, initialFilterType: FeedFilter['type'] = 'all') {
   const classFeedApi = useClassFeedApiService();
 
   // Feed state
-  const [filter, setFilter] = useState<FeedFilter>({ type: 'all' });
+  const [filter, setFilter] = useState<FeedFilter>({ type: initialFilterType });
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
 

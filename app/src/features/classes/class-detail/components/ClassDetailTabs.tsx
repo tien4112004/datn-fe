@@ -1,6 +1,15 @@
 import { useSearchParams, useOutlet, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Users, Settings, MessageSquare, GraduationCap, Calendar, Edit, FolderOpen } from 'lucide-react';
+import {
+  Users,
+  Settings,
+  MessageSquare,
+  GraduationCap,
+  Calendar,
+  Edit,
+  FolderOpen,
+  BookOpen,
+} from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { Badge } from '@ui/badge';
 import { Button } from '@ui/button';
@@ -20,6 +29,7 @@ interface ClassDetailTabsProps {
 
 const tabs = [
   { value: 'feed', icon: MessageSquare, labelKey: 'tabs.feed' },
+  { value: 'exercise', icon: BookOpen, labelKey: 'tabs.exercise' },
   { value: 'students', icon: Users, labelKey: 'tabs.students' },
   { value: 'resources', icon: FolderOpen, labelKey: 'tabs.resources' },
   { value: 'settings', icon: Settings, labelKey: 'tabs.settings' },
@@ -169,6 +179,14 @@ export const ClassDetailTabs = ({ classId, currentClass, onEditClick }: ClassDet
         {outlet ?? (
           <>
             {currentTab === 'feed' && <FeedTab classId={classId} />}
+
+            {currentTab === 'exercise' && (
+              <FeedTab
+                classId={classId}
+                initialFilter="Exercise"
+                onNavigateToFeed={() => handleTabChange('feed')}
+              />
+            )}
 
             {currentTab === 'students' && (
               <div className="p-6">

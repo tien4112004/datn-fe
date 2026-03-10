@@ -71,10 +71,10 @@ const AssignmentGrid = () => {
 
   const columns = useMemo(
     () => [
-      columnHelper.accessor('id', { header: 'ID' }),
-      columnHelper.accessor('title', { header: 'Title' }),
+      columnHelper.accessor('id', { header: t('assignment.id') }),
+      columnHelper.accessor('title', { header: t('assignment.title') }),
     ],
-    [columnHelper]
+    [columnHelper, t]
   );
 
   const table = useReactTable({

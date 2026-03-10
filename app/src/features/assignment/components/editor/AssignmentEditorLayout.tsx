@@ -29,7 +29,6 @@ import { AddQuestionButton } from './questions/AddQuestionButton';
 import { QuestionsListViewPanel } from '../viewer/QuestionsListViewPanel';
 import { GenerateQuestionsManager } from './questions/GenerateQuestionsManager';
 import { GenerateMatrixManager } from './matrix/GenerateMatrixManager';
-import { FillMatrixGapsManager } from './matrix/FillMatrixGapsManager';
 import { GenerateByTopicManager } from './matrix/GenerateByTopicManager';
 import { MatrixTemplateLibraryDialog } from './templates/MatrixTemplateLibraryDialog';
 import { MatrixTemplateSaveDialog } from './templates/MatrixTemplateSaveDialog';
@@ -86,7 +85,6 @@ export const AssignmentEditorLayout = ({
   const setBulkPointsDialogOpen = useAssignmentEditorStore((state) => state.setBulkPointsDialogOpen);
   const isGeneratingQuestions = useAssignmentEditorStore((state) => state.isGeneratingQuestions);
   const { t } = useTranslation('assignment', { keyPrefix: 'assignmentEditor' });
-  const { t: tFillGaps } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.fillMatrixGaps' });
   const { t: tToolbar } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.questions.toolbar' });
   const { t: tContextsPanel } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.contextsPanel' });
   const { t: tActions } = useTranslation('assignment', { keyPrefix: 'assignmentEditor.actions' });
@@ -107,40 +105,21 @@ export const AssignmentEditorLayout = ({
 
   const handleGenerateByTopic = () => {
     if (!matrix || matrix.length === 0) {
-      toast.error(tFillGaps('errors.noMatrix'));
+      toast.error(t('generateByTopic.errors.noMatrix'));
       return;
     }
 
     if (!matrix.some((cell) => cell.requiredCount > 0)) {
-      toast.error(tFillGaps('errors.noRequirements'));
+      toast.error(t('generateByTopic.errors.noRequirements'));
       return;
     }
 
     if (!grade || !subject) {
-      toast.error(tFillGaps('errors.missingMetadata'));
+      toast.error(t('generateByTopic.errors.missingMetadata'));
       return;
     }
 
     setMainView('generateByTopic');
-  };
-
-  const handleFillMatrixGaps = () => {
-    if (!matrix || matrix.length === 0) {
-      toast.error(tFillGaps('errors.noMatrix'));
-      return;
-    }
-
-    if (!matrix.some((cell) => cell.requiredCount > 0)) {
-      toast.error(tFillGaps('errors.noRequirements'));
-      return;
-    }
-
-    if (!grade || !subject) {
-      toast.error(tFillGaps('errors.missingMetadata'));
-      return;
-    }
-
-    setMainView('fillMatrixGaps');
   };
 
   const handleShuffleQuestions = () => {
@@ -258,13 +237,6 @@ export const AssignmentEditorLayout = ({
       label: t('matrixBuilder.generateMatrix'),
       tooltip: tActions('tooltips.generateMatrix'),
       onClick: () => setMainView('generateMatrix'),
-      disabled: isGeneratingQuestions,
-    },
-    fillMatrixGaps: {
-      icon: Sparkles,
-      label: t('actions.fillMatrixGaps'),
-      tooltip: t('actions.tooltips.fillMatrixGaps'),
-      onClick: handleFillMatrixGaps,
       disabled: isGeneratingQuestions,
     },
     generateByTopic: {
@@ -418,11 +390,6 @@ export const AssignmentEditorLayout = ({
           <GenerateQuestionsManager />
         ) : mainView === 'generateMatrix' ? (
           <GenerateMatrixManager />
-        ) : mainView === 'fillMatrixGaps' ? (
-          <FillMatrixGapsManager
-            onClose={() => setMainView('matrix')}
-            onQuestionsAdded={() => setMainView('matrix')}
-          />
         ) : mainView === 'generateByTopic' ? (
           <GenerateByTopicManager
             onClose={() => setMainView('matrix')}
@@ -482,7 +449,6 @@ type ActionKey =
   | 'generateFromContext'
   | 'addTopic'
   | 'generateMatrix'
-  | 'fillMatrixGaps'
   | 'generateByTopic'
   | 'templateLibrary'
   | 'saveAsTemplate'
@@ -503,16 +469,8 @@ const VIEW_ACTIONS: Record<string, ActionKey[]> = {
   questions: ['addQuestion', 'generate', 'fromBank'],
   questionsList: ['addQuestion', 'generate', 'fromBank', 'shuffle', 'bulkPoints'],
   generateQuestions: ['addQuestion'],
-  fillMatrixGaps: ['addQuestion', 'generate', 'fromBank', 'shuffle', 'bulkPoints'],
   contextGroup: ['addQuestion', 'fromBank', 'bulkPoints', 'shuffle', 'generateFromContext'],
-  matrix: [
-    'addTopic',
-    'generateMatrix',
-    'fillMatrixGaps',
-    'generateByTopic',
-    'templateLibrary',
-    'saveAsTemplate',
-  ],
+  matrix: ['addTopic', 'generateMatrix', 'generateByTopic', 'templateLibrary', 'saveAsTemplate'],
   generateMatrix: ['addTopic'],
   contexts: ['addContext', 'fromLibrary'],
   generateByTopic: [],

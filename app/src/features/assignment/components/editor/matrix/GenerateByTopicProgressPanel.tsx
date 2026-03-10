@@ -17,6 +17,7 @@ import type { MatrixGapDto } from '@/features/assignment/types/assignment';
 import type { QuestionWithTopic, AssignmentQuestionWithTopic } from '@/features/assignment/types/assignment';
 import type { QuestionBankItem } from '@/features/question-bank/types';
 import { useGenerateQuestionsByTopic } from '@/features/assignment/hooks';
+import type { AssignmentContext } from '@aiprimary/core';
 import type { Context } from '@/features/context';
 import { ContextDisplay } from '@/features/context/components/ContextDisplay';
 
@@ -28,7 +29,7 @@ interface TopicGroup {
 
 interface TopicResult {
   topicName: string;
-  context?: Context;
+  context?: AssignmentContext;
   questions: QuestionBankItem[];
 }
 
@@ -293,7 +294,9 @@ export function GenerateByTopicProgressPanel({
                     {result.questions.length} {String(t('progress.questions'))}
                   </span>
                 </div>
-                {result.context && <ContextDisplay context={result.context} defaultCollapsed />}
+                {result.context && (
+                  <ContextDisplay context={result.context as unknown as Context} defaultCollapsed />
+                )}
               </div>
 
               {/* Questions */}

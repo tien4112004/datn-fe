@@ -284,7 +284,6 @@ export default {
       cancel: 'Thoát',
       save: 'Lưu',
       saveAndExit: 'Lưu & Thoát',
-      fillMatrixGaps: 'Tạo câu hỏi từ ma trận',
       generateByTopic: 'Tạo theo chủ đề',
       saving: 'Đang lưu...',
       tooltips: {
@@ -296,7 +295,6 @@ export default {
         fromBank: 'Thêm từ kho câu hỏi',
         addContext: 'Tạo đoạn văn mới',
         fromLibrary: 'Nhập từ thư viện đoạn văn',
-        fillMatrixGaps: 'Phát hiện khoảng trống trong ma trận và tạo câu hỏi để lấp đầy',
         generateByTopic: 'Tạo câu hỏi theo nhóm chủ đề bằng AI',
         shuffleQuestions: 'Xáo trộn ngẫu nhiên thứ tự câu hỏi (giữ nhóm đọc hiểu cùng nhau)',
         bulkPoints: 'Đặt điểm cho tất cả câu hỏi cùng lúc',
@@ -678,65 +676,6 @@ export default {
       },
     },
 
-    fillMatrixGaps: {
-      title: 'Tạo câu hỏi từ khoảng trống ma trận',
-      detecting: 'Đang phát hiện khoảng trống...',
-      noGaps: 'Không có khoảng trống! Ma trận đã hoàn chỉnh.',
-      gapsFound: 'Phát hiện {{count}} khoảng trống cần {{total}} câu hỏi',
-      selectGaps: 'Chọn khoảng trống để điền',
-      summary: 'Đã chọn {{selected}} / {{total}} khoảng trống để tạo câu hỏi',
-      progress: 'Tiến trình',
-      generatingQuestions: 'Đang tạo câu hỏi cho {{count}} khoảng trống...',
-      success: 'Điền thành công {{count}} khoảng trống',
-      status: {
-        allRequirementsMet: 'Tất cả yêu cầu ma trận đã được đáp ứng',
-      },
-      gapDetails: {
-        title: 'Chi tiết khoảng trống',
-        topic: 'Chủ đề',
-        difficulty: 'Mức độ khó',
-        type: 'Loại câu hỏi',
-        needed: 'Cần {{count}} câu hỏi nữa',
-        available: '{{available}} / {{required}}',
-        selected: 'Đã chọn',
-        select: 'Chọn',
-      },
-      errors: {
-        noMatrix: 'Không có ma trận. Vui lòng tạo ma trận trước.',
-        noRequirements: 'Ma trận không có yêu cầu nào. Vui lòng thêm yêu cầu vào ma trận.',
-        noGapsSelected: 'Vui lòng chọn ít nhất một khoảng trống để điền',
-        modelRequired: 'Vui lòng chọn mô hình AI trước khi tạo câu hỏi',
-        detectionFailed: 'Không thể phát hiện khoảng trống',
-        generationFailed: 'Không thể tạo câu hỏi',
-        missingMetadata:
-          'Vui lòng thiết lập khối lớp và môn học trước khi tạo câu hỏi từ khoảng trống ma trận.',
-      },
-      actions: {
-        selectAll: 'Chọn tất cả',
-        clearAll: 'Bỏ chọn',
-        backToMatrix: 'Quay lại ma trận',
-        backToReview: 'Quay lại xem xét',
-        generateQuestions: 'Tạo câu hỏi',
-        fillMatrixGaps: 'Tạo câu hỏi từ khoảng trống ma trận',
-      },
-      fields: {
-        model: 'Mô hình AI',
-        modelPlaceholder: 'Chọn mô hình AI',
-        additionalPrompt: 'Yêu cầu bổ sung',
-        additionalPromptPlaceholder: 'VD: Tập trung vào các ứng dụng thực tế',
-        promptHint: 'Nhập bối cảnh bổ sung để hướng dẫn việc tạo câu hỏi',
-      },
-      tooltips: {
-        fillMatrixGaps: 'Phát hiện khoảng trống trong ma trận và tạo câu hỏi để lấp đầy',
-      },
-      resultPanel: {
-        title: 'Câu hỏi đã được tạo',
-        successMessage: 'Đã tạo thành công {{count}} câu hỏi cho {{gaps}} khoảng trống',
-        backToGenerate: 'Quay lại tạo',
-        done: 'Xem ma trận',
-      },
-    },
-
     generateByTopic: {
       title: 'Tạo câu hỏi theo chủ đề',
       description: 'Tạo câu hỏi cho các chủ đề đã chọn bằng AI',
@@ -779,6 +718,9 @@ export default {
         retry: 'Thử lại',
       },
       errors: {
+        noMatrix: 'Không có ma trận. Vui lòng tạo ma trận trước.',
+        noRequirements: 'Ma trận không có yêu cầu nào. Vui lòng thêm yêu cầu vào ma trận.',
+        missingMetadata: 'Vui lòng thiết lập khối lớp và môn học trước khi tạo câu hỏi.',
         noTopicsSelected: 'Vui lòng chọn ít nhất một chủ đề',
         modelRequired: 'Vui lòng chọn mô hình AI trước khi tạo câu hỏi',
         generationFailed: 'Không thể tạo câu hỏi',

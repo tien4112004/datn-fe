@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@ui/button';
 import { Badge } from '@ui/badge';
 import { Progress } from '@ui/progress';
-import { Loader2, Check, ArrowLeft, ChevronRight } from 'lucide-react';
+import { Loader2, Check, ArrowLeft, ChevronRight, XCircle, RotateCcw, BookOpen } from 'lucide-react';
 import type { Question } from '@aiprimary/core';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { AiDisclaimer } from '@/shared/components/common/AiDisclaimer';
@@ -30,6 +30,12 @@ interface TopicResult {
   topicName: string;
   context?: Context;
   questions: QuestionBankItem[];
+}
+
+interface TopicError {
+  topicName: string;
+  message: string;
+  group: TopicGroup;
 }
 
 interface GenerateByTopicProgressPanelProps {
@@ -65,8 +71,67 @@ export function GenerateByTopicProgressPanel({
   const [completedCount, setCompletedCount] = useState(0);
   const [progress, setProgress] = useState(0);
   const [topicResults, setTopicResults] = useState<TopicResult[]>([]);
+  const [topicErrors, setTopicErrors] = useState<TopicError[]>([]);
   const [isDone, setIsDone] = useState(false);
   const hasStarted = useRef(false);
+
+  const runTopicGeneration = async (group: TopicGroup) => {
+    const topic = topics.find((t) => t.name === group.topicName);
+    const topicId = topic?.id || group.topicName;
+
+    const questionsPerDifficulty: Record<string, Record<string, string>> = {};
+    for (const gap of group.gaps) {
+      if (!questionsPerDifficulty[gap.difficulty]) {
+        questionsPerDifficulty[gap.difficulty] = {};
+      }
+      const cell = (matrix ?? []).find(
+        (c) =>
+          c.topicName === group.topicName &&
+          c.difficulty === gap.difficulty &&
+          c.questionType === gap.questionType
+      );
+      const points = cell?.points ?? 10;
+      questionsPerDifficulty[gap.difficulty][gap.questionType] = `${gap.gapCount}:${points}`;
+    }
+
+    const request: GenerateQuestionsByTopicRequest = {
+      grade: grade,
+      subject: subject,
+      topicName: group.topicName,
+      hasContext: topic?.hasContext || false,
+      questionsPerDifficulty,
+      prompt: prompt || undefined,
+      provider: model.provider,
+      model: model.name,
+    };
+
+    const result = await generateMutation.mutateAsync(request);
+
+    setTopicResults((prev) => [
+      ...prev,
+      { topicName: group.topicName, context: result.context, questions: result.questions },
+    ]);
+
+    const newContextId = result.context
+      ? addContext({ title: result.context.title || '', content: result.context.content || '' })
+      : undefined;
+
+    result.questions.forEach((bankItem) => {
+      const questionWithTopic: QuestionWithTopic = {
+        id: generateId(),
+        type: bankItem.type,
+        difficulty: bankItem.difficulty,
+        title: bankItem.title,
+        titleImageUrl: bankItem.titleImageUrl,
+        explanation: bankItem.explanation,
+        data: bankItem.data,
+        topicId,
+        contextId: newContextId,
+      } as QuestionWithTopic;
+
+      addQuestion({ question: questionWithTopic, points: 10 } as AssignmentQuestionWithTopic);
+    });
+  };
 
   useEffect(() => {
     if (hasStarted.current) return;
@@ -79,63 +144,13 @@ export function GenerateByTopicProgressPanel({
         for (let i = 0; i < topicGroups.length; i++) {
           const group = topicGroups[i];
 
-          const topic = topics.find((t) => t.name === group.topicName);
-          const topicId = topic?.id || group.topicName;
-
-          const questionsPerDifficulty: Record<string, Record<string, string>> = {};
-          for (const gap of group.gaps) {
-            if (!questionsPerDifficulty[gap.difficulty]) {
-              questionsPerDifficulty[gap.difficulty] = {};
-            }
-            const cell = (matrix ?? []).find(
-              (c) =>
-                c.topicName === group.topicName &&
-                c.difficulty === gap.difficulty &&
-                c.questionType === gap.questionType
-            );
-            const points = cell?.points ?? 10;
-            questionsPerDifficulty[gap.difficulty][gap.questionType] = `${gap.gapCount}:${points}`;
+          try {
+            await runTopicGeneration(group);
+          } catch (topicError) {
+            const message =
+              topicError instanceof Error ? topicError.message : String(t('errors.generationFailed'));
+            setTopicErrors((prev) => [...prev, { topicName: group.topicName, message, group }]);
           }
-
-          const request: GenerateQuestionsByTopicRequest = {
-            grade: grade,
-            subject: subject,
-            topicName: group.topicName,
-            hasContext: topic?.hasContext || false,
-            questionsPerDifficulty,
-            prompt: prompt || undefined,
-            provider: model.provider,
-            model: model.name,
-          };
-
-          const result = await generateMutation.mutateAsync(request);
-
-          // Append grouped result for display
-          setTopicResults((prev) => [
-            ...prev,
-            { topicName: group.topicName, context: result.context, questions: result.questions },
-          ]);
-
-          const newContextId = result.context
-            ? addContext({ title: result.context.title || '', content: result.context.content || '' })
-            : undefined;
-
-          // Add to assignment store
-          result.questions.forEach((bankItem) => {
-            const questionWithTopic: QuestionWithTopic = {
-              id: generateId(),
-              type: bankItem.type,
-              difficulty: bankItem.difficulty,
-              title: bankItem.title,
-              titleImageUrl: bankItem.titleImageUrl,
-              explanation: bankItem.explanation,
-              data: bankItem.data,
-              topicId,
-              contextId: newContextId,
-            } as QuestionWithTopic;
-
-            addQuestion({ question: questionWithTopic, points: 10 } as AssignmentQuestionWithTopic);
-          });
 
           setCompletedCount(i + 1);
           setProgress(((i + 1) / topicGroups.length) * 100);
@@ -153,17 +168,28 @@ export function GenerateByTopicProgressPanel({
     runGeneration();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const retryTopic = async (errorItem: TopicError) => {
+    setTopicErrors((prev) => prev.filter((e) => e.topicName !== errorItem.topicName));
+    try {
+      await runTopicGeneration(errorItem.group);
+    } catch (topicError) {
+      const message = topicError instanceof Error ? topicError.message : t('errors.generationFailed');
+      setTopicErrors((prev) => [
+        ...prev,
+        { topicName: errorItem.topicName, message, group: errorItem.group },
+      ]);
+    }
+  };
+
   const totalGenerated = topicResults.reduce((sum, r) => sum + r.questions.length, 0);
 
   return (
     <div className="space-y-6 px-2">
       {/* Header */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-          {String(t('progress.title'))}
-        </h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('progress.title')}</h2>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          {String(t('progress.generating', { count: topicGroups.length }))}
+          {t('progress.generating', { count: topicGroups.length })}
         </p>
       </div>
 
@@ -171,7 +197,7 @@ export function GenerateByTopicProgressPanel({
       <div className="space-y-4 rounded-lg border p-4">
         <div className="flex items-center justify-between border-b pb-3">
           <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-            {String(t('progress.generating', { count: topicGroups.length }))}
+            {t('progress.generating', { count: topicGroups.length })}
           </p>
           <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
             {completedCount} / {topicGroups.length}
@@ -179,36 +205,66 @@ export function GenerateByTopicProgressPanel({
         </div>
         <div className="space-y-1">
           <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-            <span>{String(t('progress.progress'))}</span>
+            <span>{t('progress.progress')}</span>
             <span>{Math.round(progress)}%</span>
           </div>
           <Progress value={progress} className="h-2" />
         </div>
         <div className="space-y-2">
-          {topicGroups.map((group, idx) => (
-            <div
-              key={group.topicName}
-              className={`flex items-center gap-2 text-sm ${
-                idx < completedCount
-                  ? 'text-green-700 dark:text-green-400'
-                  : idx === completedCount
-                    ? 'text-blue-700 dark:text-blue-400'
-                    : 'text-gray-600 dark:text-gray-400'
-              }`}
-            >
-              {idx < completedCount ? (
-                <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
-              ) : idx === completedCount ? (
-                <Loader2 className="h-4 w-4 animate-spin text-blue-600 dark:text-blue-400" />
-              ) : (
-                <span className="h-4 w-4" />
-              )}
-              <Badge variant="secondary" className="text-xs">
-                {group.topicName}
-              </Badge>
-              <span className="text-xs text-gray-500">({group.totalQuestions} questions)</span>
-            </div>
-          ))}
+          {topicGroups.map((group, idx) => {
+            const errorItem = topicErrors.find((e) => e.topicName === group.topicName);
+            const isError = !!errorItem;
+            const isCompleted = !isError && idx < completedCount;
+            const isProcessing = !isError && idx === completedCount;
+            const topicMeta = topics.find((tp) => tp.name === group.topicName);
+
+            return (
+              <div
+                key={group.topicName}
+                className={`flex items-center gap-2 text-sm ${
+                  isError
+                    ? 'text-red-600 dark:text-red-400'
+                    : isCompleted
+                      ? 'text-green-700 dark:text-green-400'
+                      : isProcessing
+                        ? 'text-blue-700 dark:text-blue-400'
+                        : 'text-gray-600 dark:text-gray-400'
+                }`}
+              >
+                {isError ? (
+                  <XCircle className="h-4 w-4 shrink-0 text-red-500" />
+                ) : isCompleted ? (
+                  <Check className="h-4 w-4 shrink-0 text-green-600 dark:text-green-400" />
+                ) : isProcessing ? (
+                  <Loader2 className="h-4 w-4 shrink-0 animate-spin text-blue-600 dark:text-blue-400" />
+                ) : (
+                  <span className="h-4 w-4 shrink-0" />
+                )}
+                <Badge variant={isError ? 'destructive' : 'secondary'} className="text-xs">
+                  {group.topicName}
+                </Badge>
+                {topicMeta?.hasContext && (
+                  <div className="flex items-center gap-1 rounded-md bg-blue-50 px-2 py-0.5 text-xs text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
+                    <BookOpen className="h-3 w-3 shrink-0" />
+                  </div>
+                )}
+                <span className="text-xs text-gray-500">
+                  ({group.totalQuestions} {t('progress.questions')})
+                </span>
+                {isError && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="ml-auto h-6 gap-1 px-2 text-xs text-red-600 hover:text-red-700 dark:text-red-400"
+                    onClick={() => retryTopic(errorItem)}
+                  >
+                    <RotateCcw className="h-3 w-3" />
+                    {t('actions.retry')}
+                  </Button>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -227,7 +283,15 @@ export function GenerateByTopicProgressPanel({
                   <Badge variant="secondary" className="text-xs">
                     {result.topicName}
                   </Badge>
-                  <span className="text-xs text-gray-500">{result.questions.length} questions</span>
+                  {result.context && (
+                    <div className="flex items-center gap-1 rounded-md bg-blue-50 px-2 py-0.5 text-xs text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
+                      <BookOpen className="h-3 w-3 shrink-0" />
+                      <span>Context</span>
+                    </div>
+                  )}
+                  <span className="text-xs text-gray-500">
+                    {result.questions.length} {String(t('progress.questions'))}
+                  </span>
                 </div>
                 {result.context && <ContextDisplay context={result.context} defaultCollapsed />}
               </div>
@@ -254,10 +318,10 @@ export function GenerateByTopicProgressPanel({
           <div className="flex justify-between gap-2">
             <Button variant="outline" onClick={onBack} className="gap-2">
               <ArrowLeft className="h-4 w-4" />
-              {String(t('actions.backToConfig'))}
+              {t('actions.backToConfig')}
             </Button>
             <Button onClick={onComplete} className="gap-2">
-              {String(t('actions.done'))}
+              {t('actions.done')}
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

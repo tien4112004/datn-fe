@@ -1,5 +1,5 @@
-import type { Context } from '@/features/context';
 import type { QuestionBankItem } from '@/features/question-bank/types';
+import type { AssignmentContext } from '@aiprimary/core';
 
 /**
  * Request type for generating questions from a context (reading passage).
@@ -63,5 +63,5 @@ export interface GenerateQuestionsByTopicResponse {
   /** Array of generated questions (NOT saved to question bank) */
   questions: QuestionBankItem[];
   /** Selected context info when hasContext=true */
-  context?: Context;
+  context?: AssignmentContext;
 }

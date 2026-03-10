@@ -5,7 +5,7 @@ import { Label } from '@ui/label';
 import { Textarea } from '@ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@ui/alert';
 import { Checkbox } from '@ui/checkbox';
-import { ArrowLeft, AlertCircle, CheckCircle2, Sparkles } from 'lucide-react';
+import { ArrowLeft, AlertCircle, CheckCircle2, Sparkles, BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { AiDisclaimer } from '@/shared/components/common/AiDisclaimer';
@@ -131,7 +131,14 @@ export function GenerateByTopicManager({ onClose, onQuestionsAdded }: GenerateBy
           />
         )}
         <div className="space-y-0.5">
-          <div className="whitespace-normal break-words text-sm">{topic.name}</div>
+          <div className="flex items-center gap-1.5">
+            <span className="whitespace-normal break-words text-sm">{topic.name}</span>
+            {topic.hasContext && (
+              <span className="gap-1 rounded-md bg-blue-50 px-2 py-0.5 text-xs text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
+                <BookOpen className="h-3 w-3 shrink-0" />
+              </span>
+            )}
+          </div>
           {hasGap && (
             <div className="text-xs text-gray-500 dark:text-gray-400">
               {String(t('topicSelection.topicGaps', { count: gapCount }))}

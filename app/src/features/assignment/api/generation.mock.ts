@@ -100,6 +100,11 @@ export default class GenerationMockService {
   ): Promise<GenerateQuestionsByTopicResponse> {
     await delay(MOCK_DELAY_MS);
 
+    // Mock: randomly fail ~1 in 3 topics
+    if (Math.random() < 0.33) {
+      throw new Error(`[Mock] Failed to generate questions for topic "${request.topicName}": API timeout`);
+    }
+
     const questions: QuestionBankItem[] = [];
     let questionIndex = 0;
 

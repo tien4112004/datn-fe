@@ -763,6 +763,7 @@ export default {
         progress: 'Tiến trình',
         generatedCount: 'Đã tạo {{count}} câu hỏi',
         readingPassage: 'Đoạn văn đọc',
+        questions: 'câu hỏi',
       },
       actions: {
         backToMatrix: 'Quay lại ma trận',
@@ -775,6 +776,7 @@ export default {
         selected: 'Đã chọn',
         select: 'Chọn',
         done: 'Hoàn tất',
+        retry: 'Thử lại',
       },
       errors: {
         noTopicsSelected: 'Vui lòng chọn ít nhất một chủ đề',

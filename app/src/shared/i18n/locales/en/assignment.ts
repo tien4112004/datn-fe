@@ -773,6 +773,7 @@ export default {
         progress: 'Progress',
         generatedCount: '{{count}} question(s) generated',
         readingPassage: 'Reading Passage',
+        questions: 'questions',
       },
       actions: {
         backToMatrix: 'Back to Matrix',
@@ -785,6 +786,7 @@ export default {
         selected: 'Selected',
         select: 'Select',
         done: 'Done',
+        retry: 'Retry',
       },
       errors: {
         noTopicsSelected: 'Please select at least one topic',

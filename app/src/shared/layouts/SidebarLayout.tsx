@@ -76,15 +76,9 @@ export function NavLayoutErrorBoundary() {
     return <GlobalSpinner />;
   }
 
-  // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    return (
-      <Navigate
-        to="/login"
-        replace
-        state={{ requireAuth: true, from: location.pathname + location.search }}
-      />
-    );
+    const from = location.pathname + location.search;
+    return <Navigate to="/login" replace state={{ requireAuth: from !== '/', from }} />;
   }
 
   // Redirect students to student dashboard — they shouldn't see the teacher sidebar layout

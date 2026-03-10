@@ -11,7 +11,12 @@ import type { ResourceType } from '@/shared/constants/resourceTypes';
 import Image from '@/features/image';
 import AssignmentTable from '@/features/assignment/components/table/AssignmentTable';
 import AssignmentGrid from '@/features/assignment/components/table/AssignmentGrid';
-import { SharedResourcesTable, SharedResourcesGrid } from '@/features/shared-resources';
+import {
+  SharedResourcesTable,
+  SharedResourcesGrid,
+  AllResourcesTable,
+  AllResourcesGrid,
+} from '@/features/shared-resources';
 import { useGlobalStore } from '@/store/useGlobalStore';
 import { Spinner } from '@/shared/components/common/GlobalSpinner';
 import { PageHeader } from '@/shared/components/common/PageHeader';
@@ -58,6 +63,12 @@ const ProjectListPage = () => {
   };
 
   const tabItems: TabItem[] = [
+    {
+      key: 'all',
+      value: 'all',
+      label: t('resources.all'),
+      content: viewMode === 'grid' ? <AllResourcesGrid /> : <AllResourcesTable />,
+    },
     {
       key: 'presentation',
       value: 'presentation',

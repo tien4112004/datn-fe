@@ -18,6 +18,7 @@ export default {
     assignment: 'Assignment',
     image: 'Image',
     sharedWithMe: 'Shared with Me',
+    all: 'All',
   },
   creation: {
     createPresentationError: 'Failed to create blank presentation: {{error}}',

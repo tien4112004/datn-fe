@@ -18,6 +18,7 @@ export default {
     assignment: 'Bài tập',
     image: 'Hình ảnh',
     sharedWithMe: 'Chia sẻ với tôi',
+    all: 'Tất cả',
   },
   creation: {
     createPresentationError: 'Tạo bản trình bày trống thất bại: {{error}}',

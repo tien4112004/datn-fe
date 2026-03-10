@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import { Grid3x3, Edit } from 'lucide-react';
 import { Button } from '@ui/button';
+import { MatrixGridView } from '@aiprimary/question/matrix';
 import { useAssignmentEditorStore } from '../../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../../stores/useAssignmentFormStore';
 import { MatrixEmptyState } from './MatrixEmptyState';
-import { MatrixPreviewSummary } from '../MatrixPreviewSummary';
 import { CollapsibleSection } from '../CollapsibleSection';
 
 export const AssessmentMatrixPanel = () => {
@@ -12,6 +12,7 @@ export const AssessmentMatrixPanel = () => {
   const setMainView = useAssignmentEditorStore((state) => state.setMainView);
 
   // Get data from store
+  const topics = useAssignmentFormStore((state) => state.topics);
   const matrixCells = useAssignmentFormStore((state) => state.matrix);
   const questions = useAssignmentFormStore((state) => state.questions);
 
@@ -34,7 +35,7 @@ export const AssessmentMatrixPanel = () => {
       {!hasQuestionsOrMatrix ? (
         <MatrixEmptyState onOpenEditor={() => setMainView('matrix')} />
       ) : (
-        <MatrixPreviewSummary />
+        <MatrixGridView topics={topics} matrixCells={matrixCells} compact={true} />
       )}
     </CollapsibleSection>
   );

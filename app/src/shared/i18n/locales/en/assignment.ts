@@ -285,6 +285,7 @@ export default {
       save: 'Save',
       saveAndExit: 'Save & Exit',
       fillMatrixGaps: 'Generate Question from Matrix Gap',
+      generateByTopic: 'Generate by Topic',
       saving: 'Saving...',
       tooltips: {
         save: 'Save changes and continue editing',
@@ -296,6 +297,7 @@ export default {
         addContext: 'Create a new reading passage',
         fromLibrary: 'Import from context library',
         fillMatrixGaps: 'Detect gaps in the matrix and generate questions to fill them',
+        generateByTopic: 'Generate questions grouped by topic using AI',
         shuffleQuestions: 'Randomly shuffle question order (keeps context questions together)',
         bulkPoints: 'Set points for all questions at once',
         generateFromContext: 'Generate questions based on this reading passage using AI',
@@ -737,6 +739,59 @@ export default {
       tooltips: {
         fillMatrixGaps: 'Detect gaps in the matrix and generate questions to fill them',
       },
+      resultPanel: {
+        title: 'Questions Generated',
+        successMessage: 'Successfully generated {{count}} question(s) for {{gaps}} gap(s)',
+        backToGenerate: 'Back to Generate',
+        done: 'View Matrix',
+      },
+    },
+
+    generateByTopic: {
+      title: 'Generate Questions by Topic',
+      description: 'Generate questions for selected topics using AI',
+      topicSelection: {
+        title: 'Select Topics',
+        subtitle: 'Choose which topics to generate questions for',
+        topicGaps: '{{count}} question(s) to fill',
+        totalQuestions: '{{count}} questions across {{topics}} topic(s)',
+        noGaps: 'No gaps found. Matrix is complete.',
+        summary: '{{selected}} of {{total}} topics selected',
+      },
+      config: {
+        title: 'Configure Generation',
+        subtitle: 'Select AI model and customize generation',
+        model: 'AI Model',
+        modelPlaceholder: 'Select AI model',
+        additionalPrompt: 'Additional Prompt',
+        additionalPromptPlaceholder: 'E.g., Focus on practical applications',
+        promptHint: 'Provide additional context to guide question generation',
+      },
+      progress: {
+        title: 'Generating Questions',
+        generating: 'Generating questions for {{count}} topic(s)...',
+        progress: 'Progress',
+        generatedCount: '{{count}} question(s) generated',
+        readingPassage: 'Reading Passage',
+      },
+      actions: {
+        backToMatrix: 'Back to Matrix',
+        backToReview: 'Back to Review',
+        backToConfig: 'Back to Config',
+        next: 'Next',
+        generate: 'Generate Questions',
+        selectAll: 'Select All',
+        clearAll: 'Clear All',
+        selected: 'Selected',
+        select: 'Select',
+        done: 'Done',
+      },
+      errors: {
+        noTopicsSelected: 'Please select at least one topic',
+        modelRequired: 'Please select an AI model before generating questions',
+        generationFailed: 'Failed to generate questions',
+      },
+      success: 'Successfully generated questions for {{count}} topic(s)',
     },
 
     // Matrix view dialog

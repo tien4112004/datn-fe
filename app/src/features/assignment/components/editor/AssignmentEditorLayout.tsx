@@ -30,6 +30,7 @@ import { QuestionsListViewPanel } from '../viewer/QuestionsListViewPanel';
 import { GenerateQuestionsManager } from './questions/GenerateQuestionsManager';
 import { GenerateMatrixManager } from './matrix/GenerateMatrixManager';
 import { FillMatrixGapsManager } from './matrix/FillMatrixGapsManager';
+import { GenerateByTopicManager } from './matrix/GenerateByTopicManager';
 import { MatrixTemplateLibraryDialog } from './templates/MatrixTemplateLibraryDialog';
 import { MatrixTemplateSaveDialog } from './templates/MatrixTemplateSaveDialog';
 import { BulkPointsDialog } from './metadata/BulkPointsDialog';
@@ -103,6 +104,25 @@ export const AssignmentEditorLayout = ({
     () => (currentContextId ? questions.filter((q) => q.question.contextId === currentContextId) : []),
     [questions, currentContextId]
   );
+
+  const handleGenerateByTopic = () => {
+    if (!matrix || matrix.length === 0) {
+      toast.error(tFillGaps('errors.noMatrix'));
+      return;
+    }
+
+    if (!matrix.some((cell) => cell.requiredCount > 0)) {
+      toast.error(tFillGaps('errors.noRequirements'));
+      return;
+    }
+
+    if (!grade || !subject) {
+      toast.error(tFillGaps('errors.missingMetadata'));
+      return;
+    }
+
+    setMainView('generateByTopic');
+  };
 
   const handleFillMatrixGaps = () => {
     if (!matrix || matrix.length === 0) {
@@ -245,6 +265,13 @@ export const AssignmentEditorLayout = ({
       label: t('actions.fillMatrixGaps'),
       tooltip: t('actions.tooltips.fillMatrixGaps'),
       onClick: handleFillMatrixGaps,
+      disabled: isGeneratingQuestions,
+    },
+    generateByTopic: {
+      icon: Sparkles,
+      label: t('actions.generateByTopic'),
+      tooltip: t('actions.tooltips.generateByTopic'),
+      onClick: handleGenerateByTopic,
       disabled: isGeneratingQuestions,
     },
     templateLibrary: {
@@ -396,6 +423,11 @@ export const AssignmentEditorLayout = ({
             onClose={() => setMainView('matrix')}
             onQuestionsAdded={() => setMainView('matrix')}
           />
+        ) : mainView === 'generateByTopic' ? (
+          <GenerateByTopicManager
+            onClose={() => setMainView('matrix')}
+            onQuestionsAdded={() => setMainView('matrix')}
+          />
         ) : null}
       </div>
 
@@ -451,6 +483,7 @@ type ActionKey =
   | 'addTopic'
   | 'generateMatrix'
   | 'fillMatrixGaps'
+  | 'generateByTopic'
   | 'templateLibrary'
   | 'saveAsTemplate'
   | 'addContext'
@@ -472,9 +505,17 @@ const VIEW_ACTIONS: Record<string, ActionKey[]> = {
   generateQuestions: ['addQuestion'],
   fillMatrixGaps: ['addQuestion', 'generate', 'fromBank', 'shuffle', 'bulkPoints'],
   contextGroup: ['addQuestion', 'fromBank', 'bulkPoints', 'shuffle', 'generateFromContext'],
-  matrix: ['addTopic', 'generateMatrix', 'fillMatrixGaps', 'templateLibrary', 'saveAsTemplate'],
+  matrix: [
+    'addTopic',
+    'generateMatrix',
+    'fillMatrixGaps',
+    'generateByTopic',
+    'templateLibrary',
+    'saveAsTemplate',
+  ],
   generateMatrix: ['addTopic'],
   contexts: ['addContext', 'fromLibrary'],
+  generateByTopic: [],
   generateFromContext: [],
 };
 

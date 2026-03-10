@@ -6,10 +6,12 @@ import { toast } from 'sonner';
 import { I18N_NAMESPACES } from '@/shared/i18n/constants';
 import { MatrixGapsSummary } from './MatrixGapsSummary';
 import { FillMatrixGapsPanel } from './FillMatrixGapsPanel';
+import { FillMatrixGapsResultPanel } from './FillMatrixGapsResultPanel';
 import { useAssignmentFormStore } from '../../../stores/useAssignmentFormStore';
 import type { MatrixGapDto } from '../../../types/assignment';
+import type { QuestionBankItem } from '@/features/question-bank/types';
 
-type Step = 'review' | 'generate';
+type Step = 'review' | 'generate' | 'result';
 
 interface FillMatrixGapsManagerProps {
   onClose: () => void;
@@ -45,6 +47,7 @@ export function FillMatrixGapsManager({ onClose, onQuestionsAdded }: FillMatrixG
     () => new Set(missingQuestions.map((_, idx) => idx.toString()))
   );
   const [frozenGaps, setFrozenGaps] = useState<MatrixGapDto[]>([]);
+  const [generatedQuestions, setGeneratedQuestions] = useState<QuestionBankItem[]>([]);
 
   const handleProceed = () => {
     if (selectedGaps.size === 0) {
@@ -64,8 +67,22 @@ export function FillMatrixGapsManager({ onClose, onQuestionsAdded }: FillMatrixG
       <FillMatrixGapsPanel
         gaps={frozenGaps}
         onBack={() => setStep('review')}
-        onSuccess={() => {
-          toast.success(String(t('success', { count: selectedGaps.size })));
+        onSuccess={(questions) => {
+          setGeneratedQuestions(questions);
+          setStep('result');
+        }}
+      />
+    );
+  }
+
+  if (step === 'result') {
+    return (
+      <FillMatrixGapsResultPanel
+        questions={generatedQuestions}
+        filledGapsCount={frozenGaps.length}
+        onBack={() => setStep('generate')}
+        onDone={() => {
+          toast.success(String(t('success', { count: frozenGaps.length })));
           onQuestionsAdded?.();
           onClose();
         }}

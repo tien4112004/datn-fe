@@ -23,12 +23,12 @@ import { useModels, MODEL_TYPES } from '@/features/model';
 import { generateId } from '@/shared/lib/utils';
 import type { MatrixGapDto } from '@/features/assignment/types/assignment';
 import type { AssignmentQuestionWithTopic, QuestionWithTopic } from '@/features/assignment/types/assignment';
-import type { GenerateQuestionsRequest } from '@/features/question-bank/types';
+import type { GenerateQuestionsRequest, QuestionBankItem } from '@/features/question-bank/types';
 
 interface FillMatrixGapsPanelProps {
   gaps: MatrixGapDto[];
   onBack: () => void;
-  onSuccess: () => void;
+  onSuccess: (questions: QuestionBankItem[]) => void;
 }
 
 export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsPanelProps) {
@@ -78,6 +78,8 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
     setCompletedCount(0);
 
     try {
+      const allGeneratedQuestions: QuestionBankItem[] = [];
+
       // Generate questions for each gap
       for (let i = 0; i < gaps.length; i++) {
         const gap = gaps[i];
@@ -103,6 +105,9 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
 
         // Call API to generate questions
         const result = await generateMutation.mutateAsync(request);
+
+        // Collect all generated questions for result display
+        allGeneratedQuestions.push(...result.questions);
 
         // Transform and add questions to store
         result.questions.forEach((bankItem) => {
@@ -131,9 +136,8 @@ export function FillMatrixGapsPanel({ gaps, onBack, onSuccess }: FillMatrixGapsP
         setCompletedCount(i + 1);
       }
 
-      // Show success and trigger callback
-      toast.success(t('success', { count: gaps.length }));
-      onSuccess();
+      // Trigger callback with all generated questions
+      onSuccess(allGeneratedQuestions);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : t('errors.generationFailed');
       toast.error(errorMessage);

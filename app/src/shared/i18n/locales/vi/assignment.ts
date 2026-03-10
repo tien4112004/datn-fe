@@ -285,6 +285,7 @@ export default {
       save: 'Lưu',
       saveAndExit: 'Lưu & Thoát',
       fillMatrixGaps: 'Tạo câu hỏi từ ma trận',
+      generateByTopic: 'Tạo theo chủ đề',
       saving: 'Đang lưu...',
       tooltips: {
         save: 'Lưu thay đổi và tiếp tục chỉnh sửa',
@@ -296,6 +297,7 @@ export default {
         addContext: 'Tạo đoạn văn mới',
         fromLibrary: 'Nhập từ thư viện đoạn văn',
         fillMatrixGaps: 'Phát hiện khoảng trống trong ma trận và tạo câu hỏi để lấp đầy',
+        generateByTopic: 'Tạo câu hỏi theo nhóm chủ đề bằng AI',
         shuffleQuestions: 'Xáo trộn ngẫu nhiên thứ tự câu hỏi (giữ nhóm đọc hiểu cùng nhau)',
         bulkPoints: 'Đặt điểm cho tất cả câu hỏi cùng lúc',
         generateFromContext: 'Tạo câu hỏi dựa trên đoạn văn đọc hiểu bằng AI',
@@ -727,6 +729,59 @@ export default {
       tooltips: {
         fillMatrixGaps: 'Phát hiện khoảng trống trong ma trận và tạo câu hỏi để lấp đầy',
       },
+      resultPanel: {
+        title: 'Câu hỏi đã được tạo',
+        successMessage: 'Đã tạo thành công {{count}} câu hỏi cho {{gaps}} khoảng trống',
+        backToGenerate: 'Quay lại tạo',
+        done: 'Xem ma trận',
+      },
+    },
+
+    generateByTopic: {
+      title: 'Tạo câu hỏi theo chủ đề',
+      description: 'Tạo câu hỏi cho các chủ đề đã chọn bằng AI',
+      topicSelection: {
+        title: 'Chọn chủ đề',
+        subtitle: 'Chọn chủ đề để tạo câu hỏi',
+        topicGaps: '{{count}} câu hỏi cần tạo',
+        totalQuestions: '{{count}} câu hỏi cho {{topics}} chủ đề',
+        noGaps: 'Không có khoảng trống. Ma trận đã hoàn chỉnh.',
+        summary: 'Đã chọn {{selected}} / {{total}} chủ đề',
+      },
+      config: {
+        title: 'Cấu hình tạo câu hỏi',
+        subtitle: 'Chọn mô hình AI và tùy chỉnh',
+        model: 'Mô hình AI',
+        modelPlaceholder: 'Chọn mô hình AI',
+        additionalPrompt: 'Yêu cầu bổ sung',
+        additionalPromptPlaceholder: 'VD: Tập trung vào các ứng dụng thực tế',
+        promptHint: 'Nhập bối cảnh bổ sung để hướng dẫn việc tạo câu hỏi',
+      },
+      progress: {
+        title: 'Đang tạo câu hỏi',
+        generating: 'Đang tạo câu hỏi cho {{count}} chủ đề...',
+        progress: 'Tiến trình',
+        generatedCount: 'Đã tạo {{count}} câu hỏi',
+        readingPassage: 'Đoạn văn đọc',
+      },
+      actions: {
+        backToMatrix: 'Quay lại ma trận',
+        backToReview: 'Quay lại xem xét',
+        backToConfig: 'Quay lại cấu hình',
+        next: 'Tiếp tục',
+        generate: 'Tạo câu hỏi',
+        selectAll: 'Chọn tất cả',
+        clearAll: 'Bỏ chọn',
+        selected: 'Đã chọn',
+        select: 'Chọn',
+        done: 'Hoàn tất',
+      },
+      errors: {
+        noTopicsSelected: 'Vui lòng chọn ít nhất một chủ đề',
+        modelRequired: 'Vui lòng chọn mô hình AI trước khi tạo câu hỏi',
+        generationFailed: 'Không thể tạo câu hỏi',
+      },
+      success: 'Đã tạo thành công câu hỏi cho {{count}} chủ đề',
     },
 
     // Hộp thoại xem ma trận

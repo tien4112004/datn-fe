@@ -13,7 +13,8 @@ type MainView =
   | 'generateQuestions'
   | 'generateFromContext'
   | 'generateMatrix'
-  | 'fillMatrixGaps';
+  | 'fillMatrixGaps'
+  | 'generateByTopic';
 
 interface AssignmentEditorState {
   // UI State

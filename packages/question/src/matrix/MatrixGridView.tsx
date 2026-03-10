@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import type { ReactNode } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/tooltip';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table';
 import { Badge } from '@ui/badge';
@@ -15,9 +16,17 @@ import { MatrixCellView } from './MatrixCellView';
 interface MatrixGridViewProps {
   topics: AssignmentTopic[];
   matrixCells: MatrixCell[];
+  compact?: boolean;
+  /** Optional slot to render custom content before the topic name (e.g. a checkbox) */
+  renderTopicLabel?: (topic: AssignmentTopic) => ReactNode;
 }
 
-export const MatrixGridView = ({ topics, matrixCells }: MatrixGridViewProps) => {
+export const MatrixGridView = ({
+  topics,
+  matrixCells,
+  compact = false,
+  renderTopicLabel,
+}: MatrixGridViewProps) => {
   const { t } = useTranslation('questions', { keyPrefix: 'matrix.view' });
   const { t: tDifficulty } = useTranslation('questions');
   const { t: tQuestionType } = useTranslation('questions');
@@ -39,7 +48,7 @@ export const MatrixGridView = ({ topics, matrixCells }: MatrixGridViewProps) => 
         <TableHeader>
           {/* First header row: Topic + Difficulties spanning questionTypes */}
           <TableRow>
-            <TableHead rowSpan={2} className="w-[160px] bg-gray-50 font-semibold dark:bg-gray-900">
+            <TableHead rowSpan={2} className="w-[240px] bg-gray-50 font-semibold dark:bg-gray-900">
               {t('tableHeaders.topic')}
             </TableHead>
             {difficulties.map((difficulty) => (
@@ -78,20 +87,23 @@ export const MatrixGridView = ({ topics, matrixCells }: MatrixGridViewProps) => 
         <TableBody>
           {topics.map((topic) => (
             <TableRow key={topic.id}>
-              <TableCell className="w-[160px] align-top font-medium">
-                <div className="space-y-1">
-                  <div className="whitespace-normal break-words">{topic.name}</div>
-                  {/* Display subtopics as informational chips */}
-                  {topic.subtopics && topic.subtopics.length > 0 && (
-                    <div className="flex flex-wrap gap-1 pt-1">
-                      {topic.subtopics.map((subtopic, idx) => (
-                        <Badge key={idx} variant="secondary" className="text-xs">
-                          {subtopic.name}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </div>
+              <TableCell className="w-[240px] align-top font-medium">
+                {renderTopicLabel ? (
+                  renderTopicLabel(topic)
+                ) : (
+                  <div className="space-y-1">
+                    <div className="whitespace-normal break-words">{topic.name}</div>
+                    {topic.subtopics && topic.subtopics.length > 0 && !compact && (
+                      <div className="flex flex-wrap gap-1 pt-1">
+                        {topic.subtopics.map((subtopic, idx) => (
+                          <Badge key={idx} variant="secondary" className="text-xs">
+                            {subtopic.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </TableCell>
               {difficulties.map((difficulty, difficultyIndex) =>
                 questionTypes.map((questionType) => {

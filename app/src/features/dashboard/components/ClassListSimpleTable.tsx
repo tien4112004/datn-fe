@@ -7,7 +7,7 @@ import DataTable from '@/shared/components/table/DataTable';
 import { useClasses } from '@/features/classes/shared/hooks';
 import { useClassStore } from '@/features/classes/shared/stores';
 import type { Class } from '@/features/classes/shared/types';
-import { Badge } from 'lucide-react';
+import { Badge } from '@ui/badge';
 
 export const ClassListSimpleTable = () => {
   const { t } = useTranslation('dashboard');

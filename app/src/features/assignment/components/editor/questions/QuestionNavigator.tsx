@@ -1,13 +1,18 @@
 import React, { useMemo } from 'react';
-import { List, FileText, Grid3x3, BookOpen } from 'lucide-react';
+import { List } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/tooltip';
 import { cn } from '@/shared/lib/utils';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/tooltip';
 import { CollapsibleSection } from '../CollapsibleSection';
 import { useAssignmentEditorStore } from '../../../stores/useAssignmentEditorStore';
 import { useAssignmentFormStore } from '../../../stores/useAssignmentFormStore';
 import { groupQuestionsByContext } from '../../../utils/questionGrouping';
 import type { AssignmentContext } from '../../../types';
+import {
+  NavigatorToolbar,
+  NavigatorContextGroupButton,
+  getQuestionButtonClassName,
+} from '../../shared/NavigatorShared';
 import {
   DndContext,
   closestCenter,
@@ -34,6 +39,9 @@ interface SortableItemProps {
   tooltip?: string;
   dataTutorial?: string;
   disabled?: boolean;
+  hasTitle?: boolean;
+  isInContext?: boolean;
+  hasError?: boolean;
 }
 
 const SortableItem = ({
@@ -45,6 +53,9 @@ const SortableItem = ({
   tooltip,
   dataTutorial,
   disabled,
+  hasTitle,
+  isInContext,
+  hasError,
 }: SortableItemProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
@@ -57,6 +68,23 @@ const SortableItem = ({
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const computedClassName = className
+    ? className
+    : hasTitle !== undefined && isInContext !== undefined
+      ? getQuestionButtonClassName({
+          isActive,
+          hasError,
+          isInContext,
+          hasTitle,
+          isDragging,
+          disabled,
+        })
+      : cn(
+          'flex h-8 w-full items-center justify-center rounded text-xs font-medium transition-colors',
+          isActive ? 'bg-primary text-primary-foreground' : className,
+          isDragging ? 'cursor-grabbing' : disabled ? 'cursor-not-allowed opacity-50' : 'cursor-grab'
+        );
+
   const button = (
     <button
       ref={setNodeRef}
@@ -64,11 +92,7 @@ const SortableItem = ({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={cn(
-        'flex h-8 w-full items-center justify-center rounded text-xs font-medium transition-colors',
-        isActive ? 'bg-primary text-primary-foreground' : className,
-        isDragging ? 'cursor-grabbing' : disabled ? 'cursor-not-allowed opacity-50' : 'cursor-grab'
-      )}
+      className={computedClassName}
       {...(dataTutorial ? { 'data-tutorial': dataTutorial } : {})}
       {...attributes}
       {...listeners}
@@ -83,8 +107,8 @@ const SortableItem = ({
         <TooltipTrigger asChild>
           <div>{button}</div>
         </TooltipTrigger>
-        <TooltipContent>
-          <p>{tooltip}</p>
+        <TooltipContent className="max-w-[150px]">
+          <p className="truncate">{tooltip}</p>
         </TooltipContent>
       </Tooltip>
     );
@@ -172,106 +196,33 @@ export const QuestionNavigator = () => {
       defaultOpen={true}
     >
       <div className="space-y-2">
-        {/* Toolbar: hardcoded navigation buttons */}
-        <div className="flex gap-1.5" data-tutorial="nav-toolbar">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                data-tutorial="nav-info"
-                onClick={() => setMainView('info')}
-                disabled={isGeneratingQuestions}
-                className={cn(
-                  'flex h-8 flex-1 items-center justify-center rounded text-xs transition-colors',
-                  mainView === 'info'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
-                  hasAssignmentError &&
-                    mainView !== 'info' &&
-                    'bg-destructive/15 text-destructive hover:bg-destructive/25',
-                  isGeneratingQuestions && 'cursor-not-allowed opacity-50'
-                )}
-              >
-                <FileText className="h-3 w-3" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{t('tooltips.assignmentInfo')}</p>
-            </TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                data-tutorial="nav-matrix"
-                onClick={() => setMainView('matrix')}
-                disabled={isGeneratingQuestions}
-                className={cn(
-                  'flex h-8 flex-1 items-center justify-center rounded text-xs transition-colors',
-                  mainView === 'matrix'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
-                  hasMatrixWarning &&
-                    mainView !== 'matrix' &&
-                    'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:hover:bg-yellow-900/50',
-                  isGeneratingQuestions && 'cursor-not-allowed opacity-50'
-                )}
-              >
-                <Grid3x3 className="h-3 w-3" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{t('tooltips.matrixBuilder')}</p>
-            </TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                data-tutorial="nav-contexts"
-                onClick={() => setMainView('contexts')}
-                disabled={isGeneratingQuestions}
-                className={cn(
-                  'flex h-8 flex-1 items-center justify-center rounded text-xs transition-colors',
-                  mainView === 'contexts'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
-                  isGeneratingQuestions && 'cursor-not-allowed opacity-50'
-                )}
-              >
-                <BookOpen className="h-3 w-3" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{t('tooltips.contexts')}</p>
-            </TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                data-tutorial="nav-questions-list"
-                onClick={() => setMainView('questionsList')}
-                disabled={isGeneratingQuestions}
-                className={cn(
-                  'flex h-8 flex-1 items-center justify-center rounded text-xs transition-colors',
-                  mainView === 'questionsList'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
-                  isGeneratingQuestions && 'cursor-not-allowed opacity-50'
-                )}
-              >
-                <List className="h-3 w-3" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{t('listView')}</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
+        <NavigatorToolbar
+          activeView={mainView}
+          onInfoClick={() => setMainView('info')}
+          onMatrixClick={() => setMainView('matrix')}
+          onContextsClick={() => setMainView('contexts')}
+          onQuestionsListClick={() => setMainView('questionsList')}
+          disabled={isGeneratingQuestions}
+          infoErrorClassName={
+            hasAssignmentError && mainView !== 'info'
+              ? 'bg-destructive/15 text-destructive hover:bg-destructive/25'
+              : undefined
+          }
+          matrixWarningClassName={
+            hasMatrixWarning && mainView !== 'matrix'
+              ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:hover:bg-yellow-900/50'
+              : undefined
+          }
+          tooltipInfo={t('tooltips.assignmentInfo')}
+          tooltipMatrix={t('tooltips.matrixBuilder')}
+          tooltipContexts={t('tooltips.contexts')}
+          tooltipQuestionsList={t('listView')}
+          tutorialAttrToolbar="nav-toolbar"
+          tutorialAttrInfo="nav-info"
+          tutorialAttrMatrix="nav-matrix"
+          tutorialAttrContexts="nav-contexts"
+          tutorialAttrQuestionsList="nav-questions-list"
+        />
 
         {questions.length > 0 && <hr className="border-border" />}
 
@@ -292,31 +243,13 @@ export const QuestionNavigator = () => {
 
                     return (
                       <React.Fragment key={group.id}>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <button
-                              type="button"
-                              {...(isFirstContextGroup ? { 'data-tutorial': 'nav-context-group' } : {})}
-                              onClick={() => handleContextClick(group.contextId!)}
-                              disabled={isGeneratingQuestions}
-                              className={cn(
-                                'flex h-8 w-full items-center justify-center rounded text-xs font-medium transition-colors',
-                                isContextActive
-                                  ? 'bg-primary text-primary-foreground'
-                                  : 'bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800',
-                                isGeneratingQuestions && 'cursor-not-allowed opacity-50'
-                              )}
-                            >
-                              <BookOpen className="h-3 w-3" />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>
-                              {group.context?.title || tContext('readingPassage')} (
-                              {tContext('questionsCount', { count: group.questions.length })})
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
+                        <NavigatorContextGroupButton
+                          tooltipText={`${group.context?.title || tContext('readingPassage')} (${tContext('questionsCount', { count: group.questions.length })})`}
+                          isActive={isContextActive}
+                          onClick={() => handleContextClick(group.contextId!)}
+                          disabled={isGeneratingQuestions}
+                          dataTutorial={isFirstContextGroup ? 'nav-context-group' : undefined}
+                        />
 
                         {group.questions.map((aq) => {
                           const question = aq?.question;
@@ -334,13 +267,10 @@ export const QuestionNavigator = () => {
                               onClick={() => handleQuestionClick(question.id)}
                               disabled={isGeneratingQuestions}
                               dataTutorial={questionNumber === 1 ? 'nav-question-item' : undefined}
-                              className={cn(
-                                hasTitle
-                                  ? 'bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900'
-                                  : 'bg-blue-50/50 text-blue-600 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-400 dark:hover:bg-blue-900',
-                                hasQuestionError(question.id) &&
-                                  'bg-destructive/15 text-destructive hover:bg-destructive/25'
-                              )}
+                              tooltip={question.title || 'Untitled'}
+                              hasTitle={hasTitle}
+                              isInContext={true}
+                              hasError={hasQuestionError(question.id)}
                             >
                               {questionNumber}
                             </SortableItem>
@@ -364,13 +294,10 @@ export const QuestionNavigator = () => {
                         onClick={() => handleQuestionClick(question.id)}
                         disabled={isGeneratingQuestions}
                         dataTutorial={questionNumber === 1 ? 'nav-question-item' : undefined}
-                        className={cn(
-                          hasTitle
-                            ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
-                          hasQuestionError(question.id) &&
-                            'bg-destructive/15 text-destructive hover:bg-destructive/25'
-                        )}
+                        tooltip={question.title || 'Untitled'}
+                        hasTitle={hasTitle}
+                        isInContext={false}
+                        hasError={hasQuestionError(question.id)}
                       >
                         {questionNumber}
                       </SortableItem>

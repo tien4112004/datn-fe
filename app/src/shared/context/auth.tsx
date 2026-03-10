@@ -56,7 +56,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Listen for unauthorized events from API (401 responses)
   useEffect(() => {
     const handleUnauthorized = () => {
-      logout();
+      // Only clear user state - don't call queryClient.clear() here as it would
+      // reset the profile query to pending state, causing isLoading to stay true
+      // indefinitely and preventing redirect to /login
+      setUser(null);
+      setIsInitializing(false);
+      localStorage.removeItem(USER_KEY);
+      USER_SPECIFIC_STORAGE_KEYS.forEach((key) => {
+        localStorage.removeItem(key);
+      });
     };
 
     window.addEventListener('auth:unauthorized', handleUnauthorized);

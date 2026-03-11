@@ -12,7 +12,7 @@ import type { DocumentItem } from '@/features/dashboard/api/types';
 import { formatDistance } from 'date-fns';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { DocumentFilters, type GroupByField } from '@/features/projects/components/DocumentFilters';
-import { getGradeName, getSubjectName } from '@aiprimary/core';
+import { getGradeName, getSubjectName, getSubjectBadgeClass } from '@aiprimary/core';
 
 const columnHelper = createColumnHelper<DocumentItem>();
 
@@ -203,7 +203,7 @@ const AllResourcesTable = () => {
       }),
       columnHelper.accessor('type', {
         header: t('sharedResources.type'),
-        size: 150,
+        size: 120,
         cell: (info) => {
           const type = info.getValue();
           const label =
@@ -213,6 +213,34 @@ const AllResourcesTable = () => {
                 ? tProjects('resources.assignment')
                 : tProjects('resources.presentation');
           return <Badge variant="outline">{label}</Badge>;
+        },
+        enableSorting: false,
+      }),
+      columnHelper.accessor('grade', {
+        header: t('presentation.grade'),
+        size: 90,
+        cell: (info) => {
+          const grade = info.getValue();
+          return grade ? (
+            <Badge variant="outline">{getGradeName(grade)}</Badge>
+          ) : (
+            <span className="text-muted-foreground text-xs">-</span>
+          );
+        },
+        enableSorting: false,
+      }),
+      columnHelper.accessor('subject', {
+        header: t('presentation.subject'),
+        size: 120,
+        cell: (info) => {
+          const subject = info.getValue();
+          return subject ? (
+            <Badge variant="outline" className={getSubjectBadgeClass(subject)}>
+              {getSubjectName(subject)}
+            </Badge>
+          ) : (
+            <span className="text-muted-foreground text-xs">-</span>
+          );
         },
         enableSorting: false,
       }),

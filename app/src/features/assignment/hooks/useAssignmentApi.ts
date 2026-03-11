@@ -215,6 +215,9 @@ export const useUpdateAssignmentChapter = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: assignmentKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: ['real', 'allDocuments'] });
+      queryClient.invalidateQueries({ queryKey: ['real', 'allDocumentsInfinite'] });
+      queryClient.invalidateQueries({ queryKey: ['real', 'recentDocuments'] });
     },
   });
 };

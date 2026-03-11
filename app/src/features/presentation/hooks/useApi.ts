@@ -403,9 +403,11 @@ export const useUpdatePresentationChapter = () => {
       return id;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [presentationApiService.getType(), 'presentations'],
-      });
+      const type = presentationApiService.getType();
+      queryClient.invalidateQueries({ queryKey: [type, 'presentations'] });
+      queryClient.invalidateQueries({ queryKey: [type, 'allDocuments'] });
+      queryClient.invalidateQueries({ queryKey: [type, 'allDocumentsInfinite'] });
+      queryClient.invalidateQueries({ queryKey: [type, 'recentDocuments'] });
     },
   });
 };

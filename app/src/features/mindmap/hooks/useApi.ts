@@ -361,9 +361,11 @@ export const useUpdateMindmapChapter = () => {
       return id;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [mindmapApiService.getType(), 'mindmaps'],
-      });
+      const type = mindmapApiService.getType();
+      queryClient.invalidateQueries({ queryKey: [type, 'mindmaps'] });
+      queryClient.invalidateQueries({ queryKey: [type, 'allDocuments'] });
+      queryClient.invalidateQueries({ queryKey: [type, 'allDocumentsInfinite'] });
+      queryClient.invalidateQueries({ queryKey: [type, 'recentDocuments'] });
     },
   });
 };

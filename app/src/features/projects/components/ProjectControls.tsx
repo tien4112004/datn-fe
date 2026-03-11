@@ -10,16 +10,18 @@ import { useTranslation } from 'react-i18next';
 import { ImageUploadDialog } from '@/features/image/components/ImageUploadDialog';
 
 interface ProjectControlsProps {
-  currentResourceType: ResourceType;
+  currentResourceType: ResourceType | 'all';
 }
 
 // Type guard for supported resource types
-const isSupportedResourceType = (type: ResourceType): type is 'presentation' | 'mindmap' | 'assignment' => {
+const isSupportedResourceType = (
+  type: ResourceType | 'all'
+): type is 'presentation' | 'mindmap' | 'assignment' => {
   return type === 'presentation' || type === 'mindmap' || type === 'assignment';
 };
 
 // Resource-specific hook configuration
-const useResourceHooks = (resourceType: ResourceType) => {
+const useResourceHooks = (resourceType: ResourceType | 'all') => {
   const navigate = useNavigate();
 
   const createBlankPresentation = useCreateBlankPresentation();
@@ -59,6 +61,11 @@ const useResourceHooks = (resourceType: ResourceType) => {
   } else if (resourceType === 'image') {
     return {
       generate: () => navigate('/image/generate'),
+      createBlank: null,
+    };
+  } else if (resourceType === 'all') {
+    return {
+      generate: () => navigate('/presentation/generate'),
       createBlank: null,
     };
   }

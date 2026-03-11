@@ -20,6 +20,15 @@ export default {
     sharedWithMe: 'Shared with Me',
     all: 'All',
   },
+  groupBy: {
+    label: 'Group by',
+    placeholder: 'Group documents',
+    none: 'None',
+    grade: 'Grade',
+    subject: 'Subject',
+    chapter: 'Chapter',
+    ungrouped: 'Ungrouped',
+  },
   creation: {
     createPresentationError: 'Failed to create blank presentation: {{error}}',
     createMindmapError: 'Failed to create blank mindmap: {{error}}',

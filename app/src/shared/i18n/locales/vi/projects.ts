@@ -20,6 +20,15 @@ export default {
     sharedWithMe: 'Chia sẻ với tôi',
     all: 'Tất cả',
   },
+  groupBy: {
+    label: 'Nhóm theo',
+    placeholder: 'Nhóm tài liệu',
+    none: 'Không',
+    grade: 'Khối lớp',
+    subject: 'Môn học',
+    chapter: 'Chương',
+    ungrouped: 'Chưa phân loại',
+  },
   creation: {
     createPresentationError: 'Tạo bản trình bày trống thất bại: {{error}}',
     createMindmapError: 'Tạo sơ đồ tư duy trống thất bại: {{error}}',

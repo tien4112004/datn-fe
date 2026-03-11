@@ -14,6 +14,9 @@ import {
 import { Badge } from '@ui/badge';
 import { useChapters } from '@/shared/hooks/useChapters';
 import { SearchBar } from '@/shared/components/common/SearchBar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
+
+export type GroupByField = 'none' | 'grade' | 'subject' | 'chapter';
 
 export interface DocumentFilterValues {
   grade?: string;
@@ -28,6 +31,8 @@ interface DocumentFiltersProps {
   onSearchChange?: (value: string) => void;
   RightComponent?: React.ReactNode;
   searchPlaceholder?: string;
+  groupBy?: GroupByField;
+  onGroupByChange?: (value: GroupByField) => void;
 }
 
 export function DocumentFilters({
@@ -37,11 +42,14 @@ export function DocumentFilters({
   onSearchChange,
   RightComponent,
   searchPlaceholder,
+  groupBy = 'none',
+  onGroupByChange,
 }: DocumentFiltersProps) {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const { i18n } = useTranslation();
   const tCommon = useTranslation('common').t;
   const tGlossary = useTranslation('glossary').t;
+  const tProjects = useTranslation('projects').t;
 
   const grades = getAllGrades();
   const subjects = getAllSubjects();
@@ -66,7 +74,7 @@ export function DocumentFilters({
 
   return (
     <div className="space-y-3">
-      {/* Search bar + filter toggle */}
+      {/* Search bar row */}
       <div className="flex items-center gap-3">
         <Button
           variant="ghost"
@@ -90,6 +98,23 @@ export function DocumentFilters({
             placeholder={searchPlaceholder}
             className="flex-1 rounded-lg border-2 border-slate-200"
           />
+          {onGroupByChange && (
+            <Select value={groupBy} onValueChange={(v) => onGroupByChange(v as GroupByField)}>
+              <SelectTrigger className="w-52 shrink-0">
+                <SelectValue>
+                  {groupBy === 'none'
+                    ? tProjects('groupBy.placeholder')
+                    : `${tProjects('groupBy.label')}: ${tProjects(`groupBy.${groupBy}` as any)}`}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">{tProjects('groupBy.placeholder')}</SelectItem>
+                <SelectItem value="grade">{tProjects('groupBy.grade')}</SelectItem>
+                <SelectItem value="subject">{tProjects('groupBy.subject')}</SelectItem>
+                <SelectItem value="chapter">{tProjects('groupBy.chapter')}</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
           {RightComponent}
         </div>
       </div>

@@ -134,10 +134,10 @@ const AssignmentGrid = () => {
   const AssignmentCard = ({ assignment }: { assignment: Assignment }) => (
     <div className="group w-full cursor-pointer">
       <div
-        className="relative flex aspect-video w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-50 to-blue-50 p-6 transition-shadow duration-200 hover:shadow-md"
+        className="relative flex aspect-video w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-blue-50 p-6 transition-shadow duration-200 hover:shadow-md dark:bg-blue-950/40"
         onClick={() => navigate(`/assignment/${assignment.id}`)}
       >
-        <ClipboardList className="mb-3 h-12 w-12 text-indigo-500" />
+        <ClipboardList className="mb-3 h-12 w-12 text-blue-500" />
         <div className="text-center">
           <div className="mb-2 font-medium text-gray-700">{assignment.title}</div>
         </div>

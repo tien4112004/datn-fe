@@ -16,6 +16,18 @@ const TYPE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = 
   assignment: ClipboardList,
 };
 
+const TYPE_COLORS: Record<string, string> = {
+  presentation: 'bg-amber-50 dark:bg-amber-950/40',
+  mindmap: 'bg-purple-50 dark:bg-purple-950/40',
+  assignment: 'bg-blue-50 dark:bg-blue-950/40',
+};
+
+const TYPE_ICON_COLORS: Record<string, string> = {
+  presentation: 'text-amber-500',
+  mindmap: 'text-purple-500',
+  assignment: 'text-blue-500',
+};
+
 type ActiveGroupByField = Exclude<GroupByField, 'none'>;
 
 function groupDocuments(documents: DocumentItem[], groupBy: GroupByField, ungroupedLabel: string) {
@@ -167,8 +179,10 @@ const AllResourcesGrid = () => {
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="bg-muted/50 flex h-full w-full items-center justify-center">
-              <Icon className="text-muted-foreground h-12 w-12" />
+            <div
+              className={`flex h-full w-full items-center justify-center ${TYPE_COLORS[item.type] ?? 'bg-muted/50'}`}
+            >
+              <Icon className={`h-12 w-12 ${TYPE_ICON_COLORS[item.type] ?? 'text-muted-foreground'}`} />
             </div>
           )}
           <div className="absolute left-2 top-2">

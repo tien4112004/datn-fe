@@ -159,8 +159,8 @@ const MindmapTable = () => {
             );
           }
           return (
-            <div className="bg-muted/50 flex aspect-video w-[160px] items-center justify-center rounded border">
-              <BrainCircuit className="text-muted-foreground h-8 w-8" />
+            <div className="flex aspect-video w-[160px] items-center justify-center rounded border bg-purple-50 dark:bg-purple-950/40">
+              <BrainCircuit className="h-8 w-8 text-purple-500" />
             </div>
           );
         },

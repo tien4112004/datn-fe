@@ -75,10 +75,10 @@ const ThumbnailWrapperV2 = ({ presentation, size, visible = true }: ThumbnailWra
   // Fallback to icon
   return (
     <div
-      className="bg-muted/50 flex aspect-video h-full w-full items-center justify-center"
+      className="flex aspect-video h-full w-full items-center justify-center bg-amber-50 dark:bg-amber-950/40"
       style={size !== 'auto' ? { width: `${size}px` } : { width: '100%' }}
     >
-      <PresentationIcon className="text-muted-foreground h-12 w-12" />
+      <PresentationIcon className="h-12 w-12 text-amber-500" />
     </div>
   );
 };

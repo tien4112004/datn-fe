@@ -22,6 +22,18 @@ const TYPE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = 
   assignment: ClipboardList,
 };
 
+const TYPE_COLORS: Record<string, string> = {
+  presentation: 'bg-amber-50 dark:bg-amber-950/40',
+  mindmap: 'bg-purple-50 dark:bg-purple-950/40',
+  assignment: 'bg-blue-50 dark:bg-blue-950/40',
+};
+
+const TYPE_ICON_COLORS: Record<string, string> = {
+  presentation: 'text-amber-500',
+  mindmap: 'text-purple-500',
+  assignment: 'text-blue-500',
+};
+
 type ActiveGroupByField = Exclude<GroupByField, 'none'>;
 
 function groupDocuments(documents: DocumentItem[], groupBy: ActiveGroupByField, ungroupedLabel: string) {
@@ -172,8 +184,10 @@ const AllResourcesTable = () => {
             );
           }
           return (
-            <div className="bg-muted/50 flex aspect-video w-[120px] items-center justify-center rounded border">
-              <Icon className="text-muted-foreground h-8 w-8" />
+            <div
+              className={`flex aspect-video w-[120px] items-center justify-center rounded border ${TYPE_COLORS[type] ?? 'bg-muted/50'}`}
+            >
+              <Icon className={`h-8 w-8 ${TYPE_ICON_COLORS[type] ?? 'text-muted-foreground'}`} />
             </div>
           );
         },

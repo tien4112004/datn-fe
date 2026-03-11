@@ -159,8 +159,8 @@ const MindmapGrid = () => {
             className="h-full w-full object-contain"
           />
         ) : (
-          <div className="bg-muted/50 flex h-full w-full items-center justify-center">
-            <BrainCircuit className="text-muted-foreground h-12 w-12" />
+          <div className="flex h-full w-full items-center justify-center bg-purple-50 dark:bg-purple-950/40">
+            <BrainCircuit className="h-12 w-12 text-purple-500" />
           </div>
         )}
 

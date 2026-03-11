@@ -108,6 +108,7 @@ export default {
       downloading: 'Downloading...',
       noCards: 'No outline cards found.',
       clickAddToStart: 'Click "Add" to start creating your outline.',
+      generationError: 'Generation failed',
     },
   },
   customization: {
@@ -202,5 +203,7 @@ export default {
   generation: {
     outlineError: 'Error generating outline. Please try again.',
     presentationError: 'Error generating presentation. Please try again.',
+    contentMismatchError:
+      'The topic you entered does not match the selected grade and subject. Please adjust your topic or change the grade/subject and try again.',
   },
 };

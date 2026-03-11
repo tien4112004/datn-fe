@@ -32,7 +32,13 @@ const ActionButton = ({ onViewDetail, onDelete, onRename, onEditChapter, onExpor
 
 export default ActionButton;
 
-export const ActionContent = ({ onViewDetail, onDelete, onRename, onEditChapter, onExport }: ActionButtonProps) => {
+export const ActionContent = ({
+  onViewDetail,
+  onDelete,
+  onRename,
+  onEditChapter,
+  onExport,
+}: ActionButtonProps) => {
   const { t } = useTranslation('glossary');
 
   return (

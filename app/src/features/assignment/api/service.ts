@@ -106,11 +106,9 @@ export default class AssignmentService implements AssignmentApiService {
   }
 
   async exportPdf(id: string, options: ExportAssignmentPdfOptions = {}): Promise<Blob> {
-    const response = await this.apiClient.post(
-      `${this.baseUrl}/api/assignments/${id}/export-pdf`,
-      options,
-      { responseType: 'blob' }
-    );
+    const response = await this.apiClient.post(`${this.baseUrl}/api/assignments/${id}/export-pdf`, options, {
+      responseType: 'blob',
+    });
     return response.data;
   }
 

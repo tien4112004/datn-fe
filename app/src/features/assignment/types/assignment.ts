@@ -32,6 +32,7 @@ export type ExportPdfTheme = 'CLASSIC' | 'FRIENDLY' | 'COMPACT';
 export interface ExportAssignmentPdfOptions {
   theme?: ExportPdfTheme;
   headerConfig?: {
+    useExamHeader?: boolean;
     departmentName?: string | null;
     institutionName?: string | null;
     examPeriod?: string | null;

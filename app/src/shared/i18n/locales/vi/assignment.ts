@@ -1371,7 +1371,8 @@ export default {
       compact: 'Thu gọn (NotoSans nhỏ)',
     },
     header: {
-      label: 'Thông tin đề thi',
+      label: 'Phần đầu',
+      useExamHeader: 'Sử dụng tiêu đề kỳ thi',
       departmentName: {
         placeholder: 'Tên sở/trường (VD: SỞ GD&ĐT TP. HỒ CHÍ MINH)',
       },
@@ -1390,12 +1391,10 @@ export default {
     content: {
       label: 'Nội dung',
       showQuestionPoints: 'Hiện điểm từng câu',
-      showAnswerKey: 'Đính kèm đáp án',
-      showExplanations: 'Đính kèm giải thích',
     },
-    export: 'Xuất PDF',
-    exporting: 'Đang xuất…',
-    cancel: 'Hủy',
+    exportExam: 'Xuất đề thi',
+    exportAnswer: 'Xuất đáp án',
+    answerSuffix: 'Đáp án',
     exportSuccess: 'Xuất PDF thành công',
     exportError: 'Không thể xuất PDF',
   },

@@ -1383,7 +1383,8 @@ export default {
       compact: 'Compact (Dense NotoSans)',
     },
     header: {
-      label: 'Exam information',
+      label: 'Header',
+      useExamHeader: 'Use exam-style header',
       departmentName: {
         placeholder: 'Department/School (e.g. DEPARTMENT OF EDUCATION)',
       },
@@ -1402,12 +1403,10 @@ export default {
     content: {
       label: 'Content',
       showQuestionPoints: 'Show question points',
-      showAnswerKey: 'Include answer key',
-      showExplanations: 'Include explanations',
     },
-    export: 'Export PDF',
-    exporting: 'Exporting…',
-    cancel: 'Cancel',
+    exportExam: 'Export Exam',
+    exportAnswer: 'Export Answer Key',
+    answerSuffix: 'Answer Key',
     exportSuccess: 'PDF exported successfully',
     exportError: 'Failed to export PDF',
   },

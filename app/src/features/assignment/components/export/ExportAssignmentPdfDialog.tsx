@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FileDown, Loader2 } from 'lucide-react';
+import { FileDown, FileText, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@ui/dialog';
 import { Button } from '@ui/button';
 import { Label } from '@ui/label';
@@ -10,6 +10,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useExportAssignmentPdf } from '../../hooks/useAssignmentApi';
 import type { ExportAssignmentPdfOptions, ExportPdfTheme } from '../../types';
 import { toast } from 'sonner';
+
+export const PDF_HEADER_STORAGE_KEY = 'pdf-export-header';
+
+interface PdfHeaderFields {
+  departmentName: string;
+  institutionName: string;
+  examPeriod: string;
+  examDuration: string;
+}
+
+function loadHeaderFields(): PdfHeaderFields {
+  try {
+    const raw = localStorage.getItem(PDF_HEADER_STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {
+    // ignore corrupt data
+  }
+  return { departmentName: '', institutionName: '', examPeriod: '', examDuration: '' };
+}
+
+function saveHeaderFields(fields: PdfHeaderFields) {
+  localStorage.setItem(PDF_HEADER_STORAGE_KEY, JSON.stringify(fields));
+}
 
 interface ExportAssignmentPdfDialogProps {
   open: boolean;
@@ -27,42 +50,79 @@ export const ExportAssignmentPdfDialog = ({
   const { t } = useTranslation('assignment', { keyPrefix: 'exportPdf' });
 
   const [theme, setTheme] = useState<ExportPdfTheme>('CLASSIC');
-  const [departmentName, setDepartmentName] = useState('');
-  const [institutionName, setInstitutionName] = useState('');
-  const [examPeriod, setExamPeriod] = useState('');
-  const [examDuration, setExamDuration] = useState('');
+  const [useExamHeader, setUseExamHeader] = useState(false);
+  const [headerFields, setHeaderFields] = useState<PdfHeaderFields>(loadHeaderFields);
   const [showChapter, setShowChapter] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
   const [showQuestionPoints, setShowQuestionPoints] = useState(true);
-  const [showAnswerKey, setShowAnswerKey] = useState(false);
-  const [showExplanations, setShowExplanations] = useState(false);
+
+  const updateHeaderField = useCallback((field: keyof PdfHeaderFields, value: string) => {
+    setHeaderFields((prev) => {
+      const next = { ...prev, [field]: value };
+      saveHeaderFields(next);
+      return next;
+    });
+  }, []);
 
   const exportPdf = useExportAssignmentPdf();
+  const [exportingType, setExportingType] = useState<'exam' | 'answer' | null>(null);
 
-  const handleExport = async () => {
-    const options: ExportAssignmentPdfOptions = {
-      theme,
-      headerConfig: {
-        departmentName: departmentName.trim() || null,
-        institutionName: institutionName.trim() || null,
-        examPeriod: examPeriod.trim() || null,
-        examDuration: examDuration.trim() || null,
-        showChapter,
-        showDescription,
-      },
-      showQuestionPoints,
-      showAnswerKey,
-      showExplanations,
-    };
+  const buildOptions = (overrides: Partial<ExportAssignmentPdfOptions> = {}): ExportAssignmentPdfOptions => ({
+    theme,
+    headerConfig: {
+      useExamHeader,
+      ...(useExamHeader
+        ? {
+            departmentName: headerFields.departmentName.trim() || null,
+            institutionName: headerFields.institutionName.trim() || null,
+            examPeriod: headerFields.examPeriod.trim() || null,
+            examDuration: headerFields.examDuration.trim() || null,
+          }
+        : {}),
+      showChapter,
+      showDescription,
+    },
+    showQuestionPoints,
+    showAnswerKey: false,
+    showExplanations: false,
+    ...overrides,
+  });
 
+  const handleExportExam = async () => {
+    setExportingType('exam');
     try {
-      await exportPdf.mutateAsync({ id: assignmentId, options, filename: assignmentTitle });
+      await exportPdf.mutateAsync({
+        id: assignmentId,
+        options: buildOptions(),
+        filename: assignmentTitle,
+      });
       toast.success(t('exportSuccess'));
       onOpenChange(false);
     } catch {
       toast.error(t('exportError'));
+    } finally {
+      setExportingType(null);
     }
   };
+
+  const handleExportAnswer = async () => {
+    setExportingType('answer');
+    try {
+      await exportPdf.mutateAsync({
+        id: assignmentId,
+        options: buildOptions({ showAnswerKey: true, showExplanations: true }),
+        filename: `${assignmentTitle} - ${t('answerSuffix')}`,
+      });
+      toast.success(t('exportSuccess'));
+      onOpenChange(false);
+    } catch {
+      toast.error(t('exportError'));
+    } finally {
+      setExportingType(null);
+    }
+  };
+
+  const isExporting = exportingType !== null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -90,34 +150,16 @@ export const ExportAssignmentPdfDialog = ({
             </Select>
           </div>
 
-          {/* Header fields */}
+          {/* Header options */}
           <div className="space-y-3">
             <Label className="text-muted-foreground text-xs font-normal uppercase tracking-wide">
               {t('header.label')}
             </Label>
             <div className="space-y-2">
-              <Input
-                value={departmentName}
-                onChange={(e) => setDepartmentName(e.target.value)}
-                placeholder={t('header.departmentName.placeholder')}
-              />
-              <Input
-                value={institutionName}
-                onChange={(e) => setInstitutionName(e.target.value)}
-                placeholder={t('header.institutionName.placeholder')}
-              />
-              <Input
-                value={examPeriod}
-                onChange={(e) => setExamPeriod(e.target.value)}
-                placeholder={t('header.examPeriod.placeholder')}
-              />
-              <Input
-                value={examDuration}
-                onChange={(e) => setExamDuration(e.target.value)}
-                placeholder={t('header.examDuration.placeholder')}
-              />
-            </div>
-            <div className="space-y-2">
+              <label className="flex cursor-pointer items-center gap-2 text-sm">
+                <Checkbox checked={useExamHeader} onCheckedChange={(v) => setUseExamHeader(Boolean(v))} />
+                {t('header.useExamHeader')}
+              </label>
               <label className="flex cursor-pointer items-center gap-2 text-sm">
                 <Checkbox checked={showChapter} onCheckedChange={(v) => setShowChapter(Boolean(v))} />
                 {t('header.showChapter')}
@@ -127,6 +169,30 @@ export const ExportAssignmentPdfDialog = ({
                 {t('header.showDescription')}
               </label>
             </div>
+            {useExamHeader && (
+              <div className="space-y-2">
+                <Input
+                  value={headerFields.departmentName}
+                  onChange={(e) => updateHeaderField('departmentName', e.target.value)}
+                  placeholder={t('header.departmentName.placeholder')}
+                />
+                <Input
+                  value={headerFields.institutionName}
+                  onChange={(e) => updateHeaderField('institutionName', e.target.value)}
+                  placeholder={t('header.institutionName.placeholder')}
+                />
+                <Input
+                  value={headerFields.examPeriod}
+                  onChange={(e) => updateHeaderField('examPeriod', e.target.value)}
+                  placeholder={t('header.examPeriod.placeholder')}
+                />
+                <Input
+                  value={headerFields.examDuration}
+                  onChange={(e) => updateHeaderField('examDuration', e.target.value)}
+                  placeholder={t('header.examDuration.placeholder')}
+                />
+              </div>
+            )}
           </div>
 
           {/* Content options */}
@@ -142,37 +208,26 @@ export const ExportAssignmentPdfDialog = ({
                 />
                 {t('content.showQuestionPoints')}
               </label>
-              <label className="flex cursor-pointer items-center gap-2 text-sm">
-                <Checkbox checked={showAnswerKey} onCheckedChange={(v) => setShowAnswerKey(Boolean(v))} />
-                {t('content.showAnswerKey')}
-              </label>
-              <label className="flex cursor-pointer items-center gap-2 text-sm">
-                <Checkbox
-                  checked={showExplanations}
-                  onCheckedChange={(v) => setShowExplanations(Boolean(v))}
-                />
-                {t('content.showExplanations')}
-              </label>
             </div>
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={exportPdf.isPending}>
-            {t('cancel')}
-          </Button>
-          <Button onClick={handleExport} disabled={exportPdf.isPending}>
-            {exportPdf.isPending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t('exporting')}
-              </>
+        <DialogFooter className="flex-col gap-2 sm:flex-col">
+          <Button onClick={handleExportExam} disabled={isExporting} className="w-full">
+            {exportingType === 'exam' ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-              <>
-                <FileDown className="mr-2 h-4 w-4" />
-                {t('export')}
-              </>
+              <FileDown className="mr-2 h-4 w-4" />
             )}
+            {t('exportExam')}
+          </Button>
+          <Button onClick={handleExportAnswer} disabled={isExporting} variant="outline" className="w-full">
+            {exportingType === 'answer' ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <FileText className="mr-2 h-4 w-4" />
+            )}
+            {t('exportAnswer')}
           </Button>
         </DialogFooter>
       </DialogContent>

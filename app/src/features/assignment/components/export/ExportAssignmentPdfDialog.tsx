@@ -27,7 +27,10 @@ export const ExportAssignmentPdfDialog = ({
   const { t } = useTranslation('assignment', { keyPrefix: 'exportPdf' });
 
   const [theme, setTheme] = useState<ExportPdfTheme>('CLASSIC');
-  const [schoolName, setSchoolName] = useState('');
+  const [departmentName, setDepartmentName] = useState('');
+  const [institutionName, setInstitutionName] = useState('');
+  const [examPeriod, setExamPeriod] = useState('');
+  const [examDuration, setExamDuration] = useState('');
   const [showChapter, setShowChapter] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
   const [showQuestionPoints, setShowQuestionPoints] = useState(true);
@@ -40,7 +43,10 @@ export const ExportAssignmentPdfDialog = ({
     const options: ExportAssignmentPdfOptions = {
       theme,
       headerConfig: {
-        schoolName: schoolName.trim() || null,
+        departmentName: departmentName.trim() || null,
+        institutionName: institutionName.trim() || null,
+        examPeriod: examPeriod.trim() || null,
+        examDuration: examDuration.trim() || null,
         showChapter,
         showDescription,
       },
@@ -84,34 +90,40 @@ export const ExportAssignmentPdfDialog = ({
             </Select>
           </div>
 
-          {/* School Name */}
-          <div className="space-y-2">
-            <Label>{t('schoolName.label')}</Label>
-            <Input
-              value={schoolName}
-              onChange={(e) => setSchoolName(e.target.value)}
-              placeholder={t('schoolName.placeholder')}
-            />
-          </div>
-
-          {/* Header options */}
-          <div className="space-y-2">
+          {/* Header fields */}
+          <div className="space-y-3">
             <Label className="text-muted-foreground text-xs font-normal uppercase tracking-wide">
               {t('header.label')}
             </Label>
             <div className="space-y-2">
+              <Input
+                value={departmentName}
+                onChange={(e) => setDepartmentName(e.target.value)}
+                placeholder={t('header.departmentName.placeholder')}
+              />
+              <Input
+                value={institutionName}
+                onChange={(e) => setInstitutionName(e.target.value)}
+                placeholder={t('header.institutionName.placeholder')}
+              />
+              <Input
+                value={examPeriod}
+                onChange={(e) => setExamPeriod(e.target.value)}
+                placeholder={t('header.examPeriod.placeholder')}
+              />
+              <Input
+                value={examDuration}
+                onChange={(e) => setExamDuration(e.target.value)}
+                placeholder={t('header.examDuration.placeholder')}
+              />
+            </div>
+            <div className="space-y-2">
               <label className="flex cursor-pointer items-center gap-2 text-sm">
-                <Checkbox
-                  checked={showChapter}
-                  onCheckedChange={(v) => setShowChapter(Boolean(v))}
-                />
+                <Checkbox checked={showChapter} onCheckedChange={(v) => setShowChapter(Boolean(v))} />
                 {t('header.showChapter')}
               </label>
               <label className="flex cursor-pointer items-center gap-2 text-sm">
-                <Checkbox
-                  checked={showDescription}
-                  onCheckedChange={(v) => setShowDescription(Boolean(v))}
-                />
+                <Checkbox checked={showDescription} onCheckedChange={(v) => setShowDescription(Boolean(v))} />
                 {t('header.showDescription')}
               </label>
             </div>
@@ -131,10 +143,7 @@ export const ExportAssignmentPdfDialog = ({
                 {t('content.showQuestionPoints')}
               </label>
               <label className="flex cursor-pointer items-center gap-2 text-sm">
-                <Checkbox
-                  checked={showAnswerKey}
-                  onCheckedChange={(v) => setShowAnswerKey(Boolean(v))}
-                />
+                <Checkbox checked={showAnswerKey} onCheckedChange={(v) => setShowAnswerKey(Boolean(v))} />
                 {t('content.showAnswerKey')}
               </label>
               <label className="flex cursor-pointer items-center gap-2 text-sm">

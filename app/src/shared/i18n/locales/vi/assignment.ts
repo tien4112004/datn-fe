@@ -1370,12 +1370,20 @@ export default {
       friendly: 'Thân thiện (NotoSans lớn)',
       compact: 'Thu gọn (NotoSans nhỏ)',
     },
-    schoolName: {
-      label: 'Tên trường (tùy chọn)',
-      placeholder: 'VD: Trường Tiểu học Nguyễn Du',
-    },
     header: {
-      label: 'Phần đầu',
+      label: 'Thông tin đề thi',
+      departmentName: {
+        placeholder: 'Tên sở/trường (VD: SỞ GD&ĐT TP. HỒ CHÍ MINH)',
+      },
+      institutionName: {
+        placeholder: 'Tên cơ sở trực tiếp (VD: TRƯỜNG TIỂU HỌC NGUYỄN DU)',
+      },
+      examPeriod: {
+        placeholder: 'Kỳ thi - Năm học (VD: KIỂM TRA GIỮA KỲ I - 2025-2026)',
+      },
+      examDuration: {
+        placeholder: 'Thời gian (VD: 40 phút)',
+      },
       showChapter: 'Hiện chương',
       showDescription: 'Hiện mô tả',
     },

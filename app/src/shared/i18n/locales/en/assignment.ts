@@ -1382,12 +1382,20 @@ export default {
       friendly: 'Friendly (Larger NotoSans)',
       compact: 'Compact (Dense NotoSans)',
     },
-    schoolName: {
-      label: 'School Name (optional)',
-      placeholder: 'e.g. Trường Tiểu học Nguyễn Du',
-    },
     header: {
-      label: 'Header',
+      label: 'Exam information',
+      departmentName: {
+        placeholder: 'Department/School (e.g. DEPARTMENT OF EDUCATION)',
+      },
+      institutionName: {
+        placeholder: 'Institution (e.g. NGUYEN DU PRIMARY SCHOOL)',
+      },
+      examPeriod: {
+        placeholder: 'Exam period (e.g. MID-TERM I - 2025-2026)',
+      },
+      examDuration: {
+        placeholder: 'Duration (e.g. 40 minutes)',
+      },
       showChapter: 'Show chapter',
       showDescription: 'Show description',
     },

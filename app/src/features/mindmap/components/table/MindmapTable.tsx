@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -6,13 +6,15 @@ import {
   type SortingState,
   type PaginationState,
   type Updater,
+  type ColumnDef,
 } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import DataTable from '@/components/table/DataTable';
-import { DocumentFilters } from '@/features/projects/components/DocumentFilters';
+import { DocumentFilters, type GroupByField } from '@/features/projects/components/DocumentFilters';
 import {
   useMindmaps,
+  useInfiniteMindmaps,
   useUpdateMindmapTitle,
   useDeleteMindmap,
   useUpdateMindmapChapter,
@@ -24,7 +26,7 @@ import EditChapterDialog from '@/features/projects/components/EditChapterDialog'
 import { toast } from 'sonner';
 import { ActionButton, ActionContent } from '@/features/presentation/components';
 import { formatDistance } from 'date-fns';
-import { BrainCircuit } from 'lucide-react';
+import { BrainCircuit, ChevronDown } from 'lucide-react';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { Badge } from '@ui/badge';
 import { getSubjectName, getGradeName, getSubjectBadgeClass } from '@aiprimary/core';
@@ -32,8 +34,27 @@ import ViewToggle, { type ViewMode } from '@/features/presentation/components/ot
 
 const columnHelper = createColumnHelper<Mindmap>();
 
+type ActiveGroupByField = Exclude<GroupByField, 'none'>;
+
+function groupItems<T extends { grade?: string; subject?: string; chapter?: string }>(
+  items: T[],
+  groupBy: ActiveGroupByField,
+  ungroupedLabel: string
+) {
+  const groups = new Map<string, T[]>();
+  for (const item of items) {
+    const key = item[groupBy] ?? '';
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(item);
+  }
+  return Array.from(groups.entries())
+    .sort(([a], [b]) => (!a ? 1 : !b ? -1 : a.localeCompare(b)))
+    .map(([key, items]) => ({ key, items }));
+}
+
 const MindmapTable = () => {
   const { t } = useTranslation('common', { keyPrefix: 'table' });
+  const { t: tProjects } = useTranslation('projects');
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -41,9 +62,10 @@ const MindmapTable = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isEditChapterOpen, setIsEditChapterOpen] = useState(false);
   const [selectedMindmap, setSelectedMindmap] = useState<Mindmap | null>(null);
+  const [groupBy, setGroupBy] = useState<GroupByField>('none');
+  const isGrouped = groupBy !== 'none';
 
   const viewMode = (searchParams.get('view') as ViewMode) || 'list';
-
   const setViewMode = (mode: ViewMode) => {
     setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
@@ -52,10 +74,9 @@ const MindmapTable = () => {
     });
   };
 
-  // Use the new hook
   const {
-    data,
-    isLoading,
+    data: pagedData,
+    isLoading: pagedLoading,
     sorting,
     setSorting,
     pagination,
@@ -66,6 +87,56 @@ const MindmapTable = () => {
     documentFilters,
     setDocumentFilters,
   } = useMindmaps();
+
+  const handleFiltersChange = (next: typeof documentFilters) => {
+    setDocumentFilters(next);
+    if (next.grade && next.subject) {
+      setGroupBy('chapter');
+    } else if (groupBy === 'chapter') {
+      setGroupBy('none');
+    }
+  };
+
+  const {
+    mindmaps: infiniteData,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+    isLoading: infiniteLoading,
+  } = useInfiniteMindmaps(isGrouped);
+
+  const data = isGrouped ? infiniteData : pagedData;
+  const isLoading = isGrouped ? infiniteLoading : pagedLoading;
+
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!isGrouped) return;
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) fetchNextPage();
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isGrouped, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const getGroupLabel = (key: string, field: GroupByField) => {
+    if (!key) return tProjects('groupBy.ungrouped');
+    if (field === 'grade') return getGradeName(key);
+    if (field === 'subject') return getSubjectName(key);
+    return key;
+  };
+
+  const groups = useMemo(
+    () =>
+      isGrouped
+        ? groupItems(data as Mindmap[], groupBy as ActiveGroupByField, tProjects('groupBy.ungrouped'))
+        : null,
+    [data, groupBy, isGrouped, tProjects]
+  );
 
   const updateMindmapTitleMutation = useUpdateMindmapTitle();
   const deleteMindmapMutation = useDeleteMindmap();
@@ -87,7 +158,6 @@ const MindmapTable = () => {
               />
             );
           }
-          // Fallback to icon
           return (
             <div className="bg-muted/50 flex aspect-video w-[160px] items-center justify-center rounded border">
               <BrainCircuit className="text-muted-foreground h-8 w-8" />
@@ -174,8 +244,7 @@ const MindmapTable = () => {
     [t]
   );
 
-  // Clone data to ensure fresh references for table
-  const tableData = useMemo(() => (data ? data.map((d) => ({ ...d })) : []), [data]);
+  const tableData = useMemo(() => (pagedData ? pagedData.map((d) => ({ ...d })) : []), [pagedData]);
 
   const table = useReactTable({
     data: tableData,
@@ -186,36 +255,24 @@ const MindmapTable = () => {
     enableColumnResizing: true,
     columnResizeMode: 'onChange',
     columnResizeDirection: 'ltr',
-    state: {
-      sorting,
-      pagination,
-    },
+    state: { sorting, pagination },
     rowCount: totalItems,
     onSortingChange: setSorting as any as (updaterOrValue: Updater<SortingState>) => void,
     onPaginationChange: setPagination as any as (updaterOrValue: Updater<PaginationState>) => void,
   });
 
-  // Ensure table uses latest data by updating options when data changes
   useEffect(() => {
     table.setOptions((prev) => ({
       ...prev,
-      data: data ? data.map((d) => ({ ...d })) : [],
+      data: pagedData ? pagedData.map((d) => ({ ...d })) : [],
     }));
-  }, [data, table]);
-
-  const handleSearchChange = (newSearch: string) => {
-    setSearch(newSearch);
-  };
+  }, [pagedData, table]);
 
   const handleRename = async (id: string, newName: string) => {
     try {
       await updateMindmapTitleMutation.mutateAsync({ id, name: newName });
       setSelectedMindmap((prev) => (prev ? { ...prev, title: newName } : prev));
-      toast.success(
-        t('mindmap.renameSuccess', {
-          filename: newName,
-        })
-      ); // TODO: move to hook, set i18n
+      toast.success(t('mindmap.renameSuccess', { filename: newName }));
     } catch (error) {
       toast.error(t('renameError'));
       console.error('Failed to rename mindmap:', error);
@@ -229,7 +286,6 @@ const MindmapTable = () => {
 
   const handleConfirmDelete = async () => {
     if (!selectedMindmap) return;
-
     try {
       await deleteMindmapMutation.mutateAsync(selectedMindmap.id);
       toast.success(t('mindmap.deleteSuccess', { name: selectedMindmap.title }));
@@ -246,48 +302,24 @@ const MindmapTable = () => {
     setSelectedMindmap(null);
   };
 
-  return (
-    <div className="w-full space-y-4">
-      <DocumentFilters
-        filters={documentFilters}
-        onChange={setDocumentFilters}
-        searchQuery={search}
-        onSearchChange={handleSearchChange}
-        searchPlaceholder={t('mindmap.searchPlaceholder')}
-        RightComponent={<ViewToggle value={viewMode} onValueChange={setViewMode} />}
-      />
+  const filtersNode = (
+    <DocumentFilters
+      filters={documentFilters}
+      onChange={handleFiltersChange}
+      searchQuery={search}
+      onSearchChange={setSearch}
+      searchPlaceholder={t('mindmap.searchPlaceholder')}
+      groupBy={groupBy}
+      onGroupByChange={setGroupBy}
+      RightComponent={<ViewToggle value={viewMode} onValueChange={setViewMode} />}
+    />
+  );
 
-      <DataTable
-        table={table}
-        isLoading={isLoading}
-        onClickRow={(row) => {
-          navigate(`/mindmap/${row.original.id}`, { replace: false });
-        }}
-        rowStyle="transition cursor-pointer"
-        emptyState={<div className="text-muted-foreground">{t('mindmap.emptyState')}</div>}
-        contextMenu={(row) => (
-          <ActionContent
-            onViewDetail={() => {
-              navigate(`/mindmap/${row.original.id}`);
-            }}
-            onDelete={() => {
-              handleDelete(row.original);
-            }}
-            onRename={() => {
-              setSelectedMindmap(row.original);
-              setIsRenameOpen(true);
-            }}
-            onEditChapter={() => {
-              setSelectedMindmap(row.original);
-              setIsEditChapterOpen(true);
-            }}
-          />
-        )}
-      />
-
+  const dialogs = (
+    <>
       <RenameFileDialog
         isOpen={isRenameOpen}
-        onOpenChange={(o) => setIsRenameOpen(o)}
+        onOpenChange={setIsRenameOpen}
         project={{
           id: selectedMindmap?.id || '',
           filename: selectedMindmap?.title || '',
@@ -325,8 +357,141 @@ const MindmapTable = () => {
         }}
         isPending={updateMindmapChapter.isPending}
       />
+    </>
+  );
+
+  if (!isGrouped) {
+    return (
+      <div className="w-full space-y-4">
+        {filtersNode}
+        <DataTable
+          table={table}
+          isLoading={isLoading}
+          onClickRow={(row) => navigate(`/mindmap/${row.original.id}`, { replace: false })}
+          rowStyle="transition cursor-pointer"
+          emptyState={<div className="text-muted-foreground">{t('mindmap.emptyState')}</div>}
+          contextMenu={(row) => (
+            <ActionContent
+              onViewDetail={() => navigate(`/mindmap/${row.original.id}`)}
+              onDelete={() => handleDelete(row.original)}
+              onRename={() => {
+                setSelectedMindmap(row.original);
+                setIsRenameOpen(true);
+              }}
+              onEditChapter={() => {
+                setSelectedMindmap(row.original);
+                setIsEditChapterOpen(true);
+              }}
+            />
+          )}
+        />
+        {dialogs}
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full space-y-4">
+      {filtersNode}
+      {isLoading ? (
+        <div className="text-muted-foreground py-8 text-center text-sm">...</div>
+      ) : data.length === 0 ? (
+        <div className="text-muted-foreground">{t('mindmap.emptyState')}</div>
+      ) : (
+        <div className="space-y-8">
+          {groups!.map(({ key, items }) => (
+            <MindmapGroupSection
+              key={key}
+              label={getGroupLabel(key, groupBy)}
+              items={items}
+              columns={columns as ColumnDef<Mindmap, any>[]}
+              sorting={sorting}
+              onSortingChange={setSorting as any}
+              onRowClick={(m) => navigate(`/mindmap/${m.id}`, { replace: false })}
+              onDelete={handleDelete}
+              onRename={(m) => {
+                setSelectedMindmap(m);
+                setIsRenameOpen(true);
+              }}
+              onEditChapter={(m) => {
+                setSelectedMindmap(m);
+                setIsEditChapterOpen(true);
+              }}
+            />
+          ))}
+        </div>
+      )}
+      <div ref={sentinelRef} className="py-2 text-center">
+        {isFetchingNextPage && <span className="text-muted-foreground text-sm">...</span>}
+      </div>
+      {dialogs}
     </div>
   );
 };
+
+function MindmapGroupSection({
+  label,
+  items,
+  columns,
+  sorting,
+  onSortingChange,
+  onRowClick,
+  onDelete,
+  onRename,
+  onEditChapter,
+}: {
+  label: string;
+  items: Mindmap[];
+  columns: ColumnDef<Mindmap, any>[];
+  sorting: SortingState;
+  onSortingChange: (s: SortingState) => void;
+  onRowClick: (m: Mindmap) => void;
+  onDelete: (m: Mindmap) => void;
+  onRename: (m: Mindmap) => void;
+  onEditChapter: (m: Mindmap) => void;
+}) {
+  const [collapsed, setCollapsed] = useState(false);
+
+  const table = useReactTable({
+    data: items,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    manualSorting: true,
+    state: { sorting },
+    onSortingChange,
+  });
+
+  return (
+    <div className="space-y-2">
+      <button onClick={() => setCollapsed((v) => !v)} className="flex w-full items-center gap-2 text-left">
+        <ChevronDown
+          className={`text-muted-foreground h-4 w-4 shrink-0 transition-transform duration-200 ${collapsed ? '-rotate-90' : ''}`}
+        />
+        <h2 className="text-muted-foreground text-sm font-semibold uppercase tracking-wide">
+          {label}
+          <span className="ml-2 font-normal normal-case">({items.length})</span>
+        </h2>
+      </button>
+      {!collapsed && (
+        <DataTable
+          table={table}
+          isLoading={false}
+          onClickRow={(row) => onRowClick(row.original)}
+          rowStyle="transition cursor-pointer"
+          showPagination={false}
+          emptyState={null}
+          contextMenu={(row) => (
+            <ActionContent
+              onViewDetail={() => onRowClick(row.original)}
+              onDelete={() => onDelete(row.original)}
+              onRename={() => onRename(row.original)}
+              onEditChapter={() => onEditChapter(row.original)}
+            />
+          )}
+        />
+      )}
+    </div>
+  );
+}
 
 export default MindmapTable;

@@ -1,18 +1,21 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   createColumnHelper,
   getCoreRowModel,
   useReactTable,
   type PaginationState,
   type Updater,
+  type ColumnDef,
+  type SortingState,
 } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import DataTable from '@/components/table/DataTable';
-import { DocumentFilters } from '@/features/projects/components/DocumentFilters';
+import { DocumentFilters, type GroupByField } from '@/features/projects/components/DocumentFilters';
 import { useAssignmentListStore } from '@/features/assignment/stores/useAssignmentListStore';
 import {
   useAssignmentList,
+  useInfiniteAssignmentList,
   useDeleteAssignment,
   useUpdateAssignmentChapter,
 } from '@/features/assignment/hooks/useAssignmentApi';
@@ -27,11 +30,31 @@ import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { Badge } from '@ui/badge';
 import { getSubjectName, getGradeName, getSubjectBadgeClass } from '@aiprimary/core';
 import ViewToggle, { type ViewMode } from '@/features/presentation/components/others/ViewToggle';
+import { ChevronDown } from 'lucide-react';
 
 const columnHelper = createColumnHelper<Assignment>();
 
+type ActiveGroupByField = Exclude<GroupByField, 'none'>;
+
+function groupItems<T extends { grade?: string; subject?: string; chapter?: string }>(
+  items: T[],
+  groupBy: ActiveGroupByField,
+  ungroupedLabel: string
+) {
+  const groups = new Map<string, T[]>();
+  for (const item of items) {
+    const key = item[groupBy] ?? '';
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(item);
+  }
+  return Array.from(groups.entries())
+    .sort(([a], [b]) => (!a ? 1 : !b ? -1 : a.localeCompare(b)))
+    .map(([key, items]) => ({ key, items }));
+}
+
 const AssignmentTable = () => {
   const { t } = useTranslation('common', { keyPrefix: 'table' });
+  const { t: tProjects } = useTranslation('projects');
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -39,11 +62,22 @@ const AssignmentTable = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isEditChapterOpen, setIsEditChapterOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
+  const [groupBy, setGroupBy] = useState<GroupByField>('none');
+  const isGrouped = groupBy !== 'none';
+
   const { search, documentFilters, pagination, setSearch, setDocumentFilters, setPagination } =
     useAssignmentListStore();
 
-  const viewMode = (searchParams.get('view') as ViewMode) || 'list';
+  const handleFiltersChange = (next: typeof documentFilters) => {
+    setDocumentFilters(next);
+    if (next.grade && next.subject) {
+      setGroupBy('chapter');
+    } else if (groupBy === 'chapter') {
+      setGroupBy('none');
+    }
+  };
 
+  const viewMode = (searchParams.get('view') as ViewMode) || 'list';
   const setViewMode = (mode: ViewMode) => {
     setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
@@ -52,20 +86,67 @@ const AssignmentTable = () => {
     });
   };
 
-  // Fetch assignments
-  const { data: assignmentsResponse, isLoading } = useAssignmentList({
+  const { data: assignmentsResponse, isLoading: pagedLoading } = useAssignmentList({
     searchText: search,
     page: pagination.pageIndex + 1,
     size: pagination.pageSize,
     grade: documentFilters.grade,
     subject: documentFilters.subject,
     chapter: documentFilters.chapter,
+    enabled: !isGrouped,
+  } as any);
+
+  const {
+    assignments: infiniteData,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+    isLoading: infiniteLoading,
+  } = useInfiniteAssignmentList({
+    searchText: search,
+    grade: documentFilters.grade,
+    subject: documentFilters.subject,
+    chapter: documentFilters.chapter,
+    enabled: isGrouped,
   });
+
+  const pagedAssignments = useMemo(() => assignmentsResponse?.assignments || [], [assignmentsResponse]);
+  const totalItems = assignmentsResponse?.total || 0;
+  const data = isGrouped ? infiniteData : pagedAssignments;
+  const isLoading = isGrouped ? infiniteLoading : pagedLoading;
+
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!isGrouped) return;
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) fetchNextPage();
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isGrouped, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const getGroupLabel = (key: string, field: GroupByField) => {
+    if (!key) return tProjects('groupBy.ungrouped');
+    if (field === 'grade') return getGradeName(key);
+    if (field === 'subject') return getSubjectName(key);
+    return key;
+  };
+
+  const groups = useMemo(
+    () =>
+      isGrouped
+        ? groupItems(data as Assignment[], groupBy as ActiveGroupByField, tProjects('groupBy.ungrouped'))
+        : null,
+    [data, groupBy, isGrouped, tProjects]
+  );
+
   const deleteAssignment = useDeleteAssignment();
   const updateAssignmentChapter = useUpdateAssignmentChapter();
-
-  const data = useMemo(() => assignmentsResponse?.assignments || [], [assignmentsResponse]);
-  const totalItems = assignmentsResponse?.total || 0;
 
   const columns = useMemo(
     () => [
@@ -75,7 +156,6 @@ const AssignmentTable = () => {
         minSize: 200,
         meta: { isGrow: true },
       }),
-
       columnHelper.accessor('subject', {
         header: t('assignment.subject'),
         cell: (info) => {
@@ -102,7 +182,6 @@ const AssignmentTable = () => {
         },
         size: 100,
       }),
-
       columnHelper.accessor('updatedAt', {
         header: t('assignment.updatedAt'),
         cell: (info) =>
@@ -144,8 +223,7 @@ const AssignmentTable = () => {
     [t]
   );
 
-  // Clone data to ensure fresh references for table
-  const tableData = useMemo(() => data.map((d) => ({ ...d })), [data]);
+  const tableData = useMemo(() => pagedAssignments.map((d) => ({ ...d })), [pagedAssignments]);
 
   const table = useReactTable({
     data: tableData,
@@ -156,28 +234,20 @@ const AssignmentTable = () => {
     enableColumnResizing: true,
     columnResizeMode: 'onChange',
     columnResizeDirection: 'ltr',
-    state: {
-      pagination,
-    },
+    state: { pagination },
     rowCount: totalItems,
     onPaginationChange: setPagination as any as (updaterOrValue: Updater<PaginationState>) => void,
   });
 
-  // Ensure table uses latest data by updating options when data changes
   useEffect(() => {
     table.setOptions((prev) => ({
       ...prev,
-      data: data.map((d) => ({ ...d })),
+      data: pagedAssignments.map((d) => ({ ...d })),
     }));
-  }, [data, table]);
-
-  const handleSearchChange = (newSearch: string) => {
-    setSearch(newSearch);
-  };
+  }, [pagedAssignments, table]);
 
   const handleRename = async (_id: string, newName: string) => {
     try {
-      // TODO: Implement update assignment title mutation
       setSelectedAssignment((prev) => (prev ? { ...prev, title: newName } : prev));
       toast.success(t('assignment.renameSuccess'));
       setIsRenameOpen(false);
@@ -194,7 +264,6 @@ const AssignmentTable = () => {
 
   const handleConfirmDelete = async () => {
     if (!selectedAssignment) return;
-
     try {
       await deleteAssignment.mutateAsync(selectedAssignment.id);
       toast.success(t('assignment.deleteSuccess', { name: selectedAssignment.title }));
@@ -211,48 +280,24 @@ const AssignmentTable = () => {
     setSelectedAssignment(null);
   };
 
-  return (
-    <div className="w-full space-y-4">
-      <DocumentFilters
-        filters={documentFilters}
-        onChange={setDocumentFilters}
-        searchQuery={search}
-        onSearchChange={handleSearchChange}
-        searchPlaceholder={t('assignment.searchPlaceholder')}
-        RightComponent={<ViewToggle value={viewMode} onValueChange={setViewMode} />}
-      />
+  const filtersNode = (
+    <DocumentFilters
+      filters={documentFilters}
+      onChange={handleFiltersChange}
+      searchQuery={search}
+      onSearchChange={setSearch}
+      searchPlaceholder={t('assignment.searchPlaceholder')}
+      groupBy={groupBy}
+      onGroupByChange={setGroupBy}
+      RightComponent={<ViewToggle value={viewMode} onValueChange={setViewMode} />}
+    />
+  );
 
-      <DataTable
-        table={table}
-        isLoading={isLoading}
-        onClickRow={(row) => {
-          navigate(`/assignment/${row.original.id}`, { replace: false });
-        }}
-        rowStyle="transition cursor-pointer"
-        emptyState={<div className="text-muted-foreground">{t('assignment.emptyState')}</div>}
-        contextMenu={(row) => (
-          <ActionContent
-            onViewDetail={() => {
-              navigate(`/assignment/${row.original.id}`);
-            }}
-            onDelete={() => {
-              handleDelete(row.original);
-            }}
-            onRename={() => {
-              setSelectedAssignment(row.original);
-              setIsRenameOpen(true);
-            }}
-            onEditChapter={() => {
-              setSelectedAssignment(row.original);
-              setIsEditChapterOpen(true);
-            }}
-          />
-        )}
-      />
-
+  const dialogs = (
+    <>
       <RenameFileDialog
         isOpen={isRenameOpen}
-        onOpenChange={(o) => setIsRenameOpen(o)}
+        onOpenChange={setIsRenameOpen}
         project={{
           id: selectedAssignment?.id || '',
           filename: selectedAssignment?.title || '',
@@ -290,8 +335,133 @@ const AssignmentTable = () => {
         }}
         isPending={updateAssignmentChapter.isPending}
       />
+    </>
+  );
+
+  if (!isGrouped) {
+    return (
+      <div className="w-full space-y-4">
+        {filtersNode}
+        <DataTable
+          table={table}
+          isLoading={isLoading}
+          onClickRow={(row) => navigate(`/assignment/${row.original.id}`, { replace: false })}
+          rowStyle="transition cursor-pointer"
+          emptyState={<div className="text-muted-foreground">{t('assignment.emptyState')}</div>}
+          contextMenu={(row) => (
+            <ActionContent
+              onViewDetail={() => navigate(`/assignment/${row.original.id}`)}
+              onDelete={() => handleDelete(row.original)}
+              onRename={() => {
+                setSelectedAssignment(row.original);
+                setIsRenameOpen(true);
+              }}
+              onEditChapter={() => {
+                setSelectedAssignment(row.original);
+                setIsEditChapterOpen(true);
+              }}
+            />
+          )}
+        />
+        {dialogs}
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full space-y-4">
+      {filtersNode}
+      {isLoading ? (
+        <div className="text-muted-foreground py-8 text-center text-sm">...</div>
+      ) : data.length === 0 ? (
+        <div className="text-muted-foreground">{t('assignment.emptyState')}</div>
+      ) : (
+        <div className="space-y-8">
+          {groups!.map(({ key, items }) => (
+            <AssignmentGroupSection
+              key={key}
+              label={getGroupLabel(key, groupBy)}
+              items={items}
+              columns={columns as ColumnDef<Assignment, any>[]}
+              onRowClick={(a) => navigate(`/assignment/${a.id}`, { replace: false })}
+              onDelete={handleDelete}
+              onRename={(a) => {
+                setSelectedAssignment(a);
+                setIsRenameOpen(true);
+              }}
+              onEditChapter={(a) => {
+                setSelectedAssignment(a);
+                setIsEditChapterOpen(true);
+              }}
+            />
+          ))}
+        </div>
+      )}
+      <div ref={sentinelRef} className="py-2 text-center">
+        {isFetchingNextPage && <span className="text-muted-foreground text-sm">...</span>}
+      </div>
+      {dialogs}
     </div>
   );
 };
+
+function AssignmentGroupSection({
+  label,
+  items,
+  columns,
+  onRowClick,
+  onDelete,
+  onRename,
+  onEditChapter,
+}: {
+  label: string;
+  items: Assignment[];
+  columns: ColumnDef<Assignment, any>[];
+  onRowClick: (a: Assignment) => void;
+  onDelete: (a: Assignment) => void;
+  onRename: (a: Assignment) => void;
+  onEditChapter: (a: Assignment) => void;
+}) {
+  const [collapsed, setCollapsed] = useState(false);
+
+  const table = useReactTable({
+    data: items,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    state: {},
+  });
+
+  return (
+    <div className="space-y-2">
+      <button onClick={() => setCollapsed((v) => !v)} className="flex w-full items-center gap-2 text-left">
+        <ChevronDown
+          className={`text-muted-foreground h-4 w-4 shrink-0 transition-transform duration-200 ${collapsed ? '-rotate-90' : ''}`}
+        />
+        <h2 className="text-muted-foreground text-sm font-semibold uppercase tracking-wide">
+          {label}
+          <span className="ml-2 font-normal normal-case">({items.length})</span>
+        </h2>
+      </button>
+      {!collapsed && (
+        <DataTable
+          table={table}
+          isLoading={false}
+          onClickRow={(row) => onRowClick(row.original)}
+          rowStyle="transition cursor-pointer"
+          showPagination={false}
+          emptyState={null}
+          contextMenu={(row) => (
+            <ActionContent
+              onViewDetail={() => onRowClick(row.original)}
+              onDelete={() => onDelete(row.original)}
+              onRename={() => onRename(row.original)}
+              onEditChapter={() => onEditChapter(row.original)}
+            />
+          )}
+        />
+      )}
+    </div>
+  );
+}
 
 export default AssignmentTable;

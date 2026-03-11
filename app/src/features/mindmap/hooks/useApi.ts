@@ -1,4 +1,10 @@
-import { useQuery, useMutation, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+  type UseQueryResult,
+} from '@tanstack/react-query';
 import type { SortingState, PaginationState, Updater } from '@tanstack/react-table';
 import { useMindmapApiService } from '../api';
 import { useEffect } from 'react';
@@ -103,6 +109,38 @@ export const useMindmaps = (): UseMindmapsReturn => {
     setDocumentFilters,
     ...query,
   };
+};
+
+export const useInfiniteMindmaps = (enabled = true) => {
+  const mindmapApiService = useMindmapApiService();
+  const { search, sorting, documentFilters } = useMindmapListStore();
+  const PAGE_SIZE = 20;
+
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
+    queryKey: [mindmapApiService.getType(), 'mindmaps', 'infinite', sorting, search, documentFilters],
+    queryFn: async ({ pageParam }) => {
+      return mindmapApiService.getMindmaps({
+        page: pageParam as number,
+        pageSize: PAGE_SIZE,
+        sort: sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined,
+        filter: search.trim() || undefined,
+        grade: documentFilters.grade,
+        subject: documentFilters.subject,
+        chapter: documentFilters.chapter,
+      });
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: any) => {
+      const { currentPage, totalPages } = lastPage.pagination ?? {};
+      if (currentPage == null || totalPages == null) return undefined;
+      return currentPage < totalPages ? currentPage + 1 : undefined;
+    },
+    staleTime: 30000,
+    enabled,
+  });
+
+  const mindmaps = data?.pages.flatMap((p: any) => p.data as Mindmap[]) ?? [];
+  return { mindmaps, hasNextPage: hasNextPage ?? false, fetchNextPage, isFetchingNextPage, isLoading };
 };
 
 export const useMindmapById = (id: string | undefined) => {

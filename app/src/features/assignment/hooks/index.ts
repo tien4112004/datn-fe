@@ -3,6 +3,7 @@ export * from '@/features/question-bank/hooks/useQuestionBankApi';
 export * from './useDirtyFormTracking';
 export {
   useAssignmentList,
+  useInfiniteAssignmentList,
   useAssignment,
   useAssignmentByPost,
   useCreateAssignment,

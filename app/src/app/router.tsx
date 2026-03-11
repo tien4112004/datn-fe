@@ -5,8 +5,10 @@ import { CriticalError } from '@aiprimary/api';
 import { TeacherRoute } from '@/shared/components/TeacherRoute';
 import { StudentRoute } from '@/shared/components/StudentRoute';
 import { FeedTab } from '@/features/classes/class-feed';
+import { docsRoutes } from '@/docs/router';
 
 const router = createBrowserRouter([
+  ...docsRoutes,
   {
     path: '/login',
     lazy: async () => ({

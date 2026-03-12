@@ -571,12 +571,12 @@ export function usePostMutations() {
  * Hook for fetching all resources in a class
  * Returns all linked resources across all posts in the class
  */
-export function useClassResources(classId: string) {
+export function useClassResources(classId: string, params?: { search?: string; type?: string }) {
   const classFeedApi = useClassFeedApiService();
 
   const resourcesQuery = useQuery({
-    queryKey: feedQueryKeys.resources(classId),
-    queryFn: () => classFeedApi.getAllResourcesInClass(classId),
+    queryKey: [...feedQueryKeys.resources(classId), params],
+    queryFn: () => classFeedApi.getAllResourcesInClass(classId, params),
     enabled: !!classId,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes

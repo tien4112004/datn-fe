@@ -16,6 +16,7 @@ export type { DashboardApiService } from './types';
 export type {
   DocumentItem,
   RecentDocumentsRequest,
+  AllDocumentsRequest,
   TeacherSummary,
   GradingQueueItem,
   AtRiskStudent,

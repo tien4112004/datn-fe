@@ -4,6 +4,7 @@ export * from './useGenerationApi';
 export * from './useDirtyFormTracking';
 export {
   useAssignmentList,
+  useInfiniteAssignmentList,
   useAssignment,
   useAssignmentByPost,
   useCreateAssignment,

@@ -16,6 +16,18 @@ export const RecentDocuments = () => {
     assignment: ClipboardList,
   };
 
+  const documentTypeColors: Record<string, string> = {
+    presentation: 'bg-amber-50 dark:bg-amber-950/40',
+    mindmap: 'bg-purple-50 dark:bg-purple-950/40',
+    assignment: 'bg-blue-50 dark:bg-blue-950/40',
+  };
+
+  const documentTypeIconColors: Record<string, string> = {
+    presentation: 'text-amber-500',
+    mindmap: 'text-purple-500',
+    assignment: 'text-blue-500',
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const relativeTime = formatDistanceToNow(date, {
@@ -86,8 +98,12 @@ export const RecentDocuments = () => {
                       className="h-full w-full object-cover transition-transform group-hover:scale-105"
                     />
                   ) : (
-                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-                      <Icon className="text-muted-foreground h-8 w-8 sm:h-12 sm:w-12" />
+                    <div
+                      className={`flex h-full items-center justify-center ${documentTypeColors[doc.type] ?? 'bg-muted/50'}`}
+                    >
+                      <Icon
+                        className={`h-8 w-8 sm:h-12 sm:w-12 ${documentTypeIconColors[doc.type] ?? 'text-muted-foreground'}`}
+                      />
                     </div>
                   )}
                 </div>

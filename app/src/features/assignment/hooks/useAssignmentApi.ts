@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { getAssignmentApiService } from '../api';
 import { assignmentKeys } from '../api/assignmentApi';
 import type {
@@ -34,7 +34,7 @@ export const useAssignmentList = (filters?: AssignmentListFilters) => {
     queryFn: async () => {
       const response = await service.getAssignments({
         classId: filters?.classId,
-        search: filters?.searchText,
+        filter: filters?.searchText,
         page: filters?.page,
         size: filters?.size,
         grade: filters?.grade,
@@ -48,6 +48,39 @@ export const useAssignmentList = (filters?: AssignmentListFilters) => {
     },
     staleTime: 30 * 1000, // 30 seconds
   });
+};
+
+export const useInfiniteAssignmentList = (
+  filters?: Omit<AssignmentListFilters, 'page' | 'size'> & { enabled?: boolean }
+) => {
+  const service = getAssignmentApiService();
+  const { enabled = true, ...params } = filters ?? {};
+  const PAGE_SIZE = 20;
+
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
+    queryKey: [...assignmentKeys.list(params), 'infinite'],
+    queryFn: async ({ pageParam }) => {
+      return service.getAssignments({
+        filter: params.searchText,
+        page: pageParam as number,
+        size: PAGE_SIZE,
+        grade: params.grade,
+        subject: params.subject,
+        chapter: params.chapter,
+      });
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: any) => {
+      const { currentPage, totalPages } = lastPage.pagination ?? {};
+      if (currentPage == null || totalPages == null) return undefined;
+      return currentPage < totalPages ? currentPage + 1 : undefined;
+    },
+    staleTime: 30 * 1000,
+    enabled,
+  });
+
+  const assignments = data?.pages.flatMap((p: any) => p.data ?? []) ?? [];
+  return { assignments, hasNextPage: hasNextPage ?? false, fetchNextPage, isFetchingNextPage, isLoading };
 };
 
 /**
@@ -211,6 +244,9 @@ export const useUpdateAssignmentChapter = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: assignmentKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: ['real', 'allDocuments'] });
+      queryClient.invalidateQueries({ queryKey: ['real', 'allDocumentsInfinite'] });
+      queryClient.invalidateQueries({ queryKey: ['real', 'recentDocuments'] });
     },
   });
 };

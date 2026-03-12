@@ -3,6 +3,7 @@ import type {
   DashboardApiService,
   DocumentItem,
   RecentDocumentsRequest,
+  AllDocumentsRequest,
   TeacherSummary,
   GradingQueueItem,
   ClassAtRiskStudents,
@@ -41,6 +42,21 @@ export default class DashboardService implements DashboardApiService {
       })),
       pagination: response.data.pagination,
     };
+  }
+
+  async getAllDocuments(request?: AllDocumentsRequest): Promise<ApiResponse<DocumentItem[]>> {
+    const response = await this.apiClient.get<ApiResponse<DocumentItem[]>>(`${this.baseUrl}/api/documents`, {
+      params: {
+        page: request?.page ?? 1,
+        pageSize: request?.pageSize ?? 20,
+        sort: request?.sort ?? 'desc',
+        filter: request?.filter,
+        subject: request?.subject,
+        grade: request?.grade,
+        chapter: request?.chapter,
+      },
+    });
+    return response.data;
   }
 
   // Analytics API methods

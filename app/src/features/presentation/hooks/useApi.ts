@@ -100,6 +100,45 @@ export const usePresentations = (): UsePresentationsReturn => {
   };
 };
 
+export const useInfinitePresentations = (enabled = true) => {
+  const presentationApiService = usePresentationApiService();
+  const { search, sorting, documentFilters } = usePresentationListStore();
+  const PAGE_SIZE = 20;
+
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
+    queryKey: [
+      presentationApiService.getType(),
+      'presentations',
+      'infinite',
+      sorting,
+      search,
+      documentFilters,
+    ],
+    queryFn: async ({ pageParam }) => {
+      return presentationApiService.getPresentations({
+        page: pageParam as number,
+        pageSize: PAGE_SIZE,
+        sort: sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined,
+        filter: search.trim() || undefined,
+        grade: documentFilters.grade,
+        subject: documentFilters.subject,
+        chapter: documentFilters.chapter,
+      });
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: any) => {
+      const { currentPage, totalPages } = lastPage.pagination ?? {};
+      if (currentPage == null || totalPages == null) return undefined;
+      return currentPage < totalPages ? currentPage + 1 : undefined;
+    },
+    staleTime: 30000,
+    enabled,
+  });
+
+  const presentations = data?.pages.flatMap((p: any) => p.data as Presentation[]) ?? [];
+  return { presentations, hasNextPage: hasNextPage ?? false, fetchNextPage, isFetchingNextPage, isLoading };
+};
+
 export const useCreateBlankPresentation = () => {
   const presentationApiService = usePresentationApiService();
   const queryClient = useQueryClient();
@@ -364,9 +403,11 @@ export const useUpdatePresentationChapter = () => {
       return id;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [presentationApiService.getType(), 'presentations'],
-      });
+      const type = presentationApiService.getType();
+      queryClient.invalidateQueries({ queryKey: [type, 'presentations'] });
+      queryClient.invalidateQueries({ queryKey: [type, 'allDocuments'] });
+      queryClient.invalidateQueries({ queryKey: [type, 'allDocumentsInfinite'] });
+      queryClient.invalidateQueries({ queryKey: [type, 'recentDocuments'] });
     },
   });
 };

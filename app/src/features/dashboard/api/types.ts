@@ -6,10 +6,23 @@ export interface DocumentItem {
   thumbnail?: string;
   updatedAt: string;
   type: 'presentation' | 'mindmap' | 'assignment';
+  grade?: string;
+  subject?: string;
+  chapter?: string;
 }
 
 export interface RecentDocumentsRequest {
   limit?: number;
+}
+
+export interface AllDocumentsRequest {
+  page?: number;
+  pageSize?: number;
+  sort?: string;
+  filter?: string;
+  subject?: string;
+  grade?: string;
+  chapter?: string;
 }
 
 // Analytics Types (based on backend API)
@@ -156,6 +169,7 @@ export interface RecentActivity {
 export interface DashboardApiService {
   getType(): 'real' | 'mock';
   getRecentDocuments(request?: RecentDocumentsRequest): Promise<ApiResponse<DocumentItem[]>>;
+  getAllDocuments(request?: AllDocumentsRequest): Promise<ApiResponse<DocumentItem[]>>;
 
   // Analytics endpoints
   getTeacherSummary(): Promise<ApiResponse<TeacherSummary>>;

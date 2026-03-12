@@ -55,7 +55,7 @@ const EditChapterDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[420px]">
+      <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
           <DialogTitle>{t('actions.editChapter')}</DialogTitle>
         </DialogHeader>
@@ -65,7 +65,7 @@ const EditChapterDialog = ({
             <div className="space-y-1.5">
               <Label className="text-sm font-medium">{tCommon('grade')}</Label>
               <Select value={grade} onValueChange={setGrade}>
-                <SelectTrigger>
+                <SelectTrigger className="truncate">
                   <SelectValue placeholder={tCommon('grade')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -81,7 +81,7 @@ const EditChapterDialog = ({
             <div className="space-y-1.5">
               <Label className="text-sm font-medium">{tCommon('subject')}</Label>
               <Select value={subject} onValueChange={setSubject}>
-                <SelectTrigger>
+                <SelectTrigger className="truncate">
                   <SelectValue placeholder={tCommon('subject')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -102,7 +102,7 @@ const EditChapterDialog = ({
               onValueChange={setChapter}
               disabled={!grade || !subject || chaptersLoading}
             >
-              <SelectTrigger>
+              <SelectTrigger className="truncate">
                 <SelectValue
                   placeholder={
                     !grade || !subject
@@ -115,9 +115,9 @@ const EditChapterDialog = ({
                   }
                 />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-w-[460px]">
                 {chapters.map((ch) => (
-                  <SelectItem key={ch.id} value={ch.name}>
+                  <SelectItem key={ch.id} value={ch.name} className="whitespace-normal">
                     {ch.name}
                   </SelectItem>
                 ))}

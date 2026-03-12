@@ -1,4 +1,4 @@
-export { useRecentDocuments } from './useApi';
+export { useRecentDocuments, useAllDocuments, useInfiniteAllDocuments } from './useApi';
 export { useTeacherSummary } from './useTeacherSummary';
 export { useGradingQueue } from './useGradingQueue';
 export { useAtRiskStudents } from './useAtRiskStudents';

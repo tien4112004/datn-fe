@@ -16,7 +16,7 @@ export interface AssignmentCollectionRequest {
   size?: number;
   classId?: string;
   sort?: 'asc' | 'desc';
-  search?: string;
+  filter?: string;
   grade?: string;
   subject?: string;
   chapter?: string;

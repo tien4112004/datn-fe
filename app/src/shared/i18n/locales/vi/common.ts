@@ -134,6 +134,10 @@ export default {
       untitled: 'Chưa đặt tên',
       sharedBy: 'Chia sẻ bởi',
     },
+    allResources: {
+      searchPlaceholder: 'Tìm kiếm tất cả tài nguyên...',
+      emptyState: 'Không tìm thấy tài nguyên',
+    },
     actions: 'Hành động',
     renameError: 'Đổi tên thất bại',
     confirm: 'Xác nhận',

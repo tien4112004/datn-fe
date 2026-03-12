@@ -134,6 +134,10 @@ export default {
       untitled: 'Untitled',
       sharedBy: 'Shared by',
     },
+    allResources: {
+      searchPlaceholder: 'Search all resources...',
+      emptyState: 'No resources found',
+    },
     actions: 'Actions',
     renameError: 'Failed to rename',
     confirm: 'Confirm',

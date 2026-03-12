@@ -152,11 +152,21 @@ export default class ClassFeedService implements ClassFeedApiService {
     return Promise.all(uploadPromises);
   }
 
-  async getAllResourcesInClass(classId: string): Promise<LinkedResourceResponse[]> {
+  async getAllResourcesInClass(
+    classId: string,
+    params?: { search?: string; type?: string }
+  ): Promise<LinkedResourceResponse[]> {
     const response = await this.apiClient.get<ApiResponse<LinkedResourceResponse[]>>(
-      `${this.baseUrl}/api/classes/${classId}/resources`
+      `${this.baseUrl}/api/classes/${classId}/resources`,
+      {
+        params: {
+          search: params?.search || undefined,
+          type: params?.type || undefined,
+        },
+      }
     );
 
-    return response.data.data;
+    const data = response.data.data;
+    return Array.isArray(data) ? data : [];
   }
 }

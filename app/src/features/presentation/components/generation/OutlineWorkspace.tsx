@@ -11,36 +11,27 @@ import {
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 import { useState, useCallback, memo } from 'react';
-import { Download, Loader, Plus } from 'lucide-react';
+import { AlertTriangle, Download, Loader, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useWatch } from 'react-hook-form';
 import useOutlineStore from '@/features/presentation/stores/useOutlineStore';
 import { Card } from '@ui/card';
 import { Skeleton } from '@ui/skeleton';
-import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
-import { getAllGrades, getAllSubjects } from '@aiprimary/core';
 
 type OutlineWorkspaceProps = {
   onDownload?: () => Promise<void>;
   totalSlide: number;
+  error?: string | null;
 };
 
-const OutlineWorkspace = memo(({ onDownload, totalSlide }: OutlineWorkspaceProps) => {
+const OutlineWorkspace = memo(({ onDownload, totalSlide, error }: OutlineWorkspaceProps) => {
   const deleteContent = useOutlineStore((state) => state.deleteOutline);
   const contentIds = useOutlineStore((state) => state.outlineIds);
   const addContent = useOutlineStore((state) => state.addOutline);
   const isStreaming = useOutlineStore((state) => state.isStreaming);
   const swap = useOutlineStore((state) => state.swap);
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace.outline' });
+  const { t: tGeneration } = useTranslation('presentation', { keyPrefix: 'generation' });
   const [isDownloading, setIsDownloading] = useState(false);
-  const { control } = usePresentationForm();
-  const grade = useWatch({ control, name: 'grade' });
-  const subject = useWatch({ control, name: 'subject' });
-  const grades = getAllGrades();
-  const subjects = getAllSubjects();
-
-  const gradeName = grade ? grades.find((g) => g.code === grade)?.name : null;
-  const subjectName = subject ? subjects.find((s) => s.code === subject)?.name : null;
 
   const handleDeleteContent = useCallback(
     (id: string) => {
@@ -94,26 +85,6 @@ const OutlineWorkspace = memo(({ onDownload, totalSlide }: OutlineWorkspaceProps
 
   return (
     <Card className="w-3xl flex flex-col gap-6 rounded-xl p-8">
-      {/* Grade and Subject Info */}
-      {(gradeName || subjectName) && (
-        <div className="flex gap-4 border-b pb-4">
-          {gradeName && (
-            <div className="flex flex-col gap-1">
-              <span className="text-muted-foreground text-sm">{t('grade', { defaultValue: 'Grade' })}</span>
-              <span className="font-medium">{gradeName}</span>
-            </div>
-          )}
-          {subjectName && (
-            <div className="flex flex-col gap-1">
-              <span className="text-muted-foreground text-sm">
-                {t('subject', { defaultValue: 'Subject' })}
-              </span>
-              <span className="font-medium">{subjectName}</span>
-            </div>
-          )}
-        </div>
-      )}
-
       {contentIds.length > 0 && (
         <DndContext sensors={sensors} onDragEnd={handleOutlineCardDragEnd}>
           <SortableContext
@@ -127,7 +98,14 @@ const OutlineWorkspace = memo(({ onDownload, totalSlide }: OutlineWorkspaceProps
         </DndContext>
       )}
 
-      {!isStreaming && contentIds.length === 0 && (
+      {!isStreaming && error && contentIds.length === 0 && (
+        <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 p-6 text-center">
+          <AlertTriangle className="h-8 w-8 text-red-500" />
+          <div className="text-sm text-red-600">{tGeneration('contentMismatchError')}</div>
+        </div>
+      )}
+
+      {!isStreaming && !error && contentIds.length === 0 && (
         <div className="text-muted-foreground flex flex-col items-center justify-center text-center">
           <div className="text-lg font-medium">{t('noCards')}</div>
           <div className="text-sm">{t('clickAddToStart')}</div>

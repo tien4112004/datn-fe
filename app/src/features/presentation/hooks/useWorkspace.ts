@@ -59,12 +59,12 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
     if (isGeneratingOutline) fetch();
   }, [isGeneratingOutline, fetch]);
 
-  // Handle streaming errors
+  // Handle streaming errors - error is displayed inline in OutlineWorkspace
   useEffect(() => {
     if (error) {
-      toast.error(t('generation.outlineError'));
+      endStream();
     }
-  }, [error, t]);
+  }, [error, endStream]);
 
   // Form handlers
   const handleRegenerateOutline = useCallback(async () => {
@@ -168,6 +168,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
 
   return {
     isStreaming: isStreamingStore,
+    outlineError: error,
     stopStream,
     clearContent,
 

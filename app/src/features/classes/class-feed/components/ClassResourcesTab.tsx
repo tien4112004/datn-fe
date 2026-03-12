@@ -61,8 +61,8 @@ function groupResources(
     .map(([key, groupItems]) => ({ key, items: groupItems }));
 }
 
-function getGroupLabel(key: string, field: ActiveGroupByField, t: (k: string) => string) {
-  if (!key) return t('groupBy.ungrouped');
+function getGroupLabel(key: string, field: ActiveGroupByField, ungroupedLabel: string) {
+  if (!key) return ungroupedLabel;
   if (field === 'grade') return getGradeName(key);
   if (field === 'subject') return getSubjectName(key);
   return key;
@@ -119,101 +119,6 @@ function ResourceGridCard({ resource }: { resource: LinkedResourceResponse }) {
 
 const columnHelper = createColumnHelper<LinkedResourceResponse>();
 
-function buildColumns(t: (k: string) => string) {
-  return [
-    columnHelper.display({
-      id: 'icon',
-      header: '',
-      cell: (info) => {
-        const Icon = resourceTypeIcons[info.row.original.type];
-        return <Icon className="text-muted-foreground h-4 w-4" />;
-      },
-      size: 40,
-      minSize: 40,
-      maxSize: 40,
-      enableResizing: false,
-      enableSorting: false,
-    }),
-    columnHelper.accessor('title', {
-      header: t('table.title'),
-      cell: (info) => <span className="font-medium">{info.getValue()}</span>,
-      minSize: 200,
-      meta: { isGrow: true },
-      enableSorting: false,
-    }),
-    columnHelper.accessor('type', {
-      header: t('table.type'),
-      cell: (info) => {
-        const type = info.getValue();
-        const Icon = resourceTypeIcons[type];
-        return (
-          <div className="flex items-center gap-1.5">
-            <Icon className="h-3.5 w-3.5 shrink-0" />
-            <span className="text-xs capitalize">{type}</span>
-          </div>
-        );
-      },
-      size: 120,
-      enableSorting: false,
-    }),
-    columnHelper.accessor('grade', {
-      header: t('table.grade'),
-      cell: (info) => {
-        const grade = info.getValue();
-        return grade ? (
-          <Badge variant="outline" className="text-xs">
-            {getGradeName(grade)}
-          </Badge>
-        ) : (
-          <span className="text-muted-foreground text-xs">-</span>
-        );
-      },
-      size: 90,
-      enableSorting: false,
-    }),
-    columnHelper.accessor('subject', {
-      header: t('table.subject'),
-      cell: (info) => {
-        const subject = info.getValue();
-        return subject ? (
-          <Badge variant="outline" className={`text-xs ${getSubjectBadgeClass(subject)}`}>
-            {getSubjectName(subject)}
-          </Badge>
-        ) : (
-          <span className="text-muted-foreground text-xs">-</span>
-        );
-      },
-      size: 120,
-      enableSorting: false,
-    }),
-    columnHelper.accessor('chapter', {
-      header: t('table.chapter'),
-      cell: (info) => <span className="text-muted-foreground text-xs">{info.getValue() ?? '-'}</span>,
-      minSize: 100,
-      meta: { isGrow: true },
-      enableSorting: false,
-    }),
-    columnHelper.display({
-      id: 'open',
-      header: '',
-      cell: (info) => (
-        <Link
-          to={getResourceRoute(info.row.original)}
-          className="flex justify-center"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <ExternalLink className="text-muted-foreground h-4 w-4" />
-        </Link>
-      ),
-      size: 50,
-      minSize: 50,
-      maxSize: 50,
-      enableResizing: false,
-      enableSorting: false,
-    }),
-  ];
-}
-
 function ResourcesTable({
   data,
   navigate,
@@ -222,7 +127,99 @@ function ResourcesTable({
   navigate: ReturnType<typeof useNavigate>;
 }) {
   const { t } = useTranslation('classes', { keyPrefix: 'resources.tab' });
-  const columns = useMemo(() => buildColumns(t), [t]);
+  const columns = useMemo(
+    () => [
+      columnHelper.display({
+        id: 'icon',
+        header: '',
+        cell: (info) => {
+          const Icon = resourceTypeIcons[info.row.original.type];
+          return <Icon className="text-muted-foreground h-4 w-4" />;
+        },
+        size: 40,
+        minSize: 40,
+        maxSize: 40,
+        enableResizing: false,
+        enableSorting: false,
+      }),
+      columnHelper.accessor('title', {
+        header: t('table.title'),
+        cell: (info) => <span className="font-medium">{info.getValue()}</span>,
+        minSize: 200,
+        meta: { isGrow: true },
+        enableSorting: false,
+      }),
+      columnHelper.accessor('type', {
+        header: t('table.type'),
+        cell: (info) => {
+          const type = info.getValue();
+          const Icon = resourceTypeIcons[type];
+          return (
+            <div className="flex items-center gap-1.5">
+              <Icon className="h-3.5 w-3.5 shrink-0" />
+              <span className="text-xs capitalize">{type}</span>
+            </div>
+          );
+        },
+        size: 120,
+        enableSorting: false,
+      }),
+      columnHelper.accessor('grade', {
+        header: t('table.grade'),
+        cell: (info) => {
+          const grade = info.getValue();
+          if (!grade) return <span className="text-muted-foreground text-xs">-</span>;
+          return (
+            <Badge variant="outline" className="text-xs">
+              {getGradeName(grade)}
+            </Badge>
+          );
+        },
+        size: 90,
+        enableSorting: false,
+      }),
+      columnHelper.accessor('subject', {
+        header: t('table.subject'),
+        cell: (info) => {
+          const subject = info.getValue();
+          if (!subject) return <span className="text-muted-foreground text-xs">-</span>;
+          return (
+            <Badge variant="outline" className={`text-xs ${getSubjectBadgeClass(subject)}`}>
+              {getSubjectName(subject)}
+            </Badge>
+          );
+        },
+        size: 120,
+        enableSorting: false,
+      }),
+      columnHelper.accessor('chapter', {
+        header: t('table.chapter'),
+        cell: (info) => <span className="text-muted-foreground text-xs">{info.getValue() ?? '-'}</span>,
+        minSize: 100,
+        meta: { isGrow: true },
+        enableSorting: false,
+      }),
+      columnHelper.display({
+        id: 'open',
+        header: '',
+        cell: (info) => (
+          <Link
+            to={getResourceRoute(info.row.original)}
+            className="flex justify-center"
+            onClick={(e: React.MouseEvent) => e.stopPropagation()}
+          >
+            <ExternalLink className="text-muted-foreground h-4 w-4" />
+          </Link>
+        ),
+        size: 50,
+        minSize: 50,
+        maxSize: 50,
+        enableResizing: false,
+        enableSorting: false,
+      }),
+    ],
+    [t]
+  );
 
   const table = useReactTable({
     data,
@@ -247,19 +244,18 @@ function ResourcesTable({
   );
 }
 
-function ResourceTypeSelect({
-  value,
-  onChange,
-  t,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  t: (k: string) => string;
-}) {
+function ResourceTypeSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const { t } = useTranslation('classes', { keyPrefix: 'resources.tab' });
   return (
     <Select value={value || 'all'} onValueChange={(v) => onChange(v === 'all' ? '' : v)}>
       <SelectTrigger className="w-40 shrink-0">
-        <SelectValue>{!value ? t('types.all') : t(`types.${value}s` as any)}</SelectValue>
+        <SelectValue>
+          {value === 'presentation'
+            ? t('types.presentations')
+            : value === 'mindmap'
+              ? t('types.mindmaps')
+              : t('types.all')}
+        </SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="all">{t('types.all')}</SelectItem>
@@ -366,7 +362,7 @@ export const ClassResourcesTab = ({ classId }: ClassResourcesTabProps) => {
       onGroupByChange={setGroupBy}
       RightComponent={
         <div className="flex items-center gap-2">
-          <ResourceTypeSelect value={typeFilter} onChange={setTypeFilter} t={t} />
+          <ResourceTypeSelect value={typeFilter} onChange={setTypeFilter} />
           <ViewToggle value={viewMode} onValueChange={setViewMode} />
         </div>
       }
@@ -427,7 +423,7 @@ export const ClassResourcesTab = ({ classId }: ClassResourcesTabProps) => {
           {groups!.map(({ key, items }) => (
             <GroupSection
               key={key}
-              label={getGroupLabel(key, groupBy as ActiveGroupByField, tProjects)}
+              label={getGroupLabel(key, groupBy as ActiveGroupByField, tProjects('groupBy.ungrouped'))}
               items={items}
               viewMode={viewMode}
               navigate={navigate}

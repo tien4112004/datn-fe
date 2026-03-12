@@ -125,6 +125,7 @@ export default {
       downloading: 'Đang tải...',
       noCards: 'Không tìm thấy mục dàn ý nào.',
       clickAddToStart: 'Nhấn "Thêm" để bắt đầu tạo dàn ý của bạn.',
+      generationError: 'Tạo dàn ý thất bại',
     },
   },
   customization: {
@@ -219,5 +220,7 @@ export default {
   generation: {
     outlineError: 'Lỗi khi tạo dàn ý. Vui lòng thử lại.',
     presentationError: 'Lỗi khi tạo bản trình bày. Vui lòng thử lại.',
+    contentMismatchError:
+      'Chủ đề bạn nhập không phù hợp với lớp và môn học đã chọn. Vui lòng điều chỉnh chủ đề hoặc thay đổi lớp/môn học và thử lại.',
   },
 };

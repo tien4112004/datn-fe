@@ -13,7 +13,12 @@ interface MatrixCellEditorProps {
   showCurrentCount?: boolean;
 }
 
-export const MatrixCellEditor = ({ cell, onUpdate, onRemove, showCurrentCount = true }: MatrixCellEditorProps) => {
+export const MatrixCellEditor = ({
+  cell,
+  onUpdate,
+  onRemove,
+  showCurrentCount = true,
+}: MatrixCellEditorProps) => {
   const { t } = useTranslation('questions', { keyPrefix: 'matrix.cell' });
   const { t: tBuilder } = useTranslation('questions', { keyPrefix: 'matrix.builder' });
 
@@ -80,7 +85,7 @@ export const MatrixCellEditor = ({ cell, onUpdate, onRemove, showCurrentCount = 
 
           {showCurrentCount && (
             <div
-              className={`overflow-hidden rounded-md border px-1 py-1.5 text-center ${statusColors[status]}`}
+              className={`overflow-hidden rounded-md border px-0.5 py-1.5 text-center ${statusColors[status]}`}
             >
               <div className="text-sm font-bold leading-none">
                 {cell.currentCount}/{cell.requiredCount}

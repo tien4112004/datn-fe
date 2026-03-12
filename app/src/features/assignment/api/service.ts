@@ -1,6 +1,7 @@
 import type { ApiClient, ApiResponse } from '@aiprimary/api';
 import type { Submission } from '@aiprimary/core';
 import { getAllDifficulties, getAllQuestionTypes, createTopicId } from '@aiprimary/core';
+import i18n from '@/shared/i18n';
 import type { AssignmentApiService, AssignmentCollectionRequest } from '../types/service';
 import type {
   Assignment,
@@ -12,6 +13,7 @@ import type {
   GenerateMatrixResponse,
   GenerateAssignmentFromMatrixRequest,
   AssignmentDraft,
+  ExportAssignmentPdfOptions,
 } from '../types';
 import { createMatrixCellsForTopic } from '../utils/matrixHelpers';
 import { mergeApiMatrixIntoCells } from '../utils/matrixConversion';
@@ -103,6 +105,13 @@ export default class AssignmentService implements AssignmentApiService {
     return response.data.data;
   }
 
+  async exportPdf(id: string, options: ExportAssignmentPdfOptions = {}): Promise<Blob> {
+    const response = await this.apiClient.post(`${this.baseUrl}/api/assignments/${id}/export-pdf`, options, {
+      responseType: 'blob',
+    });
+    return response.data;
+  }
+
   async generateAssignmentFromMatrix(request: GenerateAssignmentFromMatrixRequest): Promise<AssignmentDraft> {
     const response = await this.apiClient.post(
       `${this.baseUrl}/api/assignments/generate-from-matrix`,
@@ -115,17 +124,6 @@ export default class AssignmentService implements AssignmentApiService {
 // ============================================================================
 // Frontend Data Transformation Functions
 // ============================================================================
-
-/**
- * Create a default topic for new assignments
- */
-export function createDefaultTopic() {
-  return {
-    id: createTopicId(),
-    name: 'General',
-    description: '',
-  };
-}
 
 /**
  * Transform an Assignment to AssignmentFormInitData for the form
@@ -144,7 +142,7 @@ export function transformAssignmentToFormData(assignment: Assignment): Assignmen
 
   // Fall back to a default topic if empty
   if (topics.length === 0) {
-    topics = [createDefaultTopic()];
+    topics = [];
   }
 
   // Questions are already in nested { question, points } format from the service
@@ -164,7 +162,7 @@ export function transformAssignmentToFormData(assignment: Assignment): Assignmen
   const nonZeroCells = matrixCells.filter((cell) => cell.requiredCount > 0);
 
   return {
-    title: assignment.title || 'Untitled Assignment',
+    title: assignment.title || i18n.t('common:table.assignment.untitled'),
     description: assignment.description || '',
     subject: assignment.subject || '',
     grade: assignment.grade || '',
@@ -179,14 +177,12 @@ export function transformAssignmentToFormData(assignment: Assignment): Assignmen
  * Create empty form data for a new assignment
  */
 export function createEmptyFormData(): AssignmentFormData {
-  const topic = createDefaultTopic();
-
   return {
-    title: 'Untitled Assignment',
+    title: i18n.t('common:table.assignment.untitled'),
     description: '',
     subject: '',
     grade: '',
-    topics: [topic],
+    topics: [],
     contexts: [],
     questions: [],
     matrix: [], // Start with empty matrix, cells will be added on demand

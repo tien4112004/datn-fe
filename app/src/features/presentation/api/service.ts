@@ -90,6 +90,9 @@ export default class PresentationService implements PresentationApiService {
             }
 
             const text = new TextDecoder().decode(value);
+            if (text.startsWith('[GENERATION_ERROR]')) {
+              throw new Error(text.substring('[GENERATION_ERROR]'.length));
+            }
             yield text;
           }
         } catch (error) {

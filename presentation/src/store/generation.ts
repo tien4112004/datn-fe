@@ -57,7 +57,7 @@ export const useGenerationStore = defineStore('generation', {
         this.presentationId = response.presentationId;
 
         if (response.error) {
-          this.error = String(response.error);
+          this.error = response.error instanceof Error ? response.error.message : String(response.error);
           return;
         }
 
@@ -69,8 +69,14 @@ export const useGenerationStore = defineStore('generation', {
             console.log('Received chunk:', chunk);
             hasReceivedData = true;
 
+            // Check for server-side generation error marker
+            const trimmedChunk = chunk.trim();
+            if (trimmedChunk.startsWith('[GENERATION_ERROR]')) {
+              throw new Error(trimmedChunk.substring('[GENERATION_ERROR]'.length));
+            }
+
             try {
-              const slideData = JSON.parse(chunk);
+              const slideData = JSON.parse(trimmedChunk);
               this.addStreamedSlide(slideData, slideIndex);
               console.log('Added streamed slide:', slideData);
               slideIndex++;

@@ -6,6 +6,7 @@ import type {
   UpdateAssignmentRequest,
   GenerateMatrixRequest,
   GenerateAssignmentFromMatrixRequest,
+  ExportAssignmentPdfOptions,
 } from '../types';
 import { getExamplePromptsApiService, type UpdateChapterPayload } from '@/features/projects/api';
 
@@ -33,7 +34,7 @@ export const useAssignmentList = (filters?: AssignmentListFilters) => {
     queryFn: async () => {
       const response = await service.getAssignments({
         classId: filters?.classId,
-        search: filters?.searchText,
+        filter: filters?.searchText,
         page: filters?.page,
         size: filters?.size,
         grade: filters?.grade,
@@ -60,7 +61,7 @@ export const useInfiniteAssignmentList = (
     queryKey: [...assignmentKeys.list(params), 'infinite'],
     queryFn: async ({ pageParam }) => {
       return service.getAssignments({
-        search: params.searchText,
+        filter: params.searchText,
         page: pageParam as number,
         size: PAGE_SIZE,
         grade: params.grade,
@@ -189,6 +190,34 @@ export const useGenerateMatrix = () => {
 
   return useMutation({
     mutationFn: (request: GenerateMatrixRequest) => service.generateMatrix(request),
+  });
+};
+
+/**
+ * Hook to export an assignment as a PDF and trigger a file download
+ * @returns Mutation function that accepts { id, options, filename } and downloads the PDF
+ */
+export const useExportAssignmentPdf = () => {
+  const service = getAssignmentApiService();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      options,
+      filename,
+    }: {
+      id: string;
+      options?: ExportAssignmentPdfOptions;
+      filename?: string;
+    }) => {
+      const blob = await service.exportPdf(id, options);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename ? `${filename}.pdf` : `assignment-${id}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    },
   });
 };
 

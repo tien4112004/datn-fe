@@ -26,6 +26,7 @@ import EditChapterDialog from '@/features/projects/components/EditChapterDialog'
 import { toast } from 'sonner';
 import { ActionButton, ActionContent } from '@/features/presentation/components';
 import { formatDistance } from 'date-fns';
+import { ExportAssignmentPdfDialog } from '@/features/assignment/components/export/ExportAssignmentPdfDialog';
 import { getLocaleDateFns } from '@/shared/i18n/helper';
 import { Badge } from '@ui/badge';
 import { getSubjectName, getGradeName, getSubjectBadgeClass } from '@aiprimary/core';
@@ -61,6 +62,7 @@ const AssignmentTable = () => {
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isEditChapterOpen, setIsEditChapterOpen] = useState(false);
+  const [isExportOpen, setIsExportOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [groupBy, setGroupBy] = useState<GroupByField>('none');
   const isGrouped = groupBy !== 'none';
@@ -295,6 +297,12 @@ const AssignmentTable = () => {
 
   const dialogs = (
     <>
+      <ExportAssignmentPdfDialog
+        open={isExportOpen}
+        onOpenChange={setIsExportOpen}
+        assignmentId={selectedAssignment?.id || ''}
+        assignmentTitle={selectedAssignment?.title || ''}
+      />
       <RenameFileDialog
         isOpen={isRenameOpen}
         onOpenChange={setIsRenameOpen}
@@ -360,6 +368,10 @@ const AssignmentTable = () => {
                 setSelectedAssignment(row.original);
                 setIsEditChapterOpen(true);
               }}
+              onExport={() => {
+                setSelectedAssignment(row.original);
+                setIsExportOpen(true);
+              }}
             />
           )}
         />
@@ -393,6 +405,10 @@ const AssignmentTable = () => {
                 setSelectedAssignment(a);
                 setIsEditChapterOpen(true);
               }}
+              onExport={(a) => {
+                setSelectedAssignment(a);
+                setIsExportOpen(true);
+              }}
             />
           ))}
         </div>
@@ -413,6 +429,7 @@ function AssignmentGroupSection({
   onDelete,
   onRename,
   onEditChapter,
+  onExport,
 }: {
   label: string;
   items: Assignment[];
@@ -421,6 +438,7 @@ function AssignmentGroupSection({
   onDelete: (a: Assignment) => void;
   onRename: (a: Assignment) => void;
   onEditChapter: (a: Assignment) => void;
+  onExport: (a: Assignment) => void;
 }) {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -456,6 +474,7 @@ function AssignmentGroupSection({
               onDelete={() => onDelete(row.original)}
               onRename={() => onRename(row.original)}
               onEditChapter={() => onEditChapter(row.original)}
+              onExport={() => onExport(row.original)}
             />
           )}
         />

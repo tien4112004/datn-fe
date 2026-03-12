@@ -22,6 +22,7 @@ export default {
     rename: 'Rename',
     viewDetails: 'View Details',
     editChapter: 'Edit Grade/Subject/Chapter',
+    exportPdf: 'Export PDF',
     goBack: 'Go Back',
     goHome: 'Go Home',
     tryAgain: 'Try Again',

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Controller, useWatch } from 'react-hook-form';
 import { CircleAlert, Loader2, Paperclip, RotateCcw } from 'lucide-react';
+import { getAllGrades, getAllSubjects } from '@aiprimary/core';
 import { Label } from '@ui/label';
 import OutlineWorkspace from './OutlineWorkspace';
 import { AutosizeTextarea } from '@ui/autosize-textarea';
@@ -42,6 +43,7 @@ const WorkspaceView = ({ onWorkspaceEmpty }: WorkspaceViewProps) => {
     handleRegenerateOutline,
     handleGeneratePresentation,
     isStreaming,
+    outlineError,
     control,
     setValue,
     getValues,
@@ -73,7 +75,7 @@ const WorkspaceView = ({ onWorkspaceEmpty }: WorkspaceViewProps) => {
               onRegenerateOutline={handleRegenerateOutline}
             />
 
-            <OutlineSection />
+            <OutlineSection error={outlineError} />
 
             <CustomizationSection
               control={control}
@@ -105,11 +107,14 @@ interface OutlineFormSectionProps {
 const FILE_ACCEPT = '.pdf,.docx,.doc,.txt,.jpg,.jpeg,.png,.gif,.webp,.bmp';
 
 const OutlineFormSection = memo(({ isFetching, onRegenerateOutline }: OutlineFormSectionProps) => {
-  const { t } = useTranslation('presentation', { keyPrefix: 'createOutline' });
+  const { t, i18n } = useTranslation('presentation', { keyPrefix: 'createOutline' });
   const { models } = useModels(MODEL_TYPES.TEXT);
-  const { control, attachedFiles, setAttachedFiles, isUploadingFiles, uploadFiles } = usePresentationForm();
+  const { control, setValue, attachedFiles, setAttachedFiles, isUploadingFiles, uploadFiles } =
+    usePresentationForm();
   const disabled = useOutlineStore((state) => state.isStreaming);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const grades = getAllGrades();
+  const subjects = getAllSubjects();
 
   return (
     <div className="flex flex-col gap-3">
@@ -257,6 +262,56 @@ const OutlineFormSection = memo(({ isFetching, onRegenerateOutline }: OutlineFor
                 )}
               />
             </div>
+
+            <div className="space-y-2">
+              <Label>{t('grade.label')}</Label>
+              <Controller
+                name="grade"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value || ''}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      setValue('subject', '');
+                    }}
+                    disabled={disabled}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('grade.placeholder')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {grades.map((g) => (
+                        <SelectItem key={g.code} value={g.code}>
+                          {i18n.language === 'vi' ? g.name : g.nameEn}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>{t('subject.label')}</Label>
+              <Controller
+                name="subject"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value || ''} onValueChange={field.onChange} disabled={disabled}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('subject.placeholder')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {subjects.map((s) => (
+                        <SelectItem key={s.code} value={s.code}>
+                          {s.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -273,7 +328,7 @@ const OutlineFormSection = memo(({ isFetching, onRegenerateOutline }: OutlineFor
 
 OutlineFormSection.displayName = 'OutlineFormSection';
 
-const OutlineSection = memo(() => {
+const OutlineSection = memo(({ error }: { error?: string | null }) => {
   const { t } = useTranslation('presentation', { keyPrefix: 'workspace' });
   const { control } = usePresentationForm();
   const slideCount = useWatch({ control, name: 'slideCount' });
@@ -292,7 +347,7 @@ const OutlineSection = memo(() => {
   return (
     <div className="flex flex-col gap-4">
       <div className="scroll-m-20 text-xl font-semibold tracking-tight">{t('outlineSection')}</div>
-      <OutlineWorkspace onDownload={handleDownload} totalSlide={slideCount} />
+      <OutlineWorkspace onDownload={handleDownload} totalSlide={slideCount} error={error} />
     </div>
   );
 });

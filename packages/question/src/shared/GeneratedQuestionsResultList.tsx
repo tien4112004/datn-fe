@@ -24,6 +24,8 @@ interface GeneratedQuestionsResultListProps {
   renderQuestion?: (question: QuestionBankItem, index: number) => ReactNode;
   renderCardHeader?: (question: QuestionBankItem, index: number) => CardHeaderSlots;
   showMetadata?: boolean;
+  showType?: boolean;
+  showDifficulty?: boolean;
   className?: string;
 }
 
@@ -32,6 +34,8 @@ export function GeneratedQuestionsResultList({
   renderQuestion,
   renderCardHeader,
   showMetadata = false,
+  showType = true,
+  showDifficulty = true,
   className,
 }: GeneratedQuestionsResultListProps) {
   const { t } = useTranslation('questions');
@@ -51,18 +55,26 @@ export function GeneratedQuestionsResultList({
 
         return (
           <Card key={question.id || index} className="overflow-hidden">
-            <CardContent className="p-4">
+            <CardContent>
               {/* Header: optional left slot, question number, badges, optional right slot */}
               <div className="mb-2 flex items-center justify-between gap-2">
                 <div className="flex flex-wrap items-center gap-2">
                   {headerSlots?.left}
                   <QuestionNumber number={index + 1} className="h-6 w-6 text-xs" />
-                  <Badge variant="outline" className={cn('text-xs', getQuestionTypeBadgeClass(question.type))}>
-                    {getQuestionTypeName(question.type)}
-                  </Badge>
-                  <DifficultyBadge difficulty={question.difficulty} className="text-xs" />
+                  {showType && (
+                    <Badge
+                      variant="outline"
+                      className={cn('text-xs', getQuestionTypeBadgeClass(question.type))}
+                    >
+                      {getQuestionTypeName(question.type)}
+                    </Badge>
+                  )}
+                  {showDifficulty && <DifficultyBadge difficulty={question.difficulty} className="text-xs" />}
                   {showMetadata && question.subject && (
-                    <Badge variant="outline" className={cn('text-xs', getSubjectBadgeClass(question.subject))}>
+                    <Badge
+                      variant="outline"
+                      className={cn('text-xs', getSubjectBadgeClass(question.subject))}
+                    >
                       {getSubjectName(question.subject)}
                     </Badge>
                   )}

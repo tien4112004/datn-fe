@@ -8,7 +8,6 @@ import type {
   QuestionBankItem,
   ChapterResponse,
   GenerateQuestionsRequest,
-  GenerateQuestionsFromContextRequest,
 } from '../types/questionBank';
 
 // Export the API service hook for direct use
@@ -215,20 +214,6 @@ export const useGenerateQuestions = () => {
 
   return useMutation({
     mutationFn: (request: GenerateQuestionsRequest) => apiService.generateQuestions(request),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: questionBankKeys.lists() });
-    },
-  });
-};
-
-// GENERATE questions from context (reading passage)
-export const useGenerateQuestionsFromContext = () => {
-  const queryClient = useQueryClient();
-  const apiService = useQuestionBankApiService();
-
-  return useMutation({
-    mutationFn: (request: GenerateQuestionsFromContextRequest) =>
-      apiService.generateQuestionsFromContext(request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: questionBankKeys.lists() });
     },

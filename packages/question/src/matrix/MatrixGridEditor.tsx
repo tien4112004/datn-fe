@@ -57,7 +57,7 @@ export const MatrixGridEditor = ({
         <TableHeader>
           {/* First header row: Topic + Difficulties spanning questionTypes */}
           <TableRow>
-            <TableHead rowSpan={2} className="w-[160px] bg-gray-50 font-semibold dark:bg-gray-900">
+            <TableHead rowSpan={2} className="w-[240px] bg-gray-50 font-semibold dark:bg-gray-900">
               {t('tableHeaders.topic')}
             </TableHead>
             {difficulties.map((difficulty) => (
@@ -96,7 +96,7 @@ export const MatrixGridEditor = ({
         <TableBody>
           {topics.map((topic) => (
             <TableRow key={topic.id}>
-              <TableCell className="w-[160px] align-top font-medium">
+              <TableCell className="w-[240px] align-top font-medium">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="whitespace-normal break-words">

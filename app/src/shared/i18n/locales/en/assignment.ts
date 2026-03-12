@@ -284,7 +284,7 @@ export default {
       cancel: 'Exit',
       save: 'Save',
       saveAndExit: 'Save & Exit',
-      fillMatrixGaps: 'Generate Question from Matrix Gap',
+      generateByTopic: 'Generate by Topic',
       saving: 'Saving...',
       tooltips: {
         save: 'Save changes and continue editing',
@@ -295,7 +295,7 @@ export default {
         fromBank: 'Add from question bank',
         addContext: 'Create a new reading passage',
         fromLibrary: 'Import from context library',
-        fillMatrixGaps: 'Detect gaps in the matrix and generate questions to fill them',
+        generateByTopic: 'Generate questions grouped by topic using AI',
         shuffleQuestions: 'Randomly shuffle question order (keeps context questions together)',
         bulkPoints: 'Set points for all questions at once',
         generateFromContext: 'Generate questions based on this reading passage using AI',
@@ -687,56 +687,56 @@ export default {
       },
     },
 
-    fillMatrixGaps: {
-      title: 'Generate Question from Matrix Gap',
-      detecting: 'Detecting gaps...',
-      noGaps: 'No gaps found! Matrix is complete.',
-      gapsFound: 'Found {{count}} gap(s) requiring {{total}} questions',
-      selectGaps: 'Select which gaps to fill',
-      summary: '{{selected}} of {{total}} gaps selected for generation',
-      progress: 'Progress',
-      generatingQuestions: 'Generating questions for {{count}} gap(s)...',
-      success: 'Successfully filled {{count}} gap(s)',
-      status: {
-        allRequirementsMet: 'All matrix requirements have been met',
+    generateByTopic: {
+      title: 'Generate Questions by Topic',
+      description: 'Generate questions for selected topics using AI',
+      topicSelection: {
+        title: 'Select Topics',
+        subtitle: 'Choose which topics to generate questions for',
+        topicGaps: '{{count}} question(s) to fill',
+        totalQuestions: '{{count}} questions across {{topics}} topic(s)',
+        noGaps: 'No gaps found. Matrix is complete.',
+        summary: '{{selected}} of {{total}} topics selected',
       },
-      gapDetails: {
-        title: 'Gap Details',
-        topic: 'Topic',
-        difficulty: 'Difficulty',
-        type: 'Question Type',
-        needed: 'Need {{count}} more questions',
-        available: '{{available}} / {{required}}',
-        selected: 'Selected',
-        select: 'Select',
-      },
-      errors: {
-        noMatrix: 'No matrix exists. Please create a matrix first.',
-        noRequirements: 'Matrix has no requirements. Please add requirements to the matrix.',
-        noGapsSelected: 'Please select at least one gap to fill',
-        modelRequired: 'Please select an AI model before generating questions',
-        detectionFailed: 'Failed to detect gaps',
-        generationFailed: 'Failed to generate questions',
-        missingMetadata: 'Please set the grade and subject before generating questions from matrix gaps.',
-      },
-      actions: {
-        selectAll: 'Select All',
-        clearAll: 'Clear All',
-        backToMatrix: 'Back to Matrix',
-        backToReview: 'Back to Review',
-        generateQuestions: 'Generate Questions',
-        fillMatrixGaps: 'Generate Question from Matrix Gap',
-      },
-      fields: {
+      config: {
+        title: 'Configure Generation',
+        subtitle: 'Select AI model and customize generation',
         model: 'AI Model',
         modelPlaceholder: 'Select AI model',
         additionalPrompt: 'Additional Prompt',
         additionalPromptPlaceholder: 'E.g., Focus on practical applications',
         promptHint: 'Provide additional context to guide question generation',
       },
-      tooltips: {
-        fillMatrixGaps: 'Detect gaps in the matrix and generate questions to fill them',
+      progress: {
+        title: 'Generating Questions',
+        generating: 'Generating questions for {{count}} topic(s)...',
+        progress: 'Progress',
+        generatedCount: '{{count}} question(s) generated',
+        readingPassage: 'Reading Passage',
+        questions: 'questions',
       },
+      actions: {
+        backToMatrix: 'Back to Matrix',
+        backToReview: 'Back to Review',
+        backToConfig: 'Back to Config',
+        next: 'Next',
+        generate: 'Generate Questions',
+        selectAll: 'Select All',
+        clearAll: 'Clear All',
+        selected: 'Selected',
+        select: 'Select',
+        done: 'Done',
+        retry: 'Retry',
+      },
+      errors: {
+        noMatrix: 'No matrix exists. Please create a matrix first.',
+        noRequirements: 'Matrix has no requirements. Please add requirements to the matrix.',
+        missingMetadata: 'Please set the grade and subject before generating questions.',
+        noTopicsSelected: 'Please select at least one topic',
+        modelRequired: 'Please select an AI model before generating questions',
+        generationFailed: 'Failed to generate questions',
+      },
+      success: 'Successfully generated questions for {{count}} topic(s)',
     },
 
     // Matrix view dialog
@@ -1368,9 +1368,47 @@ export default {
     actions: {
       title: 'Actions',
       edit: 'Edit Assignment',
+      export: 'Export PDF',
       viewQuestionsList: 'View Questions List',
       delete: 'Delete Assignment',
     },
+  },
+
+  exportPdf: {
+    title: 'Export as PDF',
+    theme: {
+      label: 'Theme',
+      classic: 'Classic (Times New Roman)',
+      friendly: 'Friendly (Larger NotoSans)',
+      compact: 'Compact (Dense NotoSans)',
+    },
+    header: {
+      label: 'Header',
+      useExamHeader: 'Use exam-style header',
+      departmentName: {
+        placeholder: 'Department/School (e.g. DEPARTMENT OF EDUCATION)',
+      },
+      institutionName: {
+        placeholder: 'Institution (e.g. NGUYEN DU PRIMARY SCHOOL)',
+      },
+      examPeriod: {
+        placeholder: 'Exam period (e.g. MID-TERM I - 2025-2026)',
+      },
+      examDuration: {
+        placeholder: 'Duration (e.g. 40 minutes)',
+      },
+      showChapter: 'Show chapter',
+      showDescription: 'Show description',
+    },
+    content: {
+      label: 'Content',
+      showQuestionPoints: 'Show question points',
+    },
+    exportExam: 'Export Exam',
+    exportAnswer: 'Export Answer Key',
+    answerSuffix: 'Answer Key',
+    exportSuccess: 'PDF exported successfully',
+    exportError: 'Failed to export PDF',
   },
 
   view: {

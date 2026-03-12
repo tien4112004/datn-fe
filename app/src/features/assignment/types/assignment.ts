@@ -27,6 +27,24 @@ export type {
 
 // App-specific types below
 
+export type ExportPdfTheme = 'CLASSIC' | 'FRIENDLY' | 'COMPACT';
+
+export interface ExportAssignmentPdfOptions {
+  theme?: ExportPdfTheme;
+  headerConfig?: {
+    useExamHeader?: boolean;
+    departmentName?: string | null;
+    institutionName?: string | null;
+    examPeriod?: string | null;
+    examDuration?: string | null;
+    showChapter?: boolean;
+    showDescription?: boolean;
+  };
+  showQuestionPoints?: boolean;
+  showAnswerKey?: boolean;
+  showExplanations?: boolean;
+}
+
 // Assignment form data (used by react-hook-form)
 export interface AssignmentFormData {
   title: string;

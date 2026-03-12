@@ -1,5 +1,6 @@
 // Re-export from question-bank feature for backward compatibility
 export * from '@/features/question-bank/hooks/useQuestionBankApi';
+export * from './useGenerationApi';
 export * from './useDirtyFormTracking';
 export {
   useAssignmentList,

@@ -14,6 +14,7 @@ interface AssignmentViewerLayoutProps {
   assignment: Assignment;
   onEdit: () => void;
   onDelete: () => void;
+  onExport: () => void;
   sidebarOpen: boolean;
   onSidebarOpenChange: (open: boolean) => void;
 }
@@ -22,6 +23,7 @@ export const AssignmentViewerLayout = ({
   assignment,
   onEdit,
   onDelete,
+  onExport,
   sidebarOpen,
   onSidebarOpenChange,
 }: AssignmentViewerLayoutProps) => {
@@ -30,7 +32,7 @@ export const AssignmentViewerLayout = ({
 
   const sidebarContent = (
     <div className="space-y-6">
-      <ViewerActionsPanel onEdit={onEdit} onDelete={onDelete} />
+      <ViewerActionsPanel onEdit={onEdit} onDelete={onDelete} onExport={onExport} />
       <QuestionViewNavigator assignment={assignment} />
     </div>
   );

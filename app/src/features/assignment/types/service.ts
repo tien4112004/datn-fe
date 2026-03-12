@@ -8,6 +8,7 @@ import type {
   GenerateMatrixResponse,
   GenerateAssignmentFromMatrixRequest,
   AssignmentDraft,
+  ExportAssignmentPdfOptions,
 } from './assignment';
 
 export interface AssignmentCollectionRequest {
@@ -15,7 +16,7 @@ export interface AssignmentCollectionRequest {
   size?: number;
   classId?: string;
   sort?: 'asc' | 'desc';
-  search?: string;
+  filter?: string;
   grade?: string;
   subject?: string;
   chapter?: string;
@@ -36,4 +37,7 @@ export interface AssignmentApiService {
   // Generation operations
   generateMatrix(request: GenerateMatrixRequest): Promise<GenerateMatrixResponse>;
   generateAssignmentFromMatrix(request: GenerateAssignmentFromMatrixRequest): Promise<AssignmentDraft>;
+
+  // Export operations
+  exportPdf(id: string, options?: ExportAssignmentPdfOptions): Promise<Blob>;
 }

@@ -15,6 +15,7 @@ import { DocumentFilters } from '@/features/projects/components/DocumentFilters'
 import { useAssignmentListStore } from '@/features/assignment/stores/useAssignmentListStore';
 import TablePagination from '@/shared/components/table/TablePagination';
 import { ActionContent } from '@/features/presentation/components';
+import { ExportAssignmentPdfDialog } from '@/features/assignment/components/export/ExportAssignmentPdfDialog';
 import { RenameFileDialog } from '@/shared/components/modals/RenameFileDialog';
 import { DeleteConfirmationDialog } from '@/shared/components/modals/DeleteConfirmationDialog';
 import EditChapterDialog from '@/features/projects/components/EditChapterDialog';
@@ -35,6 +36,7 @@ const AssignmentGrid = () => {
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isEditChapterOpen, setIsEditChapterOpen] = useState(false);
+  const [isExportOpen, setIsExportOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const { search, documentFilters, pagination, setSearch, setDocumentFilters, setPagination } =
     useAssignmentListStore();
@@ -71,10 +73,10 @@ const AssignmentGrid = () => {
 
   const columns = useMemo(
     () => [
-      columnHelper.accessor('id', { header: 'ID' }),
-      columnHelper.accessor('title', { header: 'Title' }),
+      columnHelper.accessor('id', { header: t('assignment.id') }),
+      columnHelper.accessor('title', { header: t('assignment.title') }),
     ],
-    [columnHelper]
+    [columnHelper, t]
   );
 
   const table = useReactTable({
@@ -159,6 +161,10 @@ const AssignmentGrid = () => {
                 onViewDetail={() => navigate(`/assignment/${assignment.id}`)}
                 onDelete={() => handleDelete(assignment)}
                 onRename={() => handleRename(assignment)}
+                onExport={() => {
+                  setSelectedAssignment(assignment);
+                  setIsExportOpen(true);
+                }}
                 onEditChapter={() => {
                   setSelectedAssignment(assignment);
                   setIsEditChapterOpen(true);
@@ -249,6 +255,13 @@ const AssignmentGrid = () => {
           <div className="text-sm text-gray-400">{t('assignment.createFirst')}</div>
         </div>
       )}
+
+      <ExportAssignmentPdfDialog
+        open={isExportOpen}
+        onOpenChange={setIsExportOpen}
+        assignmentId={selectedAssignment?.id || ''}
+        assignmentTitle={selectedAssignment?.title || ''}
+      />
 
       <RenameFileDialog
         isOpen={isRenameOpen}

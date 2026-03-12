@@ -1468,14 +1468,22 @@ export default {
       description: 'Tất cả tài liệu được chia sẻ trong các bài đăng của lớp này',
       loading: 'Đang tải tài liệu...',
       error: 'Không thể tải tài liệu',
+      searchPlaceholder: 'Tìm kiếm tài liệu...',
       empty: {
         title: 'Chưa có tài liệu nào',
         description: 'Tài liệu được chia sẻ trong bài đăng sẽ xuất hiện ở đây',
       },
       types: {
+        all: 'Tất cả',
         presentations: 'Bài trình bày',
         mindmaps: 'Sơ đồ tư duy',
-        assignments: 'Bài tập',
+      },
+      table: {
+        title: 'Tiêu đề',
+        type: 'Loại',
+        grade: 'Khối',
+        subject: 'Môn học',
+        chapter: 'Chương',
       },
     },
   },

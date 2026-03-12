@@ -28,6 +28,9 @@ export interface LinkedResourceResponse {
   permissionLevel: PermissionLevel;
   title?: string; // Enriched by backend (optional for backward compatibility)
   thumbnail?: string; // Enriched by backend (optional, null for assignments)
+  grade?: string; // Enriched by backend
+  subject?: string; // Enriched by backend
+  chapter?: string; // Enriched by backend
 }
 
 /**

@@ -27,5 +27,8 @@ export interface ClassFeedApiService {
   uploadAttachments(files: File[]): Promise<string[]>;
 
   // Resources
-  getAllResourcesInClass(classId: string): Promise<LinkedResourceResponse[]>;
+  getAllResourcesInClass(
+    classId: string,
+    params?: { search?: string; type?: string }
+  ): Promise<LinkedResourceResponse[]>;
 }

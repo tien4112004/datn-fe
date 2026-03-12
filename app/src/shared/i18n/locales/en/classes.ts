@@ -1466,14 +1466,22 @@ export default {
       description: 'All resources shared across posts in this class',
       loading: 'Loading resources...',
       error: 'Failed to load resources',
+      searchPlaceholder: 'Search resources...',
       empty: {
         title: 'No resources yet',
         description: 'Resources shared in posts will appear here',
       },
       types: {
+        all: 'All types',
         presentations: 'Presentations',
         mindmaps: 'Mindmaps',
-        assignments: 'Assignments',
+      },
+      table: {
+        title: 'Title',
+        type: 'Type',
+        grade: 'Grade',
+        subject: 'Subject',
+        chapter: 'Chapter',
       },
     },
   },

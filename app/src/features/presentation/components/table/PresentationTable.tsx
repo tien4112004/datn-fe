@@ -25,7 +25,7 @@ type ActiveGroupByField = Exclude<GroupByField, 'none'>;
 function groupItems<T extends { grade?: string; subject?: string; chapter?: string }>(
   items: T[],
   groupBy: ActiveGroupByField,
-  ungroupedLabel: string
+  _ungroupedLabel: string
 ) {
   const groups = new Map<string, T[]>();
   for (const item of items) {
@@ -385,7 +385,7 @@ function GroupSection({
   items: Presentation[];
   columns: ColumnDef<Presentation, any>[];
   sorting: SortingState;
-  onSortingChange: (s: SortingState) => void;
+  onSortingChange: (updaterOrValue: SortingState | ((old: SortingState) => SortingState)) => void;
   onRowClick: (p: Presentation) => void;
   onDelete: (p: Presentation) => void;
   onRename: (p: Presentation) => void;

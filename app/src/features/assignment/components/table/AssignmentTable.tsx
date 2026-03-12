@@ -6,7 +6,6 @@ import {
   type PaginationState,
   type Updater,
   type ColumnDef,
-  type SortingState,
 } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -40,7 +39,7 @@ type ActiveGroupByField = Exclude<GroupByField, 'none'>;
 function groupItems<T extends { grade?: string; subject?: string; chapter?: string }>(
   items: T[],
   groupBy: ActiveGroupByField,
-  ungroupedLabel: string
+  _ungroupedLabel: string
 ) {
   const groups = new Map<string, T[]>();
   for (const item of items) {

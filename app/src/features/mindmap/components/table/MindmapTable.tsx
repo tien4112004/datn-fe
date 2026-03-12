@@ -39,7 +39,7 @@ type ActiveGroupByField = Exclude<GroupByField, 'none'>;
 function groupItems<T extends { grade?: string; subject?: string; chapter?: string }>(
   items: T[],
   groupBy: ActiveGroupByField,
-  ungroupedLabel: string
+  _ungroupedLabel: string
 ) {
   const groups = new Map<string, T[]>();
   for (const item of items) {
@@ -444,7 +444,7 @@ function MindmapGroupSection({
   items: Mindmap[];
   columns: ColumnDef<Mindmap, any>[];
   sorting: SortingState;
-  onSortingChange: (s: SortingState) => void;
+  onSortingChange: (updaterOrValue: Updater<SortingState>) => void;
   onRowClick: (m: Mindmap) => void;
   onDelete: (m: Mindmap) => void;
   onRename: (m: Mindmap) => void;

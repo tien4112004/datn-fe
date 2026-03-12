@@ -352,7 +352,7 @@ function GroupSection({
   items: DocumentItem[];
   columns: ColumnDef<DocumentItem, any>[];
   sorting: SortingState;
-  onSortingChange: (s: SortingState) => void;
+  onSortingChange: (updaterOrValue: SortingState | ((old: SortingState) => SortingState)) => void;
   onRowClick: (item: DocumentItem) => void;
 }) {
   const [collapsed, setCollapsed] = useState(false);

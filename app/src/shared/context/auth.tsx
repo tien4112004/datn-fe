@@ -25,6 +25,7 @@ const USER_SPECIFIC_STORAGE_KEYS = [
   'presentation-list-store', // Presentation list filters/pagination (Zustand persist)
   'mindmap-list-store', // Mindmap list filters/pagination (Zustand persist)
   'assignment-list-store', // Assignment list filters/pagination (Zustand persist)
+  'pdf-export-header', // PDF export header fields (dept, institution, exam period, duration)
 ];
 
 export function AuthProvider({ children }: { children: ReactNode }) {

@@ -6,6 +6,7 @@ import type {
   UpdateAssignmentRequest,
   GenerateMatrixRequest,
   GenerateAssignmentFromMatrixRequest,
+  ExportAssignmentPdfOptions,
 } from '../types';
 import { getExamplePromptsApiService, type UpdateChapterPayload } from '@/features/projects/api';
 
@@ -156,6 +157,34 @@ export const useGenerateMatrix = () => {
 
   return useMutation({
     mutationFn: (request: GenerateMatrixRequest) => service.generateMatrix(request),
+  });
+};
+
+/**
+ * Hook to export an assignment as a PDF and trigger a file download
+ * @returns Mutation function that accepts { id, options, filename } and downloads the PDF
+ */
+export const useExportAssignmentPdf = () => {
+  const service = getAssignmentApiService();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      options,
+      filename,
+    }: {
+      id: string;
+      options?: ExportAssignmentPdfOptions;
+      filename?: string;
+    }) => {
+      const blob = await service.exportPdf(id, options);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename ? `${filename}.pdf` : `assignment-${id}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    },
   });
 };
 

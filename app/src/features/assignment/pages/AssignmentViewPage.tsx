@@ -18,6 +18,7 @@ import { Menu } from 'lucide-react';
 import { Button } from '@ui/button';
 import { toast } from 'sonner';
 import { AssignmentViewerLayout } from '../components/viewer/AssignmentViewerLayout';
+import { ExportAssignmentPdfDialog } from '../components/export/ExportAssignmentPdfDialog';
 import { useDeleteAssignment } from '../hooks';
 
 export const AssignmentViewPage = () => {
@@ -26,6 +27,7 @@ export const AssignmentViewPage = () => {
   const navigate = useNavigate();
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Get assignment from loader
@@ -68,10 +70,18 @@ export const AssignmentViewPage = () => {
           assignment={assignment}
           onEdit={handleEdit}
           onDelete={() => setIsDeleteDialogOpen(true)}
+          onExport={() => setIsExportDialogOpen(true)}
           sidebarOpen={sidebarOpen}
           onSidebarOpenChange={setSidebarOpen}
         />
       </div>
+
+      <ExportAssignmentPdfDialog
+        open={isExportDialogOpen}
+        onOpenChange={setIsExportDialogOpen}
+        assignmentId={id!}
+        assignmentTitle={assignment.title}
+      />
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>

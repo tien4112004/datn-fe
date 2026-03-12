@@ -1368,9 +1368,47 @@ export default {
     actions: {
       title: 'Actions',
       edit: 'Edit Assignment',
+      export: 'Export PDF',
       viewQuestionsList: 'View Questions List',
       delete: 'Delete Assignment',
     },
+  },
+
+  exportPdf: {
+    title: 'Export as PDF',
+    theme: {
+      label: 'Theme',
+      classic: 'Classic (Times New Roman)',
+      friendly: 'Friendly (Larger NotoSans)',
+      compact: 'Compact (Dense NotoSans)',
+    },
+    header: {
+      label: 'Header',
+      useExamHeader: 'Use exam-style header',
+      departmentName: {
+        placeholder: 'Department/School (e.g. DEPARTMENT OF EDUCATION)',
+      },
+      institutionName: {
+        placeholder: 'Institution (e.g. NGUYEN DU PRIMARY SCHOOL)',
+      },
+      examPeriod: {
+        placeholder: 'Exam period (e.g. MID-TERM I - 2025-2026)',
+      },
+      examDuration: {
+        placeholder: 'Duration (e.g. 40 minutes)',
+      },
+      showChapter: 'Show chapter',
+      showDescription: 'Show description',
+    },
+    content: {
+      label: 'Content',
+      showQuestionPoints: 'Show question points',
+    },
+    exportExam: 'Export Exam',
+    exportAnswer: 'Export Answer Key',
+    answerSuffix: 'Answer Key',
+    exportSuccess: 'PDF exported successfully',
+    exportError: 'Failed to export PDF',
   },
 
   view: {

@@ -1356,9 +1356,47 @@ export default {
     actions: {
       title: 'Hành động',
       edit: 'Chỉnh sửa bài tập',
+      export: 'Xuất PDF',
       viewQuestionsList: 'Xem danh sách câu hỏi',
       delete: 'Xóa bài tập',
     },
+  },
+
+  exportPdf: {
+    title: 'Xuất file PDF',
+    theme: {
+      label: 'Kiểu chữ',
+      classic: 'Cổ điển (Times New Roman)',
+      friendly: 'Thân thiện (NotoSans lớn)',
+      compact: 'Thu gọn (NotoSans nhỏ)',
+    },
+    header: {
+      label: 'Phần đầu',
+      useExamHeader: 'Sử dụng tiêu đề kỳ thi',
+      departmentName: {
+        placeholder: 'Tên sở/trường (VD: SỞ GD&ĐT TP. HỒ CHÍ MINH)',
+      },
+      institutionName: {
+        placeholder: 'Tên cơ sở trực tiếp (VD: TRƯỜNG TIỂU HỌC NGUYỄN DU)',
+      },
+      examPeriod: {
+        placeholder: 'Kỳ thi - Năm học (VD: KIỂM TRA GIỮA KỲ I - 2025-2026)',
+      },
+      examDuration: {
+        placeholder: 'Thời gian (VD: 40 phút)',
+      },
+      showChapter: 'Hiện chương',
+      showDescription: 'Hiện mô tả',
+    },
+    content: {
+      label: 'Nội dung',
+      showQuestionPoints: 'Hiện điểm từng câu',
+    },
+    exportExam: 'Xuất đề thi',
+    exportAnswer: 'Xuất đáp án',
+    answerSuffix: 'Đáp án',
+    exportSuccess: 'Xuất PDF thành công',
+    exportError: 'Không thể xuất PDF',
   },
 
   view: {

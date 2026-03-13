@@ -7,8 +7,7 @@ import type {
   PPTAnimation,
   SlideTemplate,
   PPTTextElement,
-  PageNumberSettings,
-  PageNumberPosition,
+  HeaderFooterSettings,
 } from '@/types/slides';
 import { editSlideContent, editCombinedListContent } from '@/utils/slideLayout/editing/contentEditor';
 
@@ -92,7 +91,7 @@ export interface SlidesState {
   viewportSize: number;
   viewportRatio: number;
   templates: SlideTemplate[];
-  pageNumberSettings: PageNumberSettings;
+  headerFooterSettings: HeaderFooterSettings;
 }
 
 /**
@@ -169,48 +168,67 @@ function syncElementToSchema(slide: Slide, elementId: string, props: Partial<PPT
   }
 }
 
-function getPageNumberPosition(
-  position: PageNumberPosition,
+import { renderHeaderFooterPlaceholder } from '@/utils/headerFooter';
+
+/**
+ * Legacy helper kept for compatibility. Previously, the header/footer rendering
+ * only supported {page} and left other placeholders untouched.
+ */
+function renderPagePlaceholder(template: string, pageNumber: number) {
+  return renderHeaderFooterPlaceholder(template, pageNumber);
+}
+
+function getHeaderFooterPosition(
+  part: 'left' | 'center' | 'right',
+  isHeader: boolean,
   viewportSize: number,
   viewportRatio: number
 ): { left: number; top: number } {
-  const width = 50;
+  const width = (viewportSize - 40) / 3;
   const height = 30;
   const margin = 20;
   const slideWidth = viewportSize;
   const slideHeight = viewportSize * viewportRatio;
 
-  const positions: Record<PageNumberPosition, { left: number; top: number }> = {
-    'top-left': { left: margin, top: margin },
-    'top-center': { left: (slideWidth - width) / 2, top: margin },
-    'top-right': { left: slideWidth - width - margin, top: margin },
-    'bottom-left': { left: margin, top: slideHeight - height - margin },
-    'bottom-center': { left: (slideWidth - width) / 2, top: slideHeight - height - margin },
-    'bottom-right': { left: slideWidth - width - margin, top: slideHeight - height - margin },
+  const baseLeft = {
+    left: margin,
+    center: (slideWidth - width) / 2,
+    right: slideWidth - width - margin,
   };
 
-  return positions[position];
+  const top = isHeader ? margin : slideHeight - height - margin;
+
+  return { left: baseLeft[part], top };
 }
 
-function createPageNumberElement(
+function createHeaderFooterElement(
+  content: string,
+  part: 'left' | 'center' | 'right',
+  isHeader: boolean,
   pageNumber: number,
-  position: PageNumberPosition,
   viewportSize: number,
   viewportRatio: number,
   theme: SlideTheme
-): PPTTextElement {
-  const pos = getPageNumberPosition(position, viewportSize, viewportRatio);
+): PPTTextElement | null {
+  // run the richer placeholder renderer so all tokens are handled consistently
+  const rendered = renderHeaderFooterPlaceholder(content, pageNumber).trim();
+  if (!rendered) return null;
+
+  const pos = getHeaderFooterPosition(part, isHeader, viewportSize, viewportRatio);
+  const align = part === 'left' ? 'left' : part === 'center' ? 'center' : 'right';
+
+  // embed alignment in a paragraph tag to reduce risk of inline-style stripping
   return {
     type: 'text' as const,
     lock: true,
-    id: `el-${Date.now()}-${Math.random()}`,
+    id: `el-hf-${isHeader ? 'header' : 'footer'}-${part}-${Date.now()}-${Math.random()}`,
     left: pos.left,
     top: pos.top,
-    width: 50,
+    width: (viewportSize - 40) / 3,
     height: 30,
-    content: pageNumber.toString(),
+    content: `<p style="text-align: ${align}; margin:0; width:100%; white-space:nowrap">${rendered}</p>`,
     rotate: 0,
-    textType: 'pageNumber' as const,
+    textType: (isHeader ? 'header' : 'footer') as const,
     defaultFontName: theme.fontName,
     defaultColor: theme.fontColor,
     vertical: false,
@@ -269,10 +287,11 @@ export const useSlidesStore = defineStore('slides', {
         containers: {},
       },
     ], // Templates
-    pageNumberSettings: {
+    headerFooterSettings: {
       enabled: false,
-      position: 'bottom-right',
       skipTitlePage: true,
+      header: { left: '', center: '', right: '' },
+      footer: { left: '', center: '', right: '' },
     },
   }),
 
@@ -339,12 +358,14 @@ export const useSlidesStore = defineStore('slides', {
       this.viewportRatio = viewportRatio;
     },
 
-    setPageNumberSettings(settings: Partial<PageNumberSettings>) {
-      this.pageNumberSettings = { ...this.pageNumberSettings, ...settings };
+    setHeaderFooterSettings(settings: Partial<HeaderFooterSettings>) {
+      this.headerFooterSettings = { ...this.headerFooterSettings, ...settings };
+      this.reapplyHeaderFooter();
     },
 
     setSlides(slides: Slide[]) {
       this.slides = slides;
+      this.reapplyHeaderFooter();
     },
 
     setTemplates(templates: SlideTemplate[]) {
@@ -359,57 +380,14 @@ export const useSlidesStore = defineStore('slides', {
 
       const addIndex = this.slides.length === 0 ? 0 : this.slideIndex + 1;
 
-      // Auto-add page numbers if enabled
-      if (this.pageNumberSettings.enabled) {
-        for (let i = 0; i < slides.length; i++) {
-          const slideIndex = addIndex + i;
-          const isTitle = this.pageNumberSettings.skipTitlePage && slideIndex === 0;
-          if (!isTitle) {
-            const hasPageNumber = slides[i].elements.some(
-              (el) => el.type === 'text' && (el as PPTTextElement).textType === 'pageNumber'
-            );
-            if (!hasPageNumber) {
-              const pageNum = this.pageNumberSettings.skipTitlePage ? slideIndex : slideIndex + 1;
-              const el = createPageNumberElement(
-                pageNum,
-                this.pageNumberSettings.position,
-                this.viewportSize,
-                this.viewportRatio,
-                this.theme
-              );
-              slides[i].elements.push(el);
-            }
-          }
-        }
-      }
-
       this.slides.splice(addIndex, 0, ...slides);
       this.slideIndex = addIndex;
+      this.reapplyHeaderFooter();
     },
 
     appendNewSlide(slide: Slide) {
-      // Auto-add page number if enabled
-      if (this.pageNumberSettings.enabled) {
-        const slideIndex = this.slides.length;
-        const isTitle = this.pageNumberSettings.skipTitlePage && slideIndex === 0;
-        if (!isTitle) {
-          const hasPageNumber = slide.elements.some(
-            (el) => el.type === 'text' && (el as PPTTextElement).textType === 'pageNumber'
-          );
-          if (!hasPageNumber) {
-            const pageNum = this.pageNumberSettings.skipTitlePage ? slideIndex : slideIndex + 1;
-            const el = createPageNumberElement(
-              pageNum,
-              this.pageNumberSettings.position,
-              this.viewportSize,
-              this.viewportRatio,
-              this.theme
-            );
-            slide.elements.push(el);
-          }
-        }
-      }
       this.slides.push(slide);
+      this.reapplyHeaderFooter();
     },
 
     updateSlide(props: Partial<Slide>, slideId?: string) {
@@ -453,6 +431,7 @@ export const useSlidesStore = defineStore('slides', {
 
       this.slideIndex = newIndex;
       this.slides = slides;
+      this.reapplyHeaderFooter();
     },
 
     updateSlideIndex(index: number) {
@@ -495,16 +474,16 @@ export const useSlidesStore = defineStore('slides', {
       }
     },
 
-    /**
-     * Reapply page numbers to all slides based on current pageNumberSettings.
-     * Removes existing page number elements and re-adds them if enabled.
-     */
-    reapplyPageNumbers() {
-      const settings = this.pageNumberSettings;
+    reapplyHeaderFooter() {
+      const settings = this.headerFooterSettings;
       this.slides = this.slides.map((slide, index) => {
-        // Remove existing page number elements
+        // Remove existing header/footer elements
         const filteredElements = slide.elements.filter(
-          (el) => !(el.type === 'text' && (el as PPTTextElement).textType === 'pageNumber')
+          (el) =>
+            !(
+              el.type === 'text' &&
+              ((el as PPTTextElement).textType === 'header' || (el as PPTTextElement).textType === 'footer')
+            )
         );
 
         if (!settings.enabled) {
@@ -516,15 +495,37 @@ export const useSlidesStore = defineStore('slides', {
         }
 
         const pageNum = settings.skipTitlePage ? index : index + 1;
-        const el = createPageNumberElement(
-          pageNum,
-          settings.position,
-          this.viewportSize,
-          this.viewportRatio,
-          this.theme
-        );
+        const parts: Array<'left' | 'center' | 'right'> = ['left', 'center', 'right'];
 
-        return { ...slide, elements: [...filteredElements, el] };
+        const headerEls = parts
+          .map((part) =>
+            createHeaderFooterElement(
+              settings.header[part],
+              part,
+              true,
+              pageNum,
+              this.viewportSize,
+              this.viewportRatio,
+              this.theme
+            )
+          )
+          .filter(Boolean) as PPTTextElement[];
+
+        const footerEls = parts
+          .map((part) =>
+            createHeaderFooterElement(
+              settings.footer[part],
+              part,
+              false,
+              pageNum,
+              this.viewportSize,
+              this.viewportRatio,
+              this.theme
+            )
+          )
+          .filter(Boolean) as PPTTextElement[];
+
+        return { ...slide, elements: [...filteredElements, ...headerEls, ...footerEls] };
       });
     },
 

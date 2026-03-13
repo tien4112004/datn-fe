@@ -87,6 +87,22 @@ export default {
           bottomRight: 'Dưới phải',
         },
       },
+
+      // Header / Footer
+      headerFooter: {
+        title: 'Tiêu đề & Chân trang',
+        enabled: 'Bật tiêu đề/chân trang',
+        skipTitlePage: 'Bỏ qua trang tiêu đề',
+        placeholderHint: 'Sử dụng {page} hoặc {datetime} để chèn giá trị động.',
+        insertPlaceholder: 'Chèn placeholder',
+        copyPreview: 'Sao chép xem trước',
+        preview: 'Xem trước',
+        header: 'Tiêu đề',
+        footer: 'Chân trang',
+        left: 'Trái',
+        center: 'Giữa',
+        right: 'Phải',
+      },
     },
 
     // Màu chủ đề

@@ -126,8 +126,8 @@ onMounted(async () => {
     slidesStore.setViewportSize(props.presentation.viewport.width);
   }
 
-  if (props.presentation.pageNumberSettings) {
-    slidesStore.setPageNumberSettings(props.presentation.pageNumberSettings);
+  if (props.presentation.headerFooterSettings) {
+    slidesStore.setHeaderFooterSettings(props.presentation.headerFooterSettings);
   }
 
   // Get pinia instance

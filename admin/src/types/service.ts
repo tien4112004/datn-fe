@@ -152,4 +152,7 @@ export interface AdminApiService extends Service {
   ): Promise<ApiResponse<TokenUsageStats>>;
   getTokenUsageByModel(userId: string): Promise<ApiResponse<TokenUsageStats[]>>;
   getTokenUsageByRequestType(userId: string): Promise<ApiResponse<TokenUsageStats[]>>;
+
+  // Admin Stats
+  getAdminStats(): Promise<ApiResponse<import('./adminStats').AdminStats>>;
 }

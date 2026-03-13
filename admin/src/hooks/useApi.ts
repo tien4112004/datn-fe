@@ -849,6 +849,70 @@ export function useDeleteMatrixTemplate() {
   });
 }
 
+// ============= ADMIN STATS =============
+
+export function useAdminStats() {
+  return useQuery({
+    queryKey: ['admin-stats'],
+    queryFn: () => getAdminApiService().getAdminStats(),
+    staleTime: 60000,
+    gcTime: 300000,
+  });
+}
+
+// ============= DASHBOARD STATS =============
+
+export function useDashboardStats() {
+  const usersQuery = useQuery({
+    queryKey: [...adminKeys.users.list({ page: 1, pageSize: 1 })],
+    queryFn: () => getAdminApiService().getUsers({ page: 1, pageSize: 1 }),
+    staleTime: 60000,
+    gcTime: 300000,
+  });
+
+  const themesQuery = useQuery({
+    queryKey: [...adminKeys.themes.list({ page: 1, pageSize: 1 })],
+    queryFn: () => getAdminApiService().getSlideThemes({ page: 1, pageSize: 1 }),
+    staleTime: 60000,
+    gcTime: 300000,
+  });
+
+  const templatesQuery = useQuery({
+    queryKey: [...adminKeys.templates.list({ page: 1, pageSize: 1 })],
+    queryFn: () => getAdminApiService().getSlideTemplates({ page: 1, pageSize: 1 }),
+    staleTime: 60000,
+    gcTime: 300000,
+  });
+
+  const questionBankQuery = useQuery({
+    queryKey: [...adminKeys.questionBank.list({ page: 1, pageSize: 1 })],
+    queryFn: () => getAdminApiService().getQuestionBank({ page: 1, pageSize: 1 }),
+    staleTime: 60000,
+    gcTime: 300000,
+  });
+
+  const artStylesQuery = useQuery({
+    queryKey: [...adminKeys.artStyles.list({ page: 1, pageSize: 1 })],
+    queryFn: () => getAdminApiService().getArtStyles({ page: 1, pageSize: 1 }),
+    staleTime: 60000,
+    gcTime: 300000,
+  });
+
+  return {
+    totalUsers: usersQuery.data?.pagination?.totalItems ?? null,
+    totalThemes: themesQuery.data?.pagination?.totalItems ?? null,
+    totalTemplates: templatesQuery.data?.pagination?.totalItems ?? null,
+    totalQuestions: questionBankQuery.data?.pagination?.totalItems ?? null,
+    totalArtStyles: artStylesQuery.data?.pagination?.totalItems ?? null,
+    isLoading:
+      usersQuery.isLoading ||
+      themesQuery.isLoading ||
+      templatesQuery.isLoading ||
+      questionBankQuery.isLoading ||
+      artStylesQuery.isLoading,
+  };
+}
+
 // ============= TOKEN USAGE =============
 
 export function useTokenUsageStats(userId: string, filters?: TokenUsageFilterRequest) {

@@ -775,4 +775,11 @@ export default class AdminRealApiService implements AdminApiService {
     );
     return response.data;
   }
+
+  async getAdminStats(): Promise<ApiResponse<import('@/types/adminStats').AdminStats>> {
+    const response = await api.get<ApiResponse<import('@/types/adminStats').AdminStats>>(
+      `${this.baseUrl}/api/admin/stats`
+    );
+    return response.data;
+  }
 }

@@ -68,6 +68,7 @@ export default {
   mobileApp: {
     title: 'Ứng dụng di động',
     subtitle: 'Tải ứng dụng di động để sử dụng trên điện thoại',
+    scanToDownload: 'Quét mã QR để tải về',
   },
   teacherSystemPrompt: {
     title: 'Câu lệnh hệ thống AI',

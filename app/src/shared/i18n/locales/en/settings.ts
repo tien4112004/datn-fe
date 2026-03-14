@@ -68,6 +68,7 @@ export default {
   mobileApp: {
     title: 'Mobile App',
     subtitle: 'Download the mobile app to use on your phone',
+    scanToDownload: 'Scan QR code to download',
   },
   teacherSystemPrompt: {
     title: 'AI System Prompt',

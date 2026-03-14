@@ -63,14 +63,24 @@ function SettingsPage() {
               <p className="text-muted-foreground text-sm">{t('mobileApp.subtitle')}</p>
             </div>
             <div className="lg:col-span-2">
-              <a
-                href="https://play.google.com/store/apps/details?id=com.dndstudios.aielearning"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block transition-opacity hover:opacity-80"
-              >
-                <img src={badgeSrc} alt="Get it on Google Play" className="h-[54px] w-auto" />
-              </a>
+              <div className="flex items-center gap-5">
+                <img
+                  src="/qr-to-app.png"
+                  alt="QR code to download app"
+                  className="h-24 w-24 shrink-0 rounded-md"
+                />
+                <div className="flex flex-col gap-1.5">
+                  <p className="text-muted-foreground text-xs">{t('mobileApp.scanToDownload')}</p>
+                  <a
+                    href="https://play.google.com/store/apps/details?id=com.dndstudios.aielearning"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block transition-opacity hover:opacity-80"
+                  >
+                    <img src={badgeSrc} alt="Get it on Google Play" className="h-10 w-auto" />
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>

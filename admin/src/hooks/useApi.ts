@@ -22,6 +22,7 @@ import type {
 } from '@/types/questionBank';
 import type { Context } from '@/types/context';
 import type { TokenUsageFilterRequest } from '@/types/tokenUsage';
+import type { TransactionQueryParams } from '@/types/transaction';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -856,6 +857,17 @@ export function useAdminStats() {
     queryKey: ['admin-stats'],
     queryFn: () => getAdminApiService().getAdminStats(),
     staleTime: 60000,
+    gcTime: 300000,
+  });
+}
+
+// ============= TRANSACTIONS =============
+
+export function useAdminTransactions(params?: TransactionQueryParams) {
+  return useQuery({
+    queryKey: ['admin-transactions', params],
+    queryFn: () => getAdminApiService().getAdminTransactions(params),
+    staleTime: 30000,
     gcTime: 300000,
   });
 }

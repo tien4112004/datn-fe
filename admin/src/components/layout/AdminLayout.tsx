@@ -17,6 +17,7 @@ import {
   Coins,
   Grid3X3,
   Package,
+  CreditCard,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -33,6 +34,7 @@ const navItems = [
   { to: '/model-config', icon: Settings, label: 'Model Config' },
   { to: '/coin-pricing', icon: Coins, label: 'Coin Pricing' },
   { to: '/coin-packages', icon: Package, label: 'Coin Packages' },
+  { to: '/transactions', icon: CreditCard, label: 'Transactions' },
 ];
 
 export function AdminLayout() {

@@ -47,6 +47,9 @@ const MatrixTemplatesPage = lazy(() =>
 const MatrixTemplateFormPage = lazy(() =>
   import('@/pages/MatrixTemplateFormPage').then((m) => ({ default: m.MatrixTemplateFormPage }))
 );
+const TransactionsPage = lazy(() =>
+  import('@/pages/TransactionsPage').then((m) => ({ default: m.TransactionsPage }))
+);
 
 const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<GlobalSpinner text="Loading..." />}>{children}</Suspense>
@@ -230,6 +233,14 @@ export const router = createBrowserRouter([
         element: (
           <LazyWrapper>
             <MatrixTemplateFormPage />
+          </LazyWrapper>
+        ),
+      },
+      {
+        path: 'transactions',
+        element: (
+          <LazyWrapper>
+            <TransactionsPage />
           </LazyWrapper>
         ),
       },

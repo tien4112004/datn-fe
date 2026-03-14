@@ -14,7 +14,7 @@ import type { User } from '@/types/auth';
 const columnHelper = createColumnHelper<User>();
 
 const ROLE_OPTIONS = [
-  { label: 'All roles', value: '' },
+  { label: 'All roles', value: 'all' },
   { label: 'User', value: 'user' },
   { label: 'Admin', value: 'admin' },
 ];
@@ -24,7 +24,7 @@ export function UsersPage() {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [role, setRole] = useState('');
+  const [role, setRole] = useState('all');
   const pageSize = 10;
 
   // Debounce search query
@@ -41,7 +41,7 @@ export function UsersPage() {
     page,
     pageSize,
     search: debouncedSearch || undefined,
-    role: role || undefined,
+    role: role === 'all' ? undefined : role,
   });
 
   const users: User[] = (data?.data as User[]) || [];

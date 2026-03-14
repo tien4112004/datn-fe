@@ -1,4 +1,4 @@
-export const SLIDE_COUNT_OPTIONS = [1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 36];
+export const SLIDE_COUNT_OPTIONS = [1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40];
 
 export interface LanguageOption {
   value: string;

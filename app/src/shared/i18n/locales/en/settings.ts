@@ -65,6 +65,10 @@ export default {
     title: 'Language',
     subtitle: 'Select your preferred language',
   },
+  mobileApp: {
+    title: 'Mobile App',
+    subtitle: 'Download the mobile app to use on your phone',
+  },
   teacherSystemPrompt: {
     title: 'AI System Prompt',
     subtitle: 'Customize AI behavior for all your generation requests',

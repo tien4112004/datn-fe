@@ -54,6 +54,7 @@ export interface ContextFilterParams extends PaginationParams {
 
 export interface UserQueryParams extends PaginationParams {
   search?: string;
+  role?: string;
 }
 
 export interface SlideThemeParams extends PaginationParams {

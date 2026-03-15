@@ -8,6 +8,7 @@ import type {
   SlideTemplate,
   PPTTextElement,
   HeaderFooterSettings,
+  TextType,
 } from '@/types/slides';
 import { editSlideContent, editCombinedListContent } from '@/utils/slideLayout/editing/contentEditor';
 
@@ -228,7 +229,7 @@ function createHeaderFooterElement(
     height: 30,
     content: `<p style="text-align: ${align}; margin:0; width:100%; white-space:nowrap">${rendered}</p>`,
     rotate: 0,
-    textType: (isHeader ? 'header' : 'footer') as const,
+    textType: (isHeader ? 'header' : 'footer') as TextType | undefined,
     defaultFontName: theme.fontName,
     defaultColor: theme.fontColor,
     vertical: false,

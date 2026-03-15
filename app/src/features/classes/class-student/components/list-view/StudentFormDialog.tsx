@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { FieldError } from 'react-hook-form';
-import { format, parse, isValid } from 'date-fns';
+import { format, parse, isValid as isValidDate } from 'date-fns';
 import {
   Dialog,
   DialogContent,
@@ -212,7 +212,7 @@ export function StudentFormDialog({
               <Label htmlFor="dateOfBirth">{t('form.dateOfBirth')}</Label>
               <DateInput
                 value={dateOfBirth && dateOfBirth.trim()
-                  ? (() => { const d = parse(dateOfBirth, 'yyyy-MM-dd', new Date()); return isValid(d) ? d : undefined; })()
+                  ? (() => { const d = parse(dateOfBirth, 'yyyy-MM-dd', new Date()); return isValidDate(d) ? d : undefined; })()
                   : undefined}
                 onChange={(date) => setValue('dateOfBirth', date ? format(date, 'yyyy-MM-dd') : '')}
                 fromYear={new Date().getFullYear() - 20}

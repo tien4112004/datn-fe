@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { format, parse, isValid } from 'date-fns';
+import type { Locale } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { Input } from '@ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/popover';
@@ -16,6 +17,8 @@ export interface DateInputProps extends Omit<
   toYear?: number;
   minDate?: Date;
   maxDate?: Date;
+  locale?: Locale;
+  modal?: boolean;
 }
 
 const DateInput = React.forwardRef<HTMLInputElement, DateInputProps>(
@@ -24,11 +27,13 @@ const DateInput = React.forwardRef<HTMLInputElement, DateInputProps>(
       className,
       value,
       onChange,
-      fromYear = 1900,
+      fromYear = new Date().getFullYear() - 100,
       toYear = new Date().getFullYear(),
-      minDate = new Date('1900-01-01'),
+      minDate = new Date(new Date().getFullYear() - 100, 0, 1),
       maxDate = new Date(),
       disabled,
+      locale,
+      modal = false,
       ...props
     },
     ref
@@ -57,7 +62,7 @@ const DateInput = React.forwardRef<HTMLInputElement, DateInputProps>(
     };
 
     return (
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <Popover open={isOpen} onOpenChange={setIsOpen} modal={modal}>
         <div className="relative">
           <Input
             type="text"
@@ -94,6 +99,10 @@ const DateInput = React.forwardRef<HTMLInputElement, DateInputProps>(
             captionLayout="dropdown"
             fromYear={fromYear}
             toYear={toYear}
+            locale={locale}
+            classNames={{
+              dropdown: 'absolute bg-popover inset-0 opacity-0 max-h-40 overflow-y-auto',
+            }}
           />
         </PopoverContent>
       </Popover>

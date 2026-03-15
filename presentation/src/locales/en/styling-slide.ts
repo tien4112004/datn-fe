@@ -86,6 +86,22 @@ export default {
           bottomRight: 'Bottom Right',
         },
       },
+
+      // Header / Footer
+      headerFooter: {
+        title: 'Header & Footer',
+        enabled: 'Enable header/footer',
+        skipTitlePage: 'Skip title page',
+        placeholderHint: 'Use {page} or {datetime} in any field to insert dynamic values.',
+        insertPlaceholder: 'Insert placeholder',
+        copyPreview: 'Copy preview',
+        preview: 'Preview',
+        header: 'Header',
+        footer: 'Footer',
+        left: 'Left',
+        center: 'Center',
+        right: 'Right',
+      },
     },
 
     // Theme Colors

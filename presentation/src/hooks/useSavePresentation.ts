@@ -83,7 +83,7 @@ export function useSavePresentation(presentationId: string, pinia: Pinia) {
       theme: overrides?.theme ?? slidesStore.theme,
       isParsed: true,
       viewport,
-      pageNumberSettings: slidesStore.pageNumberSettings,
+      headerFooterSettings: slidesStore.headerFooterSettings,
       // Include thumbnail URL if we're not uploading a new file (i.e., it's already an R2 URL)
       // This prevents the backend from setting thumbnail to null when no file is uploaded
       ...(thumbnailBlob ? {} : { thumbnail: thumbnailToUse }),

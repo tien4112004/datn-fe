@@ -104,12 +104,10 @@
     <Divider />
 
     <div class="row">
-      <Button style="flex: 1" @click="pageNumberSettingVisible = true">
-        {{ $t('styling.slide.design.pageNumbers.title') }}
+      <Button style="flex: 1" @click="headerFooterSettingVisible = true">
+        {{ $t('styling.slide.design.headerFooter.title') }}
       </Button>
     </div>
-
-    <Divider />
 
     <div class="row">
       <Select
@@ -404,8 +402,12 @@
     <ThemeColorsSetting @close="themeColorsSettingVisible = false" />
   </Modal>
 
-  <Modal v-model:visible="pageNumberSettingVisible" :width="400" @closed="pageNumberSettingVisible = false">
-    <PageNumberSetting @close="pageNumberSettingVisible = false" />
+  <Modal
+    v-model:visible="headerFooterSettingVisible"
+    :width="460"
+    @closed="headerFooterSettingVisible = false"
+  >
+    <HeaderFooterSetting @close="headerFooterSettingVisible = false" />
   </Modal>
 </template>
 
@@ -432,7 +434,7 @@ import { useI18n } from 'vue-i18n';
 
 import ThemeStylesExtract from './ThemeStylesExtract.vue';
 import ThemeColorsSetting from './ThemeColorsSetting.vue';
-import PageNumberSetting from './PageNumberSetting.vue';
+import HeaderFooterSetting from './HeaderFooterSetting.vue';
 import SVGLine from '../common/SVGLine.vue';
 import ColorButton from '@/components/ColorButton.vue';
 import ColorListButton from '@/components/ColorListButton.vue';
@@ -463,7 +465,7 @@ const updateTheme = (themeProps: Partial<SlideTheme>) => {
 const moreThemeConfigsVisible = ref(false);
 const themeStylesExtractVisible = ref(false);
 const themeColorsSettingVisible = ref(false);
-const pageNumberSettingVisible = ref(false);
+const headerFooterSettingVisible = ref(false);
 const currentGradientIndex = ref(0);
 const lineStyleOptions = ref<LineStyleType[]>(['solid', 'dashed', 'dotted']);
 

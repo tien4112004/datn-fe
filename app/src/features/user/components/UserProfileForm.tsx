@@ -1,12 +1,15 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { format, parse, isValid } from 'date-fns';
 import { useUserProfile, useUpdateUserProfile } from '../hooks/useApi';
 import { Input } from '@ui/input';
+import { DateInput } from '@ui/date-input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/form';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import LoadingButton from '@/shared/components/common/LoadingButton';
+import { getLocaleDateFns } from '@/shared/i18n/helper';
 
 export const UserProfileForm = () => {
   const { t } = useTranslation('settings');
@@ -82,15 +85,27 @@ export const UserProfileForm = () => {
         <FormField
           control={form.control}
           name="dateOfBirth"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('profile.form.dateOfBirth')}</FormLabel>
-              <FormControl>
-                <Input type="date" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={({ field }) => {
+            const dateValue = field.value
+              ? (() => {
+                  const parsed = parse(field.value, 'yyyy-MM-dd', new Date());
+                  return isValid(parsed) ? parsed : undefined;
+                })()
+              : undefined;
+            return (
+              <FormItem>
+                <FormLabel>{t('profile.form.dateOfBirth')}</FormLabel>
+                <FormControl>
+                  <DateInput
+                    value={dateValue}
+                    onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                    locale={getLocaleDateFns()}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
         <div className="flex gap-3 pt-2">
           <LoadingButton type="submit" loading={isUpdatingProfile} loadingText={t('profile.form.saving')}>

@@ -65,6 +65,11 @@ export default {
     title: 'Ngôn ngữ',
     subtitle: 'Chọn ngôn ngữ ưa thích của bạn',
   },
+  mobileApp: {
+    title: 'Ứng dụng di động',
+    subtitle: 'Tải ứng dụng di động để sử dụng trên điện thoại',
+    scanToDownload: 'Quét mã QR để tải về',
+  },
   teacherSystemPrompt: {
     title: 'Câu lệnh hệ thống AI',
     subtitle: 'Tùy chỉnh hành vi AI cho tất cả các yêu cầu tạo nội dung của bạn',

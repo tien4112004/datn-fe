@@ -211,9 +211,14 @@ export function StudentFormDialog({
             <div className="space-y-2">
               <Label htmlFor="dateOfBirth">{t('form.dateOfBirth')}</Label>
               <DateInput
-                value={dateOfBirth && dateOfBirth.trim()
-                  ? (() => { const d = parse(dateOfBirth, 'yyyy-MM-dd', new Date()); return isValidDate(d) ? d : undefined; })()
-                  : undefined}
+                value={
+                  dateOfBirth && dateOfBirth.trim()
+                    ? (() => {
+                        const d = parse(dateOfBirth, 'yyyy-MM-dd', new Date());
+                        return isValidDate(d) ? d : undefined;
+                      })()
+                    : undefined
+                }
                 onChange={(date) => setValue('dateOfBirth', date ? format(date, 'yyyy-MM-dd') : '')}
                 fromYear={new Date().getFullYear() - 20}
                 toYear={new Date().getFullYear()}

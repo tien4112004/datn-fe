@@ -5,6 +5,7 @@ import { useUsers } from '@/hooks';
 import { Button } from '@ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card';
 import { Input } from '@ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
 import { DataTable, TablePagination } from '@/components/table';
 import { Search } from 'lucide-react';
 import { format } from 'date-fns';
@@ -12,11 +13,18 @@ import type { User } from '@/types/auth';
 
 const columnHelper = createColumnHelper<User>();
 
+const ROLE_OPTIONS = [
+  { label: 'All roles', value: 'all' },
+  { label: 'User', value: 'user' },
+  { label: 'Admin', value: 'admin' },
+];
+
 export function UsersPage() {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [role, setRole] = useState('all');
   const pageSize = 10;
 
   // Debounce search query
@@ -33,6 +41,7 @@ export function UsersPage() {
     page,
     pageSize,
     search: debouncedSearch || undefined,
+    role: role === 'all' ? undefined : role,
   });
 
   const users: User[] = (data?.data as User[]) || [];
@@ -141,6 +150,24 @@ export function UsersPage() {
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
+              <Select
+                value={role}
+                onValueChange={(v) => {
+                  setRole(v);
+                  setPage(1);
+                }}
+              >
+                <SelectTrigger className="w-36">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ROLE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <div className="relative">
                 <Search className="text-muted-foreground absolute left-2.5 top-2.5 h-4 w-4" />
                 <Input

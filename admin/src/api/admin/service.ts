@@ -32,6 +32,7 @@ import type {
 } from '@/types/questionBank';
 import type { AdminApiService } from '@/types/service';
 import type { TokenUsageFilterRequest, TokenUsageStats } from '@/types/tokenUsage';
+import type { Transaction, TransactionQueryParams, PaginatedTransactions } from '@/types/transaction';
 import { exportQuestionsToCSV, parseQuestionBankCSV } from '@/utils/csvParser';
 import { validateQuestionBankCSV } from '@/utils/csvValidation';
 import { API_MODE, type ApiMode, api } from '@aiprimary/api';
@@ -772,6 +773,23 @@ export default class AdminRealApiService implements AdminApiService {
   async getTokenUsageByRequestType(userId: string): Promise<ApiResponse<TokenUsageStats[]>> {
     const response = await api.get<ApiResponse<TokenUsageStats[]>>(
       `${this.baseUrl}/api/admin/token-usage/users/${userId}/by-request-type`
+    );
+    return response.data;
+  }
+
+  async getAdminTransactions(params?: TransactionQueryParams): Promise<ApiResponse<PaginatedTransactions>> {
+    const response = await api.get<ApiResponse<PaginatedTransactions>>(
+      `${this.baseUrl}/api/admin/transactions`,
+      {
+        params,
+      }
+    );
+    return response.data;
+  }
+
+  async getAdminStats(): Promise<ApiResponse<import('@/types/adminStats').AdminStats>> {
+    const response = await api.get<ApiResponse<import('@/types/adminStats').AdminStats>>(
+      `${this.baseUrl}/api/admin/stats`
     );
     return response.data;
   }

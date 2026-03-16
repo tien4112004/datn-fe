@@ -38,6 +38,7 @@ import type {
 } from './coin';
 import type { CoinPackage, CoinPackageCreateRequest, CoinPackageUpdateRequest } from './coinPackage';
 import type { TokenUsageStats, TokenUsageFilterRequest } from './tokenUsage';
+import type { TransactionQueryParams, PaginatedTransactions } from './transaction';
 
 /**
  * Base service interface that all API services must extend
@@ -152,4 +153,10 @@ export interface AdminApiService extends Service {
   ): Promise<ApiResponse<TokenUsageStats>>;
   getTokenUsageByModel(userId: string): Promise<ApiResponse<TokenUsageStats[]>>;
   getTokenUsageByRequestType(userId: string): Promise<ApiResponse<TokenUsageStats[]>>;
+
+  // Transactions
+  getAdminTransactions(params?: TransactionQueryParams): Promise<ApiResponse<PaginatedTransactions>>;
+
+  // Admin Stats
+  getAdminStats(): Promise<ApiResponse<import('./adminStats').AdminStats>>;
 }

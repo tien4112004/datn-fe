@@ -839,6 +839,7 @@ export interface Slide {
 }
 
 /**
+ * TODO: deprecated, to be removed in future versions. Use HeaderFooterSettings instead.
  * Slide theme
  *
  * backgroundColor: page background color
@@ -857,6 +858,21 @@ export type PageNumberPosition =
   | 'bottom-center'
   | 'bottom-right';
 
+export interface HeaderFooterPartSettings {
+  /** Template string for the left / center / right part. Supports `{page}` placeholder. */
+  left: string;
+  center: string;
+  right: string;
+}
+
+export interface HeaderFooterSettings {
+  enabled: boolean;
+  skipTitlePage: boolean;
+  header: HeaderFooterPartSettings;
+  footer: HeaderFooterPartSettings;
+}
+
+// TODO: deprecated, to be removed in future versions. Use HeaderFooterSettings instead.
 export interface PageNumberSettings {
   enabled: boolean;
   position: PageNumberPosition;

@@ -102,9 +102,6 @@ export function usePresentationProcessor(
       slidesStore.setViewportSize(presentation.viewport.width);
       slidesStore.setViewportRatio(presentation.viewport.height / presentation.viewport.width);
     }
-    if (presentation.pageNumberSettings) {
-      slidesStore.setPageNumberSettings(presentation.pageNumberSettings);
-    }
   }
 
   // 1. Initial Logic

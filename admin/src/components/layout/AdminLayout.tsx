@@ -120,7 +120,7 @@ export function AdminLayout() {
           <h1 className="text-lg font-semibold">Admin Panel</h1>
         </header>
 
-        <main className="flex-1 overflow-auto p-6">
+        <main className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden p-6">
           <Outlet />
         </main>
       </div>

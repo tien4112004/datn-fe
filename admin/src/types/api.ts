@@ -106,3 +106,13 @@ export interface MatrixTemplateParams extends PaginationParams {
   subject?: string[];
   grade?: string[];
 }
+
+export interface FinanceQueryParams {
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface FinanceDataPoint {
+  date: string;
+  totalAmount: number;
+}

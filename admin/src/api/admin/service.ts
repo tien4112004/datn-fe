@@ -32,7 +32,7 @@ import type {
 } from '@/types/questionBank';
 import type { AdminApiService } from '@/types/service';
 import type { TokenUsageFilterRequest, TokenUsageStats } from '@/types/tokenUsage';
-import type { TransactionQueryParams, PaginatedTransactions } from '@/types/transaction';
+import type { Transaction, TransactionQueryParams, PaginatedTransactions } from '@/types/transaction';
 import { exportQuestionsToCSV, parseQuestionBankCSV } from '@/utils/csvParser';
 import { validateQuestionBankCSV } from '@/utils/csvValidation';
 import { API_MODE, type ApiMode, api } from '@aiprimary/api';

@@ -6,7 +6,7 @@ import { FileChips } from '@/shared/components/FileAttachmentInput';
 import { Card, CardContent, CardTitle } from '@ui/card';
 import { AutosizeTextarea } from '@ui/autosize-textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select';
-import { useSearchParams } from 'react-router-dom';
+
 import { useRef } from 'react';
 import ExamplePrompts from '@/features/projects/components/ExamplePrompts';
 import { usePresentationForm } from '@/features/presentation/contexts/PresentationFormContext';
@@ -41,7 +41,6 @@ const OutlineCreationView = ({ onCreateOutline }: OutlineCreationViewProps) => {
     uploadFiles,
   } = usePresentationForm();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [searchParams, setSearchParams] = useSearchParams();
   const { models } = useModels(MODEL_TYPES.TEXT);
 
   // Read advanced options state directly from URL

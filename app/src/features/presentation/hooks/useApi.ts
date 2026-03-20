@@ -125,11 +125,11 @@ export const useInfinitePresentations = (enabled = true) => {
         chapter: documentFilters.chapter,
       });
     },
-    initialPageParam: 1,
+    initialPageParam: 0,
     getNextPageParam: (lastPage: any) => {
       const { currentPage, totalPages } = lastPage.pagination ?? {};
       if (currentPage == null || totalPages == null) return undefined;
-      return currentPage < totalPages ? currentPage + 1 : undefined;
+      return currentPage + 1 < totalPages ? currentPage + 1 : undefined;
     },
     staleTime: 30000,
     enabled,

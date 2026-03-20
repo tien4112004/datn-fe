@@ -131,10 +131,17 @@ const AssignmentTable = () => {
     return () => observer.disconnect();
   }, [isGrouped, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const getGroupLabel = (key: string, field: GroupByField) => {
+  const getGroupLabel = (key: string, field: GroupByField, items: Assignment[]) => {
     if (!key) return tProjects('groupBy.ungrouped');
     if (field === 'grade') return getGradeName(key);
     if (field === 'subject') return getSubjectName(key);
+    if (field === 'chapter') {
+      const sample = items[0];
+      const parts: string[] = [];
+      if (sample?.grade && !documentFilters.grade) parts.push(getGradeName(sample.grade));
+      if (sample?.subject && !documentFilters.subject) parts.push(getSubjectName(sample.subject));
+      return parts.length > 0 ? `${parts.join(' · ')} — ${key}` : key;
+    }
     return key;
   };
 
@@ -391,7 +398,7 @@ const AssignmentTable = () => {
           {groups!.map(({ key, items }) => (
             <AssignmentGroupSection
               key={key}
-              label={getGroupLabel(key, groupBy)}
+              label={getGroupLabel(key, groupBy, items)}
               items={items}
               columns={columns as ColumnDef<Assignment, any>[]}
               onRowClick={(a) => navigate(`/assignment/${a.id}`, { replace: false })}

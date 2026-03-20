@@ -120,10 +120,17 @@ const PresentationTable = () => {
     return () => observer.disconnect();
   }, [isGrouped, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const getGroupLabel = (key: string, field: GroupByField) => {
+  const getGroupLabel = (key: string, field: GroupByField, items: Presentation[]) => {
     if (!key) return tProjects('groupBy.ungrouped');
     if (field === 'grade') return getGradeName(key);
     if (field === 'subject') return getSubjectName(key);
+    if (field === 'chapter') {
+      const sample = items[0];
+      const parts: string[] = [];
+      if (sample?.grade && !documentFilters.grade) parts.push(getGradeName(sample.grade));
+      if (sample?.subject && !documentFilters.subject) parts.push(getSubjectName(sample.subject));
+      return parts.length > 0 ? `${parts.join(' · ')} — ${key}` : key;
+    }
     return key;
   };
 
@@ -346,7 +353,7 @@ const PresentationTable = () => {
           {groups!.map(({ key, items }) => (
             <GroupSection
               key={key}
-              label={getGroupLabel(key, groupBy)}
+              label={getGroupLabel(key, groupBy, items)}
               items={items}
               columns={columns as ColumnDef<Presentation, any>[]}
               sorting={sorting}

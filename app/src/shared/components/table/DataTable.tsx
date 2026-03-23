@@ -67,7 +67,7 @@ function DataTable<TData>({
         }}
         className={className}
       >
-        <Table style={{ tableLayout: 'fixed', width: table.getTotalSize() }}>
+        <Table style={{ tableLayout: 'fixed', width: '100%', minWidth: table.getTotalSize() }}>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

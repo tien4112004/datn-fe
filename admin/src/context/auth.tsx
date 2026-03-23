@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User, AuthContextType } from '@/types/auth';
 import { useLogin as useLoginMutation, useProfile, useLogout as useLogoutMutation, authKeys } from '@/hooks';
+import { getAuthApiService } from '@/api/auth';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -9,6 +10,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
 const USER_KEY = 'admin_user';
+
+const isAdminRole = (role?: string) => role?.toLowerCase() === 'admin';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -29,7 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (profileData) {
         // Verify admin role
-        if (profileData.role === 'ADMIN' || profileData.role === 'admin') {
+        if (isAdminRole(profileData.role)) {
           setUser(profileData);
           localStorage.setItem(USER_KEY, JSON.stringify(profileData));
         } else {
@@ -71,12 +74,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Use the login mutation
       await loginMutation.mutateAsync({ email, password });
 
-      // Update hasToken state to enable profile query
-      setHasToken(true);
-
       // Tokens are stored by the mutation hook
-      // Now wait for the profile to be fetched and user state to be updated
-      await queryClient.refetchQueries({ queryKey: authKeys.profile });
+      // Fetch profile and verify admin role before completing login
+      const profile = await queryClient.fetchQuery({
+        queryKey: authKeys.profile,
+        queryFn: () => getAuthApiService().getProfile(),
+      });
+
+      if (!isAdminRole(profile.role)) {
+        clearAuthData();
+        setHasToken(false);
+        throw new Error('Access denied. Admin privileges required.');
+      }
+
+      setUser(profile);
+      localStorage.setItem(USER_KEY, JSON.stringify(profile));
+      setHasToken(true);
 
       toast.success('Login successful');
 

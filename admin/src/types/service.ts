@@ -10,6 +10,8 @@ import type {
   ArtStyleRequest,
   MatrixTemplate,
   MatrixTemplateParams,
+  FinanceQueryParams,
+  FinanceDataPoint,
 } from './api';
 import type {
   SlideTheme,
@@ -156,6 +158,8 @@ export interface AdminApiService extends Service {
 
   // Transactions
   getAdminTransactions(params?: TransactionQueryParams): Promise<ApiResponse<PaginatedTransactions>>;
+  getRevenueByDate(params?: FinanceQueryParams): Promise<ApiResponse<FinanceDataPoint[]>>;
+  getCostByDate(params?: FinanceQueryParams): Promise<ApiResponse<FinanceDataPoint[]>>;
 
   // Admin Stats
   getAdminStats(): Promise<ApiResponse<import('./adminStats').AdminStats>>;

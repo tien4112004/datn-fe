@@ -3,6 +3,8 @@ import type {
   ArtStyleRequest,
   ContextFilterParams,
   FAQPost,
+  FinanceDataPoint,
+  FinanceQueryParams,
   MatrixTemplate,
   MatrixTemplateParams,
   Pagination,
@@ -783,6 +785,22 @@ export default class AdminRealApiService implements AdminApiService {
       {
         params,
       }
+    );
+    return response.data;
+  }
+
+  async getRevenueByDate(params?: FinanceQueryParams): Promise<ApiResponse<FinanceDataPoint[]>> {
+    const response = await api.get<ApiResponse<FinanceDataPoint[]>>(
+      `${this.baseUrl}/api/admin/finance/revenue-by-date`,
+      { params }
+    );
+    return response.data;
+  }
+
+  async getCostByDate(params?: FinanceQueryParams): Promise<ApiResponse<FinanceDataPoint[]>> {
+    const response = await api.get<ApiResponse<FinanceDataPoint[]>>(
+      `${this.baseUrl}/api/admin/finance/cost-by-date`,
+      { params }
     );
     return response.data;
   }

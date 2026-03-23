@@ -25,7 +25,7 @@ export function DataTable<TData>({
   }
 
   return (
-    <div className={className}>
+    <div className={`overflow-x-auto${className ? ` ${className}` : ''}`}>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

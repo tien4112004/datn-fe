@@ -22,19 +22,34 @@ import {
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
-const navItems = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/users', icon: Users, label: 'Users' },
-  { to: '/contexts', icon: BookOpen, label: 'Contexts' },
-  { to: '/slide-themes', icon: Palette, label: 'Slide Themes' },
-  { to: '/slide-templates', icon: LayoutTemplate, label: 'Slide Templates' },
-  { to: '/art-styles', icon: Brush, label: 'Art Styles' },
-  { to: '/question-bank', icon: Library, label: 'Question Bank' },
-  { to: '/matrix-templates', icon: Grid3X3, label: 'Matrix Templates' },
-  { to: '/model-config', icon: Settings, label: 'Model Config' },
-  { to: '/coin-pricing', icon: Coins, label: 'Coin Pricing' },
-  { to: '/coin-packages', icon: Package, label: 'Coin Packages' },
-  { to: '/transactions', icon: CreditCard, label: 'Transactions' },
+const navGroups = [
+  {
+    label: 'System',
+    items: [
+      { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+      { to: '/users', icon: Users, label: 'Users' },
+      { to: '/model-config', icon: Settings, label: 'Model Config' },
+    ],
+  },
+  {
+    label: 'Document',
+    items: [
+      { to: '/contexts', icon: BookOpen, label: 'Contexts' },
+      { to: '/slide-themes', icon: Palette, label: 'Slide Themes' },
+      { to: '/slide-templates', icon: LayoutTemplate, label: 'Slide Templates' },
+      { to: '/art-styles', icon: Brush, label: 'Art Styles' },
+      { to: '/question-bank', icon: Library, label: 'Question Bank' },
+      { to: '/matrix-templates', icon: Grid3X3, label: 'Matrix Templates' },
+    ],
+  },
+  {
+    label: 'Payment',
+    items: [
+      { to: '/coin-pricing', icon: Coins, label: 'Coin Pricing' },
+      { to: '/coin-packages', icon: Package, label: 'Coin Packages' },
+      { to: '/transactions', icon: CreditCard, label: 'Transactions' },
+    ],
+  },
 ];
 
 export function AdminLayout() {
@@ -68,25 +83,34 @@ export function AdminLayout() {
           </Button>
         </div>
 
-        <nav className="flex-1 space-y-1 overflow-y-auto p-4">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === '/dashboard'}
-              onClick={() => setSidebarOpen(false)}
-              className={({ isActive }: { isActive: boolean }) =>
-                cn(
-                  'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                  isActive
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                    : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
-                )
-              }
-            >
-              <item.icon className="h-5 w-5" />
-              {item.label}
-            </NavLink>
+        <nav className="flex-1 overflow-y-auto p-4">
+          {navGroups.map((group) => (
+            <div key={group.label} className="mb-4">
+              <p className="text-sidebar-foreground/50 mb-1 px-3 text-xs font-semibold uppercase tracking-wider">
+                {group.label}
+              </p>
+              <div className="space-y-1">
+                {group.items.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.to === '/dashboard'}
+                    onClick={() => setSidebarOpen(false)}
+                    className={({ isActive }: { isActive: boolean }) =>
+                      cn(
+                        'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                        isActive
+                          ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                          : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
+                      )
+                    }
+                  >
+                    <item.icon className="h-5 w-5" />
+                    {item.label}
+                  </NavLink>
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
 
@@ -120,7 +144,7 @@ export function AdminLayout() {
           <h1 className="text-lg font-semibold">Admin Panel</h1>
         </header>
 
-        <main className="flex-1 overflow-auto p-6">
+        <main className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden p-6">
           <Outlet />
         </main>
       </div>

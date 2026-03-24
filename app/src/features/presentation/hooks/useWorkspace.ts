@@ -169,6 +169,7 @@ export const useWorkspace = ({}: UseWorkspaceProps) => {
   return {
     isStreaming: isStreamingStore,
     outlineError: error,
+    isGeneratingPresentation: draftPresentation.isPending,
     stopStream,
     clearContent,
 

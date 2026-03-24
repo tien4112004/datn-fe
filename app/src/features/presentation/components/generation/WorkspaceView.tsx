@@ -43,6 +43,7 @@ const WorkspaceView = ({ onWorkspaceEmpty }: WorkspaceViewProps) => {
     handleRegenerateOutline,
     handleGeneratePresentation,
     isStreaming,
+    isGeneratingPresentation,
     outlineError,
     control,
     setValue,
@@ -81,7 +82,7 @@ const WorkspaceView = ({ onWorkspaceEmpty }: WorkspaceViewProps) => {
               control={control}
               setValue={setValue}
               onGeneratePresentation={handleGeneratePresentation}
-              isGenerating={isStreaming}
+              isGenerating={isStreaming || isGeneratingPresentation}
             />
           </form>
         </div>

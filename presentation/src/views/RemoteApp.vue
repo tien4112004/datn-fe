@@ -7,16 +7,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  onMounted,
-  onBeforeUnmount,
-  ref,
-  watch,
-  computed,
-  provide,
-  getCurrentInstance,
-  onUnmounted,
-} from 'vue';
+import { onMounted, onBeforeUnmount, ref, watch, computed, provide, getCurrentInstance } from 'vue';
 import { storeToRefs } from 'pinia';
 import {
   useScreenStore,
@@ -65,40 +56,15 @@ const { screening, presenter } = storeToRefs(useScreenStore());
 
 // Track if this is the initial load to avoid marking as dirty
 let isInitialLoad = ref(true);
-let isProcessing = ref(false);
-
-// State tracking
-let loadingTimeoutId: number | null = null;
-let processorResult: any = null;
+const isProcessing = ref(false);
 
 // Save function reference for event bridge (React → Vue)
 let savePresentationFn: (() => Promise<void>) | null = null;
 
-// Computed loading state that combines processing and streaming states
-const isLoading = computed(() => {
-  const loading = isProcessing.value || generationStore.isStreaming;
-
-  // Set timeout when loading starts
-  if (loading && !loadingTimeoutId) {
-    loadingTimeoutId = window.setTimeout(() => {
-      if (isProcessing.value || generationStore.isStreaming) {
-        console.error('[RemoteApp] Processing timeout after 60 seconds');
-
-        // Force stop processing
-        isProcessing.value = false;
-        generationStore.stopStreaming();
-      }
-    }, 60000); // 60 seconds
-  }
-
-  // Clear timeout when loading stops
-  if (!loading && loadingTimeoutId) {
-    window.clearTimeout(loadingTimeoutId);
-    loadingTimeoutId = null;
-  }
-
-  return loading;
-});
+// Pure computed loading state - no side effects
+// Also include props.isGenerating to cover the pre-onMounted window where the
+// processor hasn't started yet but the parent already knows generation is in progress.
+const isLoading = computed(() => isProcessing.value || generationStore.isStreaming || !!props.isGenerating);
 
 // Get pinia instance and setup save presentation at top level
 const instance = getCurrentInstance();
@@ -151,7 +117,15 @@ onMounted(async () => {
     pinia!,
     props.generationRequest
   );
-  isProcessing = processorResult.isProcessing;
+  // Sync the processor's isProcessing into our top-level ref via .value
+  // (variable reassignment would break the computed's reactive dependency)
+  watch(
+    processorResult.isProcessing,
+    (val) => {
+      isProcessing.value = val;
+    },
+    { immediate: true }
+  );
 
   isInitialLoad.value = true;
   containerStore.initialize(props);
@@ -172,13 +146,6 @@ onMounted(async () => {
   snapshotStore.initSnapshotDatabase();
 
   isInitialLoad.value = false;
-});
-
-// Cleanup on unmount
-onUnmounted(() => {
-  if (loadingTimeoutId) {
-    window.clearTimeout(loadingTimeoutId);
-  }
 });
 
 watch(

@@ -1,7 +1,7 @@
 <template>
-  <div class="tw-select-none tw-flex tw-justify-between tw-px-1.5">
+  <div class="tw-select-none tw-flex tw-justify-between tw-gap-2 tw-px-1.5 tw-min-w-0">
     <!-- Breadcrumb Section -->
-    <div class="tw-flex tw-items-center tw-gap-2 tw-max-w-md tw-flex-shrink">
+    <div class="tw-flex tw-items-center tw-gap-2 tw-max-w-md tw-flex-1 tw-min-w-0 tw-flex-shrink">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem class="tw-hidden md:tw-block tw-pl-4">
@@ -29,7 +29,9 @@
             </div>
             <!-- Display Mode -->
             <div v-else class="tw-flex tw-items-center tw-gap-2">
-              <BreadcrumbPage class="tw-max-w-32 sm:tw-max-w-48 tw-truncate">{{ title }}</BreadcrumbPage>
+              <BreadcrumbPage class="tw-max-w-32 sm:tw-max-w-48 tw-truncate" :title="title">{{
+                title
+              }}</BreadcrumbPage>
               <Button
                 v-if="permission === 'edit'"
                 size="small"
@@ -45,8 +47,13 @@
       <!-- Permission Badge -->
     </div>
 
-    <div class="tw-flex tw-items-center tw-gap-2 tw-flex-shrink-0">
-      <PermissionBadge v-if="permission" :permission="permission" class="tw-ml-2" />
+    <div class="tw-flex tw-items-center tw-gap-1 sm:tw-gap-2 tw-flex-shrink-0 tw-pl-1">
+      <PermissionBadge
+        v-if="permission"
+        :permission="permission"
+        :showLabel="false"
+        class="tw-ml-1 sm:tw-ml-2 tw-flex-shrink-0"
+      />
       <Popover
         v-if="!hideStudentOptions"
         trigger="click"
@@ -155,7 +162,7 @@
           </PopoverMenuItem>
         </template>
         <div
-          class="tw-px-2.5 tw-h-8 tw-flex tw-items-center tw-rounded tw-cursor-pointer hover:tw-bg-gray-100"
+          class="tw-px-2 sm:tw-px-2.5 tw-h-8 tw-flex tw-items-center tw-rounded tw-cursor-pointer hover:tw-bg-gray-100"
         >
           <IconHamburgerButton class="tw-text-gray-600" />
         </div>
@@ -165,11 +172,11 @@
           <PresenterMenu @select="handlePresentationMode" />
         </template>
         <Button
-          class="tw-px-2.5 tw-rounded tw-cursor-pointer hover:tw-bg-gray-100"
+          class="tw-px-2 sm:tw-px-2.5 tw-rounded tw-cursor-pointer hover:tw-bg-gray-100"
           v-tooltip="$t('header.presentation.slideShow')"
         >
           <IconPpt />
-          <span class="tw-hidden sm:tw-inline">{{ $t('header.buttons.present') }}</span>
+          <span class="tw-hidden md:tw-inline">{{ $t('header.buttons.present') }}</span>
         </Button>
       </Popover>
 
@@ -178,23 +185,26 @@
           <ShareMenu :presentationId="presentationId" @cancel="handleShareCancel" @share="handleShare" />
         </template>
         <Button
-          class="tw-px-2.5 tw-rounded tw-cursor-pointer hover:tw-bg-gray-100"
+          class="tw-px-2 sm:tw-px-2.5 tw-rounded tw-cursor-pointer hover:tw-bg-gray-100"
           v-tooltip="$t('header.share.sharePresentation')"
         >
           <IconShare class="tw-text-gray-600" />
-          <span class="tw-hidden sm:tw-inline">{{ $t('header.buttons.share') }}</span>
+          <span class="tw-hidden md:tw-inline">{{ $t('header.buttons.share') }}</span>
         </Button>
       </Popover>
       <Button
         v-if="permission === 'comment' || permission === 'edit'"
-        class="tw-px-2.5 tw-rounded tw-cursor-pointer hover:tw-bg-gray-100"
+        class="tw-px-2 sm:tw-px-2.5 tw-rounded tw-cursor-pointer hover:tw-bg-gray-100"
         v-tooltip="$t('header.comments.tooltip')"
         @click="handleOpenComments"
       >
         <IconComments class="tw-text-gray-600" />
-        <span class="tw-hidden sm:tw-inline">{{ $t('header.buttons.comments') }}</span>
+        <span class="tw-hidden md:tw-inline">{{ $t('header.buttons.comments') }}</span>
       </Button>
-      <div class="tw-px-2.5 tw-rounded tw-cursor-pointer hover:tw-bg-gray-100" id="language-switcher">
+      <div
+        class="tw-px-2 sm:tw-px-2.5 tw-rounded tw-cursor-pointer hover:tw-bg-gray-100"
+        id="language-switcher"
+      >
         <LanguageSwitcher />
       </div>
     </div>
@@ -225,7 +235,7 @@ import useScreening from '@/hooks/useScreening';
 import useImport from '@/hooks/useImport';
 import useSlideHandler from '@/hooks/useSlideHandler';
 import useSlideTemplates from '@/hooks/useSlideTemplates';
-import { useUpdatePresentation } from '@/services/presentation/queries';
+import { useUpdatePresentationTitle } from '@/services/presentation/queries';
 import type { DialogForExportTypes } from '@/types/export';
 
 import HotkeyDoc from './HotkeyDoc.vue';
@@ -278,7 +288,7 @@ const { createSlide, getThemes } = useSlideTemplates();
 // Get presentation ID from container store
 const presentationId = computed(() => presentation?.value?.id || (route.params.id as string) || '');
 
-const updatePresentationMutation = useUpdatePresentation();
+const updatePresentationMutation = useUpdatePresentationTitle();
 
 const mainMenuVisible = ref(false);
 const hotkeyDrawerVisible = ref(false);

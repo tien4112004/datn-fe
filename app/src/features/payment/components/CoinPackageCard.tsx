@@ -8,6 +8,7 @@ interface CoinPackageCardProps {
   pkg: CoinPackage;
   selected: boolean;
   onSelect: (pkg: CoinPackage) => void;
+  className?: string;
 }
 
 function formatPackageName(name: string): string {
@@ -15,7 +16,7 @@ function formatPackageName(name: string): string {
   return name.split('_')[0].charAt(0).toUpperCase() + name.split('_')[0].slice(1).toLowerCase();
 }
 
-export function CoinPackageCard({ pkg, selected, onSelect }: CoinPackageCardProps) {
+export function CoinPackageCard({ pkg, selected, onSelect, className }: CoinPackageCardProps) {
   const { t } = useTranslation('payment');
   const hasBonus = pkg.bonus > 0;
 
@@ -25,7 +26,8 @@ export function CoinPackageCard({ pkg, selected, onSelect }: CoinPackageCardProp
       className={cn(
         'hover:border-primary/50 relative flex flex-col items-center gap-3 rounded-lg border-2 p-5 transition-all hover:shadow-sm',
         selected ? 'border-primary bg-primary/5' : 'border-border bg-background',
-        hasBonus && !selected && 'border-primary/30'
+        hasBonus && !selected && 'border-primary/30',
+        className
       )}
       onClick={() => onSelect(pkg)}
     >

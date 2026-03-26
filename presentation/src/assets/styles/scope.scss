@@ -1,26 +1,24 @@
 .vue-remote {
   // height: calc(100vh - var(--header-height, 64px)); // fallback to 64px if custom property not available
   height: calc(100vh - 0.5rem);
+  width: calc(100vw - var(--current-sidebar-width, var(--sidebar-width, 16rem)));
+  max-width: 100vw;
+  min-width: 0;
   margin: 0;
   padding: 0;
   overflow: hidden;
 
   [data-state='collapsed'] & {
-    width: calc(100vw - calc(var(--sidebar-width-lg-icon, 4rem) + 1rem));
+    --current-sidebar-width: calc(var(--sidebar-width-lg-icon, 4rem) + 1rem);
   }
 
   [data-state='expanded'] & {
-    width: calc(100vw - var(--sidebar-width, 16rem));
+    --current-sidebar-width: var(--sidebar-width, 16rem);
   }
 
   // Student view - full width (no sidebar rendered)
   &[data-student-view='true'] {
     width: 100%;
-  }
-
-  @media (max-width: 48rem) {
-    height: calc(100vh);
-    width: 100vw;
   }
 
   .lucide {
@@ -74,6 +72,19 @@
 
   #language-switcher {
     display: none;
+  }
+
+  // Below md breakpoint: React sidebar is hidden (md:flex), mobile header (h-12) is shown.
+  // Use full width and subtract mobile header height.
+  @media (max-width: 767px) {
+    width: 100%;
+    height: calc(100vh - 3rem - 0.5rem);
+    --toolbar-width: 240px;
+  }
+
+  // Small desktop / large tablet: reduce toolbar width so canvas isn't squeezed
+  @media (min-width: 768px) and (max-width: 1200px) {
+    --toolbar-width: 260px;
   }
 }
 

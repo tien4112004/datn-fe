@@ -326,6 +326,36 @@ export function useUpdatePresentation(
   });
 }
 
+interface UpdatePresentationTitleVariables {
+  presentationId: string;
+  data: { title: string };
+}
+
+/**
+ * Hook to update presentation title only (uses PATCH endpoint)
+ *
+ * @example
+ * ```ts
+ * const mutation = useUpdatePresentationTitle();
+ * mutation.mutate({ presentationId: '123', data: { title: 'New Title' } });
+ * ```
+ */
+export function useUpdatePresentationTitle(
+  options?: UseMutationOptions<void, Error, UpdatePresentationTitleVariables>
+): UseMutationReturnType<void, Error, UpdatePresentationTitleVariables, unknown> {
+  const queryClient = useQueryClient();
+  const presentationApi = getPresentationApi();
+
+  return useMutation({
+    mutationFn: ({ presentationId, data }: UpdatePresentationTitleVariables) =>
+      presentationApi.updatePresentationTitle(presentationId, data.title),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.presentations.detail(variables.presentationId) });
+    },
+    ...options,
+  });
+}
+
 interface SharePresentationVariables {
   presentationId: string;
   request: SharePresentationRequest;

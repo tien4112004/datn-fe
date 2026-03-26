@@ -1,8 +1,12 @@
 <template>
   <div v-if="isLoading" class="permission-badge-loading"></div>
-  <div v-else :class="['permission-badge', badgeClass]">
+  <div
+    v-else
+    :class="['permission-badge', badgeClass, { 'permission-badge-icon-only': !showLabel }]"
+    :title="badgeLabel"
+  >
     <component :is="badgeIcon" class="permission-badge-icon" />
-    <span>{{ badgeLabel }}</span>
+    <span v-if="showLabel">{{ badgeLabel }}</span>
   </div>
 </template>
 
@@ -14,10 +18,12 @@ import { Eye, MessageSquare, Edit } from 'lucide-vue-next';
 interface Props {
   permission: 'read' | 'comment' | 'edit';
   isLoading?: boolean;
+  showLabel?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   isLoading: false,
+  showLabel: true,
 });
 
 const { t } = useI18n();
@@ -47,6 +53,10 @@ const badgeIcon = computed(() => badgeConfig[props.permission].icon);
 .permission-badge-icon {
   width: 12px;
   height: 12px;
+}
+
+.permission-badge-icon-only {
+  padding: 4px;
 }
 
 .permission-badge-read {

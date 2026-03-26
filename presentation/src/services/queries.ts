@@ -20,6 +20,7 @@ export {
   useUpsertSlide,
   useUpsertSlides,
   useUpdatePresentation,
+  useUpdatePresentationTitle,
   useSharePresentation,
   useRevokeAccess,
   useSetPublicAccess,

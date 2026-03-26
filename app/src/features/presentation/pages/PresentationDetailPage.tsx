@@ -177,7 +177,7 @@ const DetailPage = () => {
         onStay={handleStay}
         onLeave={handleProceed}
       />
-      <SmallScreenDialog />
+      <SmallScreenDialog minWidth={640} minHeight={500} />
 
       {/* Duplicate Confirmation Dialog - Triggered by Vue app */}
       <AlertDialog open={duplicateDialogOpen} onOpenChange={setDuplicateDialogOpen}>

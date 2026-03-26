@@ -220,7 +220,7 @@ export default class PresentationService implements PresentationApiService {
   }
 
   async updatePresentationTitle(id: string, name: string): Promise<any | null> {
-    await this.apiClient.patch(`/api/presentations/${id}/title`, {
+    await this.apiClient.patch(`${this.baseUrl}/api/presentations/${id}/title`, {
       title: name,
     });
     // API returns 204 No Content

@@ -31,6 +31,7 @@ export interface IPresentationApi {
   ): Promise<{ stream: AsyncIterable<string> } & PresentationGenerationStartResponse>;
   getPresentation(id: string): Promise<Presentation>;
   updatePresentation(id: string, data: Partial<Presentation> | FormData): Promise<Presentation>;
+  updatePresentationTitle(id: string, title: string): Promise<void>;
   getSlideThemes(params?: { page?: number; limit?: number }): Promise<{
     data: SlideTheme[];
     total: number;

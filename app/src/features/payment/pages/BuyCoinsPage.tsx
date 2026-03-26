@@ -78,11 +78,12 @@ export function BuyCoinsPage() {
           ) : packagesError ? (
             <p className="text-destructive text-sm">{t('buyCoins.loadError')}</p>
           ) : (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+            <div className="flex gap-4">
               {(coinPackages ?? []).map((pkg) => (
                 <CoinPackageCard
                   key={pkg.id}
                   pkg={pkg}
+                  className="flex-grow"
                   selected={selectedPkg?.id === pkg.id}
                   onSelect={setSelectedPkg}
                 />

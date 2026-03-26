@@ -201,6 +201,15 @@ export class PresentationApiService implements ApiService {
   }
 
   /**
+   * Update presentation title only
+   */
+  async updatePresentationTitle(id: string, title: string): Promise<void> {
+    await this.apiClient.patch(`${this.baseUrl}/api/presentations/${id}/title`, {
+      title,
+    });
+  }
+
+  /**
    * Get slide themes from the backend with pagination support
    */
   async getSlideThemes(params?: { page?: number; limit?: number }): Promise<{

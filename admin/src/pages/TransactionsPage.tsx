@@ -167,8 +167,6 @@ export function TransactionsPage() {
     }));
   }, [revenueData, costData, costUnavailable, groupBy, dateRange]);
 
-  const chartWidth = chartData.length * 60;
-
   const handleGroupByChange = (value: GroupBy) => {
     setGroupBy(value);
     setDateRange(getDefaultDateRange(value));

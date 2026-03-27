@@ -153,7 +153,7 @@ const PresentationTable = () => {
         cell: (info) => {
           const presentation = info.row.original;
           return (
-            <div className="aspect-video w-full overflow-hidden">
+            <div className="relative aspect-video w-full overflow-hidden">
               <ThumbnailWrapperV2 presentation={presentation} size={'auto'} visible={true} />
             </div>
           );

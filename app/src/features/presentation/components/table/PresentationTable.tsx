@@ -152,7 +152,11 @@ const PresentationTable = () => {
         header: t('presentation.thumbnail'),
         cell: (info) => {
           const presentation = info.row.original;
-          return <ThumbnailWrapperV2 presentation={presentation} size={'auto'} visible={true} />;
+          return (
+            <div className="relative aspect-video w-full overflow-hidden">
+              <ThumbnailWrapperV2 presentation={presentation} size={'auto'} visible={true} />
+            </div>
+          );
         },
         size: 150,
         minSize: 150,

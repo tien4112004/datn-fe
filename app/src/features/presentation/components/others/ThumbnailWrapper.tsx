@@ -61,7 +61,7 @@ const ThumbnailWrapperV2 = ({ presentation, size, visible = true }: ThumbnailWra
       <img
         src={presentation.thumbnail}
         alt="Presentation Thumbnail"
-        className="aspect-video h-full w-full object-cover"
+        className="absolute inset-0 h-full w-full object-cover"
         style={size !== 'auto' ? { width: `${size}px` } : { width: '100%' }}
       />
     );

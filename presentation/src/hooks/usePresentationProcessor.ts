@@ -301,7 +301,7 @@ export function usePresentationProcessor(
     }
 
     // Set loading state
-    const loadingUrl = 'https://storage.huy-devops.site/ai-primary/loading.gif';
+    const loadingUrl = 'https://elearning-storage.llms.vn/ai-primary/loading.gif';
     await updateSlideImageInStore(slideId, imageElement.id, loadingUrl);
 
     try {
@@ -404,7 +404,7 @@ export function usePresentationProcessor(
     const element = slide.elements[elementIndex] as PPTImageElement;
 
     // Use inline SVG error icon (no external fetch needed, avoids CORS issues)
-    const errorIconSrc = 'https://storage.huy-devops.site/ai-primary/error.svg';
+    const errorIconSrc = 'https://elearning-storage.llms.vn/ai-primary/error.svg';
 
     // Recalculate clip for error icon so it matches TemplatePanel (which calls convertToSlide with current src)
     const updatedElement = {

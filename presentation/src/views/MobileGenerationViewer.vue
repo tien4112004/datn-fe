@@ -138,7 +138,7 @@ async function handleImageGeneration(
   }
 
   // Set loading state
-  updateSlideImage(slideId, imageElement.id, 'https://storage.huy-devops.site/ai-primary/loading.gif');
+  updateSlideImage(slideId, imageElement.id, 'https://elearning-storage.llms.vn/ai-primary/loading.gif');
   console.log('[MobileGenerationViewer] Set loading state for image:', {
     slideId,
     elementId: imageElement.id,
@@ -214,7 +214,7 @@ function updateSlideImage(slideId: string, elementId: string, url: string) {
 
 // Update slide image with error placeholder
 function updateSlideImageError(slideId: string, elementId: string) {
-  updateSlideImage(slideId, elementId, 'https://storage.huy-devops.site/ai-primary/error.svg');
+  updateSlideImage(slideId, elementId, 'https://elearning-storage.llms.vn/ai-primary/error.svg');
 }
 
 // Start streaming generation

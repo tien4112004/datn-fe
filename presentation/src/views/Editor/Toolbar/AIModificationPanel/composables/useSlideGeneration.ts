@@ -42,7 +42,7 @@ export function useSlideGeneration() {
     documentId?: string
   ) {
     // Set loading state
-    const loadingUrl = 'https://storage.huy-devops.site/ai-primary/loading.gif';
+    const loadingUrl = 'https://elearning-storage.llms.vn/ai-primary/loading.gif';
     updateSlideImage(slideId, imageElement.id, loadingUrl);
 
     try {
@@ -73,7 +73,7 @@ export function useSlideGeneration() {
       }
     } catch (error) {
       console.error('Image generation failed for slide:', slideId, error);
-      const errorUrl = 'https://storage.huy-devops.site/ai-primary/error.svg';
+      const errorUrl = 'https://elearning-storage.llms.vn/ai-primary/error.svg';
       updateSlideImage(slideId, imageElement.id, errorUrl);
     }
   }

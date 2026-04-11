@@ -26,7 +26,7 @@ const NotFoundPage = () => {
             <Button onClick={() => navigate(-1)} variant="outline">
               {t('glossary:actions.goBack')}
             </Button>
-            <Button onClick={() => navigate('/')}>{t('glossary:actions.goHome')}</Button>
+            <Button onClick={() => navigate('/dashboard')}>{t('glossary:actions.goHome')}</Button>
           </div>
         </div>
       </div>

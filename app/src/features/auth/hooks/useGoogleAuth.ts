@@ -28,7 +28,7 @@ export const useGoogleLogin = () => {
         // Update both localStorage and React context state
         setUserData(mockUser);
         setUser(mockUser);
-        navigate('/', { replace: true });
+        navigate('/student', { replace: true });
         return;
       }
 

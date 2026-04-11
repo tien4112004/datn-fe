@@ -8,6 +8,12 @@ import { FeedTab } from '@/features/classes/class-feed';
 
 const router = createBrowserRouter([
   {
+    path: '/',
+    lazy: async () => ({
+      Component: (await import('@/features/landing/pages/LandingPage')).LandingPage,
+    }),
+  },
+  {
     path: '/login',
     lazy: async () => ({
       Component: (await import('@/features/auth/pages/LoginPage')).LoginPage,
@@ -66,7 +72,7 @@ const router = createBrowserRouter([
     errorElement: <NavLayoutErrorBoundary />,
     children: [
       {
-        index: true,
+        path: 'dashboard',
         lazy: async () => ({
           Component: (await import('@/features/dashboard')).default.DashboardPage,
         }),

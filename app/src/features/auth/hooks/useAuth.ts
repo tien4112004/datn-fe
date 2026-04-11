@@ -56,7 +56,7 @@ export const useLogin = () => {
       } else if (user.role === 'student') {
         navigate('/student');
       } else {
-        navigate('/');
+        navigate('/dashboard');
       }
     },
   });

@@ -17,7 +17,7 @@ export function PaymentCancelPage() {
             <Link to="/payment">{t('cancel.backToCoins')}</Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link to="/">{t('cancel.goToDashboard')}</Link>
+            <Link to="/dashboard">{t('cancel.goToDashboard')}</Link>
           </Button>
         </div>
       </div>

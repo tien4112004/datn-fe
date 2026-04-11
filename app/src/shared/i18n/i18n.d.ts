@@ -21,6 +21,7 @@ import questions from './locales/en/questions';
 import dashboard from './locales/en/dashboard';
 import notifications from './locales/en/notifications';
 import payment from './locales/en/payment';
+import landing from './locales/en/landing';
 
 /**
  * Resources type based on English translations
@@ -43,6 +44,7 @@ export interface Resources {
   dashboard: typeof dashboard;
   notifications: typeof notifications;
   payment: typeof payment;
+  landing: typeof landing;
 }
 
 declare module 'i18next' {

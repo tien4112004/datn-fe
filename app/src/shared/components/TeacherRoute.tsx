@@ -17,7 +17,7 @@ export function TeacherRoute({ children }: TeacherRouteProps) {
 
   if (!isAuthenticated) {
     const from = location.pathname + location.search;
-    return <Navigate to="/login" replace state={{ requireAuth: from !== '/', from }} />;
+    return <Navigate to="/login" replace state={{ requireAuth: true, from }} />;
   }
 
   // Redirect students to student dashboard

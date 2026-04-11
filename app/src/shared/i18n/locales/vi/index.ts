@@ -20,6 +20,7 @@ import { questionsVi as questions } from '@aiprimary/question';
 import dashboard from './dashboard';
 import notifications from './notifications';
 import payment from './payment';
+import landing from './landing';
 
 export default {
   common,
@@ -40,4 +41,5 @@ export default {
   dashboard,
   notifications,
   payment,
+  landing,
 };

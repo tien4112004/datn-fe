@@ -41,7 +41,7 @@ export default function GoogleCallbackPage() {
           if (user.role === 'student') {
             navigate('/student', { replace: true });
           } else {
-            navigate('/', { replace: true });
+            navigate('/dashboard', { replace: true });
           }
         } else {
           throw new Error('No user data received');

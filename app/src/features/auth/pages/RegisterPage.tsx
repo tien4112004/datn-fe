@@ -19,7 +19,7 @@ export function RegisterPage() {
       if (user.role === 'student') {
         navigate('/student');
       } else {
-        navigate('/');
+        navigate('/dashboard');
       }
     }
   }, [isAuthenticated, user, navigate]);

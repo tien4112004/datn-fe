@@ -22,7 +22,7 @@ export function StudentRoute({ children }: StudentRouteProps) {
 
   // Redirect non-students to main dashboard
   if (user?.role !== 'student') {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   // Render student content

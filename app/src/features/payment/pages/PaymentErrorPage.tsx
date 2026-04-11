@@ -17,7 +17,7 @@ export function PaymentErrorPage() {
             <Link to="/payment">{t('error.tryAgain')}</Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link to="/">{t('error.goToDashboard')}</Link>
+            <Link to="/dashboard">{t('error.goToDashboard')}</Link>
           </Button>
         </div>
       </div>

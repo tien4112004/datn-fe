@@ -18,7 +18,7 @@ const ErrorPage = ({ error, errorInfo, resetError, errorId, showDetails = false 
   const { t } = useTranslation('errors', { keyPrefix: 'boundary' });
 
   const goHome = () => {
-    window.location.href = '/';
+    window.location.href = '/dashboard';
   };
 
   const handleReset = () => {

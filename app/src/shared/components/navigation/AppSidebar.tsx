@@ -28,7 +28,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     navMain: [
       {
         title: t('home'),
-        url: '/',
+        url: '/dashboard',
         icon: Home,
       },
       {

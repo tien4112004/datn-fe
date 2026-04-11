@@ -87,7 +87,7 @@ export function NavLayoutErrorBoundary() {
   }
 
   const resetError = () => {
-    navigate('/');
+    navigate('/dashboard');
   };
 
   const errorId = `router_error_${Date.now()}`;

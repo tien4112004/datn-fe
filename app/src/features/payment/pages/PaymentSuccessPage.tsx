@@ -67,7 +67,7 @@ export function PaymentSuccessPage() {
         {/* Actions */}
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Button asChild>
-            <Link to="/">{t('success.goToDashboard')}</Link>
+            <Link to="/dashboard">{t('success.goToDashboard')}</Link>
           </Button>
           <Button variant="outline" asChild>
             <Link to="/payment">{t('success.buyMore')}</Link>

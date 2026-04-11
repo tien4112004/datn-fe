@@ -26,7 +26,7 @@ export function LoginPage() {
       } else if (user.role === 'student') {
         navigate('/student');
       } else {
-        navigate('/');
+        navigate('/dashboard');
       }
     }
   }, [isAuthenticated, user, navigate, from]);

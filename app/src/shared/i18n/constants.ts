@@ -17,6 +17,7 @@ export const I18N_NAMESPACES = {
   ASSIGNMENT: 'assignment',
   COMMENTS: 'comments',
   DASHBOARD: 'dashboard',
+  LANDING: 'landing',
 } as const;
 
 export type I18nNamespace = (typeof I18N_NAMESPACES)[keyof typeof I18N_NAMESPACES];

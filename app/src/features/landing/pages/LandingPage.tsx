@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { motion } from 'motion/react';
 import gsap from 'gsap';
 import { Button } from '@ui/button';
@@ -76,7 +77,7 @@ function useCountUp(target: number, duration = 2000) {
           requestAnimationFrame(animate);
         }
       },
-      { threshold: 0.3 },
+      { threshold: 0.3 }
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -150,13 +151,25 @@ export function LandingPage() {
             className="bg-background border-border/40 border-t px-6 pb-6 pt-4 md:hidden"
           >
             <nav className="flex flex-col gap-4">
-              <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-foreground text-sm font-medium">
+              <a
+                href="#features"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-foreground text-sm font-medium"
+              >
                 {t('nav.features')}
               </a>
-              <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="text-foreground text-sm font-medium">
+              <a
+                href="#how-it-works"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-foreground text-sm font-medium"
+              >
                 {t('nav.howItWorks')}
               </a>
-              <a href="#team" onClick={() => setMobileMenuOpen(false)} className="text-foreground text-sm font-medium">
+              <a
+                href="#team"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-foreground text-sm font-medium"
+              >
                 {t('nav.team')}
               </a>
               <div className="border-border/40 flex gap-3 border-t pt-4">
@@ -252,9 +265,7 @@ export function LandingPage() {
               <span className="text-primary mb-4 block text-[12px] font-bold uppercase tracking-[0.2em]">
                 {t('howItWorks.eyebrow')}
               </span>
-              <h2 className="text-4xl font-extrabold tracking-tight md:text-5xl">
-                {t('howItWorks.title')}
-              </h2>
+              <h2 className="text-4xl font-extrabold tracking-tight md:text-5xl">{t('howItWorks.title')}</h2>
             </motion.div>
 
             <div className="relative grid grid-cols-1 gap-8 md:grid-cols-3">
@@ -267,9 +278,9 @@ export function LandingPage() {
               </div>
 
               {[
-                { key: 'create', icon: Lightbulb, step: '01' },
-                { key: 'teach', icon: BookOpen, step: '02' },
-                { key: 'learn', icon: GraduationCap, step: '03' },
+                { key: 'create' as const, icon: Lightbulb, step: '01' },
+                { key: 'teach' as const, icon: BookOpen, step: '02' },
+                { key: 'learn' as const, icon: GraduationCap, step: '03' },
               ].map((item, i) => (
                 <motion.div
                   key={item.key}
@@ -311,44 +322,52 @@ export function LandingPage() {
               <h2 className="mb-6 text-4xl font-extrabold tracking-tight md:text-5xl">
                 {t('features.title')}
               </h2>
-              <p className="text-muted-foreground text-lg leading-relaxed">
-                {t('features.subtitle')}
-              </p>
+              <p className="text-muted-foreground text-lg leading-relaxed">{t('features.subtitle')}</p>
             </motion.div>
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-6">
               {/* AI Presentations (wide — 4 cols) */}
               <BentoTile eyebrowIcon={FileText} className="flex flex-col overflow-hidden md:col-span-4">
                 <h3 className="text-xl font-bold">{t('features.items.presentation.title')}</h3>
-                <p className="text-muted-foreground mt-1 text-sm">{t('features.items.presentation.description')}</p>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  {t('features.items.presentation.description')}
+                </p>
                 <SlidesPreviewStitch />
               </BentoTile>
 
               {/* Interactive Mindmaps (2 cols) */}
               <BentoTile eyebrowIcon={GitBranch} className="flex flex-col md:col-span-2">
                 <h3 className="text-xl font-bold">{t('features.items.mindmap.title')}</h3>
-                <p className="text-muted-foreground mt-1 text-sm">{t('features.items.mindmap.description')}</p>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  {t('features.items.mindmap.description')}
+                </p>
                 <MindmapPreviewStitch />
               </BentoTile>
 
               {/* Question Bank (2 cols) */}
               <BentoTile eyebrowIcon={HelpCircle} className="flex flex-col md:col-span-2">
                 <h3 className="text-xl font-bold">{t('features.items.questionBank.title')}</h3>
-                <p className="text-muted-foreground mt-1 text-sm">{t('features.items.questionBank.description')}</p>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  {t('features.items.questionBank.description')}
+                </p>
                 <QuizPreviewStitch />
               </BentoTile>
 
               {/* Assignments & Grading (2 cols) */}
               <BentoTile eyebrowIcon={ClipboardList} className="flex flex-col md:col-span-2">
                 <h3 className="text-xl font-bold">{t('features.items.assignment.title')}</h3>
-                <p className="text-muted-foreground mt-1 text-sm">{t('features.items.assignment.description')}</p>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  {t('features.items.assignment.description')}
+                </p>
                 <AssignmentPreviewStitch />
               </BentoTile>
 
               {/* Classes & Feed (2 cols) */}
               <BentoTile eyebrowIcon={Users} className="flex flex-col md:col-span-2">
                 <h3 className="text-xl font-bold">{t('features.items.classes.title')}</h3>
-                <p className="text-muted-foreground mt-1 text-sm">{t('features.items.classes.description')}</p>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  {t('features.items.classes.description')}
+                </p>
                 <ClassesPreviewStitch />
               </BentoTile>
 
@@ -459,7 +478,12 @@ export function LandingPage() {
                   {t('cta.subtitle')}
                 </p>
                 <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                  <Button asChild size="lg" variant="secondary" className="group rounded-xl px-8 font-semibold">
+                  <Button
+                    asChild
+                    size="lg"
+                    variant="secondary"
+                    className="group rounded-xl px-8 font-semibold"
+                  >
                     <Link to="/register">
                       {t('cta.primary')}
                       <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -499,17 +523,26 @@ export function LandingPage() {
               <p className="text-sm font-semibold">{t('footer.product')}</p>
               <ul className="mt-3 space-y-2.5">
                 <li>
-                  <a href="#features" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                  <a
+                    href="#features"
+                    className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                  >
                     {t('footer.features')}
                   </a>
                 </li>
                 <li>
-                  <a href="#how-it-works" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                  <a
+                    href="#how-it-works"
+                    className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                  >
                     {t('footer.howItWorks')}
                   </a>
                 </li>
                 <li>
-                  <a href="#team" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                  <a
+                    href="#team"
+                    className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                  >
                     {t('footer.team')}
                   </a>
                 </li>
@@ -519,12 +552,18 @@ export function LandingPage() {
               <p className="text-sm font-semibold">{t('footer.resources')}</p>
               <ul className="mt-3 space-y-2.5">
                 <li>
-                  <Link to="/register" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                  <Link
+                    to="/register"
+                    className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                  >
                     {t('footer.getStarted')}
                   </Link>
                 </li>
                 <li>
-                  <Link to="/login" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                  <Link
+                    to="/login"
+                    className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                  >
                     {t('footer.signIn')}
                   </Link>
                 </li>
@@ -549,7 +588,7 @@ function StatCard({
 }: {
   stat: (typeof STATS)[number];
   index: number;
-  t: (key: string) => string;
+  t: TFunction<'landing'>;
 }) {
   const { count, ref } = useCountUp(stat.value);
   const Icon = stat.icon;
@@ -563,9 +602,7 @@ function StatCard({
       transition={{ duration: 0.4, delay: index * 0.08 }}
       className="text-center"
     >
-      <p className="text-primary text-3xl font-bold tracking-tight sm:text-4xl">
-        {formatCount(count)}+
-      </p>
+      <p className="text-primary text-3xl font-bold tracking-tight sm:text-4xl">{formatCount(count)}+</p>
       <div className="text-muted-foreground mt-2 flex items-center justify-center gap-1.5 text-sm">
         <Icon className="h-4 w-4" />
         <span>{t(`stats.${stat.key}`)}</span>
@@ -665,13 +702,25 @@ function HeroMockup() {
       tl.to(panelPresRef.current, { opacity: 1, scale: 1, y: 0, duration: 0.7, ease: 'back.out(1.3)' });
 
       // Course structure (middle) flies in
-      tl.to(panelCourseRef.current, { opacity: 1, scale: 1, x: 0, duration: 0.6, ease: 'back.out(1.4)' }, '-=0.35');
+      tl.to(
+        panelCourseRef.current,
+        { opacity: 1, scale: 1, x: 0, duration: 0.6, ease: 'back.out(1.4)' },
+        '-=0.35'
+      );
 
       // Quiz (front) flies in
-      tl.to(panelQuizRef.current, { opacity: 1, scale: 1, y: 0, x: 0, duration: 0.6, ease: 'back.out(1.4)' }, '-=0.3');
+      tl.to(
+        panelQuizRef.current,
+        { opacity: 1, scale: 1, y: 0, x: 0, duration: 0.6, ease: 'back.out(1.4)' },
+        '-=0.3'
+      );
 
       // Quiz options stream in
-      tl.to([qOpt0.current, qOpt1.current, qOpt2.current], { opacity: 1, x: 0, duration: 0.3, stagger: 0.07 }, '-=0.2');
+      tl.to(
+        [qOpt0.current, qOpt1.current, qOpt2.current],
+        { opacity: 1, x: 0, duration: 0.3, stagger: 0.07 },
+        '-=0.2'
+      );
 
       // AI badge pops
       tl.to(aiBadgeRef.current, { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: 'back.out(3)' }, '-=0.15');
@@ -683,11 +732,25 @@ function HeroMockup() {
           { y: 6, dur: 3.0 },
           { y: 7, dur: 3.3 },
         ][i];
-        gsap.to(el, { y: `+=${params.y}`, duration: params.dur, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 2.5 + i * 0.4 });
+        gsap.to(el, {
+          y: `+=${params.y}`,
+          duration: params.dur,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+          delay: 2.5 + i * 0.4,
+        });
       });
 
       // AI badge gentle bounce
-      gsap.to(aiBadgeRef.current, { y: -6, duration: 1.5, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 3 });
+      gsap.to(aiBadgeRef.current, {
+        y: -6,
+        duration: 1.5,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        delay: 3,
+      });
     }, wrapRef);
 
     return () => ctx.revert();
@@ -773,9 +836,7 @@ function HeroMockup() {
                 }
               >
                 <span>{opt.label}</span>
-                {opt.correct && (
-                  <Check className="text-primary h-3.5 w-3.5" />
-                )}
+                {opt.correct && <Check className="text-primary h-3.5 w-3.5" />}
               </div>
             ))}
           </div>
@@ -859,7 +920,12 @@ function MindmapPreviewStitch() {
     <div className="mt-auto flex items-center justify-center pt-6">
       <svg viewBox="0 0 160 120" width="160" height="120" className="text-primary/20">
         <circle cx="80" cy="60" r="15" fill="currentColor" />
-        <path d="M80 45 L80 20 M80 75 L80 100 M65 60 L30 60 M95 60 L130 60" stroke="currentColor" strokeWidth="2" fill="none" />
+        <path
+          d="M80 45 L80 20 M80 75 L80 100 M65 60 L30 60 M95 60 L130 60"
+          stroke="currentColor"
+          strokeWidth="2"
+          fill="none"
+        />
         <circle cx="80" cy="15" r="8" fill="currentColor" fillOpacity="0.5" />
         <circle cx="80" cy="105" r="8" fill="currentColor" fillOpacity="0.5" />
         <circle cx="25" cy="60" r="8" fill="currentColor" fillOpacity="0.5" />
@@ -902,7 +968,7 @@ function AssignmentPreviewStitch() {
             <div className="bg-muted h-3 w-24 rounded" />
             <div className="bg-muted/60 h-2 w-16 rounded" />
           </div>
-          <span className="rounded bg-destructive/10 px-2 py-0.5 text-[10px] font-bold uppercase text-destructive">
+          <span className="bg-destructive/10 text-destructive rounded px-2 py-0.5 text-[10px] font-bold uppercase">
             DUE TODAY
           </span>
         </div>
@@ -924,9 +990,14 @@ function ClassesPreviewStitch() {
   return (
     <div className="mt-auto space-y-2 pt-4">
       {classes.map((cls) => (
-        <div key={cls.code} className="hover:bg-primary/5 flex items-center justify-between rounded-lg p-2 transition-colors">
+        <div
+          key={cls.code}
+          className="hover:bg-primary/5 flex items-center justify-between rounded-lg p-2 transition-colors"
+        >
           <div className="flex items-center gap-3">
-            <div className={`${cls.bg} ${cls.text} flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold`}>
+            <div
+              className={`${cls.bg} ${cls.text} flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold`}
+            >
               {cls.code}
             </div>
             <span className="text-sm font-medium">{cls.name}</span>

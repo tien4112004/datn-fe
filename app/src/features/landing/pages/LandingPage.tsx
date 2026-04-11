@@ -124,7 +124,6 @@ export function LandingPage() {
               {t('nav.team')}
             </a>
           </nav>
-
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
             <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">

@@ -1,6 +1,7 @@
 export default {
   nav: {
     features: 'Features',
+    howItWorks: 'How it works',
     team: 'Team',
     signIn: 'Sign in',
     getStarted: 'Get started',
@@ -13,9 +14,38 @@ export default {
     primaryCta: 'Get started',
     secondaryCta: 'Sign in',
   },
+  stats: {
+    presentations: 'Presentations generated',
+    mindmaps: 'Mindmaps created',
+    questions: 'Questions in bank',
+    classes: 'Active classes',
+  },
+  howItWorks: {
+    eyebrow: 'How it works',
+    title: 'From idea to classroom in three steps',
+    steps: {
+      create: {
+        title: 'Create',
+        description:
+          'Use AI to generate presentations, mindmaps, quizzes, and images from any topic in seconds.',
+      },
+      teach: {
+        title: 'Teach',
+        description:
+          'Organize your classes, share materials, post announcements, and assign work — all from one dashboard.',
+      },
+      learn: {
+        title: 'Learn',
+        description:
+          'Students access materials, submit assignments, and track their own progress in a clean, focused interface.',
+      },
+    },
+  },
   features: {
     eyebrow: 'Features',
     title: 'Everything you need to run a modern classroom',
+    subtitle:
+      'A comprehensive toolkit that empowers educators with AI-driven content creation and streamlined class management.',
     items: {
       presentation: {
         title: 'AI presentations',
@@ -51,12 +81,21 @@ export default {
     developer: 'Developer',
   },
   cta: {
-    title: 'Ready to get started?',
-    subtitle: 'Sign in to your account or create a new one.',
+    title: 'Ready to transform your classroom?',
+    subtitle:
+      'Join educators who are already using AI to create better learning experiences. Get started in seconds.',
     primary: 'Create an account',
     secondary: 'Sign in',
   },
   footer: {
-    copyright: '© {{year}} E-Learning. A graduation project.',
+    product: 'Product',
+    resources: 'Resources',
+    features: 'Features',
+    howItWorks: 'How it works',
+    team: 'Our team',
+    getStarted: 'Get started',
+    signIn: 'Sign in',
+    copyright: '\u00a9 {{year}} E-Learning. A graduation project.',
+    tagline: 'AI-powered learning platform for modern classrooms.',
   },
 };
